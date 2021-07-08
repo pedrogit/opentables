@@ -1,0 +1,25 @@
+{
+  "name": "opentables",
+  "version": "1.0.0",
+  "description": "Restful server of configurable and formattable tables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedrogit/opentables.git"
+  },
+  "keywords": [
+    "restful",
+    "tables",
+    "database"
+  ],
+  "author": "Pierre Racine",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/pedrogit/opentables/issues"
+  },
+  "homepage": "https://github.com/pedrogit/opentables#readme"
+}
