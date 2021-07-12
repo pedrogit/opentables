@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "debug": "nodemon --nolazy --debug-brk=5858 index.js"
+
   },
   "repository": {
     "type": "git",
@@ -21,5 +23,12 @@
   "bugs": {
     "url": "https://github.com/pedrogit/opentables/issues"
   },
-  "homepage": "https://github.com/pedrogit/opentables#readme"
+  "homepage": "https://github.com/pedrogit/opentables#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.13.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.10"
+  }
 }
