@@ -4,10 +4,9 @@
   "description": "Restful server of configurable and formattable tables",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
+    "test": "mocha",
+    "start": "nodemon *.js",
     "debug": "nodemon --nolazy --debug-brk=5858 index.js"
-
   },
   "repository": {
     "type": "git",
@@ -29,6 +28,9 @@
     "mongoose": "^5.13.2"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "mocha": "^9.0.2",
     "nodemon": "^2.0.10"
   }
 }
