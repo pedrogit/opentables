@@ -5,49 +5,47 @@ const listModel = require('./listmodel');
 const Errors = require('./errors');
 
 const staticLists = [
-    {
-       'ownerid': 'pierre',
-       'rperm': '@all',
-       'wperm': '@owner'
-    },
-    {  
-        'ownerid': 'pierre',
-        'rperm': '@all',
-        'wperm': '@owner'
-    },
-    {
-        'ownerid': 'nat',
-        'rperm': '@all',
-        'wperm': '@owner'
-    }
+  {
+     'ownerid': 'pierre',
+     'rperm': '@all',
+     'wperm': '@owner'
+  },
+  {  
+     'ownerid': 'pierre',
+     'rperm': '@all',
+     'wperm': '@owner'
+  },
+  {
+     'ownerid': 'nat',
+     'rperm': '@all',
+     'wperm': '@owner'
+  }
 ];
 
 listRouter.get('', function(req, res, next){
-    listModel.find({})
-             .then(function(lists){
-                       res.send(lists);
-                   }).catch(next);
+  listModel.find({})
+           .then(function(lists){
+                   res.send(lists);
+                 }).catch(next);
 });
 
 listRouter.get('/:ownerid', function(req, res, next) {
-    listModel.findById(req.params.ownerid)
-             .then(function(list){
-                    if (!list) {
-                        console.log('GET lists/:ownerid error');
+  listModel.findById(req.params.ownerid)
+           .then(function(list){
+                   if (!list) {
                         next(new Errors.NotFound('No such list (' + res.req.params.ownerid + ')...'));
-                    }
-                    else {
-                        console.log('GET lists/:ownerid OK');
-                        res.send(list);
-                    };
-                   }).catch(next);
+                   }
+                   else {
+                     res.send(list);
+                   };
+                 }).catch(next);
 });
 
 listRouter.post('', function(req, res, next){
-    listModel.create(req.body)
-             .then(function(list){
-                       res.send(list);
-                   }).catch(next);
+  listModel.create(req.body)
+           .then(function(list){
+                   res.send(list);
+                 }).catch(next);
 });
 
 module.exports = listRouter;
