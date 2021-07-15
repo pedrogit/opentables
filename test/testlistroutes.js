@@ -11,27 +11,75 @@ chai.should();
 var lists = [];
 
 describe('List API', () => {
-  // post list
-  /*
-  describe('POST /api/lists', () => {
-    const newList = {
-      'ownerid': '60edb91162a87a2c383d5cf5',
-      'rperm': '@owner',
-      'wperm': '@owner'
-    };
+  // DELETE all
+  describe('DELETE /api/lists', () => {
+    it('It should delete all the lists', (done) => {
+      chai.request(server)
+          .delete('/api/lists')
+          .end((err, response) => {
+             response.should.have.status(200);
+             response.body.should.have.all.keys('deletedCount');
+             done();
+           });
+     });
+  });
 
-    it('It should post a new list', (done) => {
+  describe('POST /api/lists', () => {
+
+    it('It should post a new list as an object', (done) => {
       chai.request(server)
           .post('/api/lists')
-          .send(newList)
+          .send({
+            'ownerid': '60edb91162a87a2c383d5cf2',
+            'rperm': '@owner1',
+            'wperm': '@owner1'
+          })
           .end((err, response) => {
              response.should.have.status(201);
              response.body.should.be.a('array');
-             response.body.length.should.be.eq(3);
+             response.body.length.should.be.eq(1);
+             done();
+          });
+    });
+
+    it('It should post a new list as an array', (done) => {
+      chai.request(server)
+          .post('/api/lists')
+          .send([{
+            'ownerid': '60edb91162a87a2c383d5cf2',
+            'rperm': '@owner1',
+            'wperm': '@owner1'
+          }])
+          .end((err, response) => {
+             response.should.have.status(201);
+             response.body.should.be.a('array');
+             response.body.length.should.be.eq(1);
+             done();
+          });
+    });
+    
+    it('It should post two new lists', (done) => {
+      chai.request(server)
+          .post('/api/lists')
+          .send([{
+            'ownerid': '60edb91162a87a2c383d5cf4',
+            'rperm': '@owner1',
+            'wperm': '@owner1'
+          },
+          {
+            'ownerid': '60edb91162a87a2c383d5cf5',
+            'rperm': '@owner2',
+            'wperm': '@owner2'
+          }])
+          .end((err, response) => {
+             response.should.have.status(201);
+             response.body.should.be.a('array');
+             response.body.length.should.be.eq(2);
+             done();
           });
     });
   });
-*/
+
   // get all lists
   describe('GET /api/lists', () => {
     it('It should get all the lists', (done) => {
@@ -53,8 +101,8 @@ describe('List API', () => {
              response.should.have.status(404);
              done();
            });
+    });
   });
-});
 
     // get list by id
 
@@ -66,6 +114,4 @@ describe('List API', () => {
     // delete all lists
 
     // delete list by id
-
-
-})
+});

@@ -42,9 +42,27 @@ listRouter.get('/:ownerid', function(req, res, next) {
 });
 
 listRouter.post('', function(req, res, next){
+  console.log(req.body);
   listModel.create(req.body)
            .then(function(list){
-                   res.send(list);
+                   if (! (list instanceof Array))
+                   {
+                     list = JSON.parse('[' + JSON.stringify(list) + ']');
+                   }
+                     
+                   res.status(201)
+                      .send(list);
+                 }).catch(next);
+});
+
+listRouter.delete('', function(req, res, next){
+  listModel.deleteMany({})
+           .then(function(lists){
+                   // if DELETE fails return 500
+                   if (lists.ok != 1)
+                     next();
+
+                   res.send({'deletedCount': lists.deletedCount});
                  }).catch(next);
 });
 

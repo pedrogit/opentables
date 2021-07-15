@@ -10,6 +10,8 @@ mongoose.Promise = global.Promise;
 
 app.use(express.urlencoded({extended: true}));
 app.use(logger('short'));
+app.use(express.json());
+
 
 // Make the server able to server filesystem files from the public folder
 app.use('/public', express.static(path.join(__dirname, 'public')));
