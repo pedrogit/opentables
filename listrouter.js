@@ -12,8 +12,8 @@ listRouter.get('', function(req, res, next){
                  }).catch(next);
 });
 
-listRouter.get('/:ownerid', function(req, res, next) {
-  listModel.findById(req.params.ownerid)
+listRouter.get('/:listid', function(req, res, next) {
+  listModel.findById(req.params.listid)
            .then(function(list){
                    if (!list) {
                         next(new Errors.NotFound('No such list (' + res.req.params.ownerid + ')...'));
@@ -37,6 +37,15 @@ listRouter.post('', function(req, res, next){
                       .send(list);
                  }).catch(next);
 });
+
+listRouter.patch('/:listid', function(req, res, next) {
+  listModel.findByIdAndUpdate(req.params.listid, req.body, {new: true})
+           .then(function(list){              
+              res.status(200)
+                 .send(list);
+          }).catch(next);
+});
+
 
 listRouter.delete('', function(req, res, next){
   listModel.deleteMany({})
