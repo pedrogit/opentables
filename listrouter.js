@@ -28,10 +28,10 @@ listRouter.post('', function(req, res, next){
   console.log(req.body);
   listModel.create(req.body)
            .then(function(list){
-                   if (! (list instanceof Array))
+                   /*if (! (list instanceof Array))
                    {
                      list = JSON.parse('[' + JSON.stringify(list) + ']');
-                   }
+                   }*/
                      
                    res.status(201)
                       .send(list);

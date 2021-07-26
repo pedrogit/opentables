@@ -49,70 +49,10 @@ describe('List API', () => {
           .end((err, response) => {
              console.log(response.body);
              expect(response).to.have.status(201);
-             expect(response.body).to.be.an('array');
-             expect(response.body).to.have.a.lengthOf(1);
+             expect(response.body).to.be.an('object');
+             listIdToPatch = response.body._id;
              done();
           });
-    });
-
-    ///////////////////
-    it('It should post a new list as an array', (done) => {
-      chai.request(server)
-          .post('/api/list')
-          .send([{
-            'ownerid': '60edb91162a87a2c383d5cf2',
-            'rperm': '@owner1',
-            'wperm': '@owner1',
-            'schema': '{}'
-          }])
-          .end((err, response) => {
-             console.log(response.body);
-             expect(response).to.have.status(201);
-             expect(response.body).to.be.an('array');
-             expect(response.body).to.have.a.lengthOf(1);
-             done();
-          });
-    });
-
-    ///////////////////
-    it('It should post two new lists', (done) => {
-      chai.request(server)
-          .post('/api/list')
-          .send([{
-            'ownerid': '60edb91162a87a2c383d5cf4',
-            'rperm': '@owner1',
-            'wperm': '@owner1',
-            'schema': '{}'
-          },
-          {
-            'ownerid': '60edb91162a87a2c383d5cf5',
-            'rperm': '@owner2',
-            'wperm': '@owner2',
-            'schema': '{}'
-          }])
-          .end((err, response) => {
-             console.log(response.body);
-             expect(response).to.have.status(201);
-             expect(response.body).to.be.an('array');
-             expect(response.body).to.have.a.lengthOf(2);
-             done();
-          });
-    });
-  });
-
-  describe('GET /api/list', () => {
-    ///////////////////
-    it('It should get all the lists', (done) => {
-      chai.request(server)
-          .get('/api/list')
-          .end((err, response) => {
-             console.log(response.body);
-             listIdToPatch = response.body[3]._id;
-             expect(response).to.have.status(200);
-             expect(response.body).to.be.a('array');
-             expect(response.body).to.have.a.lengthOf(4);
-             done();
-           });
     });
 
     ///////////////////
