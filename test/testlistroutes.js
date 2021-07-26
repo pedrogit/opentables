@@ -12,10 +12,10 @@ var lists = [];
 
 describe('List API', () => {
   // DELETE all
-  describe('DELETE /api/lists', () => {
+  describe('DELETE /api/list', () => {
     it('It should delete all the lists', (done) => {
       chai.request(server)
-          .delete('/api/lists')
+          .delete('/api/list')
           .end((err, response) => {
              response.should.have.status(200);
              response.body.should.have.all.keys('deletedCount');
@@ -24,15 +24,16 @@ describe('List API', () => {
      });
   });
 
-  describe('POST /api/lists', () => {
+  describe('POST /api/list', () => {
 
     it('It should post a new list as an object', (done) => {
       chai.request(server)
-          .post('/api/lists')
+          .post('/api/list')
           .send({
             'ownerid': '60edb91162a87a2c383d5cf2',
             'rperm': '@owner1',
-            'wperm': '@owner1'
+            'wperm': '@owner1',
+            'schema': '{}'
           })
           .end((err, response) => {
              response.should.have.status(201);
@@ -44,11 +45,12 @@ describe('List API', () => {
 
     it('It should post a new list as an array', (done) => {
       chai.request(server)
-          .post('/api/lists')
+          .post('/api/list')
           .send([{
             'ownerid': '60edb91162a87a2c383d5cf2',
             'rperm': '@owner1',
-            'wperm': '@owner1'
+            'wperm': '@owner1',
+            'schema': '{}'
           }])
           .end((err, response) => {
              response.should.have.status(201);
@@ -60,16 +62,18 @@ describe('List API', () => {
     
     it('It should post two new lists', (done) => {
       chai.request(server)
-          .post('/api/lists')
+          .post('/api/list')
           .send([{
             'ownerid': '60edb91162a87a2c383d5cf4',
             'rperm': '@owner1',
-            'wperm': '@owner1'
+            'wperm': '@owner1',
+            'schema': '{}'
           },
           {
             'ownerid': '60edb91162a87a2c383d5cf5',
             'rperm': '@owner2',
-            'wperm': '@owner2'
+            'wperm': '@owner2',
+            'schema': '{}'
           }])
           .end((err, response) => {
              response.should.have.status(201);
@@ -81,10 +85,10 @@ describe('List API', () => {
   });
 
   // get all lists
-  describe('GET /api/lists', () => {
+  describe('GET /api/list', () => {
     it('It should get all the lists', (done) => {
       chai.request(server)
-          .get('/api/lists')
+          .get('/api/list')
           .end((err, response) => {
              response.should.have.status(200);
              response.body.should.be.a('array');
@@ -96,7 +100,7 @@ describe('List API', () => {
     // Test a invalid URL
     it('It should return a NOT FOUND on invalid URL', (done) => {
       chai.request(server)
-          .get('/api/list')
+          .get('/api/test')
           .end((err, response) => {
              response.should.have.status(404);
              done();

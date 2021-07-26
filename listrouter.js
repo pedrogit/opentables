@@ -4,23 +4,6 @@ const listModel = require('./listmodel');
 
 const Errors = require('./errors');
 
-const staticLists = [
-  {
-     'ownerid': 'pierre',
-     'rperm': '@all',
-     'wperm': '@owner'
-  },
-  {  
-     'ownerid': 'pierre',
-     'rperm': '@all',
-     'wperm': '@owner'
-  },
-  {
-     'ownerid': 'nat',
-     'rperm': '@all',
-     'wperm': '@owner'
-  }
-];
 
 listRouter.get('', function(req, res, next){
   listModel.find({})
@@ -71,51 +54,71 @@ module.exports = listRouter;
 /*
 
 View API
+  Permission: read and edit
+  Edit permission implies read permission (since edit permission automatically allow changing read permission)
+  @viewowner = view owner
+  @listowner keyword = list owner
+  @all = everybody
+  @itemowner = item owner (when items have a itemowner field)
 
   GET /api/view               // Get all views the users has permission to view
                               // Status: 200, 401, 403, 404 (no views weres found)
                               // Details: includes all views owned by the user
-                              // What if the user does not have permission to view the liked list
+                              // What if the user does not have permission to view the linked list
 
-  GET /api/view/:ownerid      // Get all views owned by a specific user
-                              // Status: 200, 400 invalid userid, 401, 403(?), 404 (the requested userid was not found)
-
-  GET /api/view/:subs:userid  // Get all views a specific user has subscribed to
-                              // Status: 200, 400 invalid userid, 401, 403(?), 404 (the requested userid was not found)
-
-  GET /api/view/:viewid       // Get a view by viewid with all the linked list items
+  GET /api/view/:viewid       // Get a view by viewid if has view read permission 
+                              // with all the linked list and its list items if has list read permission 
                               // Status: 200, 401, 403, 404 (no view was found)
 
-  POST /api/view          // Post a new view and create a default linked list
-                          // Status: 201, 400 invalid json, 401, 403
+  GET /api/view/:ownerid/ownedby        // Get all views owned by a specific user
+                                       // Status: 200, 400 invalid userid, 401, 403(?), 404 (the requested userid was not found)
 
-  PUT /api/view/:viewid   // Replace a view by id (and delete or create the linked list if necessary)
-                          // Status: 200, 400 invalid json or invalid viewid, 401, 403)
+  GET /api/view/:userid/subscribedtoby  // Get all views a specific user has subscribed to
+                                       // Status: 200, 400 invalid userid, 401, 403(?), 404 (the requested userid was not found)
 
-  PATCH /api/view/:viewid // Patch a view by id (and delete or create the linked list if necessary)
-                          // Status: 200, 400 invalid json or invalid viewid, 401, 403)
-
-  DELETE /api/view/:viewid  // Delete a view by id and the linked data if no more view links to it
-                            // Status: 201, 400 invalid or invalid viewid, 401, 403)
+  POST /api/view              // Post a new view with new list and list items or a default linked list
+                              // Status: 201, 400 invalid json, 401, 403
+ 
+  PATCH /api/view/:viewid     // Patch a view by id if has view edit permission 
+                              // Status: 200, 400 invalid json or invalid viewid, 401, 403
+  
+  DELETE /api/view/:viewid    // Delete a view by id and the linked list if no more view links to it and has list edit permission
+                              // Status: 200, 400 invalid or invalid viewid, 401, 403
 
 List API
 
-  GET /api/list/:listid   // Get a list and the linked listitems by listid
-                          // Status: 200, 400 invalid listid, 401, 403, 404 (the requested listid was not found)
-
-  POST /api/list          // Post a new list
-                          // Status: 201, 400 invalid json, 401, 403
-
-  PUT /api/list/:listid   // Replace a list by id
-                          // Status: 200, 400 invalid json or invalid listid, 401, 403)
-
-  PATCH /api/list/:listid // Patch a list by id (200, 400 invalid json or invalid listid, 401, 403)
-
-  DELETE /api/list/:listid  // delete a list by id (201, 400 invalid or invalid listid, 401, 403)
+  GET /api/list/:listid       // Get a list and the linked listitems by listid if has list read permission
+                              // Status: 200, 400 invalid listid, 401, 403, 404 (the requested listid was not found)
+                              // Params
+                              //   noitems: When included do not include listdata. Default false.
+  
+  POST /api/list              // Post a new list with or without data
+                              // Status: 201, 400 invalid json, 401, 403
+  
+  PATCH /api/list/:listid     // Patch a list by id
+                              // Status: 200, 400 invalid json or invalid listid, 401, 403
+    
+  DELETE /api/list/:listid    // Delete a list by id
+                              // Status: 200, 400 invalid or invalid listid, 401, 403
 
 Listitem API
 
-  POST /api/listitem            // Post one or many new list (201, 400 invalid json, 401, 403)
+  GET /api/listitem/:listid/:itemid     // Get a list item by id if has list read permission
+                                        // Status: 200, 400 invalid or invalid listid, 401, 403
+
+  POST /api/listitem/:listid/           // Post one or many new list items if has list edit permission
+                                        // Status: 201, 400 invalid json, 401, 403
+
+  PATCH /api/listitem/:listid/:itemid   // Patch a list item if has list edit permission
+                                        // Status: 200, 400 invalid json, 401, 403
+                                        // Param
+                                        //   field and value
+  
+  DELETE /api/listitem/:listid          // Delete all items from a list if has list edit permission
+                                        // Status: 200, 400 invalid json, 401, 403
+
+  DELETE /api/listitem/:listid/:itemid  // Delete one or many list items if has list edit permission
+                                        // Status: 200, 400 invalid json, 401, 403
 
   Response status codes
 

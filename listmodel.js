@@ -15,6 +15,10 @@ const ListSchema = new mongSchema({
     type: String,
     required: [true, 'write permission is required']
   },
+  schema: {
+    type: String,
+    required: [true, 'schema is required']
+  },
 }, { versionKey: '_version' });
 
 const ListModel = mongoose.model('list', ListSchema);

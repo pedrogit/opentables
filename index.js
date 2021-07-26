@@ -17,7 +17,7 @@ app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Handle the REST list API
-app.use('/api/lists', require('./listrouter'));
+app.use('/api/list', require('./listrouter'));
 
 // Implement a generic error sending middleware
 app.use((error, req, res, next) => {
