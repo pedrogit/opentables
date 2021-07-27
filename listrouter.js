@@ -8,7 +8,7 @@ const Errors = require('./errors');
 listRouter.get('', function(req, res, next){
   listModel.find({})
            .then(function(lists){
-                   res.send(lists);
+                   res.status(200).send(list);
                  }).catch(next);
 });
 
@@ -16,10 +16,10 @@ listRouter.get('/:listid', function(req, res, next) {
   listModel.findById(req.params.listid)
            .then(function(list){
                    if (!list) {
-                        next(new Errors.NotFound('No such list (' + res.req.params.ownerid + ')...'));
+                        next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
                    }
                    else {
-                     res.send(list);
+                     res.status(200).send(list);
                    };
                  }).catch(next);
 });
@@ -28,21 +28,19 @@ listRouter.post('', function(req, res, next){
   console.log(req.body);
   listModel.create(req.body)
            .then(function(list){
-                   /*if (! (list instanceof Array))
-                   {
-                     list = JSON.parse('[' + JSON.stringify(list) + ']');
-                   }*/
-                     
-                   res.status(201)
-                      .send(list);
-                 }).catch(next);
+                   if (!list) {
+                     next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
+                   }
+                   else {
+                     res.status(201).send(list);
+                   };
+       }).catch(next);
 });
 
 listRouter.patch('/:listid', function(req, res, next) {
   listModel.findByIdAndUpdate(req.params.listid, req.body, {new: true})
            .then(function(list){              
-              res.status(200)
-                 .send(list);
+              res.status(200).send(list);
           }).catch(next);
 });
 
@@ -53,8 +51,8 @@ listRouter.delete('', function(req, res, next){
                    // if DELETE fails return 500
                    if (lists.ok != 1)
                      next();
-
-                   res.send({'deletedCount': lists.deletedCount});
+                   // otherwise send the count of object deleted
+                   res.status(200).send({'deletedCount': lists.deletedCount});
                  }).catch(next);
 });
 

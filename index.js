@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-mongoose.connect('mongodb://localhost/listitdata', { useNewUrlParser: true, useUnifiedTopology: true } );
+mongoose.connect('mongodb://localhost/listitdata', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false } );
 mongoose.Promise = global.Promise;
 
 app.use(express.urlencoded({extended: true}));
@@ -15,6 +15,9 @@ app.use(express.json());
 
 // Make the server able to server filesystem files from the public folder
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Handle the REST listitem API
+app.use('/api/listitem', require('./listitemrouter'));
 
 // Handle the REST list API
 app.use('/api/list', require('./listrouter'));
