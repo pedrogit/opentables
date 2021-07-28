@@ -1,5 +1,5 @@
 const express = require('express');
-const logger = require("morgan");
+//const logger = require("morgan");
 const mongoose = require('mongoose');
 const path = require('path');
 
@@ -10,7 +10,7 @@ mongoose.connect('mongodb://localhost/listitdata', { useNewUrlParser: true, useU
 mongoose.Promise = global.Promise;
 
 app.use(express.urlencoded({extended: true}));
-app.use(logger('short'));
+//app.use(logger('short'));
 app.use(express.json());
 
 // Make the server able to server filesystem files from the public folder
