@@ -15,11 +15,10 @@ listItemRouter.post('/:listid', function(req, res, next) {
                      res.req.body._id = mongoose.Types.ObjectId().toString();
 
                      list.data.push(res.req.body);
-                     listModel.findByIdAndUpdate(res.req.params.listid, list, {new: true})
-                              .then(function(list){              
-                                      res.status(201)
-                                         .send(list.data.find(id => id = res.req.body._id));
-
+                     list.save()
+                         .then(function(list){              
+                                 res.status(201)
+                                    .send(list.data.find(id => id = res.req.body._id));
                      }).catch(next);
                    };
                  }).catch(next);
@@ -33,7 +32,6 @@ listItemRouter.post('/:listid', function(req, res, next) {
                           next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
                      }
                      else {
-                       //  res.status(200).send(list.data);
                        res.status(200)
                           .send(list.data.find(id => id = res.req.params.itemid));
                      };
