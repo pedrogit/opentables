@@ -15,7 +15,8 @@ listItemRouter.post('/:listid', function(req, res, next) {
                      res.req.body._id = mongoose.Types.ObjectId().toString();
 
                      list.data.push(res.req.body);
-                     list.save()
+                     //list.save() // not atomic
+                     listModel.findByIdAndUpdate(res.req.params.listid, list, {new: true}) // atomic
                          .then(function(list){              
                                  res.status(201)
                                     .send(list.data.find(id => id = res.req.body._id));
