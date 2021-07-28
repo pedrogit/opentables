@@ -86,6 +86,11 @@ View API
   POST /api/view              // Post a new view with new list and list items or a default linked list
                               // Status: 201, 400 invalid json, 401, 403
  
+  POST /api/view/viewid       // Clone a view and set the user a new owner
+                              // Status: 201, 400 invalid json, 401, 403
+                              // Options
+                              //   copyMode=emptyList|fullList|refToList
+
   PATCH /api/view/:viewid     // Patch a view by id if has view edit permission 
                               // Status: 200, 400 invalid json or invalid viewid, 401, 403
   
@@ -96,7 +101,7 @@ List API
 
   GET /api/list/:listid       // Get a list and the linked listitems by listid if has list read permission
                               // Status: 200, 400 invalid listid, 401, 403, 404 (the requested listid was not found)
-                              // Params
+                              // Options
                               //   noitems: When included do not include listdata. Default false.
   
   POST /api/list              // Post a new list with or without data
