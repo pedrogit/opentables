@@ -110,7 +110,7 @@ describe('List API', () => {
              console.log(response.body);
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
-             listItemIdToPatch = response.body.id;
+             listItemIdToPatch = response.body._id;
              done();
           });
     });
