@@ -21,8 +21,10 @@ const Errors = require('./errors');
                         next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
                    }
                    else {
-                     listModel.populate(list, {path: 'items', select: ['id', 'item']})
+                     listModel.populate(list, {path: 'items'})
                               .then(function(list){
+                                 // unset repeated fields
+                                 list.items.forEach(function(v){ v.listid = undefined;});
                                  res.status(200).send(list);
                                 }).catch(next);
                    };

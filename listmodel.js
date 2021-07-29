@@ -18,11 +18,27 @@ const ListSchema = new mongSchema({
   listschema: {
     type: String,
     required: [true, 'listschema is required']
-  },
-  items: {
+  }/*,
+    items: {
     type: [mongSchema.Types.ObjectId], ref: 'ListItem'
-  }
-}, { versionKey: '_version' });
+  }*/
+}, { versionKey: '_version', id: false });
+
+ListSchema.virtual('items', {
+  ref: 'ListItem', // The Model to use
+  localField: '_id', // Find in Model, where localField 
+  foreignField: 'listid', // is equal to foreignField
+});
+
+ListSchema.set('toObject', { virtuals: true });
+ListSchema.set('toJSON', { virtuals: true});
+/*
+ListSchema.set('toJSON', { virtuals: true,
+                           transform: function(doc, ret) {
+                                       delete ret.id;
+                           }
+                          });
+*/
 
 const ListModel = mongoose.model('List', ListSchema);
 
