@@ -23,16 +23,20 @@ app.use('/api/listitem', require('./listitemrouter'));
 app.use('/api/list', require('./listrouter'));
 
 // Implement a generic error sending middleware
-app.use((error, req, res, next) => {
-  if (!error.statusCode) error.statusCode = 500;
+app.use((err, req, res, next) => {
+  if (err instanceof mongoose.Error.ValidationError) 
+    return res.status(400)
+              .send(JSON.stringify({error: "Invalid JSON"}))
+
+  if (!err.statusCode) err.statusCode = 500;
   
-  if (error.statusCode === 301) {
+  if (err.statusCode === 301) {
     return res.status(301).redirect('/not-found');
   }
 
   return res
-    .status(error.statusCode)
-    .json({ error: error.toString() });
+    .status(err.statusCode)
+    .json({ err: err.toString() });
 });
 
 // Start the server

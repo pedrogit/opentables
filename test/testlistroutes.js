@@ -37,6 +37,25 @@ describe('List API', () => {
   });
 
   describe('POST /api/list', () => {
+    it('Post an invalid list', (done) => {
+      chai.request(server)
+          .post('/api/list')
+          .send({
+            'xownerid': '60edb91162a87a2c383d5cf2',
+            'rperm': '@owner1',
+            'wperm': '@owner1',
+            'listschema': '{}'
+          })
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.an('object');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+  });
+
+  describe('POST /api/list', () => {
     it('Post a new, empty list', (done) => {
       chai.request(server)
           .post('/api/list')
