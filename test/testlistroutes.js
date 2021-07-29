@@ -86,10 +86,13 @@ describe('List API', () => {
   describe('POST /api/listitem', () => {
     it('Post a first list item', (done) => {
       chai.request(server)
-          .post('/api/listitem/' + listIdToPatch)
+          .post('/api/listitem')
           .send({
-            'field1': 'field1val',
-            'field2': 'field2val'
+            listid: listIdToPatch, 
+            item: {
+              'field1': 'field1val1',
+              'field2': 'field2val1'
+            }
           })
           .end((err, response) => {
              console.log(response.body);
@@ -101,10 +104,13 @@ describe('List API', () => {
 
     it('Post a second list item', (done) => {
       chai.request(server)
-          .post('/api/listitem/' + listIdToPatch)
+          .post('/api/listitem')
           .send({
-            'field1': 'field1val',
-            'field2': 'field2val'
+            listid: listIdToPatch, 
+            item: {
+              'field1': 'field1val2',
+              'field2': 'field2val2'
+            }
           })
           .end((err, response) => {
              console.log(response.body);
@@ -131,10 +137,23 @@ describe('List API', () => {
     describe('PATCH /api/list/:listid/:itemid', () => {
       it('Patch the last list with a new listschema value', (done) => {
         chai.request(server)
-            .patch('/api/listitem/' + listIdToPatch + '/' + listItemIdToPatch)
+            .patch('/api/listitem/' + listItemIdToPatch)
             .send({
-              'field2': 'field2 value22'
+              'item.field2': 'field2 value222'
             })
+            .end((err, response) => {
+               console.log(response.body);
+               expect(response).to.have.status(200);
+               done();
+             });
+      });
+    });
+
+    describe('GET /api/listitem/:itemid', () => {
+      it('Get the last posted item', (done) => {
+        chai.request(server)
+            //.patch('/api/listitem/' + listIdToPatch + '/' + listItemIdToPatch)
+            .get('/api/listitem/' + listItemIdToPatch)
             .end((err, response) => {
                console.log(response.body);
                expect(response).to.have.status(200);
@@ -155,6 +174,5 @@ describe('List API', () => {
              });
       });
     });
-
   });
 });

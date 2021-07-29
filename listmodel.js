@@ -19,11 +19,11 @@ const ListSchema = new mongSchema({
     type: String,
     required: [true, 'listschema is required']
   },
-  data: {
-    type: [mongSchema.Types.Mixed]
+  items: {
+    type: [mongSchema.Types.ObjectId], ref: 'ListItem'
   }
 }, { versionKey: '_version' });
 
-const ListModel = mongoose.model('list', ListSchema);
+const ListModel = mongoose.model('List', ListSchema);
 
 module.exports = ListModel;

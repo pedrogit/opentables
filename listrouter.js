@@ -19,7 +19,10 @@ listRouter.get('/:listid', function(req, res, next) {
                         next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
                    }
                    else {
-                     res.status(200).send(list);
+                     listModel.populate(list, {path: 'items', select: ['id', 'item']})
+                              .then(function(list){
+                                 res.status(200).send(list);
+                                }).catch(next);
                    };
                  }).catch(next);
 });
@@ -43,7 +46,6 @@ listRouter.patch('/:listid', function(req, res, next) {
               res.status(200).send(list);
           }).catch(next);
 });
-
 
 listRouter.delete('', function(req, res, next){
   listModel.deleteMany({})
@@ -102,7 +104,7 @@ List API
   GET /api/list/:listid       // Get a list and the linked listitems by listid if has list read permission
                               // Status: 200, 400 invalid listid, 401, 403, 404 (the requested listid was not found)
                               // Options
-                              //   noitems: When included do not include listdata. Default false.
+                              //   noitems: Do not includes items. Default false.
   
   POST /api/list              // Post a new list with or without data
                               // Status: 201, 400 invalid json, 401, 403
@@ -110,27 +112,27 @@ List API
   PATCH /api/list/:listid     // Patch a list by id
                               // Status: 200, 400 invalid json or invalid listid, 401, 403
     
-  DELETE /api/list/:listid    // Delete a list by id
+  DELETE /api/list/:listid    // Delete a list by id and all its items
                               // Status: 200, 400 invalid or invalid listid, 401, 403
 
 Listitem API
 
-  GET /api/listitem/:listid/:itemid     // Get a list item by id if has list read permission
-                                        // Status: 200, 400 invalid or invalid listid, 401, 403
+  GET /api/listitem/:itemid     // Get a list item by id if has list read permission
+                                // Status: 200, 400 invalid or invalid listid, 401, 403
 
-  POST /api/listitem/:listid/           // Post one or many new list items if has list edit permission
-                                        // Status: 201, 400 invalid json, 401, 403
+  POST /api/listitem/           // Post one or many new list items if has list edit permission
+                                // Status: 201, 400 invalid json, 401, 403
 
-  PATCH /api/listitem/:listid/:itemid   // Patch a list item if has list edit permission
-                                        // Status: 200, 400 invalid json, 401, 403
-                                        // Param
-                                        //   field and value
+  POST /api/listitem/:itemid    // Clone an item if has list edit permission
+                                // Status: 201, 400 invalid json, 401, 403
+
+  PATCH /api/listitem/:itemid   // Patch a list item if has list edit permission
+                                // Status: 200, 400 invalid json, 401, 403
+                                // Data
+                                //   fields and values
   
-  DELETE /api/listitem/:listid          // Delete all items from a list if has list edit permission
-                                        // Status: 200, 400 invalid json, 401, 403
-
-  DELETE /api/listitem/:listid/:itemid  // Delete one or many list items if has list edit permission
-                                        // Status: 200, 400 invalid json, 401, 403
+  DELETE /api/listitem/:itemid  // Delete one or many list items if has list edit permission
+                                // Status: 200, 400 invalid json, 401, 403
 
   Response status codes
 
