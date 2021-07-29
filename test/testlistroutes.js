@@ -16,10 +16,10 @@ describe('List API', () => {
     chai.request(server)
         .get('/api/test')
         .end((err, response) => {
-           console.log(response.body);
            expect(response).to.have.status(404);
            done();
-        });
+           console.log(JSON.stringify(response.body, null, 2));
+         });
     });
   });
 
@@ -28,11 +28,11 @@ describe('List API', () => {
       chai.request(server)
           .delete('/api/list')
           .end((err, response) => {
-             console.log(response.body);
              expect(response).to.have.status(200);
              expect(response.body).to.have.all.keys('deletedCount');
              done();
-          });
+             console.log(JSON.stringify(response.body, null, 2));
+           });
     });
   });
 
@@ -47,12 +47,12 @@ describe('List API', () => {
             'listschema': '{}'
           })
           .end((err, response) => {
-             console.log(response.body);
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              listIdToPatch = response.body._id;
              done();
-          });
+             console.log(JSON.stringify(response.body, null, 2));
+           });
     });
   });
 
@@ -61,10 +61,10 @@ describe('List API', () => {
       chai.request(server)
           .get('/api/list/' + listIdToPatch)
           .end((err, response) => {
-             console.log(response.body);
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              done();
+             console.log(JSON.stringify(response.body, null, 2));
            });
     });
   });
@@ -75,10 +75,10 @@ describe('List API', () => {
             .patch('/api/list/' + listIdToPatch)
             .send({'listschema': "{field1: 'String'}"})
             .end((err, response) => {
-               console.log(response.body);
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('listschema').eq("{field1: 'String'}");
                done();
+               console.log(JSON.stringify(response.body, null, 2));
              });
       });
   });
@@ -95,11 +95,11 @@ describe('List API', () => {
             }
           })
           .end((err, response) => {
-             console.log(response.body);
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              done();
-          });
+             console.log(JSON.stringify(response.body, null, 2));
+            });
     });
 
     it('Post a second list item', (done) => {
@@ -113,12 +113,12 @@ describe('List API', () => {
             }
           })
           .end((err, response) => {
-             console.log(response.body);
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              listItemIdToPatch = response.body._id;
              done();
-          });
+             console.log(JSON.stringify(response.body, null, 2));
+            });
     });
 
     describe('GET /api/list/:listid', () => {
@@ -126,10 +126,10 @@ describe('List API', () => {
         chai.request(server)
             .get('/api/list/' + listIdToPatch)
             .end((err, response) => {
-               console.log(response.body);
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                done();
+               console.log(JSON.stringify(response.body, null, 2));
              });
       });
     });
@@ -142,9 +142,9 @@ describe('List API', () => {
               'item.field2': 'field2 value222'
             })
             .end((err, response) => {
-               console.log(response.body);
                expect(response).to.have.status(200);
                done();
+               console.log(JSON.stringify(response.body, null, 2));
              });
       });
     });
@@ -155,9 +155,9 @@ describe('List API', () => {
             //.patch('/api/listitem/' + listIdToPatch + '/' + listItemIdToPatch)
             .get('/api/listitem/' + listItemIdToPatch)
             .end((err, response) => {
-               console.log(response.body);
                expect(response).to.have.status(200);
                done();
+               console.log(JSON.stringify(response.body, null, 2));
              });
       });
     });
@@ -167,10 +167,10 @@ describe('List API', () => {
         chai.request(server)
             .get('/api/list/' + listIdToPatch)
             .end((err, response) => {
-               console.log(response.body);
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                done();
+               console.log(JSON.stringify(response.body, null, 2));
              });
       });
     });

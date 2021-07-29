@@ -28,7 +28,7 @@ listRouter.get('/:listid', function(req, res, next) {
 });
 
 listRouter.post('', function(req, res, next){
-  console.log(req.body);
+  //console.log(req.body);
   listModel.create(req.body)
            .then(function(list){
                    if (!list) {
