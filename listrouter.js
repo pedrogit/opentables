@@ -22,13 +22,13 @@ const Errors = require('./errors');
         next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
       }
       else {
-        listModel.populate(list, {path: 'items'})
-          .then(list => {
-            // unset repeated fields
-            list.items.forEach(function(v){ v.listid = undefined;});
-            res.status(200).send(list);
-          }).catch(next);
-      };
+        return listModel.populate(list, {path: 'items'});
+      }
+    })
+    .then(list => {
+      // unset repeated fields
+      list.items.forEach(function(v){ v.listid = undefined;});
+      res.status(200).send(list);
     }).catch(next);
 });
 
@@ -79,15 +79,16 @@ listRouter.patch('/:listid', function(req, res, next) {
 
 *************************************************************************/
 listRouter.delete('', function(req, res, next){
-  listModel.deleteMany({})
-    .then(lists => {
-      // if DELETE fails return 500
-      if (lists.ok != 1) {
-        next();
-      }
-      // otherwise send the count of object deleted
-      res.status(200).send({'deletedCount': lists.deletedCount});
-    }).catch(next);
+  listModel.deleteMany({
+  })
+  .then(lists => {
+    // if DELETE fails return 500
+    if (lists.ok != 1) {
+      next();
+    }
+    // otherwise send the count of object deleted
+    res.status(200).send({'deletedCount': lists.deletedCount});
+  }).catch(next);
 });
 
 module.exports = listRouter;

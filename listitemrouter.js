@@ -31,27 +31,31 @@ listItemRouter.get('/:itemid', function(req, res, next) {
 
 *************************************************************************/
 listItemRouter.post('', function(req, res, next){
-  console.log(req.body);
   if (!(req.body.hasOwnProperty('listid'))){
     throw new Errors.BadRequest('Listid missing for new item...');
   }
   // make sure the list exists
-  listModel.findById(req.body.listid)
-    .then(list => {
+  var list = listModel.findById(req.body.listid);
+  list.then(list => {
       list.validateItem(req.body.item);
-      listItemModel.create(req.body)
-        .then(item => {
-          if (!item) {
-            next(new Errors.NotFound('Could not create item...'));
-          }
-          else {
-            list.updateOne({$push: {"items": item.id}})
-              .then(list => {
-                res.status(201).send(item);
-              }).catch(next);
-          }
-        }).catch(next);
-    }).catch(next);
+      return list;
+  })
+  .then(list => {
+    return listItemModel.create(req.body);
+  })
+  .then(item => {
+    if (!item) {
+      throw new Errors.NotFound('Could not create item...');
+    }
+    else {
+      list.updateOne({$push: {"items": item.id}});
+    }
+    return item;
+  })
+  .then(item => {
+    res.status(201).send(item);
+  })
+  .catch(next);
 });
 
 /************************************************************************
@@ -72,17 +76,17 @@ listItemRouter.post('', function(req, res, next){
 *************************************************************************/
 listItemRouter.patch('/:itemid', function(req, res, next) {
   listItemModel.findById(req.params.itemid)
-    .then(item => {  
-      listModel.findById(item.listid.toString())
-        .then(list => {
-          list.validateItem(req.body);
-          const toSet = Utils.prefixAllKeys(req.body, 'item.');
-          listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true})
-            .then(newitem => {              
-                    res.status(200).send(newitem);
-            }).catch(next);
-        }).catch(next);
-    }).catch(next);
+  .then(item => {  
+    return listModel.findById(item.listid.toString())
+  })
+  .then(list => {
+    list.validateItem(req.body);
+    const toSet = Utils.prefixAllKeys(req.body, 'item.');
+    return listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true});
+  })
+  .then(newitem => {              
+    res.status(200).send(newitem);
+  }).catch(next);
 });
 
 /************************************************************************
