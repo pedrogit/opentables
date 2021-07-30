@@ -17,13 +17,13 @@ const Errors = require('./errors');
 *************************************************************************/
  listRouter.get('/:listid', function(req, res, next) {
   listModel.findById(req.params.listid)
-           .then(function(list){
+           .then(list => {
                    if (!list) {
                         next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
                    }
                    else {
                      listModel.populate(list, {path: 'items'})
-                              .then(function(list){
+                              .then(list => {
                                  // unset repeated fields
                                  list.items.forEach(function(v){ v.listid = undefined;});
                                  res.status(200).send(list);
@@ -44,7 +44,7 @@ listRouter.post('', function(req, res, next){
   //console.log(req.body);
   listModel.validate(req.body)
            .create(req.body)
-           .then(function(list){
+           .then(list => {
                    if (!list) {
                      next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
                    }
@@ -67,7 +67,7 @@ listRouter.patch('/:listid', function(req, res, next) {
            .findByIdAndUpdate(req.params.listid, 
                               req.body, 
                              {new: true})
-           .then(function(list){              
+           .then(list => {              
               res.status(200).send(list);
           }).catch(next);
 });
@@ -82,7 +82,7 @@ listRouter.patch('/:listid', function(req, res, next) {
 *************************************************************************/
 listRouter.delete('', function(req, res, next){
   listModel.deleteMany({})
-           .then(function(lists){
+           .then(lists => {
                    // if DELETE fails return 500
                    if (lists.ok != 1)
                      next();

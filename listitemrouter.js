@@ -20,7 +20,7 @@ const Utils = require('./utils');
 *************************************************************************/
 listItemRouter.get('/:itemid', function(req, res, next) {
   listItemModel.findById(req.params.itemid)
-               .then(function(item){              
+               .then(item => {              
                        res.status(200).send(item);
                }).catch(next);
 });
@@ -40,16 +40,16 @@ listItemRouter.post('', function(req, res, next){
   }
   // make sure the list exists
   listModel.findById(req.body.listid)
-           .then(function(list){
+           .then(list => {
               list.validateItem(req.body.item);
               listItemModel.create(req.body)
-                           .then(function(item){
+                           .then(item => {
                                   if (!item) {
                                     next(new Errors.NotFound('Could not create item...'));
                                   }
                                   else {
                                     list.updateOne({$push: {"items": item.id}})
-                                        .then(function(list){
+                                        .then(list => {
                                                 res.status(201).send(item);
                                         }).catch(next);
                                   }
@@ -75,13 +75,13 @@ listItemRouter.post('', function(req, res, next){
 *************************************************************************/
 listItemRouter.patch('/:itemid', function(req, res, next) {
   listItemModel.findById(req.params.itemid)
-               .then(function(item){  
+               .then(item => {  
                        listModel.findById(item.listid.toString())
-                                .then(function(list){
+                                .then(list => {
                                         list.validateItem(req.body);
                                         const toSet = Utils.prefixAllKeys(req.body, 'item.');
                                         listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true})
-                                            .then(function(newitem){              
+                                            .then(newitem => {              
                                                     res.status(200).send(newitem);
                                              }).catch(next);
                                  }).catch(next);
@@ -93,42 +93,5 @@ listItemRouter.patch('/:itemid', function(req, res, next) {
                                 // Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-
-/* ListItem as a subdocument implementation
-
-listItemRouter.post('/:listid', function(req, res, next) {
-    listItemModel.findById(req.params.listid)
-           .then(function(list){
-                   if (!list) {
-                        next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
-                   }
-                   else {
-                     res.req.body._id = mongoose.Types.ObjectId().toString();
-
-                     list.data.push(res.req.body);
-                     //list.save() // not atomic
-                     listModel.findByIdAndUpdate(res.req.params.listid, list, {new: true}) // atomic
-                         .then(function(list){              
-                                 res.status(201)
-                                    .send(list.data.find(id => id = res.req.body._id));
-                     }).catch(next);
-                   };
-                 }).catch(next);
-  });
-  
-  listItemRouter.patch('/:listid/:itemid', function(req, res, next) {
-    listModel.findOneAndUpdate({_id: req.params.listid, "data._id": req.params.itemid},
-                               {$set: {"data.$.field2": "field2 new value"}}, {new: true})
-             .then(function(list){
-                     if (list.n == 0) {
-                          next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
-                     }
-                     else {
-                       res.status(200)
-                          .send(list.data.find(id => id = res.req.params.itemid));
-                     };
-                   }).catch(next);
-  });
-  */
     
 module.exports = listItemRouter;
