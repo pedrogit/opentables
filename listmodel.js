@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const mongSchema = mongoose.Schema;
 
 const Errors = require('./errors');
+const Utils = require('./utils');
 
 // create list schema & model
 const ListSchema = new mongSchema({
@@ -31,6 +32,14 @@ ListSchema.virtual('items', {
 
 ListSchema.set('toObject', { virtuals: true });
 ListSchema.set('toJSON', { virtuals: true});
+
+ListSchema.statics.validate = function(obj){
+  var valid = Utils.objKeysInObjKeys(obj, this.schema.paths);
+  if (!valid.isTrue){
+    throw new Errors.BadRequest('Invalid field (' + valid.outKey + ') for object \'list\'...');
+  }
+  return this;
+}
 
 const ListModel = mongoose.model('List', ListSchema);
 

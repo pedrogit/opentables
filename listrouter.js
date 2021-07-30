@@ -4,17 +4,16 @@ const listModel = require('./listmodel');
 
 const Errors = require('./errors');
 
-const utils = require('./utils');
-
 /************************************************************************
   GET /api/list/:listid
 
   Get a list and the linked listitems by listid if has list read permission.
 
   Return status: 200, 400 invalid listid, 401, 403, 404 (the requested listid was not found)
-  
+
   Options:
     noitems: Do not includes items. Default false.
+
 *************************************************************************/
  listRouter.get('/:listid', function(req, res, next) {
   listModel.findById(req.params.listid)
@@ -43,12 +42,8 @@ const utils = require('./utils');
 *************************************************************************/
 listRouter.post('', function(req, res, next){
   //console.log(req.body);
-  var valid = utils.objKeysInObjKeys(req.body, listModel.schema.paths)
-  if (!valid.isTrue){
-    next(new Errors.BadRequest('Invalid field (' + valid.outKey + ') for object \'list\'...'));
-  }
-
-  listModel.create(req.body)
+  listModel.validate(req.body)
+           .create(req.body)
            .then(function(list){
                    if (!list) {
                      next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
@@ -68,12 +63,8 @@ listRouter.post('', function(req, res, next){
 
 *************************************************************************/
 listRouter.patch('/:listid', function(req, res, next) {
-  var valid = utils.objKeysInObjKeys(req.body, listModel.schema.paths)
-  if (!valid.isTrue){
-    next(new Errors.BadRequest('Invalid field (' + valid.outKey + ') for object \'list\'...'));
-  }
-
-  listModel.findByIdAndUpdate(req.params.listid, 
+  listModel.validate(req.body)
+           .findByIdAndUpdate(req.params.listid, 
                               req.body, 
                              {new: true})
            .then(function(list){              
