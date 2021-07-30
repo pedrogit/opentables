@@ -7,9 +7,6 @@ const listModel = require('./listmodel');
 const Errors = require('./errors');
 const Utils = require('./utils');
 
-
-// ListItem as a referenced document implementation
-
 /************************************************************************
   GET /api/listitem/:itemid
 
@@ -20,9 +17,9 @@ const Utils = require('./utils');
 *************************************************************************/
 listItemRouter.get('/:itemid', function(req, res, next) {
   listItemModel.findById(req.params.itemid)
-               .then(item => {              
-                       res.status(200).send(item);
-               }).catch(next);
+    .then(item => {              
+      res.status(200).send(item);
+    }).catch(next);
 });
 
 /************************************************************************
@@ -40,22 +37,22 @@ listItemRouter.post('', function(req, res, next){
   }
   // make sure the list exists
   listModel.findById(req.body.listid)
-           .then(list => {
-              list.validateItem(req.body.item);
-              listItemModel.create(req.body)
-                           .then(item => {
-                                  if (!item) {
-                                    next(new Errors.NotFound('Could not create item...'));
-                                  }
-                                  else {
-                                    list.updateOne({$push: {"items": item.id}})
-                                        .then(list => {
-                                                res.status(201).send(item);
-                                        }).catch(next);
-                                  }
-                            }).catch(next);
-          }).catch(next);
-        });
+    .then(list => {
+      list.validateItem(req.body.item);
+      listItemModel.create(req.body)
+        .then(item => {
+          if (!item) {
+            next(new Errors.NotFound('Could not create item...'));
+          }
+          else {
+            list.updateOne({$push: {"items": item.id}})
+              .then(list => {
+                res.status(201).send(item);
+              }).catch(next);
+          }
+        }).catch(next);
+    }).catch(next);
+});
 
 /************************************************************************
   POST /api/listitem/:itemid
@@ -75,17 +72,17 @@ listItemRouter.post('', function(req, res, next){
 *************************************************************************/
 listItemRouter.patch('/:itemid', function(req, res, next) {
   listItemModel.findById(req.params.itemid)
-               .then(item => {  
-                       listModel.findById(item.listid.toString())
-                                .then(list => {
-                                        list.validateItem(req.body);
-                                        const toSet = Utils.prefixAllKeys(req.body, 'item.');
-                                        listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true})
-                                            .then(newitem => {              
-                                                    res.status(200).send(newitem);
-                                             }).catch(next);
-                                 }).catch(next);
-               }).catch(next);
+    .then(item => {  
+      listModel.findById(item.listid.toString())
+        .then(list => {
+          list.validateItem(req.body);
+          const toSet = Utils.prefixAllKeys(req.body, 'item.');
+          listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true})
+            .then(newitem => {              
+                    res.status(200).send(newitem);
+            }).catch(next);
+        }).catch(next);
+    }).catch(next);
 });
 
 /************************************************************************
