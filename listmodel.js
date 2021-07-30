@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const mongSchema = mongoose.Schema;
 
+const Errors = require('./errors');
+
 // create list schema & model
 const ListSchema = new mongSchema({
   ownerid: {
@@ -18,10 +20,7 @@ const ListSchema = new mongSchema({
   listschema: {
     type: String,
     required: [true, 'listschema is required']
-  }/*,
-    items: {
-    type: [mongSchema.Types.ObjectId], ref: 'ListItem'
-  }*/
+  }
 }, { versionKey: '_version', id: false });
 
 ListSchema.virtual('items', {
@@ -32,13 +31,6 @@ ListSchema.virtual('items', {
 
 ListSchema.set('toObject', { virtuals: true });
 ListSchema.set('toJSON', { virtuals: true});
-/*
-ListSchema.set('toJSON', { virtuals: true,
-                           transform: function(doc, ret) {
-                                       delete ret.id;
-                           }
-                          });
-*/
 
 const ListModel = mongoose.model('List', ListSchema);
 

@@ -37,7 +37,7 @@ describe('List API', () => {
   });
 
   describe('POST /api/list', () => {
-    it('Post an invalid list', (done) => {
+    it('Post a list having an invalid field', (done) => {
       chai.request(server)
           .post('/api/list')
           .send({
@@ -76,11 +76,38 @@ describe('List API', () => {
   });
 
   describe('GET /api/list/:listid', () => {
+    it('Get list with an invalid id', (done) => {
+      chai.request(server)
+          .get('/api/list/6102f9efc3b25831e42fec8b')
+          .end((err, response) => {
+             expect(response).to.have.status(404);
+             expect(response.body).to.be.a('object');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+  });
+
+  describe('GET /api/list/:listid', () => {
     it('Get the last list by id', (done) => {
       chai.request(server)
           .get('/api/list/' + listIdToPatch)
           .end((err, response) => {
              expect(response).to.have.status(200);
+             expect(response.body).to.be.a('object');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+  });
+
+  describe('PATCH /api/list/:listid', () => {
+    it('Patch the last list with an invalid field', (done) => {
+      chai.request(server)
+          .patch('/api/list/' + listIdToPatch)
+          .send({'xlistschema': "{field1: 'String'}"})
+          .end((err, response) => {
+             expect(response).to.have.status(400);
              expect(response.body).to.be.a('object');
              done();
              console.log(JSON.stringify(response.body, null, 2));

@@ -4,6 +4,8 @@ const listModel = require('./listmodel');
 
 const Errors = require('./errors');
 
+const utils = require('./utils');
+
 /************************************************************************
   GET /api/list/:listid
 
@@ -41,6 +43,11 @@ const Errors = require('./errors');
 *************************************************************************/
 listRouter.post('', function(req, res, next){
   //console.log(req.body);
+  var valid = utils.objKeysInObjKeys(req.body, listModel.schema.paths)
+  if (!valid.isTrue){
+    next(new Errors.BadRequest('Invalid field (' + valid.outKey + ') for object \'list\'...'));
+  }
+
   listModel.create(req.body)
            .then(function(list){
                    if (!list) {
@@ -61,7 +68,14 @@ listRouter.post('', function(req, res, next){
 
 *************************************************************************/
 listRouter.patch('/:listid', function(req, res, next) {
-  listModel.findByIdAndUpdate(req.params.listid, req.body, {new: true})
+  var valid = utils.objKeysInObjKeys(req.body, listModel.schema.paths)
+  if (!valid.isTrue){
+    next(new Errors.BadRequest('Invalid field (' + valid.outKey + ') for object \'list\'...'));
+  }
+
+  listModel.findByIdAndUpdate(req.params.listid, 
+                              req.body, 
+                             {new: true})
            .then(function(list){              
               res.status(200).send(list);
           }).catch(next);
