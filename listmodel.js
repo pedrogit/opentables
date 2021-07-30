@@ -36,10 +36,21 @@ ListSchema.set('toJSON', { virtuals: true});
 ListSchema.statics.validate = function(obj){
   var valid = Utils.objKeysInObjKeys(obj, this.schema.paths);
   if (!valid.isTrue){
-    throw new Errors.BadRequest('Invalid field (' + valid.outKey + ') for object \'list\'...');
+    throw new Errors.BadRequest('Invalid field (' + valid.outKey + ') for \'list\'...');
   }
   return this;
+};
+
+ListSchema.methods.validateItem = function(obj){
+  var obj2 = JSON.parse(this.listschema);
+  var valid = Utils.objKeysInObjKeys(obj, obj2);
+  if (!valid.isTrue){
+    throw new Errors.BadRequest('Invalid field (' + valid.outKey + ') for list item \'list\'...');
+  }
+  //return this.constructor;
+  return this;
 }
+
 
 const ListModel = mongoose.model('List', ListSchema);
 

@@ -105,7 +105,7 @@ describe('List API', () => {
     it('Patch the last list with an invalid field', (done) => {
       chai.request(server)
           .patch('/api/list/' + listIdToPatch)
-          .send({'xlistschema': "{field1: 'String'}"})
+          .send({'xlistschema': '{"field1": "String", "field2": "String"}'})
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.a('object');
@@ -119,10 +119,10 @@ describe('List API', () => {
       it('Patch the last list with a new listschema value', (done) => {
         chai.request(server)
             .patch('/api/list/' + listIdToPatch)
-            .send({'listschema': "{field1: 'String'}"})
+            .send({'listschema': '{"field1": "String", "field2": "String"}'})
             .end((err, response) => {
                expect(response).to.have.status(200);
-               expect(response.body).to.have.property('listschema').eq("{field1: 'String'}");
+               expect(response.body).to.have.property('listschema').eq('{"field1": "String", "field2": "String"}');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -180,12 +180,12 @@ describe('List API', () => {
       });
     });
 
-    describe('PATCH /api/list/:listid/:itemid', () => {
+    describe('PATCH /api/list/:itemid', () => {
       it('Patch the last list with a new listschema value', (done) => {
         chai.request(server)
             .patch('/api/listitem/' + listItemIdToPatch)
             .send({
-              'item.field2': 'field2 value222'
+              "field2": "field2 value222"
             })
             .end((err, response) => {
                expect(response).to.have.status(200);

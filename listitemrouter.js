@@ -5,6 +5,8 @@ const listItemModel = require('./listitemmodel');
 const listModel = require('./listmodel');
 
 const Errors = require('./errors');
+const Utils = require('./utils');
+
 
 // ListItem as a referenced document implementation
 
@@ -18,9 +20,9 @@ const Errors = require('./errors');
 *************************************************************************/
 listItemRouter.get('/:itemid', function(req, res, next) {
   listItemModel.findById(req.params.itemid)
-           .then(function(item){              
-              res.status(200).send(item);
-          }).catch(next);
+               .then(function(item){              
+                       res.status(200).send(item);
+               }).catch(next);
 });
 
 /************************************************************************
@@ -33,22 +35,28 @@ listItemRouter.get('/:itemid', function(req, res, next) {
 *************************************************************************/
 listItemRouter.post('', function(req, res, next){
   console.log(req.body);
-  listItemModel.create(req.body)
-               .then(function(item){
-                   if (!item) {
-                     next(new Errors.NotFound('Could not create item...'));
-                   }
-                   else {
-                     // push the item in the list
-                     listModel.findByIdAndUpdate(item.listid, 
-                                                 {$push: {"items": item.id}},
-                                                 {new: true})
-                              .then(function(list){
-                                 res.status(201).send(item);
-                               })
-                   };
-       }).catch(next);
-});
+  if (!(req.body.hasOwnProperty('listid'))){
+    throw new Errors.BadRequest('Listid missing for new item...');
+  }
+  // make sure the list exists
+  listModel.findById(req.body.listid)
+           .then(function(list){
+              list.validateItem(req.body.item);
+              listItemModel.create(req.body)
+                           .then(function(item){
+                                  if (!item) {
+                                    next(new Errors.NotFound('Could not create item...'));
+                                  }
+                                  else {
+                                    list.updateOne({$push: {"items": item.id}})
+                                        .then(function(list){
+                                                res.status(201).send(item);
+                                        }).catch(next);
+                                  }
+                            }).catch(next);
+          }).catch(next);
+        });
+
 /************************************************************************
   POST /api/listitem/:itemid
   
@@ -66,13 +74,18 @@ listItemRouter.post('', function(req, res, next){
 
 *************************************************************************/
 listItemRouter.patch('/:itemid', function(req, res, next) {
-  listItemModel.findByIdAndUpdate(req.params.itemid, 
-                                   //{$set: {"item.field2": "field2 new value"}}, 
-                                   {$set: req.body}, 
-                                   {new: true})
-           .then(function(item){              
-              res.status(200).send(item);
-          }).catch(next);
+  listItemModel.findById(req.params.itemid)
+               .then(function(item){  
+                       listModel.findById(item.listid.toString())
+                                .then(function(list){
+                                        list.validateItem(req.body);
+                                        const toSet = Utils.prefixAllKeys(req.body, 'item.');
+                                        listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true})
+                                            .then(function(newitem){              
+                                                    res.status(200).send(newitem);
+                                             }).catch(next);
+                                 }).catch(next);
+               }).catch(next);
 });
 
 /************************************************************************
