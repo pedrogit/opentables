@@ -1,11 +1,6 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const listItemRouter = express.Router();
-const listItemModel = require('./listitemmodel');
-const listModel = require('./listmodel');
-
-const Errors = require('./errors');
-const Utils = require('./utils');
+const listItemControler = require('./listitemcontroler');
 
 /************************************************************************
   GET /api/listitem/:itemid
@@ -16,10 +11,7 @@ const Utils = require('./utils');
 
 *************************************************************************/
 listItemRouter.get('/:itemid', function(req, res, next) {
-  listItemModel.findById(req.params.itemid)
-    .then(item => {              
-      res.status(200).send(item);
-    }).catch(next);
+  listItemControler.findById(req.params.itemid, res, next);
 });
 
 /************************************************************************
@@ -31,31 +23,7 @@ listItemRouter.get('/:itemid', function(req, res, next) {
 
 *************************************************************************/
 listItemRouter.post('', function(req, res, next){
-  if (!(req.body.hasOwnProperty('listid'))){
-    throw new Errors.BadRequest('Listid missing for new item...');
-  }
-  // make sure the list exists
-  var list = listModel.findById(req.body.listid);
-  list.then(list => {
-      list.validateItem(req.body.item);
-      return list;
-  })
-  .then(list => {
-    return listItemModel.create(req.body);
-  })
-  .then(item => {
-    if (!item) {
-      throw new Errors.NotFound('Could not create item...');
-    }
-    else {
-      list.updateOne({$push: {"items": item.id}});
-    }
-    return item;
-  })
-  .then(item => {
-    res.status(201).send(item);
-  })
-  .catch(next);
+  listItemControler.create(req.body, res, next);
 });
 
 /************************************************************************
@@ -75,18 +43,7 @@ listItemRouter.post('', function(req, res, next){
 
 *************************************************************************/
 listItemRouter.patch('/:itemid', function(req, res, next) {
-  listItemModel.findById(req.params.itemid)
-  .then(item => {  
-    return listModel.findById(item.listid.toString())
-  })
-  .then(list => {
-    list.validateItem(req.body);
-    const toSet = Utils.prefixAllKeys(req.body, 'item.');
-    return listItemModel.findByIdAndUpdate(req.params.itemid, {$set: toSet}, {new: true});
-  })
-  .then(newitem => {              
-    res.status(200).send(newitem);
-  }).catch(next);
+  listItemControler.patch(req.params.itemid, req.body, res, next);
 });
 
 /************************************************************************

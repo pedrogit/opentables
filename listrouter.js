@@ -1,6 +1,6 @@
 const express = require('express');
 const listRouter = express.Router();
-const listModel = require('./listmodel');
+const listControler = require('./listcontroler');
 
 const Errors = require('./errors');
 
@@ -16,20 +16,7 @@ const Errors = require('./errors');
 
 *************************************************************************/
  listRouter.get('/:listid', function(req, res, next) {
-  listModel.findById(req.params.listid)
-    .then(list => {
-      if (!list) {
-        next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
-      }
-      else {
-        return listModel.populate(list, {path: 'items'});
-      }
-    })
-    .then(list => {
-      // unset repeated fields
-      list.items.forEach(function(v){ v.listid = undefined;});
-      res.status(200).send(list);
-    }).catch(next);
+   listControler.findById(req.params.listid, res, next);
 });
 
 /************************************************************************
@@ -41,17 +28,7 @@ const Errors = require('./errors');
   
 *************************************************************************/
 listRouter.post('', function(req, res, next){
-  //console.log(req.body);
-  listModel.validate(req.body)
-    .create(req.body)
-    .then(list => {
-      if (!list) {
-        next(new Errors.NotFound('No such list (' + res.req.params.listid + ')...'));
-      }
-      else {
-        res.status(201).send(list);
-      };
-    }).catch(next);
+  listControler.create(req.body, res, next);
 });
 
 /************************************************************************
@@ -63,11 +40,7 @@ listRouter.post('', function(req, res, next){
 
 *************************************************************************/
 listRouter.patch('/:listid', function(req, res, next) {
-  listModel.validate(req.body)
-    .findByIdAndUpdate(req.params.listid, req.body, {new: true})
-    .then(list => {              
-      res.status(200).send(list);
-    }).catch(next);
+  listControler.patch(req.params.listid, req.body, res, next);
 });
 
 /************************************************************************
@@ -78,17 +51,17 @@ listRouter.patch('/:listid', function(req, res, next) {
  Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
+
+/************************************************************************
+ DELETE /api/list/
+ 
+ Delete all lists!vFor testing purpose only
+ 
+ Return status: 200, 400 invalid or invalid listid, 401, 403
+
+*************************************************************************/
 listRouter.delete('', function(req, res, next){
-  listModel.deleteMany({
-  })
-  .then(lists => {
-    // if DELETE fails return 500
-    if (lists.ok != 1) {
-      next();
-    }
-    // otherwise send the count of object deleted
-    res.status(200).send({'deletedCount': lists.deletedCount});
-  }).catch(next);
+  listControler.deleteAll(res, next);
 });
 
 module.exports = listRouter;
