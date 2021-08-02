@@ -4,6 +4,9 @@ const listControler = require('./listcontroler');
 
 const Errors = require('../utils/errors');
 
+
+const listModel = require('./listmodel');
+
 /************************************************************************
   GET /api/list/:listid
 
@@ -15,8 +18,11 @@ const Errors = require('../utils/errors');
     noitems: Do not includes items. Default false.
 
 *************************************************************************/
- listRouter.get('/:listid', function(req, res, next) {
-   listControler.findById(req.params.listid, res, next);
+listRouter.get('/:listid', function(req, res, next) {
+  listControler.findById(req.params.listid)
+  .then(list => {
+    res.status(200).send(list);
+  }).catch(next);
 });
 
 /************************************************************************
@@ -27,8 +33,11 @@ const Errors = require('../utils/errors');
   Return status: 201, 400 invalid json, 401, 403
   
 *************************************************************************/
-listRouter.post('', function(req, res, next){
-  listControler.create(req.body, res, next);
+listRouter.post('', function(req, res, next) {
+  listControler.create(req.body)
+  .then(list => {
+    res.status(201).send(list);
+  }).catch(next);
 });
 
 /************************************************************************
@@ -40,7 +49,10 @@ listRouter.post('', function(req, res, next){
 
 *************************************************************************/
 listRouter.patch('/:listid', function(req, res, next) {
-  listControler.patch(req.params.listid, req.body, res, next);
+  listControler.patch(req.params.listid, req.body)
+  .then(list => {
+    res.status(200).send(list);
+  }).catch(next);
 });
 
 /************************************************************************
@@ -60,8 +72,16 @@ listRouter.patch('/:listid', function(req, res, next) {
  Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listRouter.delete('', function(req, res, next){
-  listControler.deleteAll(res, next);
+listRouter.delete('', function(req, res, next) {
+  listControler.deleteAll(res, next)
+  .then(lists => {
+    // if DELETE fails let the server default error handler return 500
+    if (lists.ok != 1) {
+      next();
+    }
+    // otherwise send the count of object deleted
+    res.status(200).send({'deletedCount': lists.deletedCount});
+  }).catch(next);
 });
 
 module.exports = listRouter;
