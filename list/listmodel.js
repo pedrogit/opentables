@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const mongSchema = mongoose.Schema;
 
-const Errors = require('./errors');
-const Utils = require('./utils');
+const Errors = require('../utils/errors');
+const Utils = require('../utils/utils');
 
 // create list schema & model
 const ListSchema = new mongSchema({

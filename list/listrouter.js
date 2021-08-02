@@ -2,7 +2,7 @@ const express = require('express');
 const listRouter = express.Router();
 const listControler = require('./listcontroler');
 
-const Errors = require('./errors');
+const Errors = require('../utils/errors');
 
 /************************************************************************
   GET /api/list/:listid

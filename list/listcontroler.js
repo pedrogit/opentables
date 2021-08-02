@@ -1,6 +1,6 @@
 const listModel = require('./listmodel');
 
-const Errors = require('./errors');
+const Errors = require('../utils/errors');
 
 class ListControler {
   findById(listid, res, next){

@@ -17,10 +17,10 @@ app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Handle the REST listitem API
-app.use('/api/listitem', require('./listitemrouter'));
+app.use('/api/listitem', require('./listitem/listitemrouter'));
 
 // Handle the REST list API
-app.use('/api/list', require('./listrouter'));
+app.use('/api/list', require('./list/listrouter'));
 
 // Implement a generic error sending middleware
 app.use((err, req, res, next) => {

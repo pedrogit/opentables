@@ -1,8 +1,8 @@
 const listItemModel = require('./listitemmodel');
-const listModel = require('./listmodel');
+const listModel = require('../list/listmodel');
 
-const Errors = require('./errors');
-const Utils = require('./utils');
+const Errors = require('../utils/errors');
+const Utils = require('../utils/utils');
 
 class ListItemControler {
   findById(itemid, res, next){
