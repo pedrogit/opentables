@@ -2,6 +2,8 @@ const express = require('express');
 const listItemRouter = express.Router();
 const listItemControler = require('./listitemcontroler');
 
+const asyncHandler = require('express-async-handler')
+
 /************************************************************************
   GET /api/listitem/:itemid
 
@@ -10,9 +12,10 @@ const listItemControler = require('./listitemcontroler');
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listItemRouter.get('/:itemid', function(req, res, next) {
-  listItemControler.findById(req.params.itemid, res, next);
-});
+listItemRouter.get('/:itemid', asyncHandler(async (req, res, next) => {
+  const item = await listItemControler.findById(req.params.itemid, res, next)
+  res.status(200).send(item);
+}));
 
 /************************************************************************
   POST /api/listitem/
@@ -22,9 +25,10 @@ listItemRouter.get('/:itemid', function(req, res, next) {
   Return status: 201, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.post('', function(req, res, next){
-  listItemControler.create(req.body, res, next);
-});
+listItemRouter.post('', asyncHandler(async (req, res, next) => {
+  const item = await listItemControler.create(req.body, res, next);
+  res.status(201).send(item);
+}));
 
 /************************************************************************
   POST /api/listitem/:itemid
@@ -42,9 +46,10 @@ listItemRouter.post('', function(req, res, next){
   Return status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.patch('/:itemid', function(req, res, next) {
-  listItemControler.patch(req.params.itemid, req.body, res, next);
-});
+listItemRouter.patch('/:itemid', asyncHandler(async (req, res, next) => {
+  const newitem = await listItemControler.patch(req.params.itemid, req.body, res, next);
+  res.status(200).send(newitem);
+}));
 
 /************************************************************************
   DELETE /api/listitem/:itemid  // Delete one or many list items if has list edit permission

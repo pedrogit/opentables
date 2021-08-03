@@ -5,52 +5,40 @@ const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
 
 class ListItemControler {
-  findById(itemid, res, next){
-    listItemModel.findById(itemid)
-    .then(item => {              
-      res.status(200).send(item);
-    }).catch(next);
-  }
-
-  create(listitem, res, next){
-    if (!(listitem.hasOwnProperty('listid'))){
-        throw new Errors.BadRequest('Listid missing for new item...');
+  async findById(itemid, res, next) {
+    const item = await listItemModel.findById(itemid);
+    if (!item) {
+      throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
     }
-    // make sure the list exists
-    var list = listModel.findById(listitem.listid);
-    list.then(list => {
-        list.validateItem(listitem.item);
-        return list;
-    })
-    .then(list => {
-        return listItemModel.create(listitem);
-    })
-    .then(item => {
-        if (!item) {
-          throw new Errors.NotFound('Could not create item...');
-        }
-        list.updateOne({$push: {"items": item.id}});
-        return item;
-    })
-    .then(item => {
-        res.status(201).send(item);
-    })
-    .catch(next);
+    return item;
   }
 
-  patch(itemid, listitem, res, next){
-    listItemModel.findById(itemid)
-    .then(item => {  
-        return listModel.findById(item.listid.toString())
-    })
-    .then(list => {
-        list.validateItem(listitem);
-        const toSet = Utils.prefixAllKeys(listitem, 'item.');
-        return listItemModel.findByIdAndUpdate(itemid, {$set: toSet}, {new: true});
-    })
-    .then(newitem => {              
-        res.status(200).send(newitem);
-    }).catch(next);
+  async create(listitem, res, next) {
+    if (!(listitem.hasOwnProperty('listid'))){
+      throw new Errors.BadRequest('Listid missing for new item...');
+    }
+    // find the list in order to validate the item schema
+    const list = await listModel.findById(listitem.listid);
+
+    list.validateItem(listitem.item);
+
+    const item = await listItemModel.create(listitem);
+
+    if (!item) {
+     throw new Errors.NotFound('Could not create item...');
+    }
+    await list.updateOne({$push: {"items": item.id}});
+
+    return item;
+  }
+
+  async patch(itemid, listitem, res, next) {
+    const item = await listItemModel.findById(itemid);
+    const list = await listModel.findById(item.listid.toString());
+
+    list.validateItem(listitem);
+    const toSet = Utils.prefixAllKeys(listitem, 'item.');
+    return listItemModel.findByIdAndUpdate(itemid, {$set: toSet}, {new: true});
   }
 }
 

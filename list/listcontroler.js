@@ -3,41 +3,37 @@ const listModel = require('./listmodel');
 const Errors = require('../utils/errors');
 
 class ListControler {
-  findById(listid) {
-    return listModel.findById(listid)
-    .then(list => {
-      if (!list) {
-        throw new Errors.NotFound('No such list (' + listid + ')...');
-      }
-      else {
-        return listModel.populate(list, {path: 'items'});
-      }
-    })
-    .then(list => {
-      // unset repeated fields
-      return list.items.forEach(function(v){ v.listid = undefined;});
-    });
+  async findById(listid) {
+    const list = await listModel.findById(listid);
+
+    if (!list) {
+      throw new Errors.NotFound('Could not find list (' + listid + ')...');
+    }
+    await listModel.populate(list, {path: 'items'});
+
+    // unset repeated fields
+    return list.items.forEach(function(v){ v.listid = undefined;});
   }
 
-  create(list) {
-    return listModel.validate(list)
-    .create(list)
-    .then(list => {
-      if (!list) {
-        throw new Errors.NotFound('Could not create new list...');
-      }
-      return list;
-    });
+  async create(list) {
+    listModel.validate(list);
+    const newlist = await listModel.create(list);
+
+    if (!newlist) {
+     throw new Errors.NotFound('Could not create new list...');
+    }
+    return newlist;
   }
 
-  patch(listid, list) {
-    return listModel.validate(list).findByIdAndUpdate(listid, list, {new: true})
-    .then(list => {
-      if (!list) {
-        throw new Errors.NotFound('Could not create new list...');
-      }
-      return list;
-    });
+  async patch(listid, list) {
+    listModel.validate(list);
+    
+    const newlist = await listModel.findByIdAndUpdate(listid, list, {new: true});
+
+    if (!newlist) {
+     throw new Errors.NotFound('Could not create new list...');
+    }
+    return newlist;
   }
 
   deleteAll(res, next) {

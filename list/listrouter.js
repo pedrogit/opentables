@@ -3,9 +3,8 @@ const listRouter = express.Router();
 const listControler = require('./listcontroler');
 
 const Errors = require('../utils/errors');
+const asyncHandler = require('express-async-handler')
 
-
-const listModel = require('./listmodel');
 
 /************************************************************************
   GET /api/list/:listid
@@ -18,12 +17,10 @@ const listModel = require('./listmodel');
     noitems: Do not includes items. Default false.
 
 *************************************************************************/
-listRouter.get('/:listid', function(req, res, next) {
-  listControler.findById(req.params.listid)
-  .then(list => {
+listRouter.get('/:listid', asyncHandler(async (req, res, next) => {
+    const list = await listControler.findById(req.params.listid);
     res.status(200).send(list);
-  }).catch(next);
-});
+}));
 
 /************************************************************************
   POST /api/list
@@ -33,12 +30,10 @@ listRouter.get('/:listid', function(req, res, next) {
   Return status: 201, 400 invalid json, 401, 403
   
 *************************************************************************/
-listRouter.post('', function(req, res, next) {
-  listControler.create(req.body)
-  .then(list => {
-    res.status(201).send(list);
-  }).catch(next);
-});
+listRouter.post('', asyncHandler(async (req, res, next) => {
+  const list = await listControler.create(req.body)
+  res.status(201).send(list);
+}));
 
 /************************************************************************
   PATCH /api/list/:listid
@@ -48,12 +43,10 @@ listRouter.post('', function(req, res, next) {
   Return status: 200, 400 invalid json or invalid listid, 401, 403
 
 *************************************************************************/
-listRouter.patch('/:listid', function(req, res, next) {
-  listControler.patch(req.params.listid, req.body)
-  .then(list => {
-    res.status(200).send(list);
-  }).catch(next);
-});
+listRouter.patch('/:listid', asyncHandler(async (req, res, next) => {
+  const list = await listControler.patch(req.params.listid, req.body)
+  res.status(200).send(list);
+}));
 
 /************************************************************************
  DELETE /api/list/:listid
@@ -72,17 +65,15 @@ listRouter.patch('/:listid', function(req, res, next) {
  Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listRouter.delete('', function(req, res, next) {
-  listControler.deleteAll(res, next)
-  .then(lists => {
-    // if DELETE fails let the server default error handler return 500
-    if (lists.ok != 1) {
-      next();
-    }
-    // otherwise send the count of object deleted
-    res.status(200).send({'deletedCount': lists.deletedCount});
-  }).catch(next);
-});
+listRouter.delete('', asyncHandler(async (req, res, next) => {
+  const result = await listControler.deleteAll(res, next)  
+  // if DELETE fails let the server default error handler return 500
+  if (result.ok != 1) {
+    next();
+  }
+  // otherwise send the count of object deleted
+  res.status(200).send({'deletedCount': result.deletedCount});
+}));
 
 module.exports = listRouter;
 

@@ -25,6 +25,7 @@
   "homepage": "https://github.com/pedrogit/opentables#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
     "mongoose": "^5.13.2",
     "morgan": "^1.10.0"
   },
