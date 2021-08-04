@@ -1,5 +1,5 @@
-const listItemModel = require('./listitemmodel');
-const listModel = require('../list/listmodel');
+const listItemModel = require('./listItemModel');
+const listModel = require('../list/listModel');
 
 const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');

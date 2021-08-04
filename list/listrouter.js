@@ -1,10 +1,9 @@
 const express = require('express');
 const listRouter = express.Router();
-const listControler = require('./listcontroler');
+const listControler = require('./listControler');
 
 const Errors = require('../utils/errors');
 const asyncHandler = require('express-async-handler')
-
 
 /************************************************************************
   GET /api/list/:listid
@@ -18,8 +17,8 @@ const asyncHandler = require('express-async-handler')
 
 *************************************************************************/
 listRouter.get('/:listid', asyncHandler(async (req, res, next) => {
-    const list = await listControler.findById(req.params.listid);
-    res.status(200).send(list);
+  const list = await listControler.findById(req.params.listid);
+  res.status(200).send(list);
 }));
 
 /************************************************************************

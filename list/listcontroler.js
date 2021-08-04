@@ -1,4 +1,4 @@
-const listModel = require('./listmodel');
+const listModel = require('./listModel');
 
 const Errors = require('../utils/errors');
 
