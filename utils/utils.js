@@ -32,19 +32,19 @@ exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trim
   assert(trimArr[0].length == 1);
   assert(trimArr[1].length == 1);
 
-  // remove trimming spaces at the beginning if requested
+  // remove trimming spaces before trimming provided characters if requested
   if (trimSpacesBefore) {
     str = str.trim();
   }
 
-  // remove characters
+  // remove characters only if they area at both end
   if (str.length > 1 && 
       str.slice(0, 1) == trimArr[0] && 
       str.slice(-1) == trimArr[1]) {
     str = str.slice(1).slice(0, str.length - 2);
   }
   
-  // remove trimming spaces at the beginning if requested
+  // remove trimming spaces after trimming provided characters if requested
   if (trimSpacesAfter) {
     str = str.trim();
   }

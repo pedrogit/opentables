@@ -44,6 +44,17 @@ describe('Test Utils functions', () => {
       var result = Utils.trimFromEdges('{aaaa}', ['{', '}']);
       expect(result).to.equal('aaaa');
     });
+
+    it('Remove surrounding space even if trimming characters are not found', () => { 
+      var result = Utils.trimFromEdges(' {aaaa}', '"', true, false);
+      expect(result).to.equal('{aaaa}');
+    });
+
+    it('Remove space surrounding trimmed string when trimming characters are not found has no effect', () => { 
+      var result = Utils.trimFromEdges(' {aaaa }', '"', true, true);
+      expect(result).to.equal('{aaaa }');
+    });
+
   });
 
   describe('Test OTSchemaToJSON', () => {
