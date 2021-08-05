@@ -71,5 +71,11 @@ exports.OTSchemaToJSON = function(otschema) {
   var jsonSchema = exports.completeTrueValues(otschema);
   jsonSchema = exports.trimFromEdges(jsonSchema, ['{', '}'], true, true);
   jsonSchema = '{' + exports.doubleQuoteKeys(jsonSchema) + '}';
-  return JSON.parse(jsonSchema);
+  var parsedSchema = '';
+  try {
+    parsedSchema = JSON.parse(jsonSchema);
+  } catch(err) {
+    throw new Error('Invalid OTSchema (' + otschema + ')...');
+  }
+  return parsedSchema;
 }
