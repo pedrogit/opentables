@@ -16,12 +16,12 @@ describe('List Item Schema', () => {
   });
 
   it('Pass a string schema', () => {
-    var schema = new ItemSchema('{field1: {string: true, required: true}}');
+    var schema = new ItemSchema('field1: {type: string, required}');
     
     expect(schema.validate('{field1: \'toto\'}')).to.be.true;
   });
 
-  it('Pass  JSON schema', () => {
+  it('Pass JSON schema', () => {
     var schema = new ItemSchema(Utils.OTSchemaToJSON('{field1: {string: true, required: true}}'));
     
     expect(schema.validate('{field1: \'toto\'}')).to.be.true;

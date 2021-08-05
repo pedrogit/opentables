@@ -96,6 +96,34 @@ describe('Test Utils functions', () => {
     });
   });
 
+  describe('Test doubleQuoteWordValues()', () => {
+    it('Without surrounding braces', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required');
+      expect(result).to.equal('field1: "required"');
+    });
+
+    it('True without surrounding braces', () => {
+      var result = Utils.doubleQuoteWordValues('field1: true');
+      expect(result).to.equal('field1: true');
+    });
+
+    it('With surrounding braces', () => {
+      var result = Utils.doubleQuoteWordValues('{field1: required}');
+      expect(result).to.equal('{field1: "required"}');
+    });
+
+    it('True with surrounding braces', () => {
+      var result = Utils.doubleQuoteWordValues('{field1: true}');
+      expect(result).to.equal('{field1: true}');
+    });
+
+    it('True with surrounding braces', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: required');
+      expect(result).to.equal('field1: "required", field2: "required"');
+    });
+  });
+
+
   describe('Test OTSchemaToJSON()', () => {
     it('Simple test', () => {
       var result = Utils.OTSchemaToJSON('field1: {required}');
