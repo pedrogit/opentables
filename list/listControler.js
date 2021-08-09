@@ -37,7 +37,7 @@ class ListControler {
     return newlist;
   }
 
-  deleteAll(res, next) {
+  deleteAll() {
     return listModel.deleteMany({});
   }
 }

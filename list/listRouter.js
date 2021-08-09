@@ -65,7 +65,7 @@ listRouter.patch('/:listid', asyncHandler(async (req, res, next) => {
 
 *************************************************************************/
 listRouter.delete('', asyncHandler(async (req, res, next) => {
-  const result = await listControler.deleteAll(res, next)  
+  const result = await listControler.deleteAll()  
   // if DELETE fails let the server default error handler return 500
   if (result.ok != 1) {
     next();
