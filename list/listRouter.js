@@ -59,7 +59,7 @@ listRouter.patch('/:listid', asyncHandler(async (req, res, next) => {
 /************************************************************************
  DELETE /api/list/
  
- Delete all lists!vFor testing purpose only
+ Delete all lists! For testing purpose only
  
  Return status: 200, 400 invalid or invalid listid, 401, 403
 
