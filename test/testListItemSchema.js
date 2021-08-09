@@ -39,10 +39,22 @@ describe('List Item Schema', () => {
     expect(function(){schema.validateJson('{"field": "toto"}')}).to.throw('ItemSchema: JSON object is not valid. "field1" is missing...');
   });
 
+  it('Valid type', () => {
+    var schema = new ItemSchema(Utils.OTSchemaToJSON('{field1: {type:string, required}}'));
+    var valid = schema.validateJson('{"field1": "toto"}');
+    expect(valid).to.deep.equal({"field1": "toto"});
+  });
+
   it('Invalid type (number instead of string)', () => {
     var schema = new ItemSchema(Utils.OTSchemaToJSON('{field1: {type:string, required}}'));
     
     expect(function(){schema.validateJson('{"field1": 123}')}).to.throw('ItemSchema: JSON object is not valid. Field "field1" value (123) is not a string...');
+  });
+
+  it('Valid upper', () => {
+    var schema = new ItemSchema(Utils.OTSchemaToJSON('{field1: {type:string, required, upper}}'));
+    var valid = schema.validateJson('{"field1": "toto"}');
+    expect(valid).to.deep.equal({"field1": "TOTO"});
   });
 });
 

@@ -23,9 +23,35 @@ class ItemSchema {
     this.validate();
   };
 
+  // traverse a json object calling provided callbacks according to the right level
+  traverse(obj, parentKey = null, level = 0, callbacks = null) {
+    for (var key in obj) {
+      console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
+      
+      if (level == 3) {
+        throw new Error('Too many levels for ItemSchema "' + this.schema + '"...');
+      }
+      else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
+        callbacks[level](key, obj, parentKey);
+      }
+
+      if (obj[key] !== null && typeof(obj[key]) == "object") {
+          //going one step down in the object tree!!
+          this.traverse(obj[key], key, ++level, callbacks);
+          level--;
+      };
+    };
+  };
+
+  // validate that this schema is valid
+  validate() {
+    this.traverse(this.schema, null, 0, [null, this.validateProperties.bind(this), null]);
+    return true;
+  };
+
   // validate this.schema properties
   validateProperties(key, obj, parentKey) {
-    const validProperties = ['type', 'required']
+    const validProperties = ['type', 'required', 'upper']
     if (!(validProperties.includes(key))) {
       throw new Error('ItemSchema: Invalid property (' + key + ') for ' + parentKey + '...');
     }
@@ -33,34 +59,6 @@ class ItemSchema {
       this.requiredFields.push(parentKey);
     }
   }
-
-  // validate passed JSON fields
-  validateField(key, obj, parentKey) {
-    if (!(Object.keys(this.schema).includes(key))) {
-      throw new Error('ItemSchema: JSON object is not valid. "' + key + '" is not a valid field for this schema...');
-    };
-    // iterate over each shema property for that field and call the corresponding validator
-    for (var property in this.schema[key]) {
-      console.log(property + ': ' + this.schema[key][property]);
-      if (property != 'required') {
-        var validatorName = 'validate_' +  this.schema[key][property];
-        obj[key] = this[validatorName](key, obj[key]); // pass object by value so the validator can modify it directly
-      }
-    }
-  }
-
-  validate_string(key, val) {
-    if (typeof val !== 'string') {
-      throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a string...');
-    }
-    return val;
-  }
-
-  // validate that this schema is valid
-  validate() {
-    this.traverse(this.schema, null, 0, [null, this.validateProperties.bind(this), null]);
-    return true;
-  };
 
   // validate a json string against this schema
   validateJson(jsonstr) {
@@ -83,24 +81,36 @@ class ItemSchema {
     return json;
   };
 
-  traverse(obj, parentKey = null, level = 0, callbacks = null) {
-    for (var key in obj) {
-      console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
-      
-      if (level == 3) {
-        throw new Error('Too many levels for ItemSchema "' + this.schema + '"...');
-      }
-      else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
-        callbacks[level](key, obj, parentKey);
-      }
-
-      if (obj[key] !== null && typeof(obj[key]) == "object") {
-          //going one step down in the object tree!!
-          this.traverse(obj[key], key, ++level, callbacks);
-          level--;
-      };
+  // validate passed JSON fields
+  validateField(key, obj, parentKey) {
+    if (!(Object.keys(this.schema).includes(key))) {
+      throw new Error('ItemSchema: JSON object is not valid. "' + key + '" is not a valid field for this schema...');
     };
-  };
+    // iterate over each shema property for that field and call the corresponding validator
+    for (var property in this.schema[key]) {
+      console.log(property + ': ' + this.schema[key][property]);
+      if (property != 'required') {
+        var validatorName = 'validate_' +  property;
+        obj[key] = this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
+      }
+    }
+  }
+s
+  validate_type(type, key, val) {
+    if (typeof val !== type) {
+      throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a ' + type + '...');
+    }
+    return val;
+  }
+
+  validate_upper(type, key, val) {
+    /*
+    if (typeof val !== 'string') {
+      throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a string...');
+    }
+    */
+    return val.toUpperCase();
+  }
 };
 
 module.exports = ItemSchema;
