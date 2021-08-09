@@ -5,7 +5,7 @@ const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
 
 class ListItemControler {
-  async findById(itemid, res, next) {
+  async findById(itemid) {
     const item = await listItemModel.findById(itemid);
     if (!item) {
       throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
@@ -13,7 +13,7 @@ class ListItemControler {
     return item;
   }
 
-  async create(listitem, res, next) {
+  async create(listitem) {
     if (!(listitem.hasOwnProperty('listid'))){
       throw new Errors.BadRequest('Listid missing for new item...');
     }
@@ -32,7 +32,7 @@ class ListItemControler {
     return item;
   }
 
-  async patch(itemid, listitem, res, next) {
+  async patch(itemid, listitem) {
     const item = await listItemModel.findById(itemid);
     const list = await listModel.findById(item.listid.toString());
 

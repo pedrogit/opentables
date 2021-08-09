@@ -13,7 +13,7 @@ const asyncHandler = require('express-async-handler')
 
 *************************************************************************/
 listItemRouter.get('/:itemid', asyncHandler(async (req, res, next) => {
-  const item = await listItemControler.findById(req.params.itemid, res, next)
+  const item = await listItemControler.findById(req.params.itemid)
   res.status(200).send(item);
 }));
 
@@ -26,7 +26,7 @@ listItemRouter.get('/:itemid', asyncHandler(async (req, res, next) => {
 
 *************************************************************************/
 listItemRouter.post('', asyncHandler(async (req, res, next) => {
-  const item = await listItemControler.create(req.body, res, next);
+  const item = await listItemControler.create(req.body);
   res.status(201).send(item);
 }));
 
@@ -47,7 +47,7 @@ listItemRouter.post('', asyncHandler(async (req, res, next) => {
 
 *************************************************************************/
 listItemRouter.patch('/:itemid', asyncHandler(async (req, res, next) => {
-  const newitem = await listItemControler.patch(req.params.itemid, req.body, res, next);
+  const newitem = await listItemControler.patch(req.params.itemid, req.body);
   res.status(200).send(newitem);
 }));
 
