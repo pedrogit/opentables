@@ -12,7 +12,8 @@ class ListControler {
     await listModel.populate(list, {path: 'items'});
 
     // unset repeated fields
-    return list.items.forEach(function(v){ v.listid = undefined;});
+    list.items.forEach(function(v){ v.listid = undefined;});
+    return list;
   }
 
   async create(list) {
