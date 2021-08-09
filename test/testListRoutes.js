@@ -266,5 +266,39 @@ describe('List API', () => {
              });
       });
     });
+
+    describe('DELETE /api/listitem/', () => {
+      it('Delete all list items', (done) => {
+        chai.request(server)
+            .delete('/api/listitem/')
+            .end((err, response) => {
+               expect(response).to.have.status(200);
+               expect(response.body).to.be.a('object');
+               expect(response.body).to.have.all.keys('deletedCount');
+               done();
+               console.log(JSON.stringify(response.body, null, 2));
+             });
+      });
+    });
+
+    describe('GET /api/list/:listid', () => {
+      it('Get the list to check if all items were deleted', (done) => {
+        chai.request(server)
+            .get('/api/list/' + listIdToPatch)
+            .end((err, response) => {
+               expect(response).to.have.status(200);
+               expect(response.body).to.be.a('object');
+               expect(response.body).to.have.property('_id');
+               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property('rperm', '@owner1');
+               expect(response.body).to.have.property('wperm', '@owner1');
+               expect(response.body).to.have.property('listschema', '{"field1": "String", "field2": "String"}');
+               expect(response.body).to.have.deep.nested.property('items', []);
+               done();
+               console.log(JSON.stringify(response.body, null, 2));
+             });
+      });
+    });
+
   });
 });

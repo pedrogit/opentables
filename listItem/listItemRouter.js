@@ -52,6 +52,23 @@ listItemRouter.patch('/:itemid', asyncHandler(async (req, res, next) => {
 }));
 
 /************************************************************************
+  DELETE /api/listitem/ 
+  
+  Delete all listsItems! For testing purpose only
+  
+  Status: 200, 400 invalid json, 401, 403
+
+*************************************************************************/
+listItemRouter.delete('', asyncHandler(async (req, res, next) => {
+  const result = await listItemControler.deleteAll()  
+  // if DELETE fails let the server default error handler return 500
+  if (result.ok != 1) {
+    next();
+  }
+  // otherwise send the count of object deleted
+  res.status(200).send({'deletedCount': result.deletedCount});
+}));
+/************************************************************************
   DELETE /api/listitem/:itemid  // Delete one or many list items if has list edit permission
                                 // Status: 200, 400 invalid json, 401, 403
 

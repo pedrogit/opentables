@@ -40,6 +40,10 @@ class ListItemControler {
     const toSet = Utils.prefixAllKeys(listitem, 'item.');
     return listItemModel.findByIdAndUpdate(itemid, {$set: toSet}, {new: true});
   }
+
+  deleteAll() {
+    return listItemModel.deleteMany({});
+  }
 }
 
 module.exports = new ListItemControler;
