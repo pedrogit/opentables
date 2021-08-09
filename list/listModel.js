@@ -25,7 +25,7 @@ const ListSchema = new mongSchema({
 }, { versionKey: '_version', id: false });
 
 ListSchema.virtual('items', {
-  ref: 'ListItem', // The Model to use
+  ref: 'ListItemModelName', // The Model to use
   localField: '_id', // Find in Model, where localField 
   foreignField: 'listid', // is equal to foreignField
 });

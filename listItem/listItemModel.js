@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const mongSchema = mongoose.Schema;
 
 // create list schema & model
-const ListItem = new mongSchema({
+const ListItemSchema = new mongSchema({
   listid: {
     type: mongSchema.Types.ObjectId,
     ref: 'List',
@@ -14,6 +14,6 @@ const ListItem = new mongSchema({
   }
 }, { versionKey: '_version' });
 
-const ListItemModel = mongoose.model('ListItem', ListItem);
+const ListItemModel = mongoose.model('ListItemModelName', ListItemSchema);
 
 module.exports = ListItemModel;
