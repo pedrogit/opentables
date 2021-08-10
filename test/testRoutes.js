@@ -41,11 +41,11 @@ describe('List API', () => {
     it('Post a list having an invalid field', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'item': {'xownerid': '60edb91162a87a2c383d5cf2',
-                          'rperm': '@owner1',
-                          'wperm': '@owner1',
-                          'listschema': '{}'}
-          })
+          .send({'xownerid': '60edb91162a87a2c383d5cf2',
+                'rperm': '@owner1',
+                'wperm': '@owner1',
+                'listschema': '{}'}
+          )
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
@@ -60,16 +60,19 @@ describe('List API', () => {
     it('Post a new, empty list', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'item': {'ownerid': '60edb91162a87a2c383d5cf2',
-                          'rperm': '@owner1',
-                          'wperm': '@owner1',
-                          'listschema': '{}'}
-          })
+          .send({'ownerid': '60edb91162a87a2c383d5cf2',
+                 'rperm': '@owner1',
+                 'wperm': '@owner1',
+                 'listschema': '{}'}
+          )
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{}'});
+             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property('rperm', '@owner1');
+             expect(response.body).to.have.property('wperm', '@owner1');
+             expect(response.body).to.have.property('listschema', '{}');
              listIdToPatch = response.body._id;
              done();
              console.log(JSON.stringify(response.body, null, 2));
@@ -99,7 +102,10 @@ describe('List API', () => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{}'});
+             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property('rperm', '@owner1');
+             expect(response.body).to.have.property('wperm', '@owner1');
+             expect(response.body).to.have.property('listschema', '{}');
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -129,7 +135,10 @@ describe('List API', () => {
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'});
+               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property('rperm', '@owner1');
+               expect(response.body).to.have.property('wperm', '@owner1');
+               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string"}, "field2": {"type": "string"}}');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -140,19 +149,17 @@ describe('List API', () => {
     it('Post a first list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({
-            listid: listIdToPatch, 
-            item: {
-              'field1': 'field1val1',
-              'field2': 'field2val1'
-            }
-          })
+          .send({'listid': listIdToPatch, 
+                 'field1': 'field1val1',
+                 'field2': 'field2val1'}
+          )
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
              expect(response.body).to.have.property('listid');
-             expect(response.body).to.have.deep.property('item', {"field1": "field1val1", "field2": "field2val1"});
+             expect(response.body).to.have.property('field1', 'field1val1');
+             expect(response.body).to.have.property('field2', 'field2val1');
              done();
              console.log(JSON.stringify(response.body, null, 2));
             });
@@ -161,19 +168,17 @@ describe('List API', () => {
     it('Post a second list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({
-            listid: listIdToPatch, 
-            item: {
-              'field1': 'field1val2',
-              'field2': 'field2val2'
-            }
-          })
+          .send({'listid': listIdToPatch, 
+                 'field1': 'field1val2',
+                 'field2': 'field2val2'}
+          )
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
              expect(response.body).to.have.property('listid');
-             expect(response.body).to.have.deep.property('item', {"field1": "field1val2", "field2": "field2val2"});
+             expect(response.body).to.have.property('field1', 'field1val2');
+             expect(response.body).to.have.property('field2', 'field2val2');
              listItemIdToPatch = response.body._id;
              done();
              console.log(JSON.stringify(response.body, null, 2));
@@ -188,9 +193,14 @@ describe('List API', () => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'});
-               expect(response.body).to.have.deep.nested.property('items[0].item', {"field1": "field1val1", "field2": "field2val1"});
-               expect(response.body).to.have.deep.nested.property('items[1].item', {"field1": "field1val2", "field2": "field2val2"});
+               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property('rperm', '@owner1');
+               expect(response.body).to.have.property('wperm', '@owner1');
+               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string"}, "field2": {"type": "string"}}');
+               expect(response.body).to.have.deep.nested.property('items[0].field1', 'field1val1');
+               expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
+               expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
+               expect(response.body).to.have.deep.nested.property('items[1].field2', 'field2val2');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -209,7 +219,8 @@ describe('List API', () => {
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
                expect(response.body).to.have.property('listid', listIdToPatch);
-               expect(response.body).to.have.deep.nested.property('item', {"field1": "field1val2", "field2": "field2 value222"});
+               expect(response.body).to.have.deep.nested.property('field1', 'field1val2');
+               expect(response.body).to.have.deep.nested.property('field2', 'field2 value222');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -225,7 +236,8 @@ describe('List API', () => {
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('_id');
                expect(response.body).to.have.property('listid', listIdToPatch);
-               expect(response.body).to.have.deep.nested.property('item', {"field1": "field1val2", "field2": "field2 value222"});
+               expect(response.body).to.have.property('field1', 'field1val2');
+               expect(response.body).to.have.property('field2', 'field2 value222');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -233,16 +245,21 @@ describe('List API', () => {
     });
 
     describe('GET /api/list/:listid', () => {
-      it('Get the list to check if new items were created', (done) => {
+      it('Get the list to check if new items were modified', (done) => {
         chai.request(server)
             .get('/api/listitem/' + listIdToPatch)
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'});
-               expect(response.body).to.have.deep.nested.property('items[0].item', {"field1": "field1val1", "field2": "field2val1"});
-               expect(response.body).to.have.deep.nested.property('items[1].item', {"field1": "field1val2", "field2": "field2 value222"});
+               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property('rperm', '@owner1');
+               expect(response.body).to.have.property('wperm', '@owner1');
+               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string"}, "field2": {"type": "string"}}');
+               expect(response.body).to.have.deep.nested.property('items[0].field1', 'field1val1');
+               expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
+               expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
+               expect(response.body).to.have.deep.nested.property('items[1].field2', 'field2 value222');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });

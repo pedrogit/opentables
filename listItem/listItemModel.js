@@ -10,12 +10,8 @@ const ListItemSchema = new mongSchema({
   listid: {
     type: mongSchema.Types.ObjectId,
     ref: 'List'
-  },
-  item: {
-    type: mongSchema.Types.Mixed,
-    required: [true, 'item is required']
   }
-}, {versionKey: '_version', id: false});
+}, {versionKey: '_version', strict: false , id: false});
 
 ListItemSchema.virtual('items', {
   ref: 'ListItemModelName', // The Model to use

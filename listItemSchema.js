@@ -88,19 +88,21 @@ class ItemSchema {
 
   // validate passed JSON fields
   validateField(key, obj, parentKey) {
-    if (!(Object.keys(this.schema).includes(key))) {
-      throw new Error('ItemSchema: JSON object is not valid. "' + key + '" is not a valid field for this schema...');
-    };
-    // iterate over each shema property for that field and call the corresponding validator
-    for (var property in this.schema[key]) {
-      console.log(property + ': ' + this.schema[key][property]);
-      if (property != 'required') {
-        var validatorName = 'validate_' +  property;
-        obj[key] = this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
+    if (key != 'listid') {
+      if (!(Object.keys(this.schema).includes(key))) {
+        throw new Error('ItemSchema: JSON object is not valid. "' + key + '" is not a valid field for this schema...');
+      };
+      // iterate over each shema property for that field and call the corresponding validator
+      for (var property in this.schema[key]) {
+        console.log(property + ': ' + this.schema[key][property]);
+        if (property != 'required') {
+          var validatorName = 'validate_' +  property;
+          obj[key] = this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
+        }
       }
     }
   }
-s
+
   validate_type(type, key, val) {
     if (typeof val !== type) {
       throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a ' + type + '...');

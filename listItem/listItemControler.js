@@ -12,7 +12,7 @@ class ListItemControler {
     }
 
     // populate the list items if it is a list
-    if (item.item.hasOwnProperty('listschema')) {
+    if (item._doc.hasOwnProperty('listschema')) {
       await listItemModel.populate(item, {path: 'items'});
     }
 
@@ -26,13 +26,13 @@ class ListItemControler {
                    listschema:  {type: string}}';
     if (listid != 0) {
       const list = await listItemModel.findById(listid);
-      schema = list.item.listschema;
+      schema = list._doc.listschema;
     }
     return schema;
   }
 
   async create(listitem) {
-    const isList = listitem.item.hasOwnProperty('listschema');
+    const isList = listitem.hasOwnProperty('listschema');
     const isListItem = listitem.hasOwnProperty('listid')
 
     if (!(isList || isListItem)) {
@@ -42,8 +42,8 @@ class ListItemControler {
     const schemaStr = await this.getListSchema(listitem.listid ? listitem.listid : 0);
 
     try {
-      const schema = new ItemSchema(Utils.OTSchemaToJSON(schemaStr));
-      listitem.item = schema.validateJson(listitem.item);
+      const schema = new ItemSchema(schemaStr);
+      listitem = schema.validateJson(listitem);
     } catch(err) {
       throw new Errors.BadRequest(err.message);
     }
@@ -60,7 +60,7 @@ class ListItemControler {
   async patch(itemid, listitem) {
     const item = await listItemModel.findById(itemid);
 
-    const isList = item.item.hasOwnProperty('listschema');
+    const isList = item.hasOwnProperty('listschema');
     const isListItem = item.hasOwnProperty('listid')
 
     const schemaStr = await this.getListSchema(item.listid ? item.listid : 0);
@@ -72,8 +72,8 @@ class ListItemControler {
       throw new Errors.BadRequest(err.message);
     }
 
-    const toSet = Utils.prefixAllKeys(listitem, 'item.');
-    return listItemModel.findByIdAndUpdate(itemid, {$set: toSet}, {new: true});
+    //const toSet = Utils.prefixAllKeys(listitem, 'item.');
+    return listItemModel.findByIdAndUpdate(itemid, {$set: listitem}, {new: true});
   }
 
   deleteAll() {
