@@ -62,8 +62,13 @@ class ItemSchema {
 
   // validate a json string against this schema
   validateJson(jsonstr) {
-    // make sure passed json is valid json
-    const json = JSON.parse(jsonstr);
+    var json;
+    if (typeof jsonstr === 'string') {
+      json = Utils.OTSchemaToJSON(jsonstr);
+    }
+    else {
+      json = jsonstr;
+    }
 
     // 1) validate all required fields are present
     const jsonkeys = Object.keys(json);

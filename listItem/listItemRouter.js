@@ -12,7 +12,7 @@ const asyncHandler = require('express-async-handler')
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listItemRouter.get('/:itemid', asyncHandler(async (req, res, next) => {
+listItemRouter.get('/:itemid', asyncHandler(async (req, res) => {
   const item = await listItemControler.findById(req.params.itemid)
   res.status(200).send(item);
 }));
@@ -25,7 +25,7 @@ listItemRouter.get('/:itemid', asyncHandler(async (req, res, next) => {
   Return status: 201, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.post('', asyncHandler(async (req, res, next) => {
+listItemRouter.post('', asyncHandler(async (req, res) => {
   const item = await listItemControler.create(req.body);
   res.status(201).send(item);
 }));
@@ -46,7 +46,7 @@ listItemRouter.post('', asyncHandler(async (req, res, next) => {
   Return status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.patch('/:itemid', asyncHandler(async (req, res, next) => {
+listItemRouter.patch('/:itemid', asyncHandler(async (req, res) => {
   const newitem = await listItemControler.patch(req.params.itemid, req.body);
   res.status(200).send(newitem);
 }));
@@ -59,7 +59,7 @@ listItemRouter.patch('/:itemid', asyncHandler(async (req, res, next) => {
   Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.delete('', asyncHandler(async (req, res, next) => {
+listItemRouter.delete('', asyncHandler(async (req, res) => {
   const result = await listItemControler.deleteAll()  
   // if DELETE fails let the server default error handler return 500
   if (result.ok != 1) {

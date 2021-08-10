@@ -19,9 +19,6 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Handle the REST listitem API
 app.use('/api/listitem', require('./listItem/listItemRouter'));
 
-// Handle the REST list API
-app.use('/api/list', require('./list/listRouter'));
-
 // Implement a generic error sending middleware
 app.use((err, req, res, next) => {
   if (err instanceof mongoose.Error.ValidationError) 

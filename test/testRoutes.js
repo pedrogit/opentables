@@ -24,10 +24,10 @@ describe('List API', () => {
     });
   });
 
-  describe('DELETE /api/list', () => {
+  describe('DELETE /api/listitem', () => {
     it('Delete all the lists from the DB', (done) => {
       chai.request(server)
-          .delete('/api/list')
+          .delete('/api/listitem')
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.have.all.keys('deletedCount');
@@ -37,45 +37,39 @@ describe('List API', () => {
     });
   });
 
-  describe('POST /api/list', () => {
+  describe('POST /api/listitem', () => {
     it('Post a list having an invalid field', (done) => {
       chai.request(server)
-          .post('/api/list')
-          .send({
-            'xownerid': '60edb91162a87a2c383d5cf2',
-            'rperm': '@owner1',
-            'wperm': '@owner1',
-            'listschema': '{}'
+          .post('/api/listitem')
+          .send({'item': {'xownerid': '60edb91162a87a2c383d5cf2',
+                          'rperm': '@owner1',
+                          'wperm': '@owner1',
+                          'listschema': '{}'}
           })
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": "Error: Invalid field (xownerid) for 'list'..."});
-
+             expect(response.body).to.deep.equal({"err": 'Error: ItemSchema: JSON object is not valid. "xownerid" is not a valid field for this schema...'});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
     });
   });
 
-  describe('POST /api/list', () => {
+  describe('POST /api/listitem', () => {
     it('Post a new, empty list', (done) => {
       chai.request(server)
-          .post('/api/list')
-          .send({
-            'ownerid': '60edb91162a87a2c383d5cf2',
-            'rperm': '@owner1',
-            'wperm': '@owner1',
-            'listschema': '{}'
+          .post('/api/listitem')
+          .send({'item': {'ownerid': '60edb91162a87a2c383d5cf2',
+                          'rperm': '@owner1',
+                          'wperm': '@owner1',
+                          'listschema': '{}'}
           })
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
-             expect(response.body).to.have.property('rperm', '@owner1');
-             expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{}');
+             expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{}'});
              listIdToPatch = response.body._id;
              done();
              console.log(JSON.stringify(response.body, null, 2));
@@ -83,32 +77,29 @@ describe('List API', () => {
     });
   });
 
-  describe('GET /api/list/:listid', () => {
+  describe('GET /api/listitem/:listid', () => {
     it('Get list with an invalid id', (done) => {
       chai.request(server)
-          .get('/api/list/6102f9efc3b25831e42fec8b')
+          .get('/api/listitem/6102f9efc3b25831e42fec8b')
           .end((err, response) => {
              expect(response).to.have.status(404);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.deep.equal({"err": "Error: Could not find list (6102f9efc3b25831e42fec8b)..."});
+             expect(response.body).to.deep.equal({"err": "Error: Could not find list item (6102f9efc3b25831e42fec8b)..."});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
     });
   });
 
-  describe('GET /api/list/:listid', () => {
+  describe('GET /api/listitem/:listid', () => {
     it('Get the last list by id', (done) => {
       chai.request(server)
-          .get('/api/list/' + listIdToPatch)
+          .get('/api/listitem/' + listIdToPatch)
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
-             expect(response.body).to.have.property('rperm', '@owner1');
-             expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{}');
+             expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{}'});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -118,12 +109,12 @@ describe('List API', () => {
   describe('PATCH /api/list/:listid', () => {
     it('Patch the last list with an invalid field', (done) => {
       chai.request(server)
-          .patch('/api/list/' + listIdToPatch)
-          .send({'xlistschema': '{"field1": "String", "field2": "String"}'})
+          .patch('/api/listitem/' + listIdToPatch)
+          .send({'xlistschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'})
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.deep.equal({"err": "Error: Invalid field (xlistschema) for 'list'..."});
+             expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"xlistschema\" is not a valid field for this schema..."});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -133,15 +124,12 @@ describe('List API', () => {
   describe('PATCH /api/list/:listid', () => {
       it('Patch the last list with a new listschema value', (done) => {
         chai.request(server)
-            .patch('/api/list/' + listIdToPatch)
-            .send({'listschema': '{"field1": "String", "field2": "String"}'})
+            .patch('/api/listitem/' + listIdToPatch)
+            .send({'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'})
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
-               expect(response.body).to.have.property('rperm', '@owner1');
-               expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema').eq('{"field1": "String", "field2": "String"}');
+               expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'});
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -192,18 +180,15 @@ describe('List API', () => {
             });
     });
 
-    describe('GET /api/list/:listid', () => {
+    describe('GET /api/listitem/:listid', () => {
       it('Get the list to check if new items were created', (done) => {
         chai.request(server)
-            .get('/api/list/' + listIdToPatch)
+            .get('/api/listitem/' + listIdToPatch)
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
-               expect(response.body).to.have.property('rperm', '@owner1');
-               expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": "String", "field2": "String"}');
+               expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'});
                expect(response.body).to.have.deep.nested.property('items[0].item', {"field1": "field1val1", "field2": "field2val1"});
                expect(response.body).to.have.deep.nested.property('items[1].item', {"field1": "field1val2", "field2": "field2val2"});
                done();
@@ -213,7 +198,7 @@ describe('List API', () => {
     });
 
     describe('PATCH /api/list/:itemid', () => {
-      it('Patch the last list with a new listschema value', (done) => {
+      it('Patch the last list item', (done) => {
         chai.request(server)
             .patch('/api/listitem/' + listItemIdToPatch)
             .send({
@@ -250,15 +235,12 @@ describe('List API', () => {
     describe('GET /api/list/:listid', () => {
       it('Get the list to check if new items were created', (done) => {
         chai.request(server)
-            .get('/api/list/' + listIdToPatch)
+            .get('/api/listitem/' + listIdToPatch)
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
-               expect(response.body).to.have.property('rperm', '@owner1');
-               expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": "String", "field2": "String"}');
+               expect(response.body).to.have.deep.property('item', {'ownerid': '60edb91162a87a2c383d5cf2', 'rperm': '@owner1', 'wperm': '@owner1', 'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'});
                expect(response.body).to.have.deep.nested.property('items[0].item', {"field1": "field1val1", "field2": "field2val1"});
                expect(response.body).to.have.deep.nested.property('items[1].item', {"field1": "field1val2", "field2": "field2 value222"});
                done();
@@ -266,39 +248,5 @@ describe('List API', () => {
              });
       });
     });
-
-    describe('DELETE /api/listitem/', () => {
-      it('Delete all list items', (done) => {
-        chai.request(server)
-            .delete('/api/listitem/')
-            .end((err, response) => {
-               expect(response).to.have.status(200);
-               expect(response.body).to.be.a('object');
-               expect(response.body).to.have.all.keys('deletedCount');
-               done();
-               console.log(JSON.stringify(response.body, null, 2));
-             });
-      });
-    });
-
-    describe('GET /api/list/:listid', () => {
-      it('Get the list to check if all items were deleted', (done) => {
-        chai.request(server)
-            .get('/api/list/' + listIdToPatch)
-            .end((err, response) => {
-               expect(response).to.have.status(200);
-               expect(response.body).to.be.a('object');
-               expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
-               expect(response.body).to.have.property('rperm', '@owner1');
-               expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": "String", "field2": "String"}');
-               expect(response.body).to.have.deep.nested.property('items', []);
-               done();
-               console.log(JSON.stringify(response.body, null, 2));
-             });
-      });
-    });
-
   });
 });
