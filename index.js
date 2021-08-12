@@ -1,13 +1,10 @@
 const express = require('express');
 //const logger = require("morgan");
-const mongoose = require('mongoose');
+
 const path = require('path');
 
 const app = express();
 const PORT = 3000;
-
-mongoose.connect('mongodb://localhost/listitdata', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false } );
-mongoose.Promise = global.Promise;
 
 app.use(express.urlencoded({extended: true}));
 //app.use(logger('short'));
@@ -21,10 +18,6 @@ app.use('/api/listitem', require('./listItem/listItemRouter'));
 
 // Implement a generic error sending middleware
 app.use((err, req, res, next) => {
-  if (err instanceof mongoose.Error.ValidationError) 
-    return res.status(400)
-              .send(JSON.stringify({error: "Invalid JSON"}))
-
   if (!err.statusCode) err.statusCode = 500;
   
   if (err.statusCode === 301) {
@@ -35,6 +28,7 @@ app.use((err, req, res, next) => {
     .status(err.statusCode)
     .json({err: err.toString()});
 });
+
 
 // Start the server
 server = app.listen(PORT, () => {

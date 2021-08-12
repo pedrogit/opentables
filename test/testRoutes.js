@@ -49,7 +49,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": 'Error: ItemSchema: JSON object is not valid. "xownerid" is not a valid field for this schema...'});
+             expect(response.body).to.deep.equal({"err": 'Error: ItemSchema: JSON object is not valid. "ownerid" is missing...'});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -106,6 +106,36 @@ describe('List API', () => {
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
              expect(response.body).to.have.property('listschema', '{}');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+  });
+
+  describe('PATCH /api/list/:listid', () => {
+    it('Patch with an invalid id', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/aaaa')
+          .send({'xlistschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'})
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.deep.equal({"err": "Error: Invalid ID format..."});
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+  });
+
+  describe('PATCH /api/list/:listid', () => {
+    it('Patch a non existing list', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/61156c3f52de9f98d61f9a23')
+          .send({'xlistschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'})
+          .end((err, response) => {
+             expect(response).to.have.status(404);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.deep.equal({"err": "Error: Could not find list item (61156c3f52de9f98d61f9a23)..."});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -201,6 +231,7 @@ describe('List API', () => {
                expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
                expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
                expect(response.body).to.have.deep.nested.property('items[1].field2', 'field2val2');
+               expect(response.body).not.to.have.deep.nested.property('items[1].listid');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });

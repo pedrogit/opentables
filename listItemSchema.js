@@ -1,5 +1,3 @@
-//var assert = require('assert');
-
 const { createMochaInstanceAlreadyRunningError } = require('mocha/lib/errors');
 const Utils = require('./utils/utils');
 
@@ -61,7 +59,7 @@ class ItemSchema {
   }
 
   // validate a json string against this schema
-  validateJson(jsonstr) {
+  validateJson(jsonstr, strict = true) {
     var json;
     if (typeof jsonstr === 'string') {
       json = Utils.OTSchemaToJSON(jsonstr);
@@ -70,14 +68,16 @@ class ItemSchema {
       json = jsonstr;
     }
 
-    // 1) validate all required fields are present
-    const jsonkeys = Object.keys(json);
-    console.log(jsonkeys);
-    var missingField = '';
-    if (!(jsonkeys === null) && 
-          !(jsonkeys.length === 0) && 
-          !(this.requiredFields.every(field => {var inc = jsonkeys.includes(field); if (!inc) {missingField = field}; return inc}))) {
-      throw new Error('ItemSchema: JSON object is not valid. "' + missingField + '" is missing...');
+    // 1) validate all required fields are present if sctict
+    if (strict) {
+      const jsonkeys = Object.keys(json);
+      console.log(jsonkeys);
+      var missingField = '';
+      if (!(jsonkeys === null) && 
+            !(jsonkeys.length === 0) && 
+            !(this.requiredFields.every(field => {var inc = jsonkeys.includes(field); if (!inc) {missingField = field}; return inc}))) {
+        throw new Error('ItemSchema: JSON object is not valid. "' + missingField + '" is missing...');
+      }
     }
 
     // 2) if strict invalidate non schema fields

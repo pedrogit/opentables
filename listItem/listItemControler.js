@@ -1,45 +1,67 @@
-const listItemModel = require('./listItemModel');
-
+const MongoDB = require('mongodb');
 const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
 const ItemSchema = require('../listItemSchema');
 
+const mongoCollection = 'listitem';
+
 class ListItemControler {
-  async findById(itemid) {
-    const item = await listItemModel.findById(itemid);
+
+  constructor() {
+    console.log('cons');
+      MongoDB.MongoClient.connect('mongodb://localhost/', (err, ldb) => {
+        if (err) {
+        throw new Error('Could not connect to database...');
+      }
+      this.coll = ldb.db('listitdata').collection('listitem');
+    });
+  };
+
+  isList(item) {
+    return item.hasOwnProperty('listschema');
+  }
+
+  isListItem(item) {
+    return item.hasOwnProperty('listid');
+  }
+
+  async findOne(itemid) {
+    var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});
+
     if (!item) {
       throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
     }
 
-    // populate the list items if it is a list
-    if (item._doc.hasOwnProperty('listschema')) {
-      await listItemModel.populate(item, {path: 'items'});
+    if (this.isList(item)) {
+      var pipeline = [{$match: {_id: MongoDB.ObjectId(itemid)}},
+                      {$lookup: {from: mongoCollection, localField: '_id', foreignField: 'listid', as: 'items'}},
+                      {$unset: 'items.listid'}
+                     ];
+      item = await this.coll.aggregate(pipeline).toArray();
+      item = item[0];
     }
 
     return item;
   }
 
   async getListSchema(listid) {
-    var schema = '{ownerid: {type: string}, \
-                   rperm:  {type: string}, \
-                   wperm:  {type: string}, \
-                   listschema:  {type: string}}';
-    if (listid != 0) {
-      const list = await listItemModel.findById(listid);
-      schema = list._doc.listschema;
+    var schema = '{ownerid: {type: string, required}, \
+                   rperm:  {type: string, required}, \
+                   wperm:  {type: string, required}, \
+                   listschema:  {type: string, required}}';
+    if (listid) {
+      const list = await this.coll.findOne({_id: MongoDB.ObjectId(listid)});
+      schema = list.listschema;
     }
     return schema;
   }
 
-  async create(listitem) {
-    const isList = listitem.hasOwnProperty('listschema');
-    const isListItem = listitem.hasOwnProperty('listid')
-
-    if (!(isList || isListItem)) {
+  async insert(listitem) {
+    if (!(this.isList(listitem) || this.isListItem(listitem))) {
       throw new Errors.BadRequest('Invalid item...');
     }
 
-    const schemaStr = await this.getListSchema(listitem.listid ? listitem.listid : 0);
+    const schemaStr = await this.getListSchema(this.isListItem(listitem) ? listitem.listid : undefined);
 
     try {
       const schema = new ItemSchema(schemaStr);
@@ -48,36 +70,50 @@ class ListItemControler {
       throw new Errors.BadRequest(err.message);
     }
 
-    const item = await listItemModel.create(listitem);
+    // convert the listid to an objectid
+    if (this.isListItem(listitem)) {
+      listitem.listid = MongoDB.ObjectId(listitem.listid);
+    }
+    await this.coll.insertOne(listitem);
 
-    if (!item) {
+    if (!listitem) {
      throw new Errors.NotFound('Could not create item...');
     }
 
-    return item;
+    return listitem;
   }
 
+
   async patch(itemid, listitem) {
-    const item = await listItemModel.findById(itemid);
+    if (!(MongoDB.ObjectId.isValid(itemid))) {
+      throw new Errors.BadRequest('Invalid ID format...');
+    }
 
-    const isList = item.hasOwnProperty('listschema');
-    const isListItem = item.hasOwnProperty('listid')
+    // first find the item to get it's parent list schema
+    var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});
+    if (!item) {
+      throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
+    }
+    const schemaStr = await this.getListSchema(this.isListItem(item) ? item.listid : 0);
 
-    const schemaStr = await this.getListSchema(item.listid ? item.listid : 0);
-
+    // validate the updated fields
     try {
       const schema = new ItemSchema(Utils.OTSchemaToJSON(schemaStr));
-      listitem = schema.validateJson(listitem);
+      listitem = schema.validateJson(listitem, false);
     } catch(err) {
       throw new Errors.BadRequest(err.message);
     }
-
-    //const toSet = Utils.prefixAllKeys(listitem, 'item.');
-    return listItemModel.findByIdAndUpdate(itemid, {$set: listitem}, {new: true});
+    
+    // update
+    item = await this.coll.findOneAndUpdate({_id: MongoDB.ObjectId(itemid)}, {$set: listitem}, {returnDocument: 'after'});
+    if (!(item.ok)) {
+      throw new Error('Could not update item...');
+    }
+    return item.value;
   }
 
   deleteAll() {
-    return listItemModel.deleteMany({});
+    return this.coll.deleteMany({});
   }
 }
 
