@@ -9,11 +9,14 @@ const asyncHandler = require('express-async-handler')
 
   Get a list item by id if has list read permission.
 
+  Options:
+    noitems: Do not includes items. Default false.
+
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listItemRouter.get('/:itemid', asyncHandler(async (req, res) => {
-  const item = await listItemControler.findOne(req.params.itemid)
+listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
+  const item = await listItemControler.findOne(req.params.itemid, req.params.noitems === 'noitems' )
   res.status(200).send(item);
 }));
 
@@ -75,6 +78,38 @@ listItemRouter.delete('', asyncHandler(async (req, res) => {
 module.exports = listItemRouter;
 
 /*
+View API
+  Permission: read and edit
+  Edit permission implies read permission (since edit permission automatically allow changing read permission)
+  @viewowner = view owner
+  @listowner keyword = list owner
+  @all = everybody
+  @itemowner = item owner (when items have a itemowner field)
+  GET /api/view               // Get all views the users has permission to view
+                              // Status: 200, 401, 403, 404 (no views weres found)
+                              // Details: includes all views owned by the user
+                              // What if the user does not have permission to view the linked list
+  GET /api/view/:viewid       // Get a view by viewid if has view read permission 
+                              // with all the linked list and its list items if has list read permission 
+                              // Status: 200, 401, 403, 404 (no view was found)
+  GET /api/view/:ownerid/ownedby        // Get all views owned by a specific user
+                                       // Status: 200, 400 invalid userid, 401, 403(?), 404 (the requested userid was not found)
+  GET /api/view/:userid/subscribedtoby  // Get all views a specific user has subscribed to
+                                       // Status: 200, 400 invalid userid, 401, 403(?), 404 (the requested userid was not found)
+  POST /api/view              // Post a new view with new list and list items or a default linked list
+                              // Status: 201, 400 invalid json, 401, 403
+ 
+  POST /api/view/viewid       // Clone a view and set the user a new owner
+                              // Status: 201, 400 invalid json, 401, 403
+                              // Options
+                              //   copyMode=emptyList|fullList|refToList
+  PATCH /api/view/:viewid     // Patch a view by id if has view edit permission 
+                              // Status: 200, 400 invalid json or invalid viewid, 401, 403
+  
+  DELETE /api/view/:viewid    // Delete a view by id and the linked list if no more view links to it and has list edit permission
+                              // Status: 200, 400 invalid or invalid viewid, 401, 403
+ 
+
 Response status codes
   - 200 OK
   - 201 Created - posted resource have been created

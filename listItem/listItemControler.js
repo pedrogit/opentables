@@ -25,14 +25,14 @@ class ListItemControler {
     return item.hasOwnProperty('listid');
   }
 
-  async findOne(itemid) {
+  async findOne(itemid, noitems = false) {
     var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});
 
     if (!item) {
       throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
     }
 
-    if (this.isList(item)) {
+    if (!noitems && this.isList(item)) {
       var pipeline = [{$match: {_id: MongoDB.ObjectId(itemid)}},
                       {$lookup: {from: mongoCollection, localField: '_id', foreignField: 'listid', as: 'items'}},
                       {$unset: 'items.listid'}
