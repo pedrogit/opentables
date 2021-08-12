@@ -176,7 +176,7 @@ describe('List API', () => {
   });
 
   describe('POST /api/listitem', () => {
-    it('Post list item having an invalid listid', (done) => {
+    it('Post a list item having an invalid listid', (done) => {
       chai.request(server)
           .post('/api/listitem')
           .send({'listid': '60edb91162a87a2c383d5cf2', 
@@ -192,7 +192,7 @@ describe('List API', () => {
             });
     });
 
-    it('Post list item having an invalid field', (done) => {
+    it('Post a list item having an invalid field', (done) => {
       chai.request(server)
           .post('/api/listitem')
           .send({'listid': listIdToPatch, 
@@ -204,6 +204,21 @@ describe('List API', () => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
              expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field3\" is not a valid field for this schema..."});
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+            });
+    });
+
+    it('Post a list item with a missing field', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({'listid': listIdToPatch, 
+                 'field1': 'field1val1'}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field2\" is missing..."});
              done();
              console.log(JSON.stringify(response.body, null, 2));
             });
