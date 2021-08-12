@@ -392,36 +392,36 @@ describe('List API', () => {
     });
   });
 
-  describe('Test upper', () => {
+  describe('Test upper and lower', () => {
     it('Patch the last list with a new listschema value', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listIdToPatch)
-          .send({'listschema': '{"field1": {"type": "string", required}, "field2": {"type": "string", required, upper}}'})
+          .send({'listschema': '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}'})
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.have.property('_id');
              expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required, upper}}');
+             expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}');
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
     });
 
-    it('Patch the last list item', (done) => {
+    it('Patch the last list item ', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listItemIdToPatch)
-          .send({
-            "field2": "field2 value222"
+          .send({"field1": "LOWERcase",
+                 "field2": "upperCASE"
           })
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
              expect(response.body).to.have.property('listid', listIdToPatch);
-             expect(response.body).to.have.deep.nested.property('field1', 'field1val2');
-             expect(response.body).to.have.deep.nested.property('field2', 'FIELD2 VALUE222');
+             expect(response.body).to.have.deep.nested.property('field1', 'lowercase');
+             expect(response.body).to.have.deep.nested.property('field2', 'UPPERCASE');
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });

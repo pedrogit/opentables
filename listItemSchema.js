@@ -49,7 +49,7 @@ class ItemSchema {
 
   // validate this.schema properties
   validateProperties(key, obj, parentKey) {
-    const validProperties = ['type', 'required', 'upper']
+    const validProperties = ['type', 'required', 'upper', 'lower']
     if (!(validProperties.includes(key))) {
       throw new Error('ItemSchema: Invalid property (' + key + ') for ' + parentKey + '...');
     }
@@ -117,6 +117,15 @@ class ItemSchema {
     }
     */
     return val.toUpperCase();
+  }
+
+  validate_lower(type, key, val) {
+    /*
+    if (typeof val !== 'string') {
+      throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a string...');
+    }
+    */
+    return val.toLowerCase();
   }
 };
 
