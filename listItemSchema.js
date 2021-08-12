@@ -1,5 +1,6 @@
 const { createMochaInstanceAlreadyRunningError } = require('mocha/lib/errors');
 const Utils = require('./utils/utils');
+const bcrypt = require('bcrypt');
 
 class ItemSchema {
   constructor(schema) {
@@ -49,7 +50,7 @@ class ItemSchema {
 
   // validate this.schema properties
   validateProperties(key, obj, parentKey) {
-    const validProperties = ['type', 'required', 'upper', 'lower']
+    const validProperties = ['type', 'required', 'upper', 'lower', 'encrypt']
     if (!(validProperties.includes(key))) {
       throw new Error('ItemSchema: Invalid property (' + key + ') for ' + parentKey + '...');
     }
@@ -111,21 +112,15 @@ class ItemSchema {
   }
 
   validate_upper(type, key, val) {
-    /*
-    if (typeof val !== 'string') {
-      throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a string...');
-    }
-    */
     return val.toUpperCase();
   }
 
   validate_lower(type, key, val) {
-    /*
-    if (typeof val !== 'string') {
-      throw new Error('ItemSchema: JSON object is not valid. Field "' + key + '" value (' + val + ') is not a string...');
-    }
-    */
     return val.toLowerCase();
+  }
+
+  validate_encrypt(type, key, val) {
+    return bcrypt.hashSync(val, bcrypt.genSaltSync(10));
   }
 };
 

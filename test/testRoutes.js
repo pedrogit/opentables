@@ -1,6 +1,7 @@
 const chai = require('chai');
 const chaihttp = require('chai-http');
 const server = require('../index');
+const bcrypt = require('bcrypt');
 
 chai.use(chaihttp);
 
@@ -420,8 +421,46 @@ describe('List API', () => {
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
              expect(response.body).to.have.property('listid', listIdToPatch);
-             expect(response.body).to.have.deep.nested.property('field1', 'lowercase');
-             expect(response.body).to.have.deep.nested.property('field2', 'UPPERCASE');
+             expect(response.body).to.have.property('field1', 'lowercase');
+             expect(response.body).to.have.property('field2', 'UPPERCASE');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+  });
+
+  describe('Test encrypt', () => {
+    it('Patch the last list with a new listschema value', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listIdToPatch)
+          .send({'listschema': '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}'})
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property('rperm', '@owner1');
+             expect(response.body).to.have.property('wperm', '@owner1');
+             expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+
+    it('Patch the last list item ', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listItemIdToPatch)
+          .send({"field1": "LOWERcase",
+                 "field2": "upperCASE",
+                 "field3": "encrypted string"
+          })
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property('listid', listIdToPatch);
+             expect(response.body).to.have.property('field1', 'lowercase');
+             expect(response.body).to.have.property('field2', 'UPPERCASE');
+             expect(bcrypt.compareSync("encrypted string", response.body.field3)).to.be.true;
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
