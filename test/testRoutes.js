@@ -339,7 +339,6 @@ describe('List API', () => {
     describe('GET /api/listitem/:itemid', () => {
       it('Get the last posted item', (done) => {
         chai.request(server)
-            //.patch('/api/listitem/' + listIdToPatch + '/' + listItemIdToPatch)
             .get('/api/listitem/' + listItemIdToPatch)
             .end((err, response) => {
                expect(response).to.have.status(200);
@@ -373,6 +372,42 @@ describe('List API', () => {
                console.log(JSON.stringify(response.body, null, 2));
              });
       });
+    });
+  });
+
+  describe('Test upper', () => {
+    it('Patch the last list with a new listschema value', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listIdToPatch)
+          .send({'listschema': '{"field1": {"type": "string", required}, "field2": {"type": "string", required, upper}}'})
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property('rperm', '@owner1');
+             expect(response.body).to.have.property('wperm', '@owner1');
+             expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required, upper}}');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
+    });
+
+    it('Patch the last list item', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listItemIdToPatch)
+          .send({
+            "field2": "field2 value222"
+          })
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property('listid', listIdToPatch);
+             expect(response.body).to.have.deep.nested.property('field1', 'field1val2');
+             expect(response.body).to.have.deep.nested.property('field2', 'FIELD2 VALUE222');
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+           });
     });
   });
 });
