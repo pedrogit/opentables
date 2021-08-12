@@ -5,6 +5,11 @@ const ItemSchema = require('../listItemSchema');
 
 const mongoCollection = 'listitem';
 
+const listSchema = '{ownerid: {type: string, required}, \
+                     rperm:  {type: string, required}, \
+                     wperm:  {type: string, required}, \
+                     listschema:  {type: string, required}}';
+
 class ListItemControler {
 
   constructor() {
@@ -45,18 +50,14 @@ class ListItemControler {
   }
 
   async getListSchema(listid) {
-    var schema = '{ownerid: {type: string, required}, \
-                   rperm:  {type: string, required}, \
-                   wperm:  {type: string, required}, \
-                   listschema:  {type: string, required}}';
     if (listid) {
       const list = await this.coll.findOne({_id: MongoDB.ObjectId(listid)});
       if (!list) {
         throw new Errors.NotFound('Could not find list with id (' + listid + ')...');
       }
-      schema = list.listschema;
+      return list.listschema;
     }
-    return schema;
+    return listSchema;
   }
 
   async insert(listitem) {
