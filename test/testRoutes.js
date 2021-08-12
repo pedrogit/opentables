@@ -161,14 +161,14 @@ describe('List API', () => {
       it('Patch the last list with a new listschema value', (done) => {
         chai.request(server)
             .patch('/api/listitem/' + listIdToPatch)
-            .send({'listschema': '{"field1": {"type": "string"}, "field2": {"type": "string"}}'})
+            .send({'listschema': '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}'})
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('_id');
                expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string"}, "field2": {"type": "string"}}');
+               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -176,6 +176,39 @@ describe('List API', () => {
   });
 
   describe('POST /api/listitem', () => {
+    it('Post list item having an invalid listid', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({'listid': '60edb91162a87a2c383d5cf2', 
+                 'field1': 'field1val1',
+                 'field2': 'field2val1'}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(404);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.deep.equal({"err": "Error: Could not find list with id (60edb91162a87a2c383d5cf2)..."});
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+            });
+    });
+
+    it('Post list item having an invalid field', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({'listid': listIdToPatch, 
+                 'field1': 'field1val1',
+                 'field2': 'field2val1',
+                 'field3': 'field3val1'}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field3\" is not a valid field for this schema..."});
+             done();
+             console.log(JSON.stringify(response.body, null, 2));
+            });
+    });
+
     it('Post a first list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
@@ -226,7 +259,7 @@ describe('List API', () => {
                expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string"}, "field2": {"type": "string"}}');
+               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                expect(response.body).to.have.deep.nested.property('items[0].field1', 'field1val1');
                expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
                expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
@@ -239,6 +272,36 @@ describe('List API', () => {
     });
 
     describe('PATCH /api/list/:itemid', () => {
+      it('Patch the last list item with a non existing field', (done) => {
+        chai.request(server)
+            .patch('/api/listitem/' + listItemIdToPatch)
+            .send({
+              "field3": "field2 value222"
+            })
+            .end((err, response) => {
+               expect(response).to.have.status(400);
+               expect(response.body).to.be.a('object');
+               expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field3\" is not a valid field for this schema..."});
+               done();
+               console.log(JSON.stringify(response.body, null, 2));
+             });
+      });
+
+      it('Patch the last list item with a value of the wrong type', (done) => {
+        chai.request(server)
+            .patch('/api/listitem/' + listItemIdToPatch)
+            .send({
+              "field2": 222
+            })
+            .end((err, response) => {
+               expect(response).to.have.status(400);
+               expect(response.body).to.be.a('object');
+               expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. Field \"field2\" value (222) is not a string..."});
+               done();
+               console.log(JSON.stringify(response.body, null, 2));
+             });
+      });
+
       it('Patch the last list item', (done) => {
         chai.request(server)
             .patch('/api/listitem/' + listItemIdToPatch)
@@ -286,7 +349,7 @@ describe('List API', () => {
                expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string"}, "field2": {"type": "string"}}');
+               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                expect(response.body).to.have.deep.nested.property('items[0].field1', 'field1val1');
                expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
                expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');

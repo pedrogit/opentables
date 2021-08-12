@@ -51,6 +51,9 @@ class ListItemControler {
                    listschema:  {type: string, required}}';
     if (listid) {
       const list = await this.coll.findOne({_id: MongoDB.ObjectId(listid)});
+      if (!list) {
+        throw new Errors.NotFound('Could not find list with id (' + listid + ')...');
+      }
       schema = list.listschema;
     }
     return schema;
