@@ -1,7 +1,7 @@
 var Globals = {
     'listIdFieldName':'_listid',
     'listSchemaFieldName': 'listschema',
-    'ownerIdFieldName': 'ownerid',
+    'ownerIdFieldName': '_ownerid',
     'mongoCollectionName': 'listitem',
     'mongoDatabaseName': 'listitdata'
 }
