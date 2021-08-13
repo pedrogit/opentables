@@ -88,9 +88,7 @@ describe('List API', () => {
              //console.log(JSON.stringify(response.body, null, 2));
           });
     });
-  });
 
-  describe('GET /api/listitem/:listid', () => {
     it('Get the last list by id', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch)
@@ -108,7 +106,7 @@ describe('List API', () => {
     });
   });
 
-  describe('PATCH /api/list/:listid', () => {
+  describe('PATCH on list', () => {
     it('Patch with an invalid id', (done) => {
       chai.request(server)
           .patch('/api/listitem/aaaa')
@@ -376,8 +374,8 @@ describe('List API', () => {
     });
   });
 
-  describe('Test upper and lower', () => {
-    it('Patch the last list with a new listschema value', (done) => {
+  describe('Test upper, lower and encrypt', () => {
+    it('Patch the list with a new listschema value', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listIdToPatch)
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}'})
@@ -393,7 +391,7 @@ describe('List API', () => {
           });
     });
 
-    it('Patch the last list item ', (done) => {
+    it('Patch the last list item with values to be converted to upper and lowercase', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listItemIdToPatch)
           .send({"field1": "LOWERcase",
@@ -410,10 +408,8 @@ describe('List API', () => {
              //console.log(JSON.stringify(response.body, null, 2));
           });
     });
-  });
 
-  describe('Test encrypt', () => {
-    it('Patch the listschema with a new encrypted string', (done) => {
+    it('Patch the listschema so field3 is encrypted', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listIdToPatch)
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}'})
@@ -429,7 +425,7 @@ describe('List API', () => {
           });
     });
 
-    it('Patch the last list item ', (done) => {
+    it('Patch the last list item with a values to be encrypted', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listItemIdToPatch)
           .send({"field3": "encrypted string"
