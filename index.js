@@ -26,7 +26,7 @@ app.use((err, req, res, next) => {
 
   return res
     .status(err.statusCode)
-    .json({err: err.toString()});
+    .json({err: err.message});
 });
 
 

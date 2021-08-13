@@ -3,6 +3,8 @@ const chaihttp = require('chai-http');
 const server = require('../index');
 const bcrypt = require('bcrypt');
 const Globals = require('../globals');
+const NodeUtil = require('util');
+const Errors = require('../utils/errors');
 
 chai.use(chaihttp);
 
@@ -49,7 +51,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": 'Error: ItemSchema: JSON object is not valid. "' + Globals.ownerIdFieldName + '" is missing...'});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.ownerIdFieldName)});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -77,13 +79,25 @@ describe('List API', () => {
           });
     });
 
+    it('Get list with a malformed id', (done) => {
+      chai.request(server)
+          .get('/api/listitem/toto')
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.MalformedID, 'toto')});
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
     it('Get list with an invalid id', (done) => {
       chai.request(server)
           .get('/api/listitem/6102f9efc3b25831e42fec8b')
           .end((err, response) => {
              expect(response).to.have.status(404);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.deep.equal({"err": "Error: Could not find list item (6102f9efc3b25831e42fec8b)..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, '6102f9efc3b25831e42fec8b')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -114,7 +128,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.deep.equal({"err": "Error: Invalid ID format..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.MalformedID, 'aaaa')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -127,7 +141,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(404);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.deep.equal({"err": "Error: Could not find list item (61156c3f52de9f98d61f9a23)..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, '61156c3f52de9f98d61f9a23')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -140,7 +154,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"xlistschema\" is not a valid field for this schema..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, 'xlistschema')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -174,7 +188,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(404);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": "Error: Could not find list with id (60edb91162a87a2c383d5cf2)..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.List_NotFound, '60edb91162a87a2c383d5cf2')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -191,7 +205,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field3\" is not a valid field for this schema..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, 'field3')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -206,7 +220,7 @@ describe('List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field2\" is missing..."});
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, 'field2')});
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -290,7 +304,7 @@ describe('List API', () => {
     });
   });
 
-  describe('PATCH on itemid', () => {
+  describe('PATCH on listitem', () => {
     it('Patch the last list item with a non existing field', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listItemIdToPatch)
@@ -300,7 +314,7 @@ describe('List API', () => {
           .end((err, response) => {
               expect(response).to.have.status(400);
               expect(response.body).to.be.a('object');
-              expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. \"field3\" is not a valid field for this schema..."});
+              expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, 'field3')});
               done();
               //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -315,7 +329,7 @@ describe('List API', () => {
           .end((err, response) => {
               expect(response).to.have.status(400);
               expect(response.body).to.be.a('object');
-              expect(response.body).to.deep.equal({"err": "Error: ItemSchema: JSON object is not valid. Field \"field2\" value (222) is not a string..."});
+              expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field2', '222', 'string')});
               done();
               //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -429,6 +443,68 @@ describe('List API', () => {
       chai.request(server)
           .patch('/api/listitem/' + listItemIdToPatch)
           .send({"field3": "encrypted string"
+          })
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
+             expect(response.body).to.have.property('field1', 'lowercase');
+             expect(response.body).to.have.property('field2', 'UPPERCASE');
+             expect(bcrypt.compareSync("encrypted string", response.body.field3)).to.be.true;
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+  });
+
+  describe('Test "string", "number" and "encrypted_string" as basic types', () => {
+    it('Patch the listschema with an invalid type for field4', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listIdToPatch)
+          .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}, "field4": "toto"}'})
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'toto', 'field4')});
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('Patch the listschema so field4 is defined as a basic string', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listIdToPatch)
+          .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}, "field4": "string"}'})
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property('rperm', '@owner1');
+             expect(response.body).to.have.property('wperm', '@owner1');
+             expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}, "field4": "string"}');
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('Patch with a non string value', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listItemIdToPatch)
+          .send({"field4": 123
+          })
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.a('object');
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field4', '123', 'string')});
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('Patch with a string', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listItemIdToPatch)
+          .send({"field4": "field4 value4"
           })
           .end((err, response) => {
              expect(response).to.have.status(200);

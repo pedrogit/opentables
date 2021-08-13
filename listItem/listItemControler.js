@@ -3,6 +3,7 @@ const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
 const Globals = require('../globals');
 const ItemSchema = require('../listItemSchema');
+const NodeUtil = require('util');
 
 const listSchema = '{' + Globals.ownerIdFieldName + ': {type: string, required}, \
                      rperm:  {type: string, required}, \
@@ -14,7 +15,7 @@ class ListItemControler {
   constructor() {
     MongoDB.MongoClient.connect('mongodb://localhost/', (err, ldb) => {
       if (err) {
-        throw new Error('Could not connect to database...');
+        throw new Error(Errors.ErrMsg.Database_CouldNotConnect);
       }
       this.coll = ldb.db(Globals.mongoDatabaseName).collection(Globals.mongoCollectionName);
     });
@@ -29,10 +30,14 @@ class ListItemControler {
   }
 
   async findOne(itemid, noitems = false) {
+    if (!(MongoDB.ObjectId.isValid(itemid))) {
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
+    }
+    
     var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});
 
     if (!item) {
-      throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
     }
 
     if (!noitems && this.isList(item)) {
@@ -51,23 +56,40 @@ class ListItemControler {
     if (listid) {
       const list = await this.coll.findOne({_id: MongoDB.ObjectId(listid)});
       if (!list) {
-        throw new Errors.NotFound('Could not find list with id (' + listid + ')...');
+        throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.List_NotFound, listid));
       }
       return list.listschema;
     }
     return listSchema;
   }
 
+  validateSchema(listitem) {
+    
+    if (this.isList(listitem)) {
+      if (Object.keys(listitem).includes(Globals.listSchemaFieldName)) {
+        try {
+          const schema = new ItemSchema(listitem[Globals.listSchemaFieldName]);
+        } catch(err) {
+          throw new Errors.BadRequest(err.message);
+        }
+      }
+    }
+  }
+
   async insert(listitem) {
     if (!(this.isList(listitem) || this.isListItem(listitem))) {
-      throw new Errors.BadRequest('Invalid item...');
+      throw new Errors.BadRequest(Errors.ErrMsg.ListItem_Invalid);
     }
+
+    this.validateSchema(listitem);
 
     const schemaStr = await this.getListSchema(this.isListItem(listitem) ? listitem[Globals.listIdFieldName] : undefined);
 
     try {
       const schema = new ItemSchema(schemaStr);
       listitem = schema.validateJson(listitem);
+
+
     } catch(err) {
       throw new Errors.BadRequest(err.message);
     }
@@ -79,7 +101,7 @@ class ListItemControler {
     await this.coll.insertOne(listitem);
 
     if (!listitem) {
-     throw new Errors.NotFound('Could not create item...');
+      throw new Errors(Errors.ErrMsg.ListItem_CouldNotCreate);
     }
 
     return listitem;
@@ -88,19 +110,21 @@ class ListItemControler {
 
   async patch(itemid, listitem) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
-      throw new Errors.BadRequest('Invalid ID format...');
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
+
+    this.validateSchema(listitem);
 
     // first find the item to get it's parent list schema
     var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});
     if (!item) {
-      throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
     }
     const schemaStr = await this.getListSchema(this.isListItem(item) ? item[Globals.listIdFieldName] : 0);
 
     // validate the updated fields
     try {
-      const schema = new ItemSchema(Utils.OTSchemaToJSON(schemaStr));
+      const schema = new ItemSchema(schemaStr);
       listitem = schema.validateJson(listitem, false);
     } catch(err) {
       throw new Errors.BadRequest(err.message);
@@ -109,7 +133,7 @@ class ListItemControler {
     // update
     item = await this.coll.findOneAndUpdate({_id: MongoDB.ObjectId(itemid)}, {$set: listitem}, {returnDocument: 'after'});
     if (!(item.ok)) {
-      throw new Error('Could not update item...');
+      throw new Error(Errors.ErrMsg.ListItem_CouldNotUpdate);
     }
     return item.value;
   }

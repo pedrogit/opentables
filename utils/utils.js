@@ -80,17 +80,3 @@ exports.doubleQuoteWordValues = function(jsonstr) {
   return newStr;
 }
 
-exports.OTSchemaToJSON = function(otschema) {
-  // double quote keys
-  var jsonSchema = exports.completeTrueValues(otschema);
-  jsonSchema = exports.trimFromEdges(jsonSchema, ['{', '}'], true, true);
-  jsonSchema = exports.doubleQuoteWordValues(jsonSchema);
-  jsonSchema = '{' + exports.doubleQuoteKeys(jsonSchema) + '}';
-  var parsedSchema = '';
-  try {
-    parsedSchema = JSON.parse(jsonSchema);
-  } catch(err) {
-    throw new Error('Invalid OTSchema (' + otschema + ')...');
-  }
-  return parsedSchema;
-}
