@@ -1,33 +1,31 @@
 const MongoDB = require('mongodb');
 const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
+const Globals = require('../globals');
 const ItemSchema = require('../listItemSchema');
 
-const mongoCollection = 'listitem';
-
-const listSchema = '{ownerid: {type: string, required}, \
+const listSchema = '{' + Globals.ownerIdFieldName + ': {type: string, required}, \
                      rperm:  {type: string, required}, \
                      wperm:  {type: string, required}, \
-                     listschema:  {type: string, required}}';
+                     ' + Globals.listSchemaFieldName + ':  {type: string, required}}';
 
 class ListItemControler {
 
   constructor() {
-    console.log('cons');
-      MongoDB.MongoClient.connect('mongodb://localhost/', (err, ldb) => {
-        if (err) {
+    MongoDB.MongoClient.connect('mongodb://localhost/', (err, ldb) => {
+      if (err) {
         throw new Error('Could not connect to database...');
       }
-      this.coll = ldb.db('listitdata').collection('listitem');
+      this.coll = ldb.db(Globals.mongoDatabaseName).collection(Globals.mongoCollectionName);
     });
   };
 
   isList(item) {
-    return item.hasOwnProperty('listschema');
+    return item.hasOwnProperty(Globals.listSchemaFieldName);
   }
 
   isListItem(item) {
-    return item.hasOwnProperty('listid');
+    return item.hasOwnProperty(Globals.listIdFieldName);
   }
 
   async findOne(itemid, noitems = false) {
@@ -39,8 +37,8 @@ class ListItemControler {
 
     if (!noitems && this.isList(item)) {
       var pipeline = [{$match: {_id: MongoDB.ObjectId(itemid)}},
-                      {$lookup: {from: mongoCollection, localField: '_id', foreignField: 'listid', as: 'items'}},
-                      {$unset: 'items.listid'}
+                      {$lookup: {from: Globals.mongoCollectionName, localField: '_id', foreignField: Globals.listIdFieldName, as: 'items'}},
+                      {$unset: 'items.' + Globals.listIdFieldName}
                      ];
       item = await this.coll.aggregate(pipeline).toArray();
       item = item[0];
@@ -65,7 +63,7 @@ class ListItemControler {
       throw new Errors.BadRequest('Invalid item...');
     }
 
-    const schemaStr = await this.getListSchema(this.isListItem(listitem) ? listitem.listid : undefined);
+    const schemaStr = await this.getListSchema(this.isListItem(listitem) ? listitem[Globals.listIdFieldName] : undefined);
 
     try {
       const schema = new ItemSchema(schemaStr);
@@ -76,7 +74,7 @@ class ListItemControler {
 
     // convert the listid to an objectid
     if (this.isListItem(listitem)) {
-      listitem.listid = MongoDB.ObjectId(listitem.listid);
+      listitem[Globals.listIdFieldName] = MongoDB.ObjectId(listitem[Globals.listIdFieldName]);
     }
     await this.coll.insertOne(listitem);
 
@@ -98,7 +96,7 @@ class ListItemControler {
     if (!item) {
       throw new Errors.NotFound('Could not find list item (' + itemid + ')...');
     }
-    const schemaStr = await this.getListSchema(this.isListItem(item) ? item.listid : 0);
+    const schemaStr = await this.getListSchema(this.isListItem(item) ? item[Globals.listIdFieldName] : 0);
 
     // validate the updated fields
     try {

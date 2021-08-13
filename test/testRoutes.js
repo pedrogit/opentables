@@ -2,6 +2,7 @@ const chai = require('chai');
 const chaihttp = require('chai-http');
 const server = require('../index');
 const bcrypt = require('bcrypt');
+const Globals = require('../globals');
 
 chai.use(chaihttp);
 
@@ -42,15 +43,15 @@ describe('List API', () => {
     it('Post a list having an invalid field', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'xownerid': '60edb91162a87a2c383d5cf2',
+          .send({['x' + Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
                 'rperm': '@owner1',
                 'wperm': '@owner1',
-                'listschema': '{}'}
+                [Globals.listSchemaFieldName]: '{}'}
           )
           .end((err, response) => {
              expect(response).to.have.status(400);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.deep.equal({"err": 'Error: ItemSchema: JSON object is not valid. "ownerid" is missing...'});
+             expect(response.body).to.deep.equal({"err": 'Error: ItemSchema: JSON object is not valid. "' + Globals.ownerIdFieldName + '" is missing...'});
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -61,19 +62,19 @@ describe('List API', () => {
     it('Post a new, empty list', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'ownerid': '60edb91162a87a2c383d5cf2',
+          .send({[Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
                  'rperm': '@owner1',
                  'wperm': '@owner1',
-                 'listschema': '{}'}
+                 [Globals.listSchemaFieldName]: '{}'}
           )
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{}');
+             expect(response.body).to.have.property(Globals.listSchemaFieldName, '{}');
              listIdToPatch = response.body._id;
              done();
              console.log(JSON.stringify(response.body, null, 2));
@@ -103,10 +104,10 @@ describe('List API', () => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{}');
+             expect(response.body).to.have.property(Globals.listSchemaFieldName, '{}');
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -162,14 +163,14 @@ describe('List API', () => {
       it('Patch the last list with a new listschema value', (done) => {
         chai.request(server)
             .patch('/api/listitem/' + listIdToPatch)
-            .send({'listschema': '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}'})
+            .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}'})
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
+               expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                done();
                console.log(JSON.stringify(response.body, null, 2));
              });
@@ -180,7 +181,7 @@ describe('List API', () => {
     it('Post a list item having an invalid listid', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'listid': '60edb91162a87a2c383d5cf2', 
+          .send({[Globals.listIdFieldName]: '60edb91162a87a2c383d5cf2', 
                  'field1': 'field1val1',
                  'field2': 'field2val1'}
           )
@@ -196,7 +197,7 @@ describe('List API', () => {
     it('Post a list item having an invalid field', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'listid': listIdToPatch, 
+          .send({[Globals.listIdFieldName]: listIdToPatch, 
                  'field1': 'field1val1',
                  'field2': 'field2val1',
                  'field3': 'field3val1'}
@@ -213,7 +214,7 @@ describe('List API', () => {
     it('Post a list item with a missing field', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'listid': listIdToPatch, 
+          .send({[Globals.listIdFieldName]: listIdToPatch, 
                  'field1': 'field1val1'}
           )
           .end((err, response) => {
@@ -228,7 +229,7 @@ describe('List API', () => {
     it('Post a first list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'listid': listIdToPatch, 
+          .send({[Globals.listIdFieldName]: listIdToPatch, 
                  'field1': 'field1val1',
                  'field2': 'field2val1'}
           )
@@ -236,7 +237,7 @@ describe('List API', () => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('listid');
+             expect(response.body).to.have.property(Globals.listIdFieldName);
              expect(response.body).to.have.property('field1', 'field1val1');
              expect(response.body).to.have.property('field2', 'field2val1');
              done();
@@ -247,7 +248,7 @@ describe('List API', () => {
     it('Post a second list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
-          .send({'listid': listIdToPatch, 
+          .send({[Globals.listIdFieldName]: listIdToPatch, 
                  'field1': 'field1val2',
                  'field2': 'field2val2'}
           )
@@ -255,7 +256,7 @@ describe('List API', () => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('listid');
+             expect(response.body).to.have.property(Globals.listIdFieldName);
              expect(response.body).to.have.property('field1', 'field1val2');
              expect(response.body).to.have.property('field2', 'field2val2');
              listItemIdToPatch = response.body._id;
@@ -272,10 +273,10 @@ describe('List API', () => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
+               expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                expect(response.body).to.have.deep.nested.property('items[0].field1', 'field1val1');
                expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
                expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
@@ -293,10 +294,10 @@ describe('List API', () => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
+               expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                expect(response.body).not.to.have.property('items');
                done();
                console.log(JSON.stringify(response.body, null, 2));
@@ -345,7 +346,7 @@ describe('List API', () => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('listid', listIdToPatch);
+               expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
                expect(response.body).to.have.deep.nested.property('field1', 'field1val2');
                expect(response.body).to.have.deep.nested.property('field2', 'field2 value222');
                done();
@@ -361,7 +362,7 @@ describe('List API', () => {
             .end((err, response) => {
                expect(response).to.have.status(200);
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('listid', listIdToPatch);
+               expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
                expect(response.body).to.have.property('field1', 'field1val2');
                expect(response.body).to.have.property('field2', 'field2 value222');
                done();
@@ -378,10 +379,10 @@ describe('List API', () => {
                expect(response).to.have.status(200);
                expect(response.body).to.be.a('object');
                expect(response.body).to.have.property('_id');
-               expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
                expect(response.body).to.have.property('rperm', '@owner1');
                expect(response.body).to.have.property('wperm', '@owner1');
-               expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
+               expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}');
                expect(response.body).to.have.deep.nested.property('items[0].field1', 'field1val1');
                expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
                expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
@@ -397,14 +398,14 @@ describe('List API', () => {
     it('Patch the last list with a new listschema value', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listIdToPatch)
-          .send({'listschema': '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}'})
+          .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}'})
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}');
+             expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}');
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -420,7 +421,7 @@ describe('List API', () => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('listid', listIdToPatch);
+             expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
              expect(response.body).to.have.property('field1', 'lowercase');
              expect(response.body).to.have.property('field2', 'UPPERCASE');
              done();
@@ -433,14 +434,14 @@ describe('List API', () => {
     it('Patch the last list with a new listschema value', (done) => {
       chai.request(server)
           .patch('/api/listitem/' + listIdToPatch)
-          .send({'listschema': '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}'})
+          .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}'})
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('ownerid', '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
-             expect(response.body).to.have.property('listschema', '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}');
+             expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}');
              done();
              console.log(JSON.stringify(response.body, null, 2));
            });
@@ -457,7 +458,7 @@ describe('List API', () => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
              expect(response.body).to.have.property('_id');
-             expect(response.body).to.have.property('listid', listIdToPatch);
+             expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
              expect(response.body).to.have.property('field1', 'lowercase');
              expect(response.body).to.have.property('field2', 'UPPERCASE');
              expect(bcrypt.compareSync("encrypted string", response.body.field3)).to.be.true;

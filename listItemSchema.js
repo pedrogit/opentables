@@ -1,6 +1,7 @@
 const { createMochaInstanceAlreadyRunningError } = require('mocha/lib/errors');
 const Utils = require('./utils/utils');
 const bcrypt = require('bcrypt');
+const Globals = require('./globals');
 
 class ItemSchema {
   constructor(schema) {
@@ -89,7 +90,7 @@ class ItemSchema {
 
   // validate passed JSON fields
   validateField(key, obj, parentKey) {
-    if (key != 'listid') {
+    if (key != Globals.listIdFieldName) {
       if (!(Object.keys(this.schema).includes(key))) {
         throw new Error('ItemSchema: JSON object is not valid. "' + key + '" is not a valid field for this schema...');
       };
