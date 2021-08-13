@@ -26,7 +26,7 @@ class ItemSchema {
   // traverse a json object calling provided callbacks according to the right level
   traverse(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {
-      console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
+      //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
       
       if (level == 3) {
         throw new Error('Too many levels for ItemSchema "' + this.schema + '"...');
@@ -73,7 +73,7 @@ class ItemSchema {
     // 1) validate all required fields are present if sctict
     if (strict) {
       const jsonkeys = Object.keys(json);
-      console.log(jsonkeys);
+      //console.log(jsonkeys);
       var missingField = '';
       if (!(jsonkeys === null) && 
             !(jsonkeys.length === 0) && 
