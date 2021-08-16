@@ -78,6 +78,11 @@ describe('testUtils.js Test Utils functions', () => {
       expect(result).to.equal('{00fi-eld_1: {00fi-eld_2: true}}');
     });
 
+    it('Double quoted key', () => {
+      var result = Utils.completeTrueValues('{field1: {  "required"  }}');
+      expect(result).to.equal('{field1: {"required": true}}');
+    });
+    
     it('More values', () => {
       var result = Utils.completeTrueValues('{a: {b, c}}');
       expect(result).to.equal('{a: {b: true, c: true}}');
@@ -94,7 +99,11 @@ describe('testUtils.js Test Utils functions', () => {
       var result = Utils.doubleQuoteKeys('{field1: required}');
       expect(result).to.equal('{"field1": required}');
     });
-  });
+
+    it('Already double quoted', () => {
+      var result = Utils.doubleQuoteKeys('{"field1": required}');
+      expect(result).to.equal('{"field1": required}');
+    });  });
 
   describe('Test doubleQuoteWordValues()', () => {
     it('Without surrounding braces', () => {
@@ -117,12 +126,57 @@ describe('testUtils.js Test Utils functions', () => {
       expect(result).to.equal('{field1: true}');
     });
 
-    it('True with surrounding braces', () => {
+    it('Two values', () => {
       var result = Utils.doubleQuoteWordValues('field1: required, field2: required');
       expect(result).to.equal('field1: "required", field2: "required"');
     });
 
-    it('True with surrounding braces', () => {
+    it('Two values, one already quoted', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "required"');
+      expect(result).to.equal('field1: "required", field2: "required"');
+    });
+
+    it('One quoted value containing :', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ:ired"');
+      expect(result).to.equal('field1: "required", field2: "requ:ired"');
+    });
+
+    it('One quoted value containing ,', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ,ired"');
+      expect(result).to.equal('field1: "required", field2: "requ,ired"');
+    });
+
+    it('One quoted value containing }', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ}ired"');
+      expect(result).to.equal('field1: "required", field2: "requ}ired"');
+    });
+
+    it('One quoted value containing } at the end', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "required}"');
+      expect(result).to.equal('field1: "required", field2: "required}"');
+    });
+
+    it('One quoted value containing "', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ\"ired"');
+      expect(result).to.equal('field1: "required", field2: "requ\"ired"');
+    });
+    
+    it('One quoted value containing " at the end', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ\"ired\""');
+      expect(result).to.equal('field1: "required", field2: "requ\"ired\""');
+    });
+
+    it('One quoted value containing \'', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ\'ired"');
+      expect(result).to.equal('field1: "required", field2: "requ\'ired"');
+    });
+
+    it('One quoted value containing \\', () => {
+      var result = Utils.doubleQuoteWordValues('field1: required, field2: "requ\\ired"');
+      expect(result).to.equal('field1: "required", field2: "requ\\ired"');
+    });
+
+    it('Value in key', () => {
       var result = Utils.doubleQuoteWordValues('testschema: schema');
       expect(result).to.equal('testschema: "schema"');
     });

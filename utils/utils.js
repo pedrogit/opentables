@@ -4,6 +4,7 @@ const NodeUtil = require('util');
 
 const identifierRegEx = '[a-zA-Z0-9_-]+';
 const afterJsonValueRegEx = '(?=[\\,\\}]|$)';
+const anythingDoubleQuoted = '"(?:[^"\\\\]|\\\\.)*"';
 
 exports.objKeysInObjKeys = function(obj1, obj2) {
   for (var key of Object.keys(obj1)) {
@@ -13,6 +14,25 @@ exports.objKeysInObjKeys = function(obj1, obj2) {
   }
   return {isTrue: true, outKey: null};
 };
+
+exports.isSurroundedBy = function(str, edges){
+  var edgeArr = [];
+  if (edges instanceof Array) {
+    edgeArr = edges;
+  }
+  else {
+    edgeArr.push(edges);
+  }
+  if (edgeArr.length == 1) {
+    edgeArr.push(edgeArr[0]);
+  }
+  assert(edgeArr.length == 2);
+  assert(edgeArr[0].length == 1);
+  assert(edgeArr[1].length == 1);
+  return str.length > 1 && 
+         str.slice(0, 1) == edgeArr[0] && 
+         str.slice(-1) == edgeArr[1];
+}
 
 exports.prefixAllKeys = function(obj, prefix) {
   var newObj = {};
@@ -24,11 +44,11 @@ exports.prefixAllKeys = function(obj, prefix) {
 
 exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trimSpacesAfter = false) {
   var trimArr = [];
-  if (!(trim instanceof Array)) {
-    trimArr.push(trim);
+  if (trim instanceof Array) {
+    trimArr = trim;
   }
   else {
-    trimArr = trim;
+    trimArr.push(trim);
   }
   if (trimArr.length == 1) {
     trimArr.push(trimArr[0]);
@@ -43,9 +63,7 @@ exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trim
   }
 
   // remove characters only if they area at both end
-  if (str.length > 1 && 
-      str.slice(0, 1) == trimArr[0] && 
-      str.slice(-1) == trimArr[1]) {
+  if (exports.isSurroundedBy(str, trimArr)) {
     str = str.slice(1).slice(0, str.length - 2);
   }
   
@@ -70,10 +88,10 @@ exports.doubleQuoteKeys = function(jsonstr) {
 }
 
 exports.doubleQuoteWordValues = function(jsonstr) {
-  const regex = new RegExp('(' + identifierRegEx + ')\\s*' + afterJsonValueRegEx, 'ig');
+  const regex = new RegExp('(' + anythingDoubleQuoted + '|' + identifierRegEx + ')\\s*' + afterJsonValueRegEx, 'ig');
   return jsonstr.replace(regex, (match, p1, p2, p3, offset, string) => {
     const boolAndNumberRegex = new RegExp('true|false|-?[0-9]+(.[0-9]+)?', 'i');
-    if (boolAndNumberRegex.test(match)) {
+    if (exports.isSurroundedBy(match, "'") || exports.isSurroundedBy(match, '"') || boolAndNumberRegex.test(match)) {
       return match;
     }
     return '"' + match + '"';
