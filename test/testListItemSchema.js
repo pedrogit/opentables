@@ -3,12 +3,12 @@ const chai = require('chai');
 const ItemSchema = require('../listItemSchema');
 
 const Utils = require('../utils/utils');
-const Errors = require('./utils/errors');
+const Errors = require('../utils/errors');
 const NodeUtil = require('util');
 
 var expect = chai.expect;
 
-describe('List Item Schema', () => {
+describe('testListItemSchema.js List Item Schema', () => {
   it('Pass null', () => {
     expect(function(){new ItemSchema();}).to.throw(Errors.ErrMsg.ItemSchema_Null);
   });

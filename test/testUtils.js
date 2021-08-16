@@ -3,7 +3,7 @@ const Utils = require('../utils/utils');
 
 var expect = chai.expect;
 
-describe('Test Utils functions', () => {
+describe('testUtils.js Test Utils functions', () => {
   describe('Test trimFromEdges()', () => {
     it('Simple test. Default to removing double quotes"', () => {    
       expect(Utils.trimFromEdges('"aaaa"')).to.equal('aaaa');
@@ -123,26 +123,27 @@ describe('Test Utils functions', () => {
     });
   });
 
-
-  describe('Test OTSchemaToJSON()', () => {
+  describe('Test simpleJSONToJSON()', () => {
     it('Simple test', () => {
-      var result = Utils.OTSchemaToJSON('field1: {required}');
+      var result = Utils.simpleJSONToJSON('field1: {required}');
       expect(result).to.deep.equal({"field1": {"required": true}});
     });
-
+  
     it('Simple test with two values', () => {
-      var result = Utils.OTSchemaToJSON('a: {b, c}');
+      var result = Utils.simpleJSONToJSON('a: {b, c}');
       expect(result).to.deep.equal({"a": {"b": true, "c": true}});
     });
-
+  
     it('Simple test with one set value and two unset values', () => {
-      var result = Utils.OTSchemaToJSON('a: {b, c:true, d}');
+      var result = Utils.simpleJSONToJSON('a: {b, c:true, d}');
       expect(result).to.deep.equal({"a": {"b": true, "c": true, d: true}});
     });
-
+  
     it('Simple test with two base values', () => {
-      var result = Utils.OTSchemaToJSON('a: {b, c}, d: {e}');
+      var result = Utils.simpleJSONToJSON('a: {b, c}, d: {e}');
       expect(result).to.deep.equal({"a": {"b": true, "c": true}, d:{e:true}});
     });
-  });});
+  });
+  
+});
 

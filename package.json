@@ -4,8 +4,8 @@
   "description": "Restful server of configurable and formattable tables",
   "main": "index.js",
   "scripts": {
-    "//": "nodemon --exec \"mocha test/testUtils.js test/testListItemSchema.js test/testRoutes.js --timeout 0\"",
-    "test": "nodemon --exec \"mocha test/testRoutes.js --timeout 0\"",
+    "test": "nodemon --exec \"mocha test/testUtils.js test/testListItemSchema.js test/testRoutes.js --timeout 0\"",
+    "//": "nodemon --exec \"mocha test/testRoutes.js --timeout 0\"",
     "start": "nodemon *.js",
     "debug": "nodemon --nolazy --debug-brk=5858 index.js"
   },

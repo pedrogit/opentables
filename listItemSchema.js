@@ -12,7 +12,11 @@ class ItemSchema {
       throw new Error(Errors.ErrMsg.ItemSchema_Null);
     }
     if (typeof schema === 'string') {
-      this.schema = this.simplifiedSchemaToJSON(schema);
+      try {
+         this.schema = Utils.simpleJSONToJSON(schema);
+      } catch(err) {
+        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema));
+      }
     }
     else {
       this.schema = schema;      
@@ -26,21 +30,6 @@ class ItemSchema {
     this.validate();
 
   };
-
-  simplifiedSchemaToJSON(simplifiedSchema) {
-    // double quote keys
-    var jsonSchema = Utils.completeTrueValues(simplifiedSchema);
-    jsonSchema = Utils.trimFromEdges(jsonSchema, ['{', '}'], true, true);
-    jsonSchema = Utils.doubleQuoteWordValues(jsonSchema);
-    jsonSchema = '{' + Utils.doubleQuoteKeys(jsonSchema) + '}';
-    var parsedSchema = '';
-    try {
-      parsedSchema = JSON.parse(jsonSchema);
-    } catch(err) {
-      throw new Error(NodeUtils.format(Errors.ErrMsg.ItemSchema_InvalidSchema, simplifiedSchema));
-    }
-    return parsedSchema;
-  }
 
   // traverse a json object calling provided callbacks according to the right level
   traverse(obj, parentKey = null, level = 0, callbacks = null) {
@@ -95,7 +84,11 @@ class ItemSchema {
   validateJson(jsonstr, strict = true) {
     var json;
     if (typeof jsonstr === 'string') {
-      json = this.simplifiedSchemaToJSON(jsonstr);
+      try {
+        json = Utils.simpleJSONToJSON(jsonstr);
+      } catch(err) {
+        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema));
+      }
     }
     else {
       json = jsonstr;

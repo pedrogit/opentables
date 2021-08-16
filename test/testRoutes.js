@@ -12,7 +12,7 @@ var expect = chai.expect;
 
 var lists = [];
 
-describe('List API', () => {
+describe('testRoutes.js List API', () => {
   var listIdToPatch;
   
   describe('Invalid URL and DELETE ALL', () => {

@@ -15,6 +15,7 @@ class NotFound extends Error {
 var ErrMsg = {
   'Database_CouldNotConnect': 'Could not connect to database...',
   'MalformedID': 'Malformed ID (%s)...',
+  'InvalidSimpleJsonStr': 'Invalid simple JSON string (%s)...',
   'ItemSchema_Null': 'ItemSchema: Schema can not be null...',
   'ItemSchema_Malformed': 'ItemSchema: JSON schema is not well formed...',
   'ItemSchema_TooManyLevels': 'Too many levels for ItemSchema "%s"...',

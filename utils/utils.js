@@ -1,4 +1,6 @@
 const { assert } = require("chai");
+const Errors = require('../utils/errors');
+const NodeUtil = require('util');
 
 const identifierRegEx = '[a-zA-Z0-9_-]+';
 const afterJsonValueRegEx = '(?=[\\,\\}]|$)';
@@ -78,5 +80,27 @@ exports.doubleQuoteWordValues = function(jsonstr) {
     }
   }
   return newStr;
+}
+
+exports.simpleJSONToJSON = function(simpleJSONStr) {
+  // Simple JSON string are like JSON strings excepts that:
+  //  external braces {} are not required
+  //  keys without values are interpreted as boolean TRUE
+  // Simple, unbraced strings (e.g. 'simple_string') are 
+  // also converted .If they are true simple strings then 
+  // simpleJSONToJSON should not be called.
+
+  // double quote keys
+  var jsonStr = exports.completeTrueValues(simpleJSONStr);
+  jsonStr = exports.trimFromEdges(jsonStr, ['{', '}'], true, true);
+  jsonStr = exports.doubleQuoteWordValues(jsonStr);
+  jsonStr = '{' + exports.doubleQuoteKeys(jsonStr) + '}';
+  var parsedSchema = '';
+  try {
+    parsedSchema = JSON.parse(jsonStr);
+  } catch(err) {
+    throw new Error(NodeUtils.format(Errors.ErrMsg.InvalidSimpleJsonStr, simpleJSONStr));
+  }
+  return parsedSchema;
 }
 
