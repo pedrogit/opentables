@@ -84,8 +84,13 @@ exports.doubleQuoteWordValues = function(jsonstr) {
 
 exports.simpleJSONToJSON = function(simpleJSONStr) {
   // Simple JSON string are like JSON strings excepts that:
-  //  external braces {} are not required
-  //  keys without values are interpreted as boolean TRUE
+  //  - external braces {} are not required
+  //  - keys do not have to be quoted
+  //  - keys without values are interpreted as boolean TRUE
+  //  - whole word values do not have to be quoted
+  // e.g. 'field1: {type: string, required}' is quivalent to 
+  //      the JSON string '{"field1": {"type": "string", "required": true}}'
+
   // Simple, unbraced strings (e.g. 'simple_string') are 
   // also converted .If they are true simple strings then 
   // simpleJSONToJSON should not be called.
