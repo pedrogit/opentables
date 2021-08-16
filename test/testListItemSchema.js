@@ -29,6 +29,33 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(schema).to.be.an('object');
   });
 
+  it('Validate a simple json string against a one level schema', () => {
+    var schema = new ItemSchema('field1: string');
+    
+    expect(schema.validateJson('{"field1": "toto"}')).to.be.an('object');
+  });
+
+  it('Test an invalid level one schema paprameter', () => {
+    expect(function(){new ItemSchema('field1: upper')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'upper', 'field1'));
+  });
+
+  it('Validate a string value against a one level schema of type number', () => {
+    var schema = new ItemSchema('field1: number');
+    expect(function(){schema.validateJson('{"field1": "toto"}')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'toto', 'number'));
+  });
+
+  it('Validate a number against a one level schema of type number', () => {
+    var schema = new ItemSchema('field1: number');
+    
+    expect(schema.validateJson('{"field1": 123}')).to.be.an('object');
+  });
+
+  it('Validate a simple json string against a simple two level schemaa', () => {
+    var schema = new ItemSchema('field1: {type: string}');
+    
+    expect(schema.validateJson('{"field1": "toto"}')).to.be.an('object');
+  });
+
   it('Validate a simple json string against a simple schema', () => {
     var schema = new ItemSchema('field1: {type: string, required}');
     
@@ -50,7 +77,7 @@ describe('testListItemSchema.js List Item Schema', () => {
   it('Invalid type (number instead of string)', () => {
     var schema = new ItemSchema('{field1: {type:string, required}}');
     
-    expect(function(){schema.validateJson('{"field1": 123}')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', '123','string'));
+    expect(function(){schema.validateJson('{"field1": 123}')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', '123', 'string'));
   });
 
   it('Valid upper', () => {

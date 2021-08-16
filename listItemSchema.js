@@ -26,9 +26,7 @@ class ItemSchema {
       throw new Error(Errors.ErrMsg.ItemSchema_Malformed);
     }
     this.requiredFields = [];
-    var self = this;
     this.validate();
-
   };
 
   // traverse a json object calling provided callbacks according to the right level
@@ -61,21 +59,20 @@ class ItemSchema {
 
   // validate this.schema first level properties
   validateSchemaFirstLevelProperties(key, obj, parentKey) {
-    const validProperties = ['string', 'number', 'encrypted_string']
-    if (obj[key] !== null && typeof(obj[key]) !== "object"){
-      if (!(validProperties.includes(obj[key].toLowerCase())))
+    if (obj[key] !== null && typeof(obj[key]) !== "object") {
+      if (this['validate_type_' +  obj[key]] === undefined) {
         throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, obj[key], key));
+      }
     }
   }
 
   // validate this.schema second level properties
   validateSchemaSecondLevelProperties(key, obj, parentKey) {
-    const validProperties = ['type', 'required', 'upper', 'lower', 'encrypt']
-    if (!(validProperties.includes(key))) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidValue, key, parentKey));
-    }
-    if (key == 'required') {
+    if (key === 'required') {
       this.requiredFields.push(parentKey);
+    }
+    else if (this['validate_' +  key] === undefined) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidValue, key, parentKey));
     }
   }
 
@@ -121,14 +118,13 @@ class ItemSchema {
       // if this.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
       if (typeof(this.schema[key]) === "object") {
         for (var property in this.schema[key]) {
-          //console.log(property + ': ' + this.schema[key][property]);
           if (property != 'required') {
             var validatorName = 'validate_' +  property;
             obj[key] = this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
           }
         }
       }
-      // if this.schema[key] is a simple type handle it
+      // if this.schema[key] is a simple type validate it
       else {
         obj[key] = this.validate_type(this.schema[key], key, obj[key]);
       }
@@ -136,8 +132,22 @@ class ItemSchema {
   }
 
   validate_type(type, key, val) {
-    if (typeof val !== type) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, type));
+    var typeValidatorName = 'validate_type_' +  type;
+    this[typeValidatorName](key, val);
+
+    return val;
+  }
+
+  validate_type_string(key, val) {
+    if (typeof val !== 'string') {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'string'));
+    }
+    return val;
+  }
+
+  validate_type_number(key, val) {
+    if (typeof val !== 'number') {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'number'));
     }
     return val;
   }
