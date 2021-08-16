@@ -63,25 +63,10 @@ class ListItemControler {
     return listSchema;
   }
 
-  validateSchema(listitem) {
-    
-    if (this.isList(listitem)) {
-      if (Object.keys(listitem).includes(Globals.listSchemaFieldName)) {
-        try {
-          const schema = new ItemSchema(listitem[Globals.listSchemaFieldName]);
-        } catch(err) {
-          throw new Errors.BadRequest(err.message);
-        }
-      }
-    }
-  }
-
   async insert(listitem) {
     if (!(this.isList(listitem) || this.isListItem(listitem))) {
       throw new Errors.BadRequest(Errors.ErrMsg.ListItem_Invalid);
     }
-
-    //this.validateSchema(listitem);
 
     const schemaStr = await this.getListSchema(this.isListItem(listitem) ? listitem[Globals.listIdFieldName] : undefined);
 
@@ -112,8 +97,6 @@ class ListItemControler {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
-
-    //this.validateSchema(listitem);
 
     // first find the item to get it's parent list schema
     var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});
