@@ -71,16 +71,13 @@ exports.doubleQuoteKeys = function(jsonstr) {
 
 exports.doubleQuoteWordValues = function(jsonstr) {
   const regex = new RegExp('(' + identifierRegEx + ')\\s*' + afterJsonValueRegEx, 'ig');
-  const boolAndNumberRegex = new RegExp('true|false|-?[0-9]+(.[0-9]+)?', 'i');
-  var newStr = jsonstr;
-  while ((result = regex.exec(jsonstr)) !== null) {
-    if (!(boolAndNumberRegex.test(result[0]))) {
-      const foundRegEx = new RegExp('(?<!")(' + result[0] + ')(?!")', 'i');
-      const replRegex = new RegExp('(' + result[0] + ')\\s*' + afterJsonValueRegEx, 'i');
-      newStr = newStr.replace(replRegex, '"$1"');
+  return jsonstr.replace(regex, (match, p1, p2, p3, offset, string) => {
+    const boolAndNumberRegex = new RegExp('true|false|-?[0-9]+(.[0-9]+)?', 'i');
+    if (boolAndNumberRegex.test(match)) {
+      return match;
     }
-  }
-  return newStr;
+    return '"' + match + '"';
+  })
 }
 
 exports.simpleJSONToJSON = function(simpleJSONStr) {
