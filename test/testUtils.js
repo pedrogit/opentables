@@ -121,12 +121,22 @@ describe('testUtils.js Test Utils functions', () => {
       var result = Utils.doubleQuoteWordValues('field1: required, field2: required');
       expect(result).to.equal('field1: "required", field2: "required"');
     });
+
+    it('True with surrounding braces', () => {
+      var result = Utils.doubleQuoteWordValues('testschema: schema');
+      expect(result).to.equal('testschema: "schema"');
+    });
   });
 
   describe('Test simpleJSONToJSON()', () => {
     it('Simple test', () => {
       var result = Utils.simpleJSONToJSON('field1: {required}');
       expect(result).to.deep.equal({"field1": {"required": true}});
+    });
+
+    it('Test empty JSON schema', () => {
+      var result = Utils.simpleJSONToJSON('{}');
+      expect(result).to.deep.equal({});
     });
   
     it('Simple test with two values', () => {

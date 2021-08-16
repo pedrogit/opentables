@@ -8,7 +8,7 @@ const NodeUtil = require('util');
 const listSchema = '{' + Globals.ownerIdFieldName + ': {type: string, required}, \
                      rperm:  {type: string, required}, \
                      wperm:  {type: string, required}, \
-                     ' + Globals.listSchemaFieldName + ':  {type: string, required}}';
+                     ' + Globals.listSchemaFieldName + ':  schema}';
 
 class ListItemControler {
 
@@ -81,7 +81,7 @@ class ListItemControler {
       throw new Errors.BadRequest(Errors.ErrMsg.ListItem_Invalid);
     }
 
-    this.validateSchema(listitem);
+    //this.validateSchema(listitem);
 
     const schemaStr = await this.getListSchema(this.isListItem(listitem) ? listitem[Globals.listIdFieldName] : undefined);
 
@@ -113,7 +113,7 @@ class ListItemControler {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
 
-    this.validateSchema(listitem);
+    //this.validateSchema(listitem);
 
     // first find the item to get it's parent list schema
     var item = await this.coll.findOne({_id: MongoDB.ObjectId(itemid)});

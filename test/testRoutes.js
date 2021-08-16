@@ -57,6 +57,22 @@ describe('testRoutes.js List API', () => {
           });
     });
 
+    it('Post a list having an invalid schema', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({[Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
+                'rperm': '@owner1',
+                'wperm': '@owner1',
+                [Globals.listSchemaFieldName]: 'toto: x'}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'x', 'toto')});
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
     it('Post a new, empty list', (done) => {
       chai.request(server)
           .post('/api/listitem')

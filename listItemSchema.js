@@ -152,6 +152,15 @@ class ItemSchema {
     return val;
   }
 
+  validate_type_schema(key, val) {
+    if (typeof val !== 'string') {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'number'));
+    }
+    new ItemSchema(val);
+    return val;
+  }
+
+
   validate_upper(type, key, val) {
     return val.toUpperCase();
   }

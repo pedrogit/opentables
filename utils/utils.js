@@ -76,7 +76,8 @@ exports.doubleQuoteWordValues = function(jsonstr) {
   while ((result = regex.exec(jsonstr)) !== null) {
     if (!(boolAndNumberRegex.test(result[0]))) {
       const foundRegEx = new RegExp('(?<!")(' + result[0] + ')(?!")', 'i');
-      newStr = newStr.replace(foundRegEx, '"$1"');
+      const replRegex = new RegExp('(' + result[0] + ')\\s*' + afterJsonValueRegEx, 'i');
+      newStr = newStr.replace(replRegex, '"$1"');
     }
   }
   return newStr;
