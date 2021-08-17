@@ -22,7 +22,7 @@ var ErrMsg = {
   'ItemSchema_InvalidValue': 'Invalid value (%s) for %s...',
   'ItemSchema_MissingField': 'ItemSchema: JSON object is not valid. "%s" is missing...',
   'ItemSchema_InvalidField': 'ItemSchema: JSON object is not valid. "%s" is not a valid field for this schema...',
-  'ItemSchema_InvalidType': 'JSON object is not valid. Field "%s" value (%s) is not a %s...',
+  'ItemSchema_InvalidType': 'JSON object is not valid. Field "%s" value (%s) is not a valid %s...',
   'ItemSchema_InvalidSchema': 'Invalid schema (%s)...',
   'ItemSchema_InvalidSchemaParameter': 'Invalid schema parameter (%s) for field "%s"...',
   'List_NotFound': 'Could not find list (%s)...',

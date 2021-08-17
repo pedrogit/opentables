@@ -133,7 +133,7 @@ class ItemSchema {
 
   validate_type(type, key, val) {
     var typeValidatorName = 'validate_type_' +  type;
-    this[typeValidatorName](key, val);
+    val = this[typeValidatorName](key, val);
 
     return val;
   }
@@ -160,7 +160,6 @@ class ItemSchema {
     return val;
   }
 
-
   validate_upper(type, key, val) {
     return val.toUpperCase();
   }
@@ -171,6 +170,42 @@ class ItemSchema {
 
   validate_encrypt(type, key, val) {
     return bcrypt.hashSync(val, bcrypt.genSaltSync(10));
+  }
+
+  validate_type_email(key, email) {
+    const emailError = new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, email, 'email'));
+    var emailRegExp = new RegExp('^[-!#$%&\'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&\'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$');
+    if (!email) {
+      throw emailError;
+    }
+
+    var emailParts = email.split('@');
+  
+    if (emailParts.length !== 2) {
+      throw emailError;
+    }
+  
+    var account = emailParts[0];
+    var address = emailParts[1];
+  
+    if (account.length > 64) {
+      throw emailError;
+    }
+    else if(address.length > 255) {
+      throw emailError;
+    }
+    var domainParts = address.split('.');
+    if (domainParts.some(function (part) {
+                           return part.length > 63;
+                         })) {
+      throw emailError;
+    }
+  
+    if (!emailRegExp.test(email)) {
+      throw emailError;
+    }
+  
+    return email.toLowerCase();
   }
 };
 

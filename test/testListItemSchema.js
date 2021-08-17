@@ -80,10 +80,22 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(function(){schema.validateJson('{"field1": 123}')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', '123', 'string'));
   });
 
-  it('Valid upper', () => {
+  it('Validate upper', () => {
     var schema = new ItemSchema('{field1: {type:string, required, upper}}');
     var valid = schema.validateJson('{"field1": "toto"}');
     expect(valid).to.deep.equal({"field1": "TOTO"});
   });
+
+  it('Invalid email', () => {
+    var schema = new ItemSchema('{field1: email}');
+    expect(function(){schema.validateJson('{"field1": "aaaa"}')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'aaaa', 'email'));
+  });
+
+  it('Valid email', () => {
+    var schema = new ItemSchema('{field1: email}');
+    var valid = schema.validateJson('{"field1": "Aaaa@x.com"}');
+    expect(valid).to.deep.equal({"field1": "aaaa@x.com"});
+  });
+
 });
 
