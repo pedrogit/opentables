@@ -63,40 +63,51 @@ class ListItemControler {
     return listSchema;
   }
 
-  async validateItem(item, listid, strict = true) {
+  async validateItems(item, listid, strict = true) {
     // find listitem schema
     const schemaStr = await this.getListSchema(listid);
-
+    var newItems;
     // validate provided JSON against the schema
     try {
-      const schema = new ItemSchema(schemaStr);
-      item = schema.validateJson(item, strict);
+      const schema = new ItemSchema(schemaStr, listid);
+      if (item.hasOwnProperty('items')) {
+        newItems = item.items.map(item => {
+          return schema.validateJson(item, strict);
+        })
+      }
+      else {
+        newItems = schema.validateJson(item, strict);
+      }
     } catch(err) {
       throw new Errors.BadRequest(err.message);
     }
-    return item;
+    return newItems;
   }
 
-  async insert(item) {
-    if (!(this.isList(item) || this.isListItem(item))) {
-      throw new Errors.BadRequest(Errors.ErrMsg.ListItem_Invalid);
-    }
-
-    var item = await this.validateItem(item, this.isListItem(item) ? item[Globals.listIdFieldName] : undefined);
+  async insertMany(item) {
+    var newitems = await this.validateItems(item, this.isListItem(item) ? item[Globals.listIdFieldName] : undefined);
   
     // convert the listid to an objectid
-    if (this.isListItem(item)) {
-      item[Globals.listIdFieldName] = MongoDB.ObjectId(item[Globals.listIdFieldName]);
+    if (this.isListItem(newitems)) {
+      newitems[Globals.listIdFieldName] = MongoDB.ObjectId(newitems[Globals.listIdFieldName]);
     }
 
     // create it
-    await this.coll.insertOne(item);
-
-    if (!item) {
-      throw new Errors(Errors.ErrMsg.ListItem_CouldNotCreate);
+    if (newitems.length === undefined){
+      await this.coll.insertOne(newitems);
+    }
+    else {   
+      newitems = await this.coll.insertMany(newitems);
     }
 
-    return item;
+    if (!newitems || (newitems.acknowledged !== undefined && !newitems.acknowledged)) {
+      throw new Errors(Errors.ErrMsg.ListItem_CouldNotCreate);
+    }
+    if (newitems.acknowledged !== undefined) {
+      delete newitems.acknowledged;
+    }
+
+    return newitems;
   }
 
   async patch(itemid, newitem) {
@@ -110,8 +121,7 @@ class ListItemControler {
       throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
     }
 
-    newitem = await this.validateItem(newitem, this.isListItem(item) ? item[Globals.listIdFieldName] : undefined, false);
-    
+    newitem = await this.validateItems(newitem, this.isListItem(item) ? item[Globals.listIdFieldName] : undefined, false);
     // update it
     item = await this.coll.findOneAndUpdate({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}, {$set: newitem}, {returnDocument: 'after'});
     if (!(item.ok)) {

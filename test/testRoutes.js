@@ -281,6 +281,26 @@ describe('testRoutes.js List API', () => {
           });
     });
 
+    it('Post two list items', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({[Globals.listIdFieldName]: listIdToPatch, 
+                 items:[{'field1': 'field1val2',
+                         'field2': 'field2val2'},{
+                         'field1': 'field1val3',
+                         'field2': 'field2val3'}]}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(201);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.have.property('insertedCount', 2);
+             expect(response.body).to.have.property('insertedIds');
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+
     it('Get the list to check if new items were created', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch)

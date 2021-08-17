@@ -29,7 +29,7 @@ listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
 
 *************************************************************************/
 listItemRouter.post('', asyncHandler(async (req, res) => {
-  const item = await listItemControler.insert(req.body);
+  const item = await listItemControler.insertMany(req.body);
   res.status(201).send(item);
 }));
 
