@@ -84,12 +84,12 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
              expect(response.body).to.have.property(Globals.listSchemaFieldName, '{}');
-             listIdToPatch = response.body._id;
+             listIdToPatch = response.body[Globals.itemIdFieldName];
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -125,7 +125,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
@@ -182,7 +182,7 @@ describe('testRoutes.js List API', () => {
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required}, "field2": {"type": "string", required}}'})
           .end((err, response) => {
               expect(response).to.have.status(200);
-              expect(response.body).to.have.property('_id');
+              expect(response.body).to.have.property(Globals.itemIdFieldName);
               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
               expect(response.body).to.have.property('rperm', '@owner1');
               expect(response.body).to.have.property('wperm', '@owner1');
@@ -252,7 +252,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.listIdFieldName);
              expect(response.body).to.have.property('field1', 'field1val1');
              expect(response.body).to.have.property('field2', 'field2val1');
@@ -271,11 +271,11 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(201);
              expect(response.body).to.be.an('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.listIdFieldName);
              expect(response.body).to.have.property('field1', 'field1val2');
              expect(response.body).to.have.property('field2', 'field2val2');
-             listItemIdToPatch = response.body._id;
+             listItemIdToPatch = response.body[Globals.itemIdFieldName];
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -287,7 +287,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
               expect(response).to.have.status(200);
               expect(response.body).to.be.a('object');
-              expect(response.body).to.have.property('_id');
+              expect(response.body).to.have.property(Globals.itemIdFieldName);
               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
               expect(response.body).to.have.property('rperm', '@owner1');
               expect(response.body).to.have.property('wperm', '@owner1');
@@ -308,7 +308,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
               expect(response).to.have.status(200);
               expect(response.body).to.be.a('object');
-              expect(response.body).to.have.property('_id');
+              expect(response.body).to.have.property(Globals.itemIdFieldName);
               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
               expect(response.body).to.have.property('rperm', '@owner1');
               expect(response.body).to.have.property('wperm', '@owner1');
@@ -360,7 +360,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
               expect(response).to.have.status(200);
               expect(response.body).to.be.a('object');
-              expect(response.body).to.have.property('_id');
+              expect(response.body).to.have.property(Globals.itemIdFieldName);
               expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
               expect(response.body).to.have.deep.nested.property('field1', 'field1val2');
               expect(response.body).to.have.deep.nested.property('field2', 'field2 value222');
@@ -374,7 +374,7 @@ describe('testRoutes.js List API', () => {
           .get('/api/listitem/' + listItemIdToPatch)
           .end((err, response) => {
               expect(response).to.have.status(200);
-              expect(response.body).to.have.property('_id');
+              expect(response.body).to.have.property(Globals.itemIdFieldName);
               expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
               expect(response.body).to.have.property('field1', 'field1val2');
               expect(response.body).to.have.property('field2', 'field2 value222');
@@ -389,7 +389,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
               expect(response).to.have.status(200);
               expect(response.body).to.be.a('object');
-              expect(response.body).to.have.property('_id');
+              expect(response.body).to.have.property(Globals.itemIdFieldName);
               expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
               expect(response.body).to.have.property('rperm', '@owner1');
               expect(response.body).to.have.property('wperm', '@owner1');
@@ -411,7 +411,7 @@ describe('testRoutes.js List API', () => {
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}}'})
           .end((err, response) => {
              expect(response).to.have.status(200);
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
@@ -430,7 +430,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
              expect(response.body).to.have.property('field1', 'lowercase');
              expect(response.body).to.have.property('field2', 'UPPERCASE');
@@ -445,7 +445,7 @@ describe('testRoutes.js List API', () => {
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}}'})
           .end((err, response) => {
              expect(response).to.have.status(200);
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
@@ -463,7 +463,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
              expect(response.body).to.have.property('field1', 'lowercase');
              expect(response.body).to.have.property('field2', 'UPPERCASE');
@@ -493,7 +493,7 @@ describe('testRoutes.js List API', () => {
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}, "field4": "string"}'})
           .end((err, response) => {
              expect(response).to.have.status(200);
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
              expect(response.body).to.have.property('rperm', '@owner1');
              expect(response.body).to.have.property('wperm', '@owner1');
@@ -525,7 +525,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.be.a('object');
-             expect(response.body).to.have.property('_id');
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
              expect(response.body).to.have.property(Globals.listIdFieldName, listIdToPatch);
              expect(response.body).to.have.property('field1', 'lowercase');
              expect(response.body).to.have.property('field2', 'UPPERCASE');
