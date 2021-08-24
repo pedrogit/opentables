@@ -54,13 +54,27 @@ class listItemFilter {
     delete obj['$contains'];
   };
 
-  convert_icontains(obj) {
-    obj['$contains'] = obj['$icontains'];
-    delete obj['$icontains'];
+  convert_contains_i(obj) {
+    obj['$contains'] = obj['$contains_i'];
+    delete obj['$contains_i'];
     this.convert_contains(obj);
     obj['$regexFind'].options = 'i';
   };
 
+  convert_isexactly(obj) {
+    obj['$contains'] = obj['$isexactly'];
+    delete obj['$isexactly'];
+    this.convert_contains(obj);
+    obj['$regexFind'].regex = '^' + obj['$regexFind'].regex + '$';
+  };
+
+  convert_isexactly_i(obj) {
+    obj['$contains'] = obj['$isexactly_i'];
+    delete obj['$isexactly_i'];
+    this.convert_contains(obj);
+    obj['$regexFind'].regex = '^' + obj['$regexFind'].regex + '$';
+    obj['$regexFind'].options = 'i';
+  };
 };
 
 module.exports = listItemFilter;
