@@ -18,7 +18,7 @@ const url = require('url');
 *************************************************************************/
 listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
   const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-  const item = await listItemControler.findOne(req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
+  const item = await listItemControler.find(req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
   res.status(200).send(item);
 }));
 

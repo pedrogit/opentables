@@ -31,7 +31,7 @@ class ListItemControler {
     return item.hasOwnProperty(Globals.listIdFieldName);
   }
 
-  async findOne(itemid, filter, noitems = false) {
+  async find(itemid, filter, noitems = false) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
