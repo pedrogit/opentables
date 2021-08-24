@@ -16,12 +16,12 @@ var ErrMsg = {
   'Database_CouldNotConnect': 'Could not connect to database...',
   'MalformedID': 'Malformed ID (%s)...',
   'InvalidSimpleJsonStr': 'Invalid simple JSON string (%s)...',
-  'ItemSchema_Null': 'ItemSchema: Schema can not be null...',
-  'ItemSchema_Malformed': 'ItemSchema: JSON schema is not well formed...',
+  'ItemSchema_Null': 'Schema can not be null...',
+  'ItemSchema_Malformed': 'JSON schema is not well formed...',
   'ItemSchema_TooManyLevels': 'Too many levels for ItemSchema "%s"...',
   'ItemSchema_InvalidValue': 'Invalid value (%s) for %s...',
-  'ItemSchema_MissingField': 'ItemSchema: JSON object is not valid. "%s" is missing...',
-  'ItemSchema_InvalidField': 'ItemSchema: JSON object is not valid. "%s" is not a valid field for this schema...',
+  'ItemSchema_MissingField': 'JSON object is not valid. "%s" is missing...',
+  'ItemSchema_InvalidField': 'JSON object is not valid. "%s" is not a valid field for this schema...',
   'ItemSchema_InvalidType': 'JSON object is not valid. Field "%s" value (%s) is not a valid %s...',
   'ItemSchema_InvalidSchema': 'Invalid schema (%s)...',
   'ItemSchema_InvalidSchemaParameter': 'Invalid schema parameter (%s) for field "%s"...',
@@ -29,7 +29,10 @@ var ErrMsg = {
   'ListItem_NotFound': 'Could not find list item (%s)...',
   'ListItem_Invalid': 'Invalid item...',
   'ListItem_CouldNotCreate': 'Could not create item...',
-  'ListItem_CouldNotUpdate': 'Could not update item...'
+  'ListItem_CouldNotUpdate': 'Could not update item...',
+  'ItemFilter_Null': 'Filter can not be null...',
+  'ItemFilter_InvalidFilter': 'Invalid filter (%s)...',
+  'ItemFilter_Malformed': 'JSON filter is not well formed...',
 }
 
 module.exports = {

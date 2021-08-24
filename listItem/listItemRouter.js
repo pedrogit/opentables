@@ -2,7 +2,8 @@ const express = require('express');
 const listItemRouter = express.Router();
 const listItemControler = require('./listItemControler');
 
-const asyncHandler = require('express-async-handler')
+const asyncHandler = require('express-async-handler');
+const url = require('url');
 
 /************************************************************************
   GET /api/listitem/:itemid
@@ -16,7 +17,8 @@ const asyncHandler = require('express-async-handler')
 
 *************************************************************************/
 listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
-  const item = await listItemControler.findOne(req.params.itemid, req.params.noitems === 'noitems' )
+  const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+  const item = await listItemControler.findOne(req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
   res.status(200).send(item);
 }));
 

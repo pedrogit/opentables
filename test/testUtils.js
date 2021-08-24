@@ -103,7 +103,13 @@ describe('testUtils.js Test Utils functions', () => {
     it('Already double quoted', () => {
       var result = Utils.doubleQuoteKeys('{"field1": required}');
       expect(result).to.equal('{"field1": required}');
-    });  });
+    });
+
+    it('Key starting with a dollars sign', () => {
+      var result = Utils.doubleQuoteKeys('{$field1: required}');
+      expect(result).to.equal('{"$field1": required}');
+    });
+  });
 
   describe('Test doubleQuoteWordValues()', () => {
     it('Without surrounding braces', () => {

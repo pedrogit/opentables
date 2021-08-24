@@ -3,6 +3,8 @@ const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
 const Globals = require('../globals');
 const ItemSchema = require('../listItemSchema');
+const ItemFilter = require('../listItemFilter');
+
 const NodeUtil = require('util');
 
 const listSchema = '{' + Globals.ownerIdFieldName + ': {type: string, required}, \
@@ -29,7 +31,7 @@ class ListItemControler {
     return item.hasOwnProperty(Globals.listIdFieldName);
   }
 
-  async findOne(itemid, noitems = false) {
+  async findOne(itemid, filter, noitems = false) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
@@ -41,8 +43,26 @@ class ListItemControler {
     }
 
     if (!noitems && this.isList(item)) {
+      var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
+
+      if (filter) {
+        var mongoDBFilter = new ItemFilter(filter);
+        var jsonFilter = mongoDBFilter.final();
+        lookup.let = {x: '$' + Globals.itemIdFieldName};
+        lookup.pipeline = [{$match: 
+                            {$expr: 
+                              {$and: [
+                                {$eq: ['$' + Globals.listIdFieldName, '$$x']},
+                                jsonFilter
+                              ]}
+                            }
+                          }];
+        delete lookup.localField;
+        delete lookup.foreignField;
+      }
+
       var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
-                      {$lookup: {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'}},
+                      {$lookup: lookup},
                       {$unset: 'items.' + Globals.listIdFieldName}
                      ];
       item = await this.coll.aggregate(pipeline).toArray();

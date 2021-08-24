@@ -14,6 +14,7 @@ var lists = [];
 
 describe('testRoutes.js List API', () => {
   var listIdToPatch;
+  var firstItemID;
   
   describe('Invalid URL and DELETE ALL', () => {
     it('Test an invalid URL. It should return a NOT FOUND on invalid URL', (done) => {
@@ -242,7 +243,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('Post a first list item', (done) => {
+    it('Post a first valid list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
           .send({[Globals.listIdFieldName]: listIdToPatch, 
@@ -256,6 +257,7 @@ describe('testRoutes.js List API', () => {
              expect(response.body).to.have.property(Globals.listIdFieldName);
              expect(response.body).to.have.property('field1', 'field1val1');
              expect(response.body).to.have.property('field2', 'field2val1');
+             firstItemID = response.body[Globals.itemIdFieldName];
              done();
              //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -285,10 +287,10 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .post('/api/listitem')
           .send({[Globals.listIdFieldName]: listIdToPatch, 
-                 items:[{'field1': 'field1val2',
-                         'field2': 'field2val2'},{
-                         'field1': 'field1val3',
-                         'field2': 'field2val3'}]}
+                 items:[{'field1': 'field1val3',
+                         'field2': 'field2val3'},{
+                         'field1': 'field1val4',
+                         'field2': 'field2val4'}]}
           )
           .end((err, response) => {
              expect(response).to.have.status(201);
@@ -316,6 +318,10 @@ describe('testRoutes.js List API', () => {
               expect(response.body).to.have.deep.nested.property('items[0].field2', 'field2val1');
               expect(response.body).to.have.deep.nested.property('items[1].field1', 'field1val2');
               expect(response.body).to.have.deep.nested.property('items[1].field2', 'field2val2');
+              expect(response.body).to.have.deep.nested.property('items[2].field1', 'field1val3');
+              expect(response.body).to.have.deep.nested.property('items[2].field2', 'field2val3');
+              expect(response.body).to.have.deep.nested.property('items[3].field1', 'field1val4');
+              expect(response.body).to.have.deep.nested.property('items[3].field2', 'field2val4');
               expect(response.body).not.to.have.deep.nested.property('items[1].listid');
               done();
               ////console.log(JSON.stringify(response.body, null, 2));
@@ -552,6 +558,32 @@ describe('testRoutes.js List API', () => {
              expect(bcrypt.compareSync("encrypted string", response.body.field3)).to.be.true;
              done();
              //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+  });
+
+  describe('Test GET with filter', () => {
+    it('Patch the listschema with an invalid type for field4', (done) => {
+      chai.request(server)
+          .get('/api/listitem/' + listIdToPatch + '?filter=$contains:[$field1, "field1val1"]')
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.deep.equal({
+              _id: listIdToPatch,
+              _ownerid: "60edb91162a87a2c383d5cf2",
+              rperm: "@owner1",
+              wperm: "@owner1",
+              listschema: "{\"field1\": {\"type\": \"string\", required, lower}, \"field2\": {\"type\": \"string\", required, upper}, \"field3\": {\"type\": \"string\", encrypt}, \"field4\": \"string\"}",
+              items: [
+                {
+                  _id: firstItemID,
+                  field1: "field1val1",
+                  field2: "field2val1",
+                },
+              ],
+            });
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
           });
     });
   });

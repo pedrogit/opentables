@@ -19,23 +19,23 @@ describe('testListItemSchema.js List Item Schema', () => {
 
   it('Pass a string schema', () => {
     var schema = new ItemSchema('field1: {type: string, required}');
-    
+    // just make sure the constructor does not throw
     expect(schema).to.be.an('object');
   });
 
   it('Pass JSON schema', () => {
-    var schema = new ItemSchema('{field1: {type:string, required}}');
-    
+    var schema = new ItemSchema({field1: {type: 'string', required: true}});
+    // just make sure the constructor does not throw
     expect(schema).to.be.an('object');
   });
 
   it('Validate a simple json string against a one level schema', () => {
     var schema = new ItemSchema('field1: string');
-    
+    // just make sure the constructor does not throw
     expect(schema.validateJson('{"field1": "toto"}')).to.be.an('object');
   });
 
-  it('Test an invalid level one schema paprameter', () => {
+  it('Test an invalid level one schema parameter', () => {
     expect(function(){new ItemSchema('field1: upper')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'upper', 'field1'));
   });
 
@@ -46,20 +46,26 @@ describe('testListItemSchema.js List Item Schema', () => {
 
   it('Validate a number against a one level schema of type number', () => {
     var schema = new ItemSchema('field1: number');
-    
-    expect(schema.validateJson('{"field1": 123}')).to.be.an('object');
+    var json = schema.validateJson('{"field1": 123}');
+
+    expect(json).to.be.an('object');
+    expect(json).to.have.property('field1', 123);
   });
 
   it('Validate a simple json string against a simple two level schemaa', () => {
     var schema = new ItemSchema('field1: {type: string}');
-    
-    expect(schema.validateJson('{"field1": "toto"}')).to.be.an('object');
+    var json = schema.validateJson('{"field1": "toto"}');
+
+    expect(json).to.be.an('object');
+    expect(json).to.have.property('field1', 'toto');
   });
 
   it('Validate a simple json string against a simple schema', () => {
     var schema = new ItemSchema('field1: {type: string, required}');
-    
-    expect(schema.validateJson('{"field1": "toto"}')).to.be.an('object');
+    var json = schema.validateJson('{"field1": "toto"}');
+
+    expect(json).to.be.an('object');
+    expect(json).to.have.property('field1', 'toto');
   });
 
   it('Validate a missing field', () => {
@@ -70,8 +76,10 @@ describe('testListItemSchema.js List Item Schema', () => {
 
   it('Valid type', () => {
     var schema = new ItemSchema('{field1: {type:string, required}}');
-    var valid = schema.validateJson('{"field1": "toto"}');
-    expect(valid).to.deep.equal({"field1": "toto"});
+    var json = schema.validateJson('{"field1": "toto"}');
+
+    expect(json).to.be.an('object');
+    expect(json).to.deep.equal({"field1": "toto"});
   });
 
   it('Invalid type (number instead of string)', () => {
@@ -82,8 +90,10 @@ describe('testListItemSchema.js List Item Schema', () => {
 
   it('Validate upper', () => {
     var schema = new ItemSchema('{field1: {type:string, required, upper}}');
-    var valid = schema.validateJson('{"field1": "toto"}');
-    expect(valid).to.deep.equal({"field1": "TOTO"});
+    var json = schema.validateJson('{"field1": "toto"}');
+
+    expect(json).to.be.an('object');
+    expect(json).to.deep.equal({"field1": "TOTO"});
   });
 
   it('Invalid email', () => {
@@ -93,8 +103,10 @@ describe('testListItemSchema.js List Item Schema', () => {
 
   it('Valid email', () => {
     var schema = new ItemSchema('{field1: email}');
-    var valid = schema.validateJson('{"field1": "Aaaa@x.com"}');
-    expect(valid).to.deep.equal({"field1": "aaaa@x.com"});
+    var json = schema.validateJson('{"field1": "Aaaa@x.com"}');
+
+    expect(json).to.be.an('object');
+    expect(json).to.deep.equal({"field1": "aaaa@x.com"});
   });
 
 });

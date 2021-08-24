@@ -2,8 +2,9 @@ const { assert } = require("chai");
 const Errors = require('../utils/errors');
 const NodeUtil = require('util');
 
-const identifierRegEx = '[a-zA-Z0-9_-]+';
-const afterJsonValueRegEx = '(?=[\\,\\}]|$)';
+const identifierRegEx = '\\$?[a-zA-Z0-9_-]+';
+const afterJsonKeyRegEx = '(?=[\\,\\}]|$)';
+const afterJsonValueRegEx = '(?=[\\,\\}\\]]|$)';
 const anythingDoubleQuoted = '"(?:[^"\\\\]|\\\\.)*"';
 
 exports.objKeysInObjKeys = function(obj1, obj2) {
@@ -76,9 +77,9 @@ exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trim
 
 exports.completeTrueValues = function(jsonstr) {
   const nonQuotedOrQuotedId = identifierRegEx + '|"' + identifierRegEx + '"';
-  var regex = new RegExp('{\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonValueRegEx, 'ig');
+  var regex = new RegExp('{\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonKeyRegEx, 'ig');
   jsonstr = jsonstr.replace(regex, '{$1: true');
-  regex = new RegExp(',\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonValueRegEx, 'ig');
+  regex = new RegExp(',\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonKeyRegEx, 'ig');
   return jsonstr.replace(regex, ', $1: true');
 }
 
@@ -89,13 +90,14 @@ exports.doubleQuoteKeys = function(jsonstr) {
 
 exports.doubleQuoteWordValues = function(jsonstr) {
   const regex = new RegExp('(' + anythingDoubleQuoted + '|' + identifierRegEx + ')\\s*' + afterJsonValueRegEx, 'ig');
-  return jsonstr.replace(regex, (match, p1, p2, p3, offset, string) => {
-    const boolAndNumberRegex = new RegExp('true|false|-?[0-9]+(.[0-9]+)?', 'i');
+  jsonstr = jsonstr.replace(regex, (match, p1, p2, p3, offset, string) => {
+    const boolAndNumberRegex = new RegExp('^(true|false|-?[0-9]+(.[0-9]+)?)$', 'i');
     if (exports.isSurroundedBy(match, "'") || exports.isSurroundedBy(match, '"') || boolAndNumberRegex.test(match)) {
       return match;
     }
     return '"' + match + '"';
   })
+  return jsonstr;
 }
 
 exports.simpleJSONToJSON = function(simpleJSONStr) {
