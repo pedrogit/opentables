@@ -62,7 +62,10 @@ class ListItemControler {
     }
     return listSchema;
   }
-
+  /*
+    Validate items against the schema stored in the item with _id = listid
+    When strict is false, ignore fields which are not in the schema, otherwise throw an error
+  */
   async validateItems(item, listid, strict = true) {
     // find listitem schema
     const schemaStr = await this.getListSchema(listid);
@@ -70,13 +73,21 @@ class ListItemControler {
     // validate provided JSON against the schema
     try {
       const schema = new ItemSchema(schemaStr, listid);
-      if (item.hasOwnProperty('items')) {
+      if (item.hasOwnProperty('items')) { // validate many
         newItems = item.items.map(item => {
-          return schema.validateJson(item, strict);
+          var newItem = schema.validateJson(item, strict);
+          if (strict && listid && (!newItem[Globals.listIdFieldName] || typeof newItem[Globals.listIdFieldName] === 'string')) {
+            newItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
+          }
+
+          return newItem;
         })
       }
-      else {
+      else { // validate only one
         newItems = schema.validateJson(item, strict);
+        if (strict && listid && (!newItems[Globals.listIdFieldName] || typeof newItems[Globals.listIdFieldName] === 'string')) {
+          newItems[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
+        }
       }
     } catch(err) {
       throw new Errors.BadRequest(err.message);
@@ -86,11 +97,6 @@ class ListItemControler {
 
   async insertMany(item) {
     var newitems = await this.validateItems(item, this.isListItem(item) ? item[Globals.listIdFieldName] : undefined);
-  
-    // convert the listid to an objectid
-    if (this.isListItem(newitems)) {
-      newitems[Globals.listIdFieldName] = MongoDB.ObjectId(newitems[Globals.listIdFieldName]);
-    }
 
     // create it
     if (newitems.length === undefined){
@@ -103,6 +109,8 @@ class ListItemControler {
     if (!newitems || (newitems.acknowledged !== undefined && !newitems.acknowledged)) {
       throw new Errors(Errors.ErrMsg.ListItem_CouldNotCreate);
     }
+
+    // delete the acknoledgment property if there was many items
     if (newitems.acknowledged !== undefined) {
       delete newitems.acknowledged;
     }
