@@ -563,9 +563,33 @@ describe('testRoutes.js List API', () => {
   });
 
   describe('Test GET with filter', () => {
-    it('Patch the listschema with an invalid type for field4', (done) => {
+    it('Test case sensitive constains', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch + '?filter=$contains:[$field1, "field1val1"]')
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.deep.equal({
+              _id: listIdToPatch,
+              _ownerid: "60edb91162a87a2c383d5cf2",
+              rperm: "@owner1",
+              wperm: "@owner1",
+              listschema: "{\"field1\": {\"type\": \"string\", required, lower}, \"field2\": {\"type\": \"string\", required, upper}, \"field3\": {\"type\": \"string\", encrypt}, \"field4\": \"string\"}",
+              items: [
+                {
+                  _id: firstItemID,
+                  field1: "field1val1",
+                  field2: "field2val1",
+                },
+              ],
+            });
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('Test case insensitive constains', (done) => {
+      chai.request(server)
+          .get('/api/listitem/' + listIdToPatch + '?filter=$icontains:[$field1, "FIELd1val1"]')
           .end((err, response) => {
              expect(response).to.have.status(200);
              expect(response.body).to.deep.equal({

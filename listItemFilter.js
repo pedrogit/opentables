@@ -48,10 +48,19 @@ class listItemFilter {
   }
 
   convert_contains(obj) {
-    console.log(obj);
-    obj['$gt'] = [{'$indexOfCP': [ obj['$contains'][0], obj['$contains'][1] ]}, -1];
+    //console.log(obj);
+    //obj['$gt'] = [{'$indexOfCP': [ obj['$contains'][0], obj['$contains'][1] ]}, -1];
+    obj['$regexFind'] = {input: obj['$contains'][0], regex: obj['$contains'][1]};
     delete obj['$contains'];
   };
+
+  convert_icontains(obj) {
+    obj['$contains'] = obj['$icontains'];
+    delete obj['$icontains'];
+    this.convert_contains(obj);
+    obj['$regexFind'].options = 'i';
+  };
+
 };
 
 module.exports = listItemFilter;

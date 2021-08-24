@@ -36,7 +36,7 @@ describe('testListItemFilter.js List Item Filter', () => {
     var finalFilter  = filter.final();
 
     expect(finalFilter).to.be.an('object');
-    expect(finalFilter).to.have.deep.property('$gt', [{'$indexOfCP': ['$field1', 'aaa']}, -1]);
+    expect(finalFilter).to.have.deep.property('$regexFind', {input: '$field1', regex:  'aaa'});
   });
 
 });
