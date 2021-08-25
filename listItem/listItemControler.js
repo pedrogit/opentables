@@ -31,6 +31,19 @@ class ListItemControler {
     return item.hasOwnProperty(Globals.listIdFieldName);
   }
 
+  async simpleFind(listid, filter) {
+    if (!(MongoDB.ObjectId.isValid(listid))) {
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, listid));
+    }
+    const idFilter = {[Globals.listIdFieldName]: MongoDB.ObjectId(listid)};
+    //if (filter) {
+    const  newFilter = {...idFilter, ...filter};
+      //newFilter[$and] = {idFilter, filter}
+    //}
+    const items = this.coll.findOne(newFilter);
+    return items; 
+  }
+
   async find(itemid, filter, noitems = false) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
@@ -94,17 +107,17 @@ class ListItemControler {
     try {
       const schema = new ItemSchema(schemaStr, listid);
       if (item.hasOwnProperty('items')) { // validate many
-        newItems = item.items.map(item => {
-          var newItem = schema.validateJson(item, strict);
+        newItems = await Promise.all(item.items.map(async (item) => {
+          var newItem = await schema.validateJson(item, strict);
           if (strict && listid && (!newItem[Globals.listIdFieldName] || typeof newItem[Globals.listIdFieldName] === 'string')) {
             newItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
           }
 
           return newItem;
-        })
+        }))
       }
       else { // validate only one
-        newItems = schema.validateJson(item, strict);
+        newItems = await schema.validateJson(item, strict);
         if (strict && listid && (!newItems[Globals.listIdFieldName] || typeof newItems[Globals.listIdFieldName] === 'string')) {
           newItems[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
         }

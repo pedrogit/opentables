@@ -602,7 +602,7 @@ describe('testRoutes.js List API', () => {
                 {
                   _id: firstItemID,
                   field1: "field1val1",
-                  field2: "field2val1",
+                  field2: "field2val1"
                 },
               ],
             });
@@ -692,6 +692,64 @@ describe('testRoutes.js List API', () => {
             });
             done();
             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+  });
+
+  describe('Test unique parameter', () => {
+    it('Patch the listschema so field4 is defined as unique', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listIdToPatch)
+          .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}, "field4": {type: "string", unique}}'})
+          .end((err, response) => {
+             expect(response).to.have.status(200);
+             expect(response.body).to.have.property(Globals.itemIdFieldName);
+             expect(response.body).to.have.property(Globals.ownerIdFieldName, '60edb91162a87a2c383d5cf2');
+             expect(response.body).to.have.property('rperm', '@owner1');
+             expect(response.body).to.have.property('wperm', '@owner1');
+             expect(response.body).to.have.property(Globals.listSchemaFieldName, '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": {"type": "string", encrypt}, "field4": {type: "string", unique}}');
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('Post a duplicate list item', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({[Globals.listIdFieldName]: listIdToPatch,
+                 field1: "field1val1",
+                 field2: "field2val1",
+                 field4: "field4 value4"}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(400);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'field4', 'field4 value4')});
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('Post a non duplicate list item', (done) => {
+      chai.request(server)
+          .post('/api/listitem')
+          .send({[Globals.listIdFieldName]: listIdToPatch,
+                 field1: "field1val1",
+                 field2: "field2val1",
+                 field4: "field4 value5"}
+          )
+          .end((err, response) => {
+             expect(response).to.have.status(201);
+             expect(response.body).to.be.an('object');
+             expect(response.body).to.deep.equal({
+              _listid: listIdToPatch,
+              field1: "field1val1",
+              field2: "FIELD2VAL1",
+              field4: "field4 value5",
+              _id: response.body._id
+             });
+             done();
+             //console.log(JSON.stringify(response.body, null, 2));
           });
     });
   });

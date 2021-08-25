@@ -1,13 +1,14 @@
-const { createMochaInstanceAlreadyRunningError } = require('mocha/lib/errors');
 const Utils = require('./utils/utils');
 const Errors = require('./utils/errors');
 const NodeUtil = require('util');
+const listItemControler = require('./listitem//listItemControler');
+
 
 const bcrypt = require('bcrypt');
 const Globals = require('./globals');
 
 class ItemSchema {
-  constructor(schema) {
+  constructor(schema, listid = null) {
     if (schema == null) {
       throw new Error(Errors.ErrMsg.ItemSchema_Null);
     }
@@ -22,6 +23,10 @@ class ItemSchema {
       this.schema = schema;      
     }
 
+    if (listid !== null) {
+      this.listid = listid;
+    }
+
     if (typeof this.schema !== 'object') {
       throw new Error(Errors.ErrMsg.ItemSchema_Malformed);
     }
@@ -30,7 +35,7 @@ class ItemSchema {
   };
 
   // traverse a json object calling provided callbacks according to the right level
-  traverse(obj, parentKey = null, level = 0, callbacks = null) {
+  traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
       
@@ -43,7 +48,7 @@ class ItemSchema {
 
       if (obj[key] !== null && typeof(obj[key]) == "object") {
           //going one step down in the object tree!!
-          this.traverse(obj[key], key, ++level, callbacks);
+            this.traverseSync(obj[key], key, ++level, callbacks);
           level--;
       };
     };
@@ -51,7 +56,7 @@ class ItemSchema {
 
   // validate that this schema is valid
   validate() {
-    this.traverse(this.schema, null, 0, [this.validateSchemaFirstLevelProperties.bind(this), 
+    this.traverseSync(this.schema, null, 0, [this.validateSchemaFirstLevelProperties.bind(this), 
                                          this.validateSchemaSecondLevelProperties.bind(this), 
                                          null]);
     return true;
@@ -76,9 +81,28 @@ class ItemSchema {
     }
   }
 
+  // traverse a json object calling provided callbacks according to the right level
+  async traverse(obj, parentKey = null, level = 0, callbacks = null) {
+    for (var key in obj) {
+      //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
+      
+      if (level == 3) {
+        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_TooManyLevels, this.schema));
+      }
+      else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
+        await callbacks[level](key, obj, parentKey);
+      }
+
+      if (obj[key] !== null && typeof(obj[key]) == "object") {
+          //going one step down in the object tree!!
+          await this.traverse(obj[key], key, ++level, callbacks);
+          level--;
+      };
+    };
+  };
 
   // validate a json string against this schema
-  validateJson(jsonstr, strict = true) {
+  async validateJson(jsonstr, strict = true) {
     var json;
     if (typeof jsonstr === 'string') {
       try {
@@ -105,13 +129,13 @@ class ItemSchema {
 
     // 2) if strict invalidate non schema fields
     // 3) validate and sanitize each field
-    this.traverse(json, null, 0, [this.validateField.bind(this), null, null]);
+    await this.traverse(json, null, 0, [this.validateField.bind(this), null, null]);
     return json;
   };
 
   // validate passed JSON fields
-  validateField(key, obj, parentKey) {
-    if (key != Globals.listIdFieldName) { // ignore the listid field since it is vaidated by the controler
+  async validateField(key, obj, parentKey) {
+    if (key != Globals.listIdFieldName) { // ignore the listid field since it is validated by the controler
       if (!(Object.keys(this.schema).includes(key))) {
         throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, key));
       };
@@ -120,7 +144,7 @@ class ItemSchema {
         for (var property in this.schema[key]) {
           if (property != 'required') {
             var validatorName = 'validate_' +  property;
-            obj[key] = this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
+            obj[key] = await this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
           }
         }
       }
@@ -134,7 +158,6 @@ class ItemSchema {
   validate_type(type, key, val) {
     var typeValidatorName = 'validate_type_' +  type;
     val = this[typeValidatorName](key, val);
-
     return val;
   }
 
@@ -158,18 +181,6 @@ class ItemSchema {
     }
     new ItemSchema(val);
     return val;
-  }
-
-  validate_upper(type, key, val) {
-    return val.toUpperCase();
-  }
-
-  validate_lower(type, key, val) {
-    return val.toLowerCase();
-  }
-
-  validate_encrypt(type, key, val) {
-    return bcrypt.hashSync(val, bcrypt.genSaltSync(10));
   }
 
   validate_type_email(key, email) {
@@ -206,6 +217,29 @@ class ItemSchema {
     }
   
     return email.toLowerCase();
+  }
+
+  validate_upper(type, key, val) {
+    return val.toUpperCase();
+  }
+
+  validate_lower(type, key, val) {
+    return val.toLowerCase();
+  }
+
+  validate_encrypt(type, key, val) {
+    return bcrypt.hashSync(val, bcrypt.genSaltSync(10));
+  }
+
+  async validate_unique(type, key, val) {
+    // if listid is set search for a
+    if (this.listid) {
+      const item = await listItemControler.simpleFind(this.listid, {[key]: val});
+      if (item){
+        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, key, val));
+      }
+    }
+    return val;
   }
 };
 
