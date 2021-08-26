@@ -168,6 +168,14 @@ class ItemSchema {
     return val;
   }
 
+   validate_type_encrypted_string(key, val) {
+    if (typeof val !== 'string') {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'encrypted_string'));
+    }
+    var encryptedStr = this.validate_encrypt(null, key, val);
+    return encryptedStr;
+  }
+
   validate_type_number(key, val) {
     if (typeof val !== 'number') {
       throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'number'));

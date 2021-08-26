@@ -7,10 +7,10 @@ const ItemFilter = require('../listItemFilter');
 
 const NodeUtil = require('util');
 
-const listSchema = '{' + Globals.ownerIdFieldName + ': {type: string, required}, \
-                     rperm:  {type: string, required}, \
-                     wperm:  {type: string, required}, \
-                     ' + Globals.listSchemaFieldName + ':  schema}';
+const listSchema = '{' + Globals.ownerIdFieldName + ': {type: string, required, lower}, \
+                     rperm:  {type: string, required, lower}, \
+                     wperm:  {type: string, required, lower}, \
+                     ' + Globals.listSchemaFieldName + ':  {type: schema, lower}}';
 
 class ListItemControler {
 
@@ -36,10 +36,7 @@ class ListItemControler {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, listid));
     }
     const idFilter = {[Globals.listIdFieldName]: MongoDB.ObjectId(listid)};
-    //if (filter) {
-    const  newFilter = {...idFilter, ...filter};
-      //newFilter[$and] = {idFilter, filter}
-    //}
+    const newFilter = {...idFilter, ...filter};
     const items = this.coll.findOne(newFilter);
     return items; 
   }

@@ -127,3 +127,18 @@ exports.simpleJSONToJSON = function(simpleJSONStr) {
   return parsedSchema;
 }
 
+exports.objWithout = function(obj, without) {
+  var newObj = {...obj};
+  if (without && typeof without === 'string') {
+    without = [without];
+  }
+  if (typeof newObj === 'object' && without instanceof Array){
+    without.forEach((x) => {
+      if (newObj.hasOwnProperty(x)){
+        delete newObj[x];
+      }
+    })
+  }
+  return newObj;
+}
+
