@@ -25,7 +25,7 @@ class ListItemControler {
   };
 
   isList(item) {
-    return item.hasOwnProperty(Globals.listSchemaFieldName);
+    return (item.hasOwnProperty(Globals.listSchemaFieldName) || !(item.hasOwnProperty(Globals.listIdFieldName)));
   }
 
   async simpleFind(listid, filter) {
@@ -93,25 +93,26 @@ class ListItemControler {
     Validate items against the schema stored in the item with _id = listid
     When strict is false, ignore fields which are not in the schema, otherwise throw an error
   */
-  async validateItems(item, listid, strict = true) {
-    if (strict && !(this.isList(item)) && !(item[Globals.listIdFieldName])) {
+  async validateItems(item, strict = true) {
+    if (!(this.isList(item)) && !(item[Globals.listIdFieldName])) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.listIdFieldName));
     }
     // find listitem schema
-    const schemaStr = await this.getListSchema(listid);
+    const schemaStr = await this.getListSchema(item._listid);
     var newItems;
     // validate provided JSON against the schema
     try {
-      const schema = new ItemSchema(schemaStr, listid);
+      const schema = new ItemSchema(schemaStr, item._listid);
       if (!(this.isList(item))) {
         schema.schema[Globals.listIdFieldName] = {type: 'objectid', required: true};      
       }
       if (item.hasOwnProperty('items')) { // validate many
-        newItems = await Promise.all(item.items.map(async (item) => {
-          if (strict && listid && (!item[Globals.listIdFieldName] || typeof item[Globals.listIdFieldName] === 'string')) {
-            item[Globals.listIdFieldName] = listid;
+        newItems = await Promise.all(item.items.map(async (thisitem) => {
+          // move the listid value to the item level
+          if (strict && item[Globals.listIdFieldName]) {
+            thisitem[Globals.listIdFieldName] = item[Globals.listIdFieldName];
           }
-          var newItem = await schema.validateJson(item, strict);
+          var newItem = await schema.validateJson(thisitem, strict);
           return newItem;
         }))
       }
@@ -126,7 +127,7 @@ class ListItemControler {
   }
 
   async insertMany(item) {
-    var newitems = await this.validateItems(item, this.isList(item) ? undefined : item[Globals.listIdFieldName]);
+    var newitems = await this.validateItems(item);
 
     // create it
     if (newitems.length === undefined){
@@ -159,7 +160,11 @@ class ListItemControler {
       throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
     }
 
-    newitem = await this.validateItems(newitem, this.isList(item) ? undefined : item[Globals.listIdFieldName], false);
+    if (item[Globals.listIdFieldName]) {
+      newitem[Globals.listIdFieldName] = item[Globals.listIdFieldName];
+    }
+
+    newitem = await this.validateItems(newitem, false);
     // update it
     item = await this.coll.findOneAndUpdate({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}, {$set: newitem}, {returnDocument: 'after'});
     if (!(item.ok)) {

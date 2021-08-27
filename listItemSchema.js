@@ -247,13 +247,12 @@ class ItemSchema {
   }
 
   async validate_unique(type, key, val) {
-    // if listid is set search for a
-    if (this.listid) {
+    // search for an identique value
       const item = await listItemControler.simpleFind(this.listid, {[key]: val});
       if (item){
         throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, key, val));
       }
-    }
+
     return val;
   }
 };

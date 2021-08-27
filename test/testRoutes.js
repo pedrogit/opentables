@@ -233,12 +233,12 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.listIdFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.ownerIdFieldName)});
             done();
             //console.log(JSON.stringify(response.body, null, 2));
           });
     });
-    it('4.1 - Post a list item having an invalid listid', (done) => {
+    it('4.2 - Post a list item having an invalid listid', (done) => {
       firstItem = {
         [Globals.listIdFieldName]: '60edb91162a87a2c383d5cf2', 
         'field1': 'field1val1',
@@ -257,7 +257,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.2 - Post a list item having an invalid field', (done) => {
+    it('4.3 - Post a list item having an invalid field', (done) => {
       firstItem = {
         ...firstItem,
         [Globals.listIdFieldName]: listIdToPatch
@@ -275,7 +275,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.3 - Post a list item with a missing field', (done) => {
+    it('4.4 - Post a list item with a missing field', (done) => {
       chai.request(server)
           .post('/api/listitem')
           .send({
@@ -291,7 +291,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.4 - Post a first valid list item', (done) => {
+    it('4.5 - Post a first valid list item', (done) => {
       chai.request(server)
           .post('/api/listitem')
           .send(firstItem)
@@ -309,7 +309,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.5 - Post a second list item', (done) => {
+    it('4.6 - Post a second list item', (done) => {
       secondItem = {
         [Globals.listIdFieldName]: listIdToPatch, 
         'field1': 'field1val2',
@@ -334,7 +334,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.6 - Post two list items', (done) => {
+    it('4.7 - Post two list items', (done) => {
       twoItems = {
         [Globals.listIdFieldName]: listIdToPatch, 
         items:[
@@ -364,7 +364,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.7 - Get the list to check if new items were created', (done) => {
+    it('4.8 - Get the list to check if new items were created', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch)
           .end((err, response) => {
@@ -379,7 +379,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('4.8 - Get the list again but without the list of items', (done) => {
+    it('4.9 - Get the list again but without the list of items', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch + '/noitems')
           .end((err, response) => {
@@ -693,7 +693,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('8.3 - Test succesfull case sensitive isexactly returning something', (done) => {
+    it('8.4 - Test succesfull case sensitive isexactly returning something', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch + '?filter=$isexactly:[$field1, "field1val1"]')
           .end((err, response) => {
@@ -710,7 +710,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('8.4 - Test case insensitive isexactly', (done) => {
+    it('8.5 - Test case insensitive isexactly', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch + '?filter=$isexactly_i:[$field1, "FIeld1val1"]')
           .end((err, response) => {
@@ -727,7 +727,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('8.5 - Test succesfull case sensitive isexactly returning nothing', (done) => {
+    it('8.6 - Test succesfull case sensitive isexactly returning nothing', (done) => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch + '?filter=$isexactly:[$field1, "xxx"]')
           .end((err, response) => {
@@ -811,6 +811,25 @@ describe('testRoutes.js List API', () => {
             //console.log(JSON.stringify(response.body, null, 2));
           });
     });
+
+    it('9.4 - Patch with a duplicate list item', (done) => {
+      chai.request(server)
+          .patch('/api/listitem/' + listItemIdToPatch)
+          .send(
+            {
+              field4: "field4 value4"
+            }
+          )
+          .end((err, response) => {
+            expect(response).to.have.status(400);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'field4', 'field4 value4')});
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+
   });
 
   var userListId;
