@@ -1,3 +1,4 @@
+const MongoDB = require('mongodb');
 const Utils = require('./utils/utils');
 const Errors = require('./utils/errors');
 const NodeUtil = require('util');
@@ -135,23 +136,21 @@ class ItemSchema {
 
   // validate passed JSON fields
   async validateField(key, obj, parentKey) {
-    if (key != Globals.listIdFieldName) { // ignore the listid field since it is validated by the controler
-      if (!(Object.keys(this.schema).includes(key))) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, key));
-      };
-      // if this.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
-      if (typeof(this.schema[key]) === "object") {
-        for (var property in this.schema[key]) {
-          if (property != 'required') {
-            var validatorName = 'validate_' +  property;
-            obj[key] = await this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
-          }
+    if (!(Object.keys(this.schema).includes(key))) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, key));
+    };
+    // if this.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
+    if (typeof(this.schema[key]) === "object") {
+      for (var property in this.schema[key]) {
+        if (property != 'required') {
+          var validatorName = 'validate_' +  property;
+          obj[key] = await this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
         }
       }
-      // if this.schema[key] is a simple type validate it
-      else {
-        obj[key] = await this.validate_type(this.schema[key], key, obj[key]);
-      }
+    }
+    // if this.schema[key] is a simple type validate it
+    else {
+      obj[key] = await this.validate_type(this.schema[key], key, obj[key]);
     }
   }
 
@@ -159,6 +158,13 @@ class ItemSchema {
     var typeValidatorName = 'validate_type_' +  type;
     val = this[typeValidatorName](key, val);
     return val;
+  }
+
+  validate_type_objectid(key, val) {
+    if (!(MongoDB.ObjectId.isValid(val))) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'objectid'));
+    }
+    return MongoDB.ObjectId(val);
   }
 
   validate_type_string(key, val) {
@@ -185,7 +191,7 @@ class ItemSchema {
 
   validate_type_schema(key, val) {
     if (typeof val !== 'string') {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'number'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'schema'));
     }
     new ItemSchema(val);
     return val;

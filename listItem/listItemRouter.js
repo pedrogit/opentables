@@ -18,7 +18,7 @@ const url = require('url');
 *************************************************************************/
 listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
   const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-  const item = await listItemControler.find(req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
+  const item = await listItemControler.findWithItems(req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
   res.status(200).send(item);
 }));
 
@@ -119,7 +119,7 @@ Response status codes
   - 401 Unauthorized – client failed to authenticate with the server
   - 403 Forbidden – client authenticated but does not have permission to access the requested resource
   - 404 Not Found – the requested resource does not exist
-  - 412 Precondition Failed – one or more conditions in the request  fields evaluated to false
+  - 412 Precondition Failed – one or more conditions in the request fields evaluated to false
   - 422 Unprocessable Entity - Well formed but unprocessable request (not used)
   - 500 Internal Server Error – a generic error occurred on the server
   - 503 Service Unavailable – the requested service is not available

@@ -221,6 +221,23 @@ describe('testRoutes.js List API', () => {
   var firstItem;
   var secondItem;
   describe('4 - POST on listitem', () => {
+    it('4.1 - Post a list item having no listid', (done) => {
+      firstItem = {
+        'field1': 'field1val1',
+        'field2': 'field2val1'
+      };
+
+      chai.request(server)
+          .post('/api/listitem')
+          .send(firstItem)
+          .end((err, response) => {
+            expect(response).to.have.status(400);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.listIdFieldName)});
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
     it('4.1 - Post a list item having an invalid listid', (done) => {
       firstItem = {
         [Globals.listIdFieldName]: '60edb91162a87a2c383d5cf2', 
@@ -801,6 +818,7 @@ describe('testRoutes.js List API', () => {
     it('10.1 - Create a users list', (done) => {
       const newUserList = 
         {
+          [Globals.itemIdFieldName]: Globals.userListId,
           [Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
           'rperm': '@owner1',
           'wperm': '@owner1',
@@ -812,13 +830,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(
-              {
-                ...newUserList, 
-                [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
-              }
-             );
-             userListId = response.body[Globals.itemIdFieldName];
+            expect(response.body).to.deep.equal(newUserList);
             done();
             //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -827,7 +839,7 @@ describe('testRoutes.js List API', () => {
     it('10.2 - Register a new user', (done) => {
       const pw = 'mypassword';
       var newUser = {
-        [Globals.listIdFieldName]: userListId,
+        [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'Pedro',
         'lastname': 'Root',
         'organisation': 'Myself',
@@ -850,6 +862,35 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(newUser);
             expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+    it('10.3 - Register another user with the same email', (done) => {
+      const pw = 'mypassword';
+      var newUser = {
+        [Globals.listIdFieldName]: Globals.userListId,
+        'firstname': 'Pedro2',
+        'lastname': 'Root2',
+        'organisation': 'Myself2',
+        'email': 'Pedro@gmail.com',
+        'password': pw
+      }
+      chai.request(server)
+          .post('/api/listitem')
+          .send(newUser)
+          .end((err, response) => {
+            newUser = {
+              ...newUser,
+              ...{
+                [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
+                email: newUser.email.toLowerCase(),
+                password: response.body.password
+              }
+            }
+            expect(response).to.have.status(400);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'email', 'pedro@gmail.com')});
             done();
             //console.log(JSON.stringify(response.body, null, 2));
           });
