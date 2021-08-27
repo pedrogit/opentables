@@ -1,7 +1,7 @@
 const Utils = require('./utils/utils');
 const Errors = require('./utils/errors');
 const NodeUtil = require('util');
-const listItemControler = require('./listitem//listItemControler');
+const listItemControler = require('./listitem/listItemControler');
 
 
 const bcrypt = require('bcrypt');
@@ -150,7 +150,7 @@ class ItemSchema {
       }
       // if this.schema[key] is a simple type validate it
       else {
-        obj[key] = this.validate_type(this.schema[key], key, obj[key]);
+        obj[key] = await this.validate_type(this.schema[key], key, obj[key]);
       }
     }
   }
@@ -168,11 +168,11 @@ class ItemSchema {
     return val;
   }
 
-   validate_type_encrypted_string(key, val) {
+   async validate_type_encrypted_string(key, val) {
     if (typeof val !== 'string') {
       throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'encrypted_string'));
     }
-    var encryptedStr = this.validate_encrypt(null, key, val);
+    var encryptedStr = await this.validate_encrypt(null, key, val);
     return encryptedStr;
   }
 
@@ -235,8 +235,9 @@ class ItemSchema {
     return val.toLowerCase();
   }
 
-  validate_encrypt(type, key, val) {
-    return bcrypt.hashSync(val, bcrypt.genSaltSync(10));
+  async validate_encrypt(type, key, val) {
+    var hash =  await bcrypt.hash(val, 10);
+    return hash;
   }
 
   async validate_unique(type, key, val) {
