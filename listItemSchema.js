@@ -4,7 +4,6 @@ const Errors = require('./utils/errors');
 const NodeUtil = require('util');
 const listItemControler = require('./listitem/listItemControler');
 
-
 const bcrypt = require('bcrypt');
 const Globals = require('./globals');
 

@@ -1,9 +1,42 @@
+require('dotenv').config();
 const express = require('express');
-const listItemRouter = express.Router();
+const url = require('url');
+const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
+
+const Globals = require('../globals');
 const listItemControler = require('./listItemControler');
 
-const asyncHandler = require('express-async-handler');
-const url = require('url');
+var isNewUser = function(item) {
+  return item.hasOwnProperty(Globals.listIdFieldName) &&
+  item[Globals.listIdFieldName].toString() === Globals.userListId &&
+  item.hasOwnProperty('email');
+}
+
+const listItemRouter = express.Router();
+/************************************************************************
+  GET /api/listitem/logout
+
+  Logout (forget the token)
+
+  Return status: 200, 400 invalid or invalid listid, 401, 403
+
+*************************************************************************/
+listItemRouter.get('/login', asyncHandler(async (req, res) => {
+  res.status(200).send();
+}));
+
+/************************************************************************
+  GET /api/listitem/logout
+
+  Logout (forget the token)
+
+  Return status: 200, 400 invalid or invalid listid, 401, 403
+
+*************************************************************************/
+listItemRouter.get('/logout', asyncHandler(async (req, res) => {
+  res.status(200).send();
+}));
 
 /************************************************************************
   GET /api/listitem/:itemid
@@ -32,6 +65,12 @@ listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
 *************************************************************************/
 listItemRouter.post('', asyncHandler(async (req, res) => {
   const item = await listItemControler.insertMany(req.body);
+
+  // convert email to cookie token when registering
+  if (isNewUser(item)) {
+    res.cookie('authtoken', jwt.sign({ email: item.email }, process.env.TOKEN_SECRET), { httpOnly: true });
+  }
+
   res.status(201).send(item);
 }));
 

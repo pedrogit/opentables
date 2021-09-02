@@ -2,8 +2,11 @@ const chai = require('chai');
 const chaihttp = require('chai-http');
 const server = require('../index');
 const bcrypt = require('bcrypt');
-const Globals = require('../globals');
+const libCookie = require('cookie');
+const setCookie = require('set-cookie-parser');
 const NodeUtil = require('util');
+
+const Globals = require('../globals');
 const Errors = require('../utils/errors');
 const Utils = require('../utils/utils');
 
@@ -19,7 +22,7 @@ describe('testRoutes.js List API', () => {
   var listIdToPatch;
   var lastList;
   var twoItems;
-  var items;
+  var lastItems;
   
   describe('1 - Invalid URL and DELETE ALL', () => {
     it('1.1 - Test an invalid URL. It should return a NOT FOUND on invalid URL', (done) => {
@@ -300,7 +303,7 @@ describe('testRoutes.js List API', () => {
               ...firstItem,
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
             }
-            items = [Utils.objWithout(firstItem, '_listid')];
+            lastItems = [Utils.objWithout(firstItem, Globals.listIdFieldName)];
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(firstItem);
@@ -325,7 +328,7 @@ describe('testRoutes.js List API', () => {
               ...secondItem,
               [Globals.itemIdFieldName]: listItemIdToPatch
             }
-            items.push(Utils.objWithout(secondItem, '_listid'));
+            lastItems.push(Utils.objWithout(secondItem, Globals.listIdFieldName));
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(secondItem);
@@ -358,7 +361,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.have.property('insertedIds');
             twoItems.items[0][Globals.itemIdFieldName] = response.body.insertedIds[0];
             twoItems.items[1][Globals.itemIdFieldName] = response.body.insertedIds[1];
-            items = items.concat(twoItems.items);
+            lastItems = lastItems.concat(twoItems.items);
             done();
             //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -372,7 +375,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.be.a('object');
             expect(response.body).to.deep.equal({
               ...lastList, 
-              items: items
+              items: lastItems
             });
             done();
             //console.log(JSON.stringify(response.body, null, 2));
@@ -436,7 +439,7 @@ describe('testRoutes.js List API', () => {
               ...secondItem,
               ...secondItemPatch
             }
-            items[1] = Utils.objWithout(secondItem, '_listid');
+            lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
             expect(response.body).to.deep.equal(secondItem);
@@ -460,13 +463,9 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .get('/api/listitem/' + listIdToPatch)
           .end((err, response) => {
-            var tempFirstItem = {...firstItem};
-            delete tempFirstItem[Globals.listIdFieldName];
-            var tempSecondItem = {...secondItem};
-            delete tempSecondItem[Globals.listIdFieldName];
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({...lastList, items: items});
+            expect(response.body).to.deep.equal({...lastList, items: lastItems});
             done();
             //console.log(JSON.stringify(response.body, null, 2));
           });
@@ -506,6 +505,8 @@ describe('testRoutes.js List API', () => {
           field2: secondItemPatch.field2.toUpperCase()
         }
       };
+
+      lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
 
       chai.request(server)
           .patch('/api/listitem/' + listItemIdToPatch)
@@ -631,6 +632,8 @@ describe('testRoutes.js List API', () => {
                 field4: 'field4 value4'
               }
             }
+            lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
+
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
             expect(response.body).to.deep.equal(secondItem);
@@ -651,7 +654,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.deep.equal(
               {
                 ...lastList,
-                ...{items: items.slice(0, 1)}
+                ...{items: lastItems.slice(0, 1)}
               }
             );
             done();
@@ -668,7 +671,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.deep.equal(
               {
                 ...lastList,
-                ...{items: items.slice(0, 1)}
+                ...{items: lastItems.slice(0, 1)}
               }
             );
             done();
@@ -702,7 +705,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.deep.equal(
               {
                 ...lastList,
-                ...{items: items.slice(0, 1)}
+                ...{items: lastItems.slice(0, 1)}
               }
             );
             done();
@@ -719,7 +722,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.deep.equal(
               {
                 ...lastList,
-                ...{items: items.slice(0, 1)}
+                ...{items: lastItems.slice(0, 1)}
               }
             );
             done();
@@ -794,10 +797,17 @@ describe('testRoutes.js List API', () => {
               field2: "field2val5",
               field4: "field4 value5"
             };
+
+
       chai.request(server)
           .post('/api/listitem')
           .send(dupListItem)
           .end((err, response) => {
+            lastItems[4] = Utils.objWithout({
+              ...dupListItem,
+              field2: dupListItem.field2.toUpperCase(),
+              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
+            }, Globals.listIdFieldName);
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(
@@ -828,12 +838,14 @@ describe('testRoutes.js List API', () => {
             //console.log(JSON.stringify(response.body, null, 2));
           });
     });
-
-
   });
 
-  var userListId;
   describe('10 - Test registration, login, authentification and permission', () => {
+    let lastToken;
+    var cookies;
+    var newUser;
+    let pw = 'mypassword';
+    
     it('10.1 - Create a users list', (done) => {
       const newUserList = 
         {
@@ -856,8 +868,7 @@ describe('testRoutes.js List API', () => {
     });
 
     it('10.2 - Register a new user', (done) => {
-      const pw = 'mypassword';
-      var newUser = {
+      newUser = {
         [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'Pedro',
         'lastname': 'Root',
@@ -881,13 +892,40 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(newUser);
             expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
+            expect(response).to.have.cookie('authtoken');
+
+            cookies = setCookie.parse(response);
+
             done();
             //console.log(JSON.stringify(response.body, null, 2));
           });
     });
-    it('10.3 - Register another user with the same email', (done) => {
+
+    it('10.3 - Make sure the cookie are sent back from the server', (done) => {
+      var newCookie = cookies.map(function(cookie) {
+        return libCookie.serialize(cookie.name, cookie.value, cookie);
+      });
+
+      chai.request(server)
+          .get('/api/listitem/' + listIdToPatch)
+          .set('Cookie', newCookie)
+          .end((err, response) => {
+            lastList = {
+              ...lastList,
+              ...{items: lastItems}
+            }
+            expect(response).to.have.status(200);
+            expect(response.body).to.be.a('object');
+            expect(response.body).to.deep.equal(lastList);
+            expect(response).to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('10.4 - Register another user with the same email', (done) => {
       const pw = 'mypassword';
-      var newUser = {
+      var newUser2 = {
         [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'Pedro2',
         'lastname': 'Root2',
@@ -895,18 +933,16 @@ describe('testRoutes.js List API', () => {
         'email': 'Pedro@gmail.com',
         'password': pw
       }
+
+      var newCookie = cookies.map(function(cookie) {
+        return libCookie.serialize(cookie.name, cookie.value, cookie);
+      });
+
       chai.request(server)
           .post('/api/listitem')
-          .send(newUser)
+          .set('Cookie', newCookie)
+          .send(newUser2)
           .end((err, response) => {
-            newUser = {
-              ...newUser,
-              ...{
-                [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-                email: newUser.email.toLowerCase(),
-                password: response.body.password
-              }
-            }
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'email', 'pedro@gmail.com')});
@@ -914,6 +950,92 @@ describe('testRoutes.js List API', () => {
             //console.log(JSON.stringify(response.body, null, 2));
           });
     });
+
+    it('10.5 - Logout the user', (done) => {
+      chai.request(server)
+          .get('/api/listitem/logout')
+          .send()
+          .end((err, response) => {
+            expect(response).to.have.status(200);
+            expect(response.body).to.be.an('object');
+            expect(response).not.to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('10.6 - Login the user using an invalid email', (done) => {
+      chai.request(server)
+          .get('/api/listitem/login')
+          .auth('x' + newUser.email, pw)
+          .end((err, response) => {
+            expect(response).to.have.status(401);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.InvalidUser)});
+            expect(response).not.to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+    
+    it('10.7 - Login the user using an invalid password', (done) => {
+      chai.request(server)
+          .get('/api/listitem/login')
+          .auth(newUser.email, 'x' + pw)
+          .end((err, response) => {
+            expect(response).to.have.status(401);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.CouldNotLogin)});
+            expect(response).not.to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('10.8 - Login the user', (done) => {
+      chai.request(server)
+          .get('/api/listitem/login')
+          .auth(newUser.email, pw)
+          .end((err, response) => {
+            expect(response).to.have.status(200);
+            expect(response.body).to.be.an('object');
+            expect(response).to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('10.9 - Logout the user', (done) => {
+      chai.request(server)
+          .get('/api/listitem/logout')
+          .send()
+          .end((err, response) => {
+            expect(response).to.have.status(200);
+            expect(response.body).to.be.an('object');
+            expect(response).not.to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
+    it('10.10 - Get the last list with authorization', (done) => {
+      chai.request(server)
+          .get('/api/listitem/' + listIdToPatch)
+          .auth(newUser.email, pw)
+          .end((err, response) => {
+            lastList = {
+              ...lastList,
+              items: lastItems
+            }
+            expect(response).to.have.status(200);
+            expect(response.body).to.be.a('object');
+            expect(response.body).to.deep.equal(lastList);
+            expect(response).to.have.cookie('authtoken');
+            done();
+            //console.log(JSON.stringify(response.body, null, 2));
+          });
+    });
+
 
   });
 });

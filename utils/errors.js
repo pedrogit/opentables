@@ -5,6 +5,13 @@ class BadRequest extends Error {
   }
 }
 
+class Unauthorized extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 401;
+  }
+}
+
 class NotFound extends Error {
   constructor(message) {
     super(message);
@@ -12,8 +19,17 @@ class NotFound extends Error {
   }
 }
 
+class InternalServerError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 500;
+  }
+}
+
 var ErrMsg = {
   'Database_CouldNotConnect': 'Could not connect to database...',
+  'InvalidUser': 'User does not exists...',
+  'CouldNotLogin': 'Could not login user...',
   'MalformedID': 'Malformed ID (%s)...',
   'InvalidSimpleJsonStr': 'Invalid simple JSON string (%s)...',
   'ItemSchema_Null': 'Schema can not be null...',
@@ -38,6 +54,8 @@ var ErrMsg = {
 
 module.exports = {
   BadRequest : BadRequest,
+  Unauthorized : Unauthorized,
   NotFound : NotFound,
+  InternalServerError : InternalServerError,
   ErrMsg : ErrMsg
 }
