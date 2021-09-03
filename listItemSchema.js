@@ -2,7 +2,6 @@ const MongoDB = require('mongodb');
 const Utils = require('./utils/utils');
 const Errors = require('./utils/errors');
 const NodeUtil = require('util');
-//const listItemControler = require('./listItemControler');
 
 const bcrypt = require('bcrypt');
 const Globals = require('./globals');
@@ -166,6 +165,34 @@ class ItemSchema {
       throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'objectid'));
     }
     return MongoDB.ObjectId(val);
+  }
+
+  validate_type_user(key, val) {
+    val = val.toLowerCase();
+    if (['@all', '@owner'].includes(val)) {
+      return val;
+    }
+    try {
+      val = this.validate_type_email(key, val);
+    } catch (err) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'user'));
+    }
+    return val;
+  }
+
+  validate_type_user_array(key, val) {
+    var valArr = val;
+    try {
+      if (!(valArr instanceof Array)) {
+          valArr = valArr.split(/\s*\,\s*/);
+      }
+      valArr.map(v => {
+        this.validate_type_user(key, v);
+      });
+    } catch(err) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'user_array'));
+    }
+    return val.toLowerCase();
   }
 
   validate_type_string(key, val) {

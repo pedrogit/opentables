@@ -123,5 +123,23 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.deep.equal({"field1": "aaaa@x.com"});
   });
 
+  it('Invalid user_array', async () => {
+    var schema = new ItemSchema('field1: user_array');
+    try {
+      var json = await schema.validateJson('{"field1": "aa, bb"}');
+    } catch(err) {
+      console.log('aa');
+    }
+    await expectThrowsAsync(() => schema.validateJson('{"field1": "aa, bb"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'aa, bb', 'user_array'))
+  });
+
+  it('Valid user_array', async () => {
+    var schema = new ItemSchema('field1: user_array');
+    var json = await schema.validateJson('"field1": "@All, BB@gmail.com"');
+
+    expect(json).to.be.an('object');
+    expect(json).to.deep.equal({"field1": "@all, bb@gmail.com"});
+  });
+
 });
 

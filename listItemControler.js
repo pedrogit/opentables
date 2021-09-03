@@ -9,8 +9,8 @@ const NodeUtil = require('util');
 
 const listSchema = '{' + Globals.itemIdFieldName + ': objectid, '
                        + Globals.ownerIdFieldName + ': {type: objectid, required}, \
-                     rperm:  {type: string, required, lower}, \
-                     wperm:  {type: string, required, lower}, \
+                     rperm:  {type: user_array, required, lower}, \
+                     wperm:  {type: user_array, required, lower}, \
                      ' + Globals.listSchemaFieldName + ':  {type: schema, lower}}';
 
 class ListItemControler {

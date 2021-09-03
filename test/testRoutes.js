@@ -52,8 +52,8 @@ describe('testRoutes.js List API', () => {
     it('2.1 - Post a new list having an invalid field', (done) => {
       lastList = {
         ['x' + Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
-        'rperm': '@OWNER1',
-        'wperm': '@owner1',
+        'rperm': '@OWNER',
+        'wperm': '@owner',
         [Globals.listSchemaFieldName]: '{}'
       };
       chai.request(server)
@@ -95,14 +95,14 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .post('/api/listitem')
           .send({[Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
-                 'rperm': '@OWNER1',
-                 'wperm': '@owner1',
+                 'rperm': '@OWNER',
+                 'wperm': '@owner',
                  [Globals.listSchemaFieldName]: '{}'}
           )
           .end((err, response) => {
             lastList = {
               ...lastList,
-              'rperm': '@OWNER1'.toLowerCase(),
+              'rperm': '@OWNER'.toLowerCase(),
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
             };
             expect(response).to.have.status(201);
@@ -851,8 +851,8 @@ describe('testRoutes.js List API', () => {
         {
           [Globals.itemIdFieldName]: Globals.userListId,
           [Globals.ownerIdFieldName]: '60edb91162a87a2c383d5cf2',
-          'rperm': '@owner1',
-          'wperm': '@owner1',
+          'rperm': '@owner',
+          'wperm': '@owner',
           [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
         };
       chai.request(server)
