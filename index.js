@@ -10,8 +10,8 @@ const NodeUtil = require('util');
 const Globals = require('./globals');
 const Errors = require('./utils/errors');
 
-const listItemRouter = require('./listItem/listItemRouter');
-const listItemControler = require('./listitem/listItemControler');
+const listItemControler = require('./listItemControler');
+const listItemRouter = require('./listItemRouter');
 
 const app = express();
 const PORT = 3000;
@@ -41,7 +41,6 @@ app.use(async (req, res, next) => {
   else if (req.cookies.authtoken) {
     try {
       jwt.verify(req.cookies.authtoken, process.env.TOKEN_SECRET);
-      //res.cookie('authtoken', jwt.sign(jwt.decode(req.cookies.authtoken), process.env.TOKEN_SECRET), { httpOnly: true });
       //resend the cookie
       res.cookie('authtoken', req.cookies.authtoken);
     }

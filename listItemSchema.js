@@ -2,13 +2,13 @@ const MongoDB = require('mongodb');
 const Utils = require('./utils/utils');
 const Errors = require('./utils/errors');
 const NodeUtil = require('util');
-const listItemControler = require('./listitem/listItemControler');
+//const listItemControler = require('./listItemControler');
 
 const bcrypt = require('bcrypt');
 const Globals = require('./globals');
 
 class ItemSchema {
-  constructor(schema, listid = null) {
+  constructor(schema, controler, listid = null) {
     if (schema == null) {
       throw new Error(Errors.ErrMsg.ItemSchema_Null);
     }
@@ -26,6 +26,8 @@ class ItemSchema {
     if (listid !== null) {
       this.listid = listid;
     }
+
+    this.controler = controler;
 
     if (typeof this.schema !== 'object') {
       throw new Error(Errors.ErrMsg.ItemSchema_Malformed);
@@ -247,7 +249,9 @@ class ItemSchema {
 
   async validate_unique(type, key, val) {
     // search for an identique value
-      const item = await listItemControler.simpleFind(this.listid, {[key]: val});
+      //const item = await listItemControler.simpleFind(this.listid, {[key]: val});
+      const item = await this.controler.simpleFind(this.listid, {[key]: val});
+      
       if (item){
         throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, key, val));
       }

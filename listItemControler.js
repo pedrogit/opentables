@@ -1,9 +1,9 @@
 const MongoDB = require('mongodb');
-const Errors = require('../utils/errors');
-const Utils = require('../utils/utils');
-const Globals = require('../globals');
-const ItemSchema = require('../listItemSchema');
-const ItemFilter = require('../listItemFilter');
+const Errors = require('./utils/errors');
+const Utils = require('./utils/utils');
+const Globals = require('./globals');
+const ItemSchema = require('./listItemSchema');
+const ItemFilter = require('./listItemFilter');
 
 const NodeUtil = require('util');
 
@@ -18,7 +18,7 @@ class ListItemControler {
     MongoDB.MongoClient.connect(process.env.MONGODB_ADDRESS, (err, ldb) => {
       if (err) {
         throw new Errors.InternalServerError(Errors.ErrMsg.Database_CouldNotConnect);
-      }
+      };
       this.coll = ldb.db(Globals.mongoDatabaseName).collection(Globals.mongoCollectionName);
     });
   };
@@ -31,7 +31,7 @@ class ListItemControler {
   async simpleFind(listid, filter) {
     if (!(MongoDB.ObjectId.isValid(listid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, listid));
-    }
+    };
     const idFilter = {[Globals.listIdFieldName]: MongoDB.ObjectId(listid)};
     const newFilter = {...idFilter, ...filter};
     const items = this.coll.findOne(newFilter);
@@ -41,13 +41,13 @@ class ListItemControler {
   async findWithItems(itemid, filter, noitems = false) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
-    }
+    };
     
     var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
 
     if (!item) {
       throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
-    }
+    };
 
     if (!noitems && ListItemControler.isList(item)) {
       var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
@@ -66,7 +66,7 @@ class ListItemControler {
                           }];
         delete lookup.localField;
         delete lookup.foreignField;
-      }
+      };
 
       var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
                       {$lookup: lookup},
@@ -102,7 +102,7 @@ class ListItemControler {
     var newItems;
     // validate provided JSON against the schema
     try {
-      const schema = new ItemSchema(schemaStr, item[Globals.listIdFieldName]);
+      const schema = new ItemSchema(schemaStr, this, item[Globals.listIdFieldName]);
       if (!(ListItemControler.isList(item))) {
         schema.schema[Globals.listIdFieldName] = {type: 'objectid', required: true};      
       }
@@ -180,4 +180,4 @@ class ListItemControler {
 
 module.exports = new ListItemControler;
 
-//console.log('asa');
+console.log('asa');

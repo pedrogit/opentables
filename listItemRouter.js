@@ -4,7 +4,8 @@ const url = require('url');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
-const Globals = require('../globals');
+const Globals = require('./globals');
+const ItemSchema = require('./listItemSchema');
 const listItemControler = require('./listItemControler');
 
 var isNewUser = function(item) {
