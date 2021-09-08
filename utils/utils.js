@@ -1,6 +1,8 @@
+require('dotenv').config();
 const { assert } = require("chai");
 const Errors = require('../utils/errors');
 const NodeUtil = require('util');
+const jwt = require('jsonwebtoken');
 
 const identifierRegEx = '\\$?[a-zA-Z0-9_-]+';
 const afterJsonKeyRegEx = '(?=[\\,\\}]|$)';
@@ -140,5 +142,10 @@ exports.objWithout = function(obj, without) {
     })
   }
   return newObj;
+}
+
+exports.setCookieJWT = function(res, payload) {
+  var jwtoken = jwt.sign(payload, process.env.TOKEN_SECRET, {algorithm: 'HS256'});
+  res.cookie('authtoken', jwtoken, {httpOnly: true});
 }
 

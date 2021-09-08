@@ -1,10 +1,10 @@
-require('dotenv').config();
 const express = require('express');
 const url = require('url');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
 const Globals = require('./globals');
+const Utils = require('./utils/utils');
 const ItemSchema = require('./listItemSchema');
 const listItemControler = require('./listItemControler');
 
@@ -69,7 +69,8 @@ listItemRouter.post('', asyncHandler(async (req, res) => {
 
   // convert email to cookie token when registering
   if (isNewUser(item)) {
-    res.cookie('authtoken', jwt.sign({ email: item.email }, process.env.TOKEN_SECRET), { httpOnly: true });
+    Utils.setCookieJWT(res, {email: item.email});
+    //res.cookie('authtoken', jwt.sign({ email: item.email }, process.env.TOKEN_SECRET), { httpOnly: true });
   }
 
   res.status(201).send(item);

@@ -1,4 +1,3 @@
-require('dotenv').config()
 const express = require('express');
 const cookieParser = require('cookie-parser')
 //const logger = require("morgan");
@@ -9,6 +8,7 @@ const NodeUtil = require('util');
 
 const Globals = require('./globals');
 const Errors = require('./utils/errors');
+const Utils = require('./utils/utils');
 
 const listItemControler = require('./listItemControler');
 const listItemRouter = require('./listItemRouter');
@@ -36,11 +36,12 @@ app.use(async (req, res, next) => {
     if (!(bcrypt.compareSync(password, item.password))) {
       next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
     }
-    res.cookie('authtoken', jwt.sign({ email: item.email }, process.env.TOKEN_SECRET), { httpOnly: true });
+    //res.cookie('authtoken', jwt.sign({ email: item.email }, process.env.TOKEN_SECRET), { httpOnly: true });
+    Utils.setCookieJWT(res, {email: item.email});
   }
   else if (req.cookies.authtoken) {
     try {
-      jwt.verify(req.cookies.authtoken, process.env.TOKEN_SECRET);
+      jwt.verify(req.cookies.authtoken, process.env.TOKEN_SECRET, { algorithms: ['HS256'] });
       //resend the cookie
       res.cookie('authtoken', req.cookies.authtoken);
     }
