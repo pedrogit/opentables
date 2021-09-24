@@ -155,6 +155,7 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .patch('/api/' + Globals.listitemAPIKeyword + '/aaaa')
           .send(listPatch)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
@@ -167,6 +168,7 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .patch('/api/' + Globals.listitemAPIKeyword + '/61156c3f52de9f98d61f9a23')
           .send(listPatch)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(404);
             expect(response.body).to.be.a('object');
@@ -240,6 +242,7 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .post('/api/' + Globals.listitemAPIKeyword)
           .send(firstItem)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(404);
             expect(response.body).to.be.an('object');

@@ -99,11 +99,6 @@ class ListItemControler {
   };
 
   static validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm) {
-    // unauth user have no edit permissions
-    if (user === Globals.unauthUserName) {
-      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-    }
-
     // admin and listowner have all permissions
     if (user === process.env.ADMIN_EMAIL || user === listOwner) {
       return;
@@ -122,12 +117,7 @@ class ListItemControler {
   }
   
   static validateCreatePerm(user, item, listOwner, listCPerm, listWPerm) {
-    if (ListItemControler.isList(item)) {
-      if (user === Globals.unauthUserName) {
-        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-      }
-    }
-    else {
+    if (!(ListItemControler.isList(item))) {
       ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
     }
     return;
@@ -193,6 +183,11 @@ class ListItemControler {
   };
 
   async insertMany(user, item) {
+    // unauth user have no edit permissions
+    if (user === Globals.unauthUserName) {
+      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+    }
+    
     // find listitem schema
     var parentList = await this.getParentList(item);
 
@@ -223,6 +218,11 @@ class ListItemControler {
   };
 
   async patch(user, itemid, newitem) {
+    // unauth user have no edit permissions
+    if (user === Globals.unauthUserName) {
+      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+    }
+
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
@@ -262,6 +262,11 @@ class ListItemControler {
   };
 
   async delete(user, itemid) {
+    // unauth user have no edit permissions
+    if (user === Globals.unauthUserName) {
+      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+    }
+
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
