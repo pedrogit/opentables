@@ -12,6 +12,13 @@ class Unauthorized extends Error {
   }
 }
 
+class Forbidden extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 403;
+  }
+}
+
 class NotFound extends Error {
   constructor(message) {
     super(message);
@@ -30,6 +37,7 @@ var ErrMsg = {
   'Database_CouldNotConnect': 'Could not connect to database...',
   'InvalidUser': 'User does not exists...',
   'CouldNotLogin': 'Could not login user...',
+  'Forbidden': 'User does not have sufficient permission to execute this task...',
   'MalformedID': 'Malformed ID (%s)...',
   'InvalidSimpleJsonStr': 'Invalid simple JSON string (%s)...',
   'ItemSchema_Null': 'Schema can not be null...',
@@ -55,6 +63,7 @@ var ErrMsg = {
 module.exports = {
   BadRequest : BadRequest,
   Unauthorized : Unauthorized,
+  Forbidden: Forbidden,
   NotFound : NotFound,
   InternalServerError : InternalServerError,
   ErrMsg : ErrMsg

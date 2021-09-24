@@ -8,10 +8,11 @@ const ItemFilter = require('./listItemFilter');
 const NodeUtil = require('util');
 
 const listSchema = '{' + Globals.itemIdFieldName + ': objectid, '
-                       + Globals.ownerIdFieldName + ': {type: objectid, required}, \
-                     rperm:  {type: user_array, required, lower}, \
-                     wperm:  {type: user_array, required, lower}, \
-                     ' + Globals.listSchemaFieldName + ':  {type: schema, lower}}';
+                       + Globals.ownerFieldName + ': {type: user, required},  '
+                       + Globals.listConfPermFieldName + ':  {type: user_array, required, lower},  '
+                       + Globals.listWritePermFieldName + ':  {type: user_array, required, lower}, '
+                       + Globals.listReadPermFieldName + ':  {type: user_array, required, lower}, '
+                       + Globals.listSchemaFieldName + ':  {type: schema, lower}}';
 
 class ListItemControler {
   constructor() {
@@ -38,7 +39,7 @@ class ListItemControler {
     return items; 
   };
 
-  async findWithItems(itemid, filter, noitems = false) {
+  async findWithItems(user, itemid, filter, noitems = false) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     };
@@ -79,33 +80,81 @@ class ListItemControler {
     return item;
   };
 
-  async getListSchema(listid) {
-    if (listid) {
-      const list = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(listid)});
-      if (!list) {
-        throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.List_NotFound, listid));
-      }
-      return list.listschema;
+  async getParentList(item) {
+    // it's a list!
+    if (ListItemControler.isList(item)) {
+      var result = {[Globals.listSchemaFieldName]: listSchema}
+      return result;
     }
-    return listSchema;
+    
+    // it's a list item
+    if (!(item[Globals.listIdFieldName])) {
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.listIdFieldName));
+    }
+    const list = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(item[Globals.listIdFieldName])});
+    if (!list) {
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.List_NotFound, item[Globals.listIdFieldName]));
+    }
+    return list;
   };
+
+  static validateCreateListItemPerm(user, listOwner, listCPerm, listWPerm) {
+    if ((listCPerm === '@all' ||  listWPerm === '@all') && user !== Globals.unauthUserName) {
+      return;
+    }
+    if (user === process.env.ADMIN_EMAIL || user === listOwner) {
+      return;
+    }
+    if (listCPerm.split(/\s*,\s*/).includes(user)){
+      return;
+    }
+    if (listWPerm.split(/\s*,\s*/).includes(user)){
+      return;
+    }
+    throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+    return;
+  }
+  
+  static validateCreatePerm(user, item, listOwner, listCPerm, listWPerm) {
+    if (ListItemControler.isList(item)) {
+      if (user === Globals.unauthUserName) {
+        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+      }
+    }
+    else {
+      ListItemControler.validateCreateListItemPerm(user, listOwner, listCPerm, listWPerm);
+    }
+    return;
+  };
+
+  static validateDeletePerm(user, item, listOwner, listCPerm, listWPerm) {
+    if (ListItemControler.isList(item)) {
+      if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
+        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+      }
+    }
+    else {
+      ListItemControler.validateCreateListItemPerm(user, listOwner, listCPerm, listWPerm);
+    }
+    return;
+  };
+
   /*
     Validate items against the schema stored in the item with _id = listid
     When strict is false, ignore fields which are not in the schema, otherwise throw an error
   */
-  async validateItems(item, strict = true) {
-    if (!(ListItemControler.isList(item)) && !(item[Globals.listIdFieldName])) {
-      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.listIdFieldName));
-    }
-    // find listitem schema
-    const schemaStr = await this.getListSchema(item[Globals.listIdFieldName]);
+  async validateItems(schemaStr, item, strict = true) {
     var newItems;
     // validate provided JSON against the schema
     try {
       const schema = new ItemSchema(schemaStr, this, item[Globals.listIdFieldName]);
+
+      // add the schema description for the listid property
       if (!(ListItemControler.isList(item))) {
         schema.schema[Globals.listIdFieldName] = {type: 'objectid', required: true};      
       }
+
+      // validate many or one
       if (item.hasOwnProperty('items')) { // validate many
         newItems = await Promise.all(item.items.map(async (thisitem) => {
           // move the listid value to the item level
@@ -126,8 +175,15 @@ class ListItemControler {
     return newItems;
   };
 
-  async insertMany(item) {
-    var newitems = await this.validateItems(item);
+  async insertMany(user, item) {
+    // find listitem schema
+    var parentList = await this.getParentList(item);
+
+    // validate permissions
+    ListItemControler.validateCreatePerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    
+    // validate item against schema
+    var newitems = await this.validateItems(parentList[Globals.listSchemaFieldName], item);
 
     // create it
     if (newitems.length === undefined){
@@ -141,7 +197,7 @@ class ListItemControler {
       throw new Errors.InternalServerError(Errors.ErrMsg.ListItem_CouldNotCreate);
     }
 
-    // delete the acknoledgment property if there was many items
+    // delete the acknowledgment property if there was many items
     if (newitems.acknowledged !== undefined) {
       delete newitems.acknowledged;
     }
@@ -149,7 +205,7 @@ class ListItemControler {
     return newitems;
   };
 
-  async patch(itemid, newitem) {
+  async patch(user, itemid, newitem) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
@@ -164,7 +220,15 @@ class ListItemControler {
       newitem[Globals.listIdFieldName] = item[Globals.listIdFieldName];
     }
 
-    newitem = await this.validateItems(newitem, false);
+    // find listitem schema
+    var parentList = await this.getParentList(newitem);
+
+    // validate permissions
+    ListItemControler.validateCreatePerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+
+    // validate item against schema
+    newitem = await this.validateItems(parentList[Globals.listSchemaFieldName], newitem, false);
+    
     // update it
     item = await this.coll.findOneAndUpdate({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}, {$set: newitem}, {returnDocument: 'after'});
     if (!(item.ok)) {
@@ -173,11 +237,36 @@ class ListItemControler {
     return item.value;
   };
 
-  deleteAll() {
+  deleteAll(user) {
+    if (user !== process.env.ADMIN_EMAIL) {
+      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+    }
     return this.coll.deleteMany({});
+  };
+
+  async delete(user, itemid) {
+    if (!(MongoDB.ObjectId.isValid(itemid))) {
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
+    }
+
+    // find the item to check if it is a list or a listitem
+    var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
+    if (!item) {
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
+    }
+
+    // find listitem schema
+    var parentList = await this.getParentList(item);
+
+    // check user permissions
+    ListItemControler.validateDeletePerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+ 
+    if (ListItemControler.isList(item)) {
+      // delete all associated listitem
+      this.coll.deleteMany({[Globals.listIdFieldName]: MongoDB.ObjectId(item[Globals.listIdFieldName])});
+    }
+    return this.coll.deleteOne({[Globals.listIdFieldName]: itemid});
   };
 }
 
 module.exports = new ListItemControler;
-
-console.log('asa');

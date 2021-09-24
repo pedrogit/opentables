@@ -52,7 +52,7 @@ listItemRouter.get('/logout', asyncHandler(async (req, res) => {
 *************************************************************************/
 listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
   const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-  const item = await listItemControler.findWithItems(req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
+  const item = await listItemControler.findWithItems(req.user, req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
   res.status(200).send(item);
 }));
 
@@ -65,12 +65,16 @@ listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
 
 *************************************************************************/
 listItemRouter.post('', asyncHandler(async (req, res) => {
-  const item = await listItemControler.insertMany(req.body);
+  // register new users as admin
+  if (isNewUser(req.body)) {
+    req.user = process.env.ADMIN_EMAIL;
+  }
+
+  const item = await listItemControler.insertMany(req.user, req.body);
 
   // convert email to cookie token when registering
   if (isNewUser(item)) {
-    Utils.setCookieJWT(res, {email: item.email});
-    //res.cookie('authtoken', jwt.sign({ email: item.email }, process.env.TOKEN_SECRET), { httpOnly: true });
+    Utils.setCookieJWT(req, res, {email: item.email});
   }
 
   res.status(201).send(item);
@@ -93,7 +97,7 @@ listItemRouter.post('', asyncHandler(async (req, res) => {
 
 *************************************************************************/
 listItemRouter.patch('/:itemid', asyncHandler(async (req, res) => {
-  const newitem = await listItemControler.patch(req.params.itemid, req.body);
+  const newitem = await listItemControler.patch(req.user, req.params.itemid, req.body);
   res.status(200).send(newitem);
 }));
 
@@ -106,7 +110,7 @@ listItemRouter.patch('/:itemid', asyncHandler(async (req, res) => {
 
 *************************************************************************/
 listItemRouter.delete('', asyncHandler(async (req, res) => {
-  const result = await listItemControler.deleteAll()  
+  const result = await listItemControler.deleteAll(req.user)  
   // if DELETE fails let the server default error handler return 500
   if (result.acknowledged) {
     res.status(200).send({'deletedCount': result.deletedCount});
@@ -117,7 +121,14 @@ listItemRouter.delete('', asyncHandler(async (req, res) => {
                                 // Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-    
+listItemRouter.delete('/:itemid', asyncHandler(async (req, res) => {
+  const result = await listItemControler.delete(req.user, req.params.itemid)  
+  // if DELETE fails let the server default error handler return 500
+  if (result.acknowledged) {
+    res.status(200).send({'deletedCount': result.deletedCount});
+}
+}));
+
 module.exports = listItemRouter;
 
 /*

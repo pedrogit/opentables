@@ -125,11 +125,6 @@ describe('testListItemSchema.js List Item Schema', () => {
 
   it('Invalid user_array', async () => {
     var schema = new ItemSchema('field1: user_array');
-    try {
-      var json = await schema.validateJson('{"field1": "aa, bb"}');
-    } catch(err) {
-      console.log('aa');
-    }
     await expectThrowsAsync(() => schema.validateJson('{"field1": "aa, bb"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'aa, bb', 'user_array'))
   });
 
