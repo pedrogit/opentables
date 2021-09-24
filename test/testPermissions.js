@@ -342,6 +342,22 @@ try {
                     done();
                   });
             });
+
+            it(l + '.6 - Get the list as ' + permissionTests[l].user + ' (' + permissionTests[l].getlist + ')', (done) => {
+              chai.request(server)
+                  .get('/api/' + Globals.listitemAPIKeyword + '/' + lastListID)
+                  .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
+                  .end((err, response) => {
+                    if (permissionTests[l].getlist == 'yes' || permissionTests[l].getlist == 'granted') {
+                      expect(response).to.have.status(200);
+                    }
+                    else {
+                      expect(response).to.have.status(403);
+                      expect(response.body).to.deep.equal({"err": Errors.ErrMsg.Forbidden});
+                    }
+                    done();
+                  });
+            });
         }
       });
 

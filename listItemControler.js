@@ -39,45 +39,69 @@ class ListItemControler {
     return items; 
   };
 
-  async findWithItems(user, itemid, filter, noitems = false) {
-    if (!(MongoDB.ObjectId.isValid(itemid))) {
-      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
-    };
-    
-    var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
-
-    if (!item) {
-      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
-    };
-
-    if (!noitems && ListItemControler.isList(item)) {
-      var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
-
-      if (filter) {
-        var mongoDBFilter = new ItemFilter(filter);
-        var jsonFilter = mongoDBFilter.final();
-        lookup.let = {x: '$' + Globals.itemIdFieldName};
-        lookup.pipeline = [{$match: 
-                            {$expr: 
-                              {$and: [
-                                {$eq: ['$' + Globals.listIdFieldName, '$$x']},
-                                jsonFilter
-                              ]}
-                            }
-                          }];
-        delete lookup.localField;
-        delete lookup.foreignField;
-      };
-
-      var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
-                      {$lookup: lookup},
-                      {$unset: 'items.' + Globals.listIdFieldName}
-                     ];
-      item = await this.coll.aggregate(pipeline).toArray();
-      item = item[0];
+  static validatePerm(user, listOwner, listCPerm, listWPerm, listRPerm) {
+    // admin and listowner have all permissions
+    if (user === process.env.ADMIN_EMAIL || user === listOwner) {
+      return;
     }
 
-    return item;
+    if (user !== Globals.unauthUserName) {
+      // if listCPerm permission is @all or the user is listed grant permission
+      if (listCPerm && (listCPerm === '@all' || listCPerm.split(/\s*,\s*/).includes(user))) {
+        return;
+      }
+
+      // if listWPerm permission is @all or the user is listed grant permission
+      if (listWPerm && (listWPerm === '@all' || listWPerm.split(/\s*,\s*/).includes(user))) {
+        return;
+      }
+    }
+
+    // if listRPerm permission is @all or the user is listed grant permission
+    if (listRPerm && (listRPerm === '@all' || listRPerm.split(/\s*,\s*/).includes(user))) {
+      return;
+    }
+
+    throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+  }
+  
+  static validateReadPerm(user, item, listOwner, listCPerm, listWPerm, listRPerm) {
+    if (ListItemControler.isList(item)) {
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName]);
+    }
+    else {
+      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm, listRPerm);
+    }
+    return;
+  }
+
+  static validateCreatePerm(user, item, listOwner, listCPerm, listWPerm) {
+    if (!(ListItemControler.isList(item))) {
+      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm);
+    }
+    return;
+  };
+
+  static validatePatchPerm(user, item, listOwner, listCPerm, listWPerm) {
+    if (ListItemControler.isList(item)) {
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
+    }
+    else {
+      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm);
+    }
+    return;
+  };
+
+  static validateDeletePerm(user, item, listOwner, listCPerm, listWPerm) {
+    if (ListItemControler.isList(item)) {
+      if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
+        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+      }
+    }
+    else {
+      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm);
+    }
+    return;
   };
 
   async getParentList(item) {
@@ -98,52 +122,57 @@ class ListItemControler {
     return list;
   };
 
-  static validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm) {
-    // admin and listowner have all permissions
-    if (user === process.env.ADMIN_EMAIL || user === listOwner) {
-      return;
-    }
+  async findWithItems(user, itemid, filter, noitems = false) {
+    if (!(MongoDB.ObjectId.isValid(itemid))) {
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
+    };
+    
+    var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
 
-    // if listCPerm permission is @all or the user is listed grant permission
-    if (listCPerm && (listCPerm === '@all' || listCPerm.split(/\s*,\s*/).includes(user))) {
-      return;
-    }
+    if (!item) {
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
+    };
 
-    // if listWPerm permission is @all or the user is listed grant permission
-    if (listWPerm && (listWPerm === '@all' || listWPerm.split(/\s*,\s*/).includes(user))) {
-      return;
-    }
-    throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-  }
-  
-  static validateCreatePerm(user, item, listOwner, listCPerm, listWPerm) {
-    if (!(ListItemControler.isList(item))) {
-      ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
-    }
-    return;
-  };
-
-  static validatePatchPerm(user, item, listOwner, listCPerm, listWPerm) {
     if (ListItemControler.isList(item)) {
-      ListItemControler.validateWriteListItemPerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
-    }
-    else {
-      ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
-    }
-    return;
-  };
 
+      // validate permissions
+      ListItemControler.validateReadPerm(user, item);
 
-  static validateDeletePerm(user, item, listOwner, listCPerm, listWPerm) {
-    if (ListItemControler.isList(item)) {
-      if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
-        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+      if (!noitems) {
+        var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
+
+        if (filter) {
+          var mongoDBFilter = new ItemFilter(filter);
+          var jsonFilter = mongoDBFilter.final();
+          lookup.let = {x: '$' + Globals.itemIdFieldName};
+          lookup.pipeline = [{$match: 
+                              {$expr: 
+                                {$and: [
+                                  {$eq: ['$' + Globals.listIdFieldName, '$$x']},
+                                  jsonFilter
+                                ]}
+                              }
+                            }];
+          delete lookup.localField;
+          delete lookup.foreignField;
+        };
+
+        var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
+                        {$lookup: lookup},
+                        {$unset: 'items.' + Globals.listIdFieldName}
+                      ];
+        item = await this.coll.aggregate(pipeline).toArray();
+        item = item[0];
       }
     }
     else {
-      ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
+      // find listitem schema
+      var parentList = await this.getParentList(item);
+      // validate permissions
+      ListItemControler.validateReadPerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName], parentList[Globals.listReadPermFieldName]);
     }
-    return;
+
+    return item;
   };
 
   /*
