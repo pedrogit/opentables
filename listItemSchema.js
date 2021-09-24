@@ -169,7 +169,7 @@ class ItemSchema {
 
   validate_type_user(key, val) {
     val = val.toLowerCase();
-    if (['@all', '@auth', '@listowner'].includes(val)) {
+    if (['@all', '@listowner'].includes(val)) {
       return val;
     }
     try {

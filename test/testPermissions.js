@@ -210,18 +210,18 @@ try {
 
     // perform remaining tests
     for (let i = 0; i < 27; i++) {
-      let j = 3 * i + 4;
+        let j = 3 * i + 4;
       init();
       let lastList = {
         [Globals.ownerFieldName]: 'owner@gmail.com',
-        [Globals.listConfPermFieldName]: permissionTests[j].listwrite,
-        [Globals.listWritePermFieldName]: permissionTests[j].listitemwrite,
-        [Globals.listReadPermFieldName]: permissionTests[j].listitemread,
+        [Globals.listConfPermFieldName]: '@listowner',
+        [Globals.listWritePermFieldName]: '@listowner',
+        [Globals.listReadPermFieldName]: '@listowner',
         [Globals.listSchemaFieldName]: 'field1: string'
       };
 
-      describe('Test ' + j + ' - ' + (j + 3) + ', cperm=' + lastList[Globals.listConfPermFieldName] + ', wperm=' + lastList[Globals.listWritePermFieldName] + ', rperm=' + lastList[Globals.listReadPermFieldName], () => {
-        it('Create a list with the given permissions', (done) => {
+      describe('Test ' + j + ' - ' + (j + 2), () => {
+        it('Create a list as ' + permissionTests[j].user, (done) => {
           chai.request(server)
               .post('/api/' + Globals.listitemAPIKeyword)
               .send(lastList)
@@ -241,7 +241,31 @@ try {
         for (let k = 0; k < 3; k++) {
             let l = j + k;
 
-            it(l + '.1 - Add list item as ' + permissionTests[l].user, (done) => {
+            it(l + '.1 - Patch the list as ' + permissionTests[l].user + ' (' + permissionTests[l].patchlist + ') with c=' + permissionTests[l].listwrite + ', w=' + permissionTests[l].listitemwrite + ', r=' + permissionTests[l].listitemread, (done) => {
+              listPatch = {
+                [Globals.listConfPermFieldName]: permissionTests[l].listwrite,
+                [Globals.listWritePermFieldName]: permissionTests[l].listitemwrite,
+                [Globals.listReadPermFieldName]: permissionTests[l].listitemread        
+              };
+        
+              chai.request(server)
+                  .patch('/api/' + Globals.listitemAPIKeyword + '/' + lastListID)
+                  .send(listPatch)
+                  .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
+                  .end((err, response) => {
+                    if (permissionTests[l].patchlist == 'yes' || permissionTests[l].patchlist == 'granted') {
+                      expect(response).to.have.status(200);
+                      lastItemID = response.body[Globals.itemIdFieldName];
+                    }
+                    else {
+                      expect(response).to.have.status(403);
+                      expect(response.body).to.deep.equal({"err": Errors.ErrMsg.Forbidden});
+                    }
+                    done();
+                  });
+            });
+
+            it(l + '.2 - Add list item as ' + permissionTests[l].user + ' (' + permissionTests[l].createlistitem + ')', (done) => {
               lastItem = {
                 field1: 'val1',
                 [Globals.listIdFieldName]: lastListID
@@ -264,7 +288,7 @@ try {
                   });
             });
 
-            it(l + '.2 - Patch list item as ' + permissionTests[l].user, (done) => {
+            it(l + '.3 - Patch list item as ' + permissionTests[l].user + ' (' + permissionTests[l].patchlistitem + ')', (done) => {
               chai.request(server)
                   .patch('/api/' + Globals.listitemAPIKeyword + '/' + lastItemID)
                   .send({field1: 'val2'})
@@ -281,7 +305,7 @@ try {
                   });
             });
             
-            it(l + '.3 - Delete list item as ' + permissionTests[l].user, (done) => {
+            it(l + '.4 - Delete list item as ' + permissionTests[l].user + ' (' + permissionTests[l].deletelistitem + ')', (done) => {
               chai.request(server)
                   .delete('/api/' + Globals.listitemAPIKeyword + '/' + lastItemID)
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
@@ -297,7 +321,7 @@ try {
                   });
             });
 
-            it(l + '.4 - Add list item as ' + permissionTests[l].user + ' for the next user', (done) => {
+            it(l + '.5 - Add list item as ' + permissionTests[l].user + ' for the next user' + ' (' + permissionTests[l].createlistitem + ')', (done) => {
               lastItem = {
                 field1: 'val3',
                 [Globals.listIdFieldName]: lastListID

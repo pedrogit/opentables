@@ -98,21 +98,27 @@ class ListItemControler {
     return list;
   };
 
-  static validateCreateListItemPerm(user, listOwner, listCPerm, listWPerm) {
-    if ((listCPerm === '@all' ||  listWPerm === '@all') && user !== Globals.unauthUserName) {
-      return;
+  static validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm) {
+    // unauth user have no edit permissions
+    if (user === Globals.unauthUserName) {
+      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
+
+    // admin and listowner have all permissions
     if (user === process.env.ADMIN_EMAIL || user === listOwner) {
       return;
     }
-    if (listCPerm.split(/\s*,\s*/).includes(user)){
+
+    // if listCPerm permission is @all or the user is listed grant permission
+    if (listCPerm && (listCPerm === '@all' || listCPerm.split(/\s*,\s*/).includes(user))) {
       return;
     }
-    if (listWPerm.split(/\s*,\s*/).includes(user)){
+
+    // if listWPerm permission is @all or the user is listed grant permission
+    if (listWPerm && (listWPerm === '@all' || listWPerm.split(/\s*,\s*/).includes(user))) {
       return;
     }
     throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-    return;
   }
   
   static validateCreatePerm(user, item, listOwner, listCPerm, listWPerm) {
@@ -122,10 +128,21 @@ class ListItemControler {
       }
     }
     else {
-      ListItemControler.validateCreateListItemPerm(user, listOwner, listCPerm, listWPerm);
+      ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
     }
     return;
   };
+
+  static validatePatchPerm(user, item, listOwner, listCPerm, listWPerm) {
+    if (ListItemControler.isList(item)) {
+      ListItemControler.validateWriteListItemPerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
+    }
+    else {
+      ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
+    }
+    return;
+  };
+
 
   static validateDeletePerm(user, item, listOwner, listCPerm, listWPerm) {
     if (ListItemControler.isList(item)) {
@@ -134,7 +151,7 @@ class ListItemControler {
       }
     }
     else {
-      ListItemControler.validateCreateListItemPerm(user, listOwner, listCPerm, listWPerm);
+      ListItemControler.validateWriteListItemPerm(user, listOwner, listCPerm, listWPerm);
     }
     return;
   };
@@ -224,7 +241,7 @@ class ListItemControler {
     var parentList = await this.getParentList(newitem);
 
     // validate permissions
-    ListItemControler.validateCreatePerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    ListItemControler.validatePatchPerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
 
     // validate item against schema
     newitem = await this.validateItems(parentList[Globals.listSchemaFieldName], newitem, false);
