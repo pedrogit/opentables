@@ -46,63 +46,24 @@ class ListItemControler {
     }
 
     if (user !== Globals.unauthUserName) {
-      // if listCPerm permission is @all or the user is listed grant permission
+      // if listCPerm permission is @all or the user is listed, grant permission
       if (listCPerm && (listCPerm === '@all' || listCPerm.split(/\s*,\s*/).includes(user))) {
         return;
       }
 
-      // if listWPerm permission is @all or the user is listed grant permission
+      // if listWPerm permission is @all or the user is listed, grant permission
       if (listWPerm && (listWPerm === '@all' || listWPerm.split(/\s*,\s*/).includes(user))) {
         return;
       }
     }
 
-    // if listRPerm permission is @all or the user is listed grant permission
+    // if listRPerm permission is @all or the user is listed, grant permission
     if (listRPerm && (listRPerm === '@all' || listRPerm.split(/\s*,\s*/).includes(user))) {
       return;
     }
 
     throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
   }
-  
-  static validateReadPerm(user, item, listOwner, listCPerm, listWPerm, listRPerm) {
-    if (ListItemControler.isList(item)) {
-      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName]);
-    }
-    else {
-      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm, listRPerm);
-    }
-    return;
-  }
-
-  static validateCreatePerm(user, item, listOwner, listCPerm, listWPerm) {
-    if (!(ListItemControler.isList(item))) {
-      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm);
-    }
-    return;
-  };
-
-  static validatePatchPerm(user, item, listOwner, listCPerm, listWPerm) {
-    if (ListItemControler.isList(item)) {
-      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
-    }
-    else {
-      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm);
-    }
-    return;
-  };
-
-  static validateDeletePerm(user, item, listOwner, listCPerm, listWPerm) {
-    if (ListItemControler.isList(item)) {
-      if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
-        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-      }
-    }
-    else {
-      ListItemControler.validatePerm(user, listOwner, listCPerm, listWPerm);
-    }
-    return;
-  };
 
   async getParentList(item) {
     // it's a list!
@@ -136,7 +97,7 @@ class ListItemControler {
     if (ListItemControler.isList(item)) {
 
       // validate permissions
-      ListItemControler.validateReadPerm(user, item);
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName]);
 
       if (!noitems) {
         var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
@@ -169,7 +130,7 @@ class ListItemControler {
       // find listitem schema
       var parentList = await this.getParentList(item);
       // validate permissions
-      ListItemControler.validateReadPerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName], parentList[Globals.listReadPermFieldName]);
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName], parentList[Globals.listReadPermFieldName]);
     }
 
     return item;
@@ -220,8 +181,10 @@ class ListItemControler {
     // find listitem schema
     var parentList = await this.getParentList(item);
 
-    // validate permissions
-    ListItemControler.validateCreatePerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    // validate permissions only for list items
+    if (!(ListItemControler.isList(item))) {
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    }
     
     // validate item against schema
     var newitems = await this.validateItems(parentList[Globals.listSchemaFieldName], item);
@@ -270,7 +233,12 @@ class ListItemControler {
     var parentList = await this.getParentList(newitem);
 
     // validate permissions
-    ListItemControler.validatePatchPerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    if (ListItemControler.isList(item)) {
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
+    }
+    else {
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    }
 
     // validate item against schema
     newitem = await this.validateItems(parentList[Globals.listSchemaFieldName], newitem, false);
@@ -310,7 +278,14 @@ class ListItemControler {
     var parentList = await this.getParentList(item);
 
     // check user permissions
-    ListItemControler.validateDeletePerm(user, item, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    if (ListItemControler.isList(item)) {
+      if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
+        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+      }
+    }
+    else {
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    }
  
     if (ListItemControler.isList(item)) {
       // delete all associated listitem
