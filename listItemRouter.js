@@ -9,8 +9,8 @@ const ItemSchema = require('./listItemSchema');
 const listItemControler = require('./listItemControler');
 
 var isNewUser = function(item) {
-  return item.hasOwnProperty(Globals.listIdFieldName) &&
-  item[Globals.listIdFieldName].toString() === Globals.userListId &&
+  return item.hasOwnProperty(Globals.parentIdFieldName) &&
+  item[Globals.parentIdFieldName].toString() === Globals.userListId &&
   item.hasOwnProperty('email');
 }
 
