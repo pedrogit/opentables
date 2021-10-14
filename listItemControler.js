@@ -18,7 +18,9 @@ class ListItemControler {
   };
 
   static isList(item) {
-    return item[Globals.parentIdFieldName] && item[Globals.parentIdFieldName].toString() === Globals.listofAllListId;
+    return item[Globals.parentIdFieldName] && 
+           (item[Globals.parentIdFieldName].toString() === Globals.listofAllListId ||
+           ListItemControler.hasVoidParent(item));
   };
   
   static hasVoidParent(item) {
@@ -62,9 +64,6 @@ class ListItemControler {
   }
 
   async getParentList(item) {
-
-    
-    // it's a list item
     if (!(item[Globals.parentIdFieldName])) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.parentIdFieldName));
     }
@@ -86,39 +85,46 @@ class ListItemControler {
       throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
     };
 
-    // validate permissions
-    //ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName]);
+    if (ListItemControler.isList(item)) {
+      // validate permissions
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName]);
 
-    if (!noitems) {
-      var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.parentIdFieldName, as: 'items'};
+      if (!noitems) {
+        var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.parentIdFieldName, as: 'items'};
 
-      if (filter) {
-        var mongoDBFilter = new ItemFilter(filter);
-        var jsonFilter = mongoDBFilter.final();
-        lookup.let = {x: '$' + Globals.itemIdFieldName};
-        lookup.pipeline = [{$match: 
-                            {$expr: 
-                              {$and: [
-                                {$eq: ['$' + Globals.parentIdFieldName, '$$x']},
-                                jsonFilter
-                              ]}
-                            }
-                          }];
-        delete lookup.localField;
-        delete lookup.foreignField;
-      };
+        if (filter) {
+          var mongoDBFilter = new ItemFilter(filter);
+          var jsonFilter = mongoDBFilter.final();
+          lookup.let = {x: '$' + Globals.itemIdFieldName};
+          lookup.pipeline = [{$match: 
+                              {$expr: 
+                                {$and: [
+                                  {$eq: ['$' + Globals.parentIdFieldName, '$$x']},
+                                  jsonFilter
+                                ]}
+                              }
+                            }];
+          delete lookup.localField;
+          delete lookup.foreignField;
+        };
 
-      var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
-                      {$lookup: lookup},
-                      {$unset: 'items.' + Globals.parentIdFieldName}
-                    ];
-      item = await this.coll.aggregate(pipeline).toArray();
-      item = item[0];
-      if (item.items.length === 0) {
-        delete item.items;
+        var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
+                        {$lookup: lookup},
+                        {$unset: 'items.' + Globals.parentIdFieldName}
+                      ];
+        item = await this.coll.aggregate(pipeline).toArray();
+        item = item[0];
+        if (item.items.length === 0) {
+          delete item.items;
+        }
       }
     }
-
+    else {
+      // find listitem schema
+      var parentList = await this.getParentList(item);
+      // validate permissions
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName], parentList[Globals.listReadPermFieldName]);
+    }
 
     return item;
   };

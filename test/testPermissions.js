@@ -44,14 +44,46 @@ function init() {
           });
     });
 
-    it('2 - Create a users list', (done) => {
+    it('2 - Create the list of lists', (done) => {
+      listOfAllList = {
+        [Globals.itemIdFieldName]: Globals.listofAllListId,
+        [Globals.parentIdFieldName]: Globals.voidListId,
+        [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
+        [Globals.listConfPermFieldName]: '@listowner',
+        [Globals.listWritePermFieldName]: '@all',
+        [Globals.listReadPermFieldName]: '@all',
+        [Globals.listSchemaFieldName]: '{' 
+          + Globals.itemIdFieldName + ': objectid, '
+          + Globals.parentIdFieldName + ': {type: objectid, required},  '
+          + Globals.ownerFieldName + ': {type: user, required},  '
+          + Globals.listConfPermFieldName + ':  {type: user_array, required, lower},  '
+          + Globals.listWritePermFieldName + ':  {type: user_array, required, lower}, '
+          + Globals.listReadPermFieldName + ':  {type: user_array, required, lower}, '
+          + Globals.listSchemaFieldName + ':  {type: schema, lower}'
+          + '}'
+      };
+
+      chai.request(server)
+          .post('/api/' + Globals.listitemAPIKeyword)
+          .send(listOfAllList)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+          .end((err, response) => {
+            expect(response).to.have.status(201);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal(listOfAllList);
+            done();
+          });
+    });
+
+    it('3 - Create a users list', (done) => {
       const newUserList = 
         {
           [Globals.itemIdFieldName]: Globals.userListId,
+          [Globals.parentIdFieldName]: Globals.listofAllListId,
           [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
           [Globals.listConfPermFieldName]: '@listowner',
-          [Globals.listWritePermFieldName]: '@listowner',
-          [Globals.listReadPermFieldName]: '@listowner',
+          [Globals.listWritePermFieldName]: '@all',
+          [Globals.listReadPermFieldName]: '@all',
           [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
         };
       chai.request(server)
@@ -66,9 +98,9 @@ function init() {
           });
     });
 
-    it('3 - Register the owner user', (done) => {
+    it('4 - Register the owner user', (done) => {
       newUser = {
-        [Globals.listIdFieldName]: Globals.userListId,
+        [Globals.parentIdFieldName]: Globals.userListId,
         'firstname': 'The',
         'lastname': 'Owner',
         'organisation': 'Myself',
@@ -96,9 +128,9 @@ function init() {
           });
     });
 
-    it('4 - Register the other user', (done) => {
+    it('5 - Register the other user', (done) => {
       newUser = {
-        [Globals.listIdFieldName]: Globals.userListId,
+        [Globals.parentIdFieldName]: Globals.userListId,
         'firstname': 'The',
         'lastname': 'Other',
         'organisation': 'Itself',
@@ -139,6 +171,7 @@ try {
     //console.log(permissionTests);
 
     lastList = {
+      [Globals.parentIdFieldName]: Globals.listofAllListId,
       [Globals.ownerFieldName]: 'owner@gmail.com',
       [Globals.listConfPermFieldName]: 'x@auth',
       [Globals.listWritePermFieldName]: 'x@auth',
@@ -213,6 +246,7 @@ try {
         let j = 3 * i + 4;
       init();
       let lastList = {
+        [Globals.parentIdFieldName]: Globals.listofAllListId,
         [Globals.ownerFieldName]: 'owner@gmail.com',
         [Globals.listConfPermFieldName]: '@listowner',
         [Globals.listWritePermFieldName]: '@listowner',
@@ -268,7 +302,7 @@ try {
             it(l + '.2 - Add list item as ' + permissionTests[l].user + ' (' + permissionTests[l].createlistitem + ')', (done) => {
               lastItem = {
                 field1: 'val1',
-                [Globals.listIdFieldName]: lastListID
+                [Globals.parentIdFieldName]: lastListID
               };
         
               chai.request(server)
@@ -324,7 +358,7 @@ try {
             it(l + '.5 - Add list item as ' + permissionTests[l].user + ' for the next user' + ' (' + permissionTests[l].createlistitem + ')', (done) => {
               lastItem = {
                 field1: 'val3',
-                [Globals.listIdFieldName]: lastListID
+                [Globals.parentIdFieldName]: lastListID
               };
               chai.request(server)
                   .post('/api/' + Globals.listitemAPIKeyword)
