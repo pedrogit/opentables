@@ -179,10 +179,8 @@ class ListItemControler {
       // find listitem schema
       var parentList = await this.getParentList(item);
 
-      // validate permissions only for list items
-      if (!(ListItemControler.isList(item))) {
-        ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
-      }
+      // validate permissions
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
       
       // validate item against schema
       newitems = await this.validateItems(parentList[Globals.listSchemaFieldName], item);
@@ -232,7 +230,7 @@ class ListItemControler {
     var parentList = await this.getParentList(newitem);
 
     // validate permissions
-    if (ListItemControler.isList(item)) {
+    if (ListItemControler.isList(item)) { // list patch permissions are defined at the list level (not the parent level)
       ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
     }
     else {
@@ -281,15 +279,13 @@ class ListItemControler {
       if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
         throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
       }
+      // delete all associated listitem
+      this.coll.deleteMany({[Globals.parentIdFieldName]: MongoDB.ObjectId(item[Globals.parentIdFieldName])});
     }
     else {
       ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
     }
- 
-    if (ListItemControler.isList(item)) {
-      // delete all associated listitem
-      this.coll.deleteMany({[Globals.parentIdFieldName]: MongoDB.ObjectId(item[Globals.parentIdFieldName])});
-    }
+
     return this.coll.deleteOne({[Globals.parentIdFieldName]: itemid});
   };
 }
