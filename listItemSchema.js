@@ -15,7 +15,7 @@ class ItemSchema {
       try {
          this.schema = Utils.simpleJSONToJSON(schema);
       } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema, err.message));
       }
     }
     else {
@@ -109,7 +109,7 @@ class ItemSchema {
       try {
         json = Utils.simpleJSONToJSON(jsonstr);
       } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema, err.message));
       }
     }
     else {
@@ -124,7 +124,7 @@ class ItemSchema {
       if (!(jsonkeys === null) && 
             !(jsonkeys.length === 0) && 
             !(this.requiredFields.every(field => {var inc = jsonkeys.includes(field); if (!inc) {missingField = field}; return inc}))) {
-              throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, missingField));
+              throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, missingField));
       }
     }
 
@@ -137,7 +137,7 @@ class ItemSchema {
   // validate passed JSON fields
   async validateField(key, obj, parentKey) {
     if (!(Object.keys(this.schema).includes(key))) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, key));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, key));
     };
     // if this.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
     if (typeof(this.schema[key]) === "object") {

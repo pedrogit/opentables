@@ -22,28 +22,28 @@ const expectThrowsAsync = async (method, errorMessage) => {
   }
 }
 
-describe('testListItemSchema.js List Item Schema', () => {
-  it('Pass null', () => {
+describe('1 testListItemSchema.js List Item Schema', () => {
+  it('1.1 Pass null', () => {
     expect(function(){new ItemSchema();}).to.throw(Errors.ErrMsg.ItemSchema_Null);
   });
 
-  it('Pass invalid schema string', () => {
-    expect(function(){new ItemSchema('toto');}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, 'toto'));
+  it('1.2 Pass invalid schema string', () => {
+    expect(function(){new ItemSchema('toto');}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, 'toto', 'Unexpected token } in JSON at position 7'));
   });
 
-  it('Pass a string schema', () => {
+  it('1.3 Pass a string schema', () => {
     var schema = new ItemSchema('field1: {type: string, required}');
     // just make sure the constructor does not throw
     expect(schema).to.be.an('object');
   });
 
-  it('Pass JSON schema', () => {
+  it('1.4 Pass JSON schema', () => {
     var schema = new ItemSchema({field1: {type: 'string', required: true}});
     // just make sure the constructor does not throw
     expect(schema).to.be.an('object');
   });
 
-  it('Validate a simple json string against a one level schema', async () => {
+  it('1.5 Validate a simple json string against a one level schema', async () => {
     var schema = new ItemSchema('field1: string');
     var result = await schema.validateJson('{"field1": "toto"}');
     // just make sure the constructor does not throw
@@ -51,16 +51,16 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(result).to.have.property('field1', 'toto');
   });
 
-  it('Test an invalid level one schema parameter', () => {
+  it('1.6 Test an invalid level one schema parameter', () => {
     expect(function() {new ItemSchema('field1: upper')}).to.throw(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'upper', 'field1'));
   });
 
-  it('Validate a string value against a one level schema of type number', async () => {
+  it('1.7 Validate a string value against a one level schema of type number', async () => {
     var schema = new ItemSchema('field1: number');
     await expectThrowsAsync(() => schema.validateJson('{"field1": "toto"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'toto', 'number'))
    });
 
-  it('Validate a number against a one level schema of type number', async () => {
+  it('1.8 Validate a number against a one level schema of type number', async () => {
     var schema = new ItemSchema('field1: number');
     var json = await schema.validateJson('{"field1": 123}');
 
@@ -68,7 +68,7 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.have.property('field1', 123);
   });
 
-  it('Validate a simple json string against a simple two level schemaa', async () => {
+  it('1.9 Validate a simple json string against a simple two level schemaa', async () => {
     var schema = new ItemSchema('field1: {type: string}');
     var json = await schema.validateJson('{"field1": "toto"}');
 
@@ -76,7 +76,7 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.have.property('field1', 'toto');
   });
 
-  it('Validate a simple json string against a simple schema', async () => {
+  it('1.10 Validate a simple json string against a simple schema', async () => {
     var schema = new ItemSchema('field1: {type: string, required}');
     var json = await schema.validateJson('{"field1": "toto"}');
 
@@ -84,12 +84,12 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.have.property('field1', 'toto');
   });
 
-  it('Validate a missing field', async () => {
+  it('1.11 Validate a missing field', async () => {
     var schema = new ItemSchema('field1: {type: string, required}');
-    await expectThrowsAsync(() => schema.validateJson('{"field": "toto"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, 'field1'))
+    await expectThrowsAsync(() => schema.validateJson('{"field": "toto"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, 'field1'))
   });
 
-  it('Valid type', async () => {
+  it('1.12 Valid type', async () => {
     var schema = new ItemSchema('{field1: {type:string, required}}');
     var json = await schema.validateJson('{"field1": "toto"}');
 
@@ -97,12 +97,12 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.deep.equal({"field1": "toto"});
   });
 
-  it('Invalid type (number instead of string)', async () => {
+  it('1.13 Invalid type (number instead of string)', async () => {
     var schema = new ItemSchema('{field1: {type:string, required}}');
     await expectThrowsAsync(() => schema.validateJson('{"field1": 123}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', '123', 'string'))
   });
 
-  it('Validate upper', async () => {
+  it('1.14 Validate upper', async () => {
     var schema = new ItemSchema('{field1: {type:string, required, upper}}');
     var json = await schema.validateJson('{"field1": "toto"}');
 
@@ -110,12 +110,12 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.deep.equal({"field1": "TOTO"});
   });
 
-  it('Invalid email', async () => {
+  it('1.15 Invalid email', async () => {
     var schema = new ItemSchema('{field1: email}');
     await expectThrowsAsync(() => schema.validateJson('{"field1": "aaaa"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'aaaa', 'email'))
   });
 
-  it('Valid email', async () => {
+  it('1.16 Valid email', async () => {
     var schema = new ItemSchema('{field1: email}');
     var json = await schema.validateJson('{"field1": "Aaaa@x.com"}');
 
@@ -123,12 +123,12 @@ describe('testListItemSchema.js List Item Schema', () => {
     expect(json).to.deep.equal({"field1": "aaaa@x.com"});
   });
 
-  it('Invalid user_array', async () => {
+  it('1.17 Invalid user_array', async () => {
     var schema = new ItemSchema('field1: user_array');
     await expectThrowsAsync(() => schema.validateJson('{"field1": "aa, bb"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'aa, bb', 'user_array'))
   });
 
-  it('Valid user_array', async () => {
+  it('1.18 Valid user_array', async () => {
     var schema = new ItemSchema('field1: user_array');
     var json = await schema.validateJson('"field1": "@All, BB@gmail.com"');
 

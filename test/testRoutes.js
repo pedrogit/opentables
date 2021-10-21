@@ -21,7 +21,7 @@ describe('testRoutes.js List API', () => {
   var lastList;
   var twoItems;
   var lastItems;
-  var listOfAllList;
+  var listOfAllList = {...Globals.listOfAllLists};
   
   describe('1 - Invalid URL and DELETE ALL', () => {
     it('1.1 - Test an invalid URL. It should return a NOT FOUND on invalid URL', (done) => {
@@ -44,44 +44,13 @@ describe('testRoutes.js List API', () => {
             done();
           });
     });
-
-    it('1.3 - Create the list of lists', (done) => {
-      listOfAllList = {
-        [Globals.itemIdFieldName]: Globals.listofAllListId,
-        [Globals.parentIdFieldName]: Globals.voidListId,
-        [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-        [Globals.listConfPermFieldName]: '@listowner',
-        [Globals.listWritePermFieldName]: '@all',
-        [Globals.listReadPermFieldName]: '@all',
-        [Globals.listSchemaFieldName]: '{' 
-          + Globals.itemIdFieldName + ': objectid, '
-          + Globals.parentIdFieldName + ': {type: objectid, required},  '
-          + Globals.ownerFieldName + ': {type: user, required},  '
-          + Globals.listConfPermFieldName + ':  {type: user_array, required, lower},  '
-          + Globals.listWritePermFieldName + ':  {type: user_array, required, lower}, '
-          + Globals.listReadPermFieldName + ':  {type: user_array, required, lower}, '
-          + Globals.listSchemaFieldName + ':  {type: schema, lower}'
-          + '}'
-      };
-
-      chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
-          .send(listOfAllList)
-          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
-          .end((err, response) => {
-            expect(response).to.have.status(201);
-            expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(listOfAllList);
-            done();
-          });
-    });
-
   });
 
   describe('2 - POST and GET on list', () => {
     it('2.1 - Post a new list having an invalid field', (done) => {
       lastList = {
         [Globals.parentIdFieldName]: Globals.listofAllListId,
+        name: 'First test list',
         ['x' + Globals.ownerFieldName]: 'p@gmail.com',
         [Globals.listConfPermFieldName]: '@listowner',
         [Globals.listWritePermFieldName]: '@listowner',
@@ -95,7 +64,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.ownerFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.ownerFieldName)});
             done();
           });
     });
@@ -218,7 +187,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, 'xlistschema')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, 'xlistschema')});
             done();
           });
     });
@@ -262,7 +231,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, Globals.parentIdFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.parentIdFieldName)});
             done();
           });
     });
@@ -298,7 +267,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, 'field3')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, 'field3')});
             done();
           });
     });
@@ -314,7 +283,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingField, 'field2')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, 'field2')});
             done();
           });
     });
@@ -429,7 +398,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidField, 'field3')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, 'field3')});
             done();
           });
     });
@@ -850,32 +819,8 @@ describe('testRoutes.js List API', () => {
     var cookies;
     var newUser;
     let pw = 'mypassword';
-    
-    it('10.1 - Create a users list', (done) => {
-      const newUserList = 
-        {
-          [Globals.itemIdFieldName]: Globals.userListId,
-          [Globals.parentIdFieldName]: Globals.listofAllListId,
-          [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-          [Globals.listConfPermFieldName]: '@listowner',
-          [Globals.listWritePermFieldName]: '@listowner',
-          [Globals.listReadPermFieldName]: '@listowner',
-          [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
-        };
-      listOfAllList.items.push(newUserList);
-      chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
-          .send(newUserList)
-          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
-          .end((err, response) => {
-            expect(response).to.have.status(201);
-            expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(newUserList);
-            done();
-          });
-    });
 
-    it('10.2 - Register a new user', (done) => {
+    it('10.1 - Register a new user', (done) => {
       newUser = {
         [Globals.parentIdFieldName]: Globals.userListId,
         'firstname': 'Pedro',
@@ -908,7 +853,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.3 - Make sure the cookie is sent back from the server', (done) => {
+    it('10.2 - Make sure the cookie is sent back from the server', (done) => {
       var newCookie = cookies.map(function(cookie) {
         return libCookie.serialize(cookie.name, cookie.value, cookie);
       });
@@ -929,7 +874,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.4 - Register another user with the same email', (done) => {
+    it('10.3 - Register another user with the same email', (done) => {
       const pw = 'mypassword';
       var newUser2 = {
         [Globals.parentIdFieldName]: Globals.userListId,
@@ -956,7 +901,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.5 - Logout the user', (done) => {
+    it('10.4 - Logout the user', (done) => {
       chai.request(server)
           .get('/api/' + Globals.listitemAPIKeyword + '/logout')
           .send()
@@ -968,7 +913,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.6 - Login the user using an invalid email', (done) => {
+    it('10.5 - Login the user using an invalid email', (done) => {
       chai.request(server)
           .get('/api/' + Globals.listitemAPIKeyword + '/login')
           .auth('x' + newUser.email, pw)
@@ -981,7 +926,7 @@ describe('testRoutes.js List API', () => {
           });
     });
     
-    it('10.7 - Login the user using an invalid password', (done) => {
+    it('10.6 - Login the user using an invalid password', (done) => {
       chai.request(server)
           .get('/api/' + Globals.listitemAPIKeyword + '/login')
           .auth(newUser.email, 'x' + pw)
@@ -994,7 +939,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.8 - Login the user', (done) => {
+    it('10.7 - Login the user', (done) => {
       chai.request(server)
           .get('/api/' + Globals.listitemAPIKeyword + '/login')
           .auth(newUser.email, pw)
@@ -1006,7 +951,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.9 - Logout the user', (done) => {
+    it('10.8 - Logout the user', (done) => {
       chai.request(server)
           .get('/api/' + Globals.listitemAPIKeyword + '/logout')
           .send()
@@ -1018,7 +963,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('10.10 - Get the last list with authorization', (done) => {
+    it('10.9 - Get the last list with authorization', (done) => {
       chai.request(server)
           .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
           .auth(newUser.email, pw)
@@ -1040,6 +985,7 @@ describe('testRoutes.js List API', () => {
     it('11.1 - Add an extra list', (done) => {
       newList = {
         ...lastList,
+        name: 'Extra list',
         [Globals.listSchemaFieldName]: '{}'
       };
       delete newList.items;
@@ -1056,6 +1002,7 @@ describe('testRoutes.js List API', () => {
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(newList);
+            listOfAllList.items.push(newList);
             done();
           });
     });
@@ -1065,13 +1012,41 @@ describe('testRoutes.js List API', () => {
           .get('/api/' + Globals.listitemAPIKeyword + '/' + Globals.listofAllListId)
           //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
-            listOfAllList.items.push(newList);
             listOfAllList.items.forEach(function(v){ delete v[Globals.parentIdFieldName] });
+
             expect(response).to.have.status(200);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(listOfAllList);
             done();
           });
     });
+  });
+
+  describe('12 - Test views and referenced lists', () => {
+    it('12.1 - Create a new view', (done) => {
+      newView = {
+        [Globals.parentIdFieldName]: Globals.listofAllViewId,
+        name: 'First view',
+        [Globals.ownerFieldName]: 'p@gmail.com',
+        [Globals.listConfPermFieldName]: '@listowner',
+        item_template: '',
+        _childlistid: listIdToPatch
+      };
+      chai.request(server)
+          .post('/api/' + Globals.listitemAPIKeyword)
+          .send(newView)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+          .end((err, response) => {
+            newView = {
+              ...newView,
+              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
+            };
+            expect(response).to.have.status(201);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal(newList);
+            done();
+          });
+    });
+
   });
 });

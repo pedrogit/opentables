@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const Globals = require('../globals');
 const server = require('../index');
 const Errors = require('../utils/errors');
+const { restart } = require('nodemon');
 
 chai.use(chaihttp);
 
@@ -28,77 +29,28 @@ function userPw(user) {
        : '';
 }
 
+function reset() {
+  it('1 - Delete all the lists from the DB', (done) => {
+    chai.request(server)
+        .delete('/api/' + Globals.listitemAPIKeyword)
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response).to.have.status(200);
+          expect(response.body).to.have.all.keys('deletedCount');
+          done();
+        });
+  });
+}
+
 function init() {
   describe('Initialize permission tests', () => {
     var cookies;
     var newUser;
     
-    it('1 - Delete all the lists from the DB', (done) => {
-      chai.request(server)
-          .delete('/api/' + Globals.listitemAPIKeyword)
-          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
-          .end((err, response) => {
-            expect(response).to.have.status(200);
-            expect(response.body).to.have.all.keys('deletedCount');
-            done();
-          });
-    });
+    reset();
 
-    it('2 - Create the list of lists', (done) => {
-      listOfAllList = {
-        [Globals.itemIdFieldName]: Globals.listofAllListId,
-        [Globals.parentIdFieldName]: Globals.voidListId,
-        [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-        [Globals.listConfPermFieldName]: '@listowner',
-        [Globals.listWritePermFieldName]: '@all',
-        [Globals.listReadPermFieldName]: '@all',
-        [Globals.listSchemaFieldName]: '{' 
-          + Globals.itemIdFieldName + ': objectid, '
-          + Globals.parentIdFieldName + ': {type: objectid, required},  '
-          + Globals.ownerFieldName + ': {type: user, required},  '
-          + Globals.listConfPermFieldName + ':  {type: user_array, required, lower},  '
-          + Globals.listWritePermFieldName + ':  {type: user_array, required, lower}, '
-          + Globals.listReadPermFieldName + ':  {type: user_array, required, lower}, '
-          + Globals.listSchemaFieldName + ':  {type: schema, lower}'
-          + '}'
-      };
 
-      chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
-          .send(listOfAllList)
-          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
-          .end((err, response) => {
-            expect(response).to.have.status(201);
-            expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(listOfAllList);
-            done();
-          });
-    });
-
-    it('3 - Create a users list', (done) => {
-      const newUserList = 
-        {
-          [Globals.itemIdFieldName]: Globals.userListId,
-          [Globals.parentIdFieldName]: Globals.listofAllListId,
-          [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-          [Globals.listConfPermFieldName]: '@listowner',
-          [Globals.listWritePermFieldName]: '@all',
-          [Globals.listReadPermFieldName]: '@all',
-          [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
-        };
-      chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
-          .send(newUserList)
-          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
-          .end((err, response) => {
-            expect(response).to.have.status(201);
-            expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(newUserList);
-            done();
-          });
-    });
-
-    it('4 - Register the owner user', (done) => {
+    it('2 - Register the owner user', (done) => {
       newUser = {
         [Globals.parentIdFieldName]: Globals.userListId,
         'firstname': 'The',
@@ -128,7 +80,7 @@ function init() {
           });
     });
 
-    it('5 - Register the other user', (done) => {
+    it('3 - Register the other user', (done) => {
       newUser = {
         [Globals.parentIdFieldName]: Globals.userListId,
         'firstname': 'The',
@@ -157,9 +109,7 @@ function init() {
             done();
           });
     });
-
   });
-
 }
 
 init();
@@ -172,6 +122,7 @@ try {
 
     lastList = {
       [Globals.parentIdFieldName]: Globals.listofAllListId,
+      name: 'Permission tests list',
       [Globals.ownerFieldName]: 'owner@gmail.com',
       [Globals.listConfPermFieldName]: 'x@auth',
       [Globals.listWritePermFieldName]: 'x@auth',
@@ -244,9 +195,10 @@ try {
     // perform remaining tests
     for (let i = 0; i < 27; i++) {
         let j = 3 * i + 4;
-      init();
+      reset();
       let lastList = {
         [Globals.parentIdFieldName]: Globals.listofAllListId,
+        name: 'Permission tests list',
         [Globals.ownerFieldName]: 'owner@gmail.com',
         [Globals.listConfPermFieldName]: '@listowner',
         [Globals.listWritePermFieldName]: '@listowner',

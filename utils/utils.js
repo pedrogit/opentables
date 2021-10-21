@@ -1,6 +1,5 @@
 require('dotenv').config();
 const { assert } = require("chai");
-const Errors = require('../utils/errors');
 const NodeUtil = require('util');
 const jwt = require('jsonwebtoken');
 
@@ -112,7 +111,7 @@ exports.simpleJSONToJSON = function(simpleJSONStr) {
   //      the JSON string '{"field1": {"type": "string", "required": true}}'
 
   // Simple, unbraced strings (e.g. 'simple_string') are 
-  // also converted .If they are true simple strings then 
+  // also converted. If they are true simple strings then 
   // simpleJSONToJSON should not be called.
 
   // double quote keys
@@ -124,7 +123,7 @@ exports.simpleJSONToJSON = function(simpleJSONStr) {
   try {
     parsedSchema = JSON.parse(jsonStr);
   } catch(err) {
-    throw new Error(NodeUtils.format(Errors.ErrMsg.InvalidSimpleJsonStr, simpleJSONStr));
+    throw new Error(err.message);
   }
   return parsedSchema;
 }
