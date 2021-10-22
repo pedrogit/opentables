@@ -136,7 +136,7 @@ View API
   Permission: read and edit
   Edit permission implies read permission (since edit permission automatically allow changing read permission)
   @viewowner = view owner
-  @listowner keyword = list owner
+  @owner keyword = list owner
   @all = everybody
   @itemowner = item owner (when items have a itemowner field)
   GET /api/view               // Get all views the users has permission to view

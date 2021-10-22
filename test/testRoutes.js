@@ -52,8 +52,8 @@ describe('testRoutes.js List API', () => {
         [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'First test list',
         ['x' + Globals.ownerFieldName]: 'p@gmail.com',
-        [Globals.readWritePermFieldName]: '@listowner',
-        [Globals.itemReadWritePermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@owner',
+        [Globals.itemReadWritePermFieldName]: '@owner',
         [Globals.itemReadPermFieldName]: '@ALL',
         [Globals.listSchemaFieldName]: '{}'
       };
@@ -1022,16 +1022,44 @@ describe('testRoutes.js List API', () => {
     });
   });
 
+  describe('12 - Test embedded_itemid_lists', () => {
+    it('12.1 - Add an author list', (done) => {
+      authorList = {
+        [Globals.listIdFieldName]: Globals.listofAllListId,
+        name: 'List of authors',
+        [Globals.ownerFieldName]: 'pedro@gmail.com', 
+        [Globals.readWritePermFieldName]: '@owner',
+        [Globals.itemReadWritePermFieldName]: '@owner',
+        [Globals.itemReadPermFieldName]: '@all',
+        [Globals.listSchemaFieldName] :  'name: string, books: embedded_itemid_list'
+      };
+      chai.request(server)
+          .post('/api/' + Globals.listitemAPIKeyword)
+          .send(authorList)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+          .end((err, response) => {
+            authorList = {
+              ...authorList,
+              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
+            };
+            expect(response).to.have.status(201);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal(authorList);
+            done();
+          });
+    });
 
-  describe('12 - Test views and referenced lists', () => {
+  });
+
+  describe('13 - Test views', () => {
     var newView;
 
-    it('12.1 - Create a new view', (done) => {
+    it('13.1 - Create a new view', (done) => {
       newView = {
         [Globals.listIdFieldName]: Globals.listofAllViewId,
         name: 'First view',
         [Globals.ownerFieldName]: 'p@gmail.com',
-        [Globals.readWritePermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@owner',
         item_template: '',
         _childlist: listIdToPatch
       };
@@ -1051,7 +1079,7 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('12.2 - Get the view with the embedded list and the list items', (done) => {
+    it('13.2 - Get the view with the embedded list and the list items', (done) => {
       chai.request(server)
       .get('/api/' + Globals.listitemAPIKeyword + '/' + newView[Globals.itemIdFieldName])
       .send(newView)
@@ -1068,7 +1096,7 @@ describe('testRoutes.js List API', () => {
       });
     });
 
-    it('12.3 - Patch the view with a new item_template', (done) => {
+    it('13.3 - Patch the view with a new item_template', (done) => {
       newView = {
         ...newView,
         item_template: "[[field1]]"

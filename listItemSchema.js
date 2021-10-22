@@ -206,9 +206,24 @@ class ItemSchema {
     return MongoDB.ObjectId(val);
   }
 
+  validate_type_embedded_itemid_list(key, val) {
+    var valArr = val;
+    try {
+      if (!(valArr instanceof Array)) {
+          valArr = valArr.split(/\s*\,\s*/);
+      }
+      valArr.map(v => {
+        this.validate_type_embedded_itemid(key, v);
+      });
+    } catch(err) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'user_array'));
+    }
+    return val;
+  }
+
   validate_type_user(key, val) {
     val = val.toLowerCase();
-    if (['@all', '@listowner'].includes(val)) {
+    if (['@all', '@owner'].includes(val)) {
       return val;
     }
     try {

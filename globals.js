@@ -26,7 +26,7 @@ Globals = {
         [Globals.listIdFieldName]: Globals.voidListId,
         name: 'List of all lists',
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-        [Globals.readWritePermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@owner',
         [Globals.itemReadWritePermFieldName]: '@all',
         [Globals.itemReadPermFieldName]: '@all',
         [Globals.listSchemaFieldName]: '{' 
@@ -45,7 +45,7 @@ Globals = {
         [Globals.listIdFieldName]: Globals.voidListId,
         name: 'List of all views',
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-        [Globals.readWritePermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@owner',
         [Globals.itemReadWritePermFieldName]: '@all',
         [Globals.itemReadPermFieldName]: '@all',
         [Globals.listSchemaFieldName]: '{' 
@@ -63,9 +63,9 @@ Globals = {
         [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'List of all users',
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-        [Globals.readWritePermFieldName]: '@listowner',
-        [Globals.itemReadWritePermFieldName]: '@listowner',
-        [Globals.itemReadPermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@owner',
+        [Globals.itemReadWritePermFieldName]: '@owner',
+        [Globals.itemReadPermFieldName]: '@owner',
         [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
       }
 }

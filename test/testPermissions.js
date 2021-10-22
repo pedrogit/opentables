@@ -17,14 +17,14 @@ let pw = 'mypassword';
 
 function userEmail(user) {
   return user == 'admin' ? process.env.ADMIN_EMAIL 
-       : user == 'listowner' ? 'owner@gmail.com'
+       : user == 'owner' ? 'owner@gmail.com'
        : user == 'auth' ? 'other@gmail.com'
        : '';
 }
 
 function userPw(user) {
   return user == 'admin' ? process.env.ADMIN_PASSWORD
-       : user == 'listowner' ? pw
+       : user == 'owner' ? pw
        : user == 'auth' ? pw
        : '';
 }
@@ -200,9 +200,9 @@ try {
         [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'Permission tests list',
         [Globals.ownerFieldName]: 'owner@gmail.com',
-        [Globals.readWritePermFieldName]: '@listowner',
-        [Globals.itemReadWritePermFieldName]: '@listowner',
-        [Globals.itemReadPermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@owner',
+        [Globals.itemReadWritePermFieldName]: '@owner',
+        [Globals.itemReadPermFieldName]: '@owner',
         [Globals.listSchemaFieldName]: 'field1: string'
       };
 
