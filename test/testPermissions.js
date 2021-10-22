@@ -52,7 +52,7 @@ function init() {
 
     it('2 - Register the owner user', (done) => {
       newUser = {
-        [Globals.parentIdFieldName]: Globals.userListId,
+        [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'The',
         'lastname': 'Owner',
         'organisation': 'Myself',
@@ -82,7 +82,7 @@ function init() {
 
     it('3 - Register the other user', (done) => {
       newUser = {
-        [Globals.parentIdFieldName]: Globals.userListId,
+        [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'The',
         'lastname': 'Other',
         'organisation': 'Itself',
@@ -121,12 +121,12 @@ try {
     //console.log(permissionTests);
 
     lastList = {
-      [Globals.parentIdFieldName]: Globals.listofAllListId,
+      [Globals.listIdFieldName]: Globals.listofAllListId,
       name: 'Permission tests list',
       [Globals.ownerFieldName]: 'owner@gmail.com',
-      [Globals.listConfPermFieldName]: 'x@auth',
-      [Globals.listWritePermFieldName]: 'x@auth',
-      [Globals.listReadPermFieldName]: 'x@auth',
+      [Globals.readWritePermFieldName]: 'x@auth',
+      [Globals.itemReadWritePermFieldName]: 'x@auth',
+      [Globals.itemReadPermFieldName]: 'x@auth',
       [Globals.listSchemaFieldName]: 'field1: string'
     };
 
@@ -197,12 +197,12 @@ try {
         let j = 3 * i + 4;
       reset();
       let lastList = {
-        [Globals.parentIdFieldName]: Globals.listofAllListId,
+        [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'Permission tests list',
         [Globals.ownerFieldName]: 'owner@gmail.com',
-        [Globals.listConfPermFieldName]: '@listowner',
-        [Globals.listWritePermFieldName]: '@listowner',
-        [Globals.listReadPermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@listowner',
+        [Globals.itemReadWritePermFieldName]: '@listowner',
+        [Globals.itemReadPermFieldName]: '@listowner',
         [Globals.listSchemaFieldName]: 'field1: string'
       };
 
@@ -229,9 +229,9 @@ try {
 
             it(l + '.1 - Patch the list as ' + permissionTests[l].user + ' (' + permissionTests[l].patchlist + ') with c=' + permissionTests[l].listwrite + ', w=' + permissionTests[l].listitemwrite + ', r=' + permissionTests[l].listitemread, (done) => {
               listPatch = {
-                [Globals.listConfPermFieldName]: permissionTests[l].listwrite,
-                [Globals.listWritePermFieldName]: permissionTests[l].listitemwrite,
-                [Globals.listReadPermFieldName]: permissionTests[l].listitemread        
+                [Globals.readWritePermFieldName]: permissionTests[l].listwrite,
+                [Globals.itemReadWritePermFieldName]: permissionTests[l].listitemwrite,
+                [Globals.itemReadPermFieldName]: permissionTests[l].listitemread        
               };
         
               chai.request(server)
@@ -254,7 +254,7 @@ try {
             it(l + '.2 - Add list item as ' + permissionTests[l].user + ' (' + permissionTests[l].createlistitem + ')', (done) => {
               lastItem = {
                 field1: 'val1',
-                [Globals.parentIdFieldName]: lastListID
+                [Globals.listIdFieldName]: lastListID
               };
         
               chai.request(server)
@@ -310,7 +310,7 @@ try {
             it(l + '.5 - Add list item as ' + permissionTests[l].user + ' for the next user' + ' (' + permissionTests[l].createlistitem + ')', (done) => {
               lastItem = {
                 field1: 'val3',
-                [Globals.parentIdFieldName]: lastListID
+                [Globals.listIdFieldName]: lastListID
               };
               chai.request(server)
                   .post('/api/' + Globals.listitemAPIKeyword)

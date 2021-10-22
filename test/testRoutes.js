@@ -52,9 +52,9 @@ describe('testRoutes.js List API', () => {
         [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'First test list',
         ['x' + Globals.ownerFieldName]: 'p@gmail.com',
-        [Globals.listConfPermFieldName]: '@listowner',
-        [Globals.listWritePermFieldName]: '@listowner',
-        [Globals.listReadPermFieldName]: '@ALL',
+        [Globals.readWritePermFieldName]: '@listowner',
+        [Globals.itemReadWritePermFieldName]: '@listowner',
+        [Globals.itemReadPermFieldName]: '@ALL',
         [Globals.listSchemaFieldName]: '{}'
       };
       chai.request(server)
@@ -100,7 +100,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             lastList = {
               ...lastList,
-              [Globals.listReadPermFieldName]: lastList[Globals.listReadPermFieldName].toLowerCase(),
+              [Globals.itemReadPermFieldName]: lastList[Globals.itemReadPermFieldName].toLowerCase(),
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
             };
             expect(response).to.have.status(201);
@@ -1031,7 +1031,7 @@ describe('testRoutes.js List API', () => {
         [Globals.listIdFieldName]: Globals.listofAllViewId,
         name: 'First view',
         [Globals.ownerFieldName]: 'p@gmail.com',
-        [Globals.listConfPermFieldName]: '@listowner',
+        [Globals.readWritePermFieldName]: '@listowner',
         item_template: '',
         _childlist: listIdToPatch
       };
@@ -1068,5 +1068,21 @@ describe('testRoutes.js List API', () => {
       });
     });
 
+    it('12.3 - Patch the view with a new item_template', (done) => {
+      newView = {
+        ...newView,
+        item_template: "[[field1]]"
+      }
+      chai.request(server)
+          .patch('/api/' + Globals.listitemAPIKeyword + '/' + newView[Globals.itemIdFieldName])
+          .send({item_template: newView.item_template})
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+          .end((err, response) => {
+            expect(response).to.have.status(200);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal(newView);
+            done();
+          });
+    });
   });
 });

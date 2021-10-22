@@ -124,12 +124,12 @@ describe('1 testListItemSchema.js List Item Schema', () => {
   });
 
   it('1.17 Invalid user_array', async () => {
-    var schema = new ItemSchema('field1: user_array');
+    var schema = new ItemSchema('field1: user_list');
     await expectThrowsAsync(() => schema.validateJson('{"field1": "aa, bb"}'), NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field1', 'aa, bb', 'user_array'))
   });
 
   it('1.18 Valid user_array', async () => {
-    var schema = new ItemSchema('field1: user_array');
+    var schema = new ItemSchema('field1: user_list');
     var json = await schema.validateJson('"field1": "@All, BB@gmail.com"');
 
     expect(json).to.be.an('object');

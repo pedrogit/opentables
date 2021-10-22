@@ -44,16 +44,16 @@ class ItemSchema {
   getEmbeddedItems() {
     var embItems = [];
     for (var key in this.schema) {
-
       if (this.schema[key] === 'embedded_itemid' || 
-           this.schema[key] === 'embedded_itemid_list'){
+          this.schema[key] === 'embedded_listid' ||
+          this.schema[key] === 'embedded_itemid_list' ){
         var item = {};
         item.type = this.schema[key];
         embItems.push({[key]: item});
-      } 
+      }
       else if (this.schema[key].type === 'embedded_itemid' || 
                this.schema[key].type === 'embedded_itemid_list') {
-        embItems.push({[key]: this.schema[key].type});
+        embItems.push({[key]: this.schema[key]});
       }
     }
 
@@ -188,6 +188,13 @@ class ItemSchema {
   validate_type_objectid(key, val) {
     if (!(MongoDB.ObjectId.isValid(val))) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'objectid'));
+    }
+    return MongoDB.ObjectId(val);
+  }
+
+  validate_type_embedded_listid(key, val) {
+    if (!(MongoDB.ObjectId.isValid(val))) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'embedded_listid'));
     }
     return MongoDB.ObjectId(val);
   }

@@ -125,7 +125,7 @@ class ListItemControler {
 
     if (ListItemControler.isList(item)) {
       // validate permissions
-      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName]);
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName], item[Globals.itemReadWritePermFieldName], item[Globals.itemReadPermFieldName]);
 
       if (!noitems) {
         var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
@@ -156,7 +156,7 @@ class ListItemControler {
         // if the requested list is the list of list, remove list for which the user deon not have read permissions
         if (itemid === Globals.listofAllListId) {
           item.items = item.items.filter(item => {
-            return ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName], item[Globals.listWritePermFieldName], item[Globals.listReadPermFieldName], false);
+            return ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName], item[Globals.itemReadWritePermFieldName], item[Globals.itemReadPermFieldName], false);
           });
         }
         if (item.items.length === 0) {
@@ -169,16 +169,14 @@ class ListItemControler {
       var parentList = await this.getParentList(item);
       
       // validate permissions
-      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName], parentList[Globals.listReadPermFieldName]);
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName], parentList[Globals.itemReadPermFieldName]);
     
       // add embedded items if there are any
       const schema = new ItemSchema(parentList[Globals.listSchemaFieldName]);
       await Promise.all(schema.getEmbeddedItems().map(async embItem => {
         var propName = Object.keys(embItem)[0];
         item[propName] = await this.findWithItems(user, item[propName]);
-        var x = item;
       }));
-      var y = item;
     }
 
     return item;
@@ -228,7 +226,7 @@ class ListItemControler {
     var parentList = await this.getParentList(item);
 
     // validate permissions
-    ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+    ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
     
     // validate item against schema
     var newitems = await this.validateItems(parentList[Globals.listSchemaFieldName], item);
@@ -278,10 +276,10 @@ class ListItemControler {
 
     // validate permissions
     if (ListItemControler.isList(item)) { // list patch permissions are defined at the list level (not the parent level)
-      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.listConfPermFieldName]);
+      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName]);
     }
     else {
-      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
     }
 
     // validate item against schema
@@ -337,7 +335,7 @@ class ListItemControler {
       this.coll.deleteMany({[Globals.listIdFieldName]: MongoDB.ObjectId(item[Globals.listIdFieldName])});
     }
     else {
-      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.listConfPermFieldName], parentList[Globals.listWritePermFieldName]);
+      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
     }
 
     return this.coll.deleteOne({[Globals.listIdFieldName]: itemid});
