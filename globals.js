@@ -7,7 +7,7 @@ var Globals = {
     'listofAllViewId': '000000000000000000000002',
     'userListId':      '000000000000000000000003',
     'itemIdFieldName':'_id', // do not change
-    'parentIdFieldName':'_parentid',
+    'listIdFieldName':'_listid',
     'ownerFieldName': 'owner',
     'listSchemaFieldName': 'listschema',
     'listConfPermFieldName': 'listcperm',
@@ -22,10 +22,8 @@ var Globals = {
 Globals = {
     ...Globals,
     listOfAllLists: {
-        //[Globals.itemIdFieldName]: MongoDB.ObjectId(Globals.listofAllListId),
-        //[Globals.parentIdFieldName]: MongoDB.ObjectId(Globals.voidListId),
         [Globals.itemIdFieldName]: Globals.listofAllListId,
-        [Globals.parentIdFieldName]: Globals.voidListId,
+        [Globals.listIdFieldName]: Globals.voidListId,
         name: 'List of all lists',
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
         [Globals.listConfPermFieldName]: '@listowner',
@@ -33,20 +31,18 @@ Globals = {
         [Globals.listReadPermFieldName]: '@all',
         [Globals.listSchemaFieldName]: '{' 
           + Globals.itemIdFieldName + ': objectid, '
-          + Globals.parentIdFieldName + ': {type: objectid, required}, '
+          + Globals.listIdFieldName + ': {type: objectid, required}, '
           + 'name: {type: string, required}, '
           + Globals.ownerFieldName + ': {type: user, required}, '
-          + Globals.listConfPermFieldName + ':  {type: user_array, required, lower}, '
-          + Globals.listWritePermFieldName + ':  {type: user_array, required, lower}, '
-          + Globals.listReadPermFieldName + ':  {type: user_array, required, lower}, '
+          + Globals.listConfPermFieldName + ':  {type: user_list, required, lower}, '
+          + Globals.listWritePermFieldName + ':  {type: user_list, required, lower}, '
+          + Globals.listReadPermFieldName + ':  {type: user_list, required, lower}, '
           + Globals.listSchemaFieldName + ':  {type: schema, lower}'
           + '}'
       },
       listOfAllViews: {
-        //[Globals.itemIdFieldName]: MongoDB.ObjectId(Globals.listofAllViewId),
-        //[Globals.parentIdFieldName]: MongoDB.ObjectId(Globals.voidListId),
         [Globals.itemIdFieldName]: Globals.listofAllViewId,
-        [Globals.parentIdFieldName]: Globals.voidListId,
+        [Globals.listIdFieldName]: Globals.voidListId,
         name: 'List of all views',
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
         [Globals.listConfPermFieldName]: '@listowner',
@@ -54,19 +50,17 @@ Globals = {
         [Globals.listReadPermFieldName]: '@all',
         [Globals.listSchemaFieldName]: '{' 
           + Globals.itemIdFieldName + ': objectid, '
-          + Globals.parentIdFieldName + ': {type: objectid, required}, '
+          + Globals.listIdFieldName + ': {type: objectid, required}, '
           + 'name: {type: string, required}, '
           + Globals.ownerFieldName + ': {type: user, required},  '
-          + Globals.listConfPermFieldName + ':  {type: user_array, required, lower},  '
+          + Globals.listConfPermFieldName + ':  {type: user_list, required, lower},  '
           + 'item_template: string, '
-          + '_childlistid: {type: objectid_array, listid: "' + Globals.listofAllListId + '", min_occ: 1, max_occ:1, inc_props: "all"}'
+          + '_childlist: embedded_itemid'
           + '}'
       },
       listOfUsers: {
-        //[Globals.itemIdFieldName]: MongoDB.ObjectId(Globals.userListId),
-        //[Globals.parentIdFieldName]: MongoDB.ObjectId(Globals.listofAllListId),
         [Globals.itemIdFieldName]: Globals.userListId,
-        [Globals.parentIdFieldName]: Globals.listofAllListId,
+        [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'List of all users',
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
         [Globals.listConfPermFieldName]: '@listowner',

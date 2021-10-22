@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const Globals = require('./globals');
 
 class ItemSchema {
-  constructor(schema, controler, listid = null) {
+  constructor(schema, controler = null, listid = null) {
     if (schema == null) {
       throw new Error(Errors.ErrMsg.ItemSchema_Null);
     }
@@ -26,7 +26,9 @@ class ItemSchema {
       this.listid = listid;
     }
 
-    this.controler = controler;
+    if (controler !== null) {
+      this.controler = controler;
+    }
 
     if (typeof this.schema !== 'object') {
       throw new Error(Errors.ErrMsg.ItemSchema_Malformed);
@@ -34,6 +36,29 @@ class ItemSchema {
     this.requiredFields = [];
     this.validate();
   };
+
+  schemaAsJson() {
+    return this.schema;
+  }
+
+  getEmbeddedItems() {
+    var embItems = [];
+    for (var key in this.schema) {
+
+      if (this.schema[key] === 'embedded_itemid' || 
+           this.schema[key] === 'embedded_itemid_list'){
+        var item = {};
+        item.type = this.schema[key];
+        embItems.push({[key]: item});
+      } 
+      else if (this.schema[key].type === 'embedded_itemid' || 
+               this.schema[key].type === 'embedded_itemid_list') {
+        embItems.push({[key]: this.schema[key].type});
+      }
+    }
+
+    return embItems;
+  }
 
   // traverse a json object calling provided callbacks according to the right level
   traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
@@ -167,6 +192,13 @@ class ItemSchema {
     return MongoDB.ObjectId(val);
   }
 
+  validate_type_embedded_itemid(key, val) {
+    if (!(MongoDB.ObjectId.isValid(val))) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'embedded_itemid'));
+    }
+    return MongoDB.ObjectId(val);
+  }
+
   validate_type_user(key, val) {
     val = val.toLowerCase();
     if (['@all', '@listowner'].includes(val)) {
@@ -180,7 +212,7 @@ class ItemSchema {
     return val;
   }
 
-  validate_type_user_array(key, val) {
+  validate_type_user_list(key, val) {
     var valArr = val;
     try {
       if (!(valArr instanceof Array)) {
@@ -276,7 +308,10 @@ class ItemSchema {
 
   async validate_unique(type, key, val) {
     // search for an identique value
-      //const item = await listItemControler.simpleFind(this.listid, {[key]: val});
+      if (!(this.controler)) {
+        throw new Error(Errors.ErrMsg.ItemSchema_NoControler);
+      }
+
       const item = await this.controler.simpleFind(this.listid, {[key]: val});
       
       if (item){

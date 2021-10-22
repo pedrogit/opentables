@@ -49,7 +49,7 @@ describe('testRoutes.js List API', () => {
   describe('2 - POST and GET on list', () => {
     it('2.1 - Post a new list having an invalid field', (done) => {
       lastList = {
-        [Globals.parentIdFieldName]: Globals.listofAllListId,
+        [Globals.listIdFieldName]: Globals.listofAllListId,
         name: 'First test list',
         ['x' + Globals.ownerFieldName]: 'p@gmail.com',
         [Globals.listConfPermFieldName]: '@listowner',
@@ -231,13 +231,13 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.parentIdFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.listIdFieldName)});
             done();
           });
     });
     it('4.2 - Post a list item having an invalid listid', (done) => {
       firstItem = {
-        [Globals.parentIdFieldName]: '60edb91162a87a2c383d5cf2', 
+        [Globals.listIdFieldName]: '60edb91162a87a2c383d5cf2', 
         'field1': 'field1val1',
         'field2': 'field2val1'
       };
@@ -257,7 +257,7 @@ describe('testRoutes.js List API', () => {
     it('4.3 - Post a list item having an invalid field', (done) => {
       firstItem = {
         ...firstItem,
-        [Globals.parentIdFieldName]: listIdToPatch
+        [Globals.listIdFieldName]: listIdToPatch
       };
 
       chai.request(server)
@@ -276,7 +276,7 @@ describe('testRoutes.js List API', () => {
       chai.request(server)
           .post('/api/' + Globals.listitemAPIKeyword)
           .send({
-            [Globals.parentIdFieldName]: listIdToPatch, 
+            [Globals.listIdFieldName]: listIdToPatch, 
             ...{field1: firstItem.field1}
           })
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
@@ -298,7 +298,7 @@ describe('testRoutes.js List API', () => {
               ...firstItem,
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
             }
-            lastItems = [Utils.objWithout(firstItem, Globals.parentIdFieldName)];
+            lastItems = [Utils.objWithout(firstItem, Globals.listIdFieldName)];
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(firstItem);
@@ -308,7 +308,7 @@ describe('testRoutes.js List API', () => {
 
     it('4.6 - Post a second list item', (done) => {
       secondItem = {
-        [Globals.parentIdFieldName]: listIdToPatch, 
+        [Globals.listIdFieldName]: listIdToPatch, 
         'field1': 'field1val2',
         'field2': 'field2val2'
       };
@@ -323,7 +323,7 @@ describe('testRoutes.js List API', () => {
               ...secondItem,
               [Globals.itemIdFieldName]: listItemIdToPatch
             }
-            lastItems.push(Utils.objWithout(secondItem, Globals.parentIdFieldName));
+            lastItems.push(Utils.objWithout(secondItem, Globals.listIdFieldName));
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(secondItem);
@@ -333,7 +333,7 @@ describe('testRoutes.js List API', () => {
 
     it('4.7 - Post two list items', (done) => {
       twoItems = {
-        [Globals.parentIdFieldName]: listIdToPatch, 
+        [Globals.listIdFieldName]: listIdToPatch, 
         items:[
           {
             'field1': 'field1val3',
@@ -432,7 +432,7 @@ describe('testRoutes.js List API', () => {
               ...secondItem,
               ...secondItemPatch
             }
-            lastItems[1] = Utils.objWithout(secondItem, Globals.parentIdFieldName);
+            lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
             expect(response.body).to.deep.equal(secondItem);
@@ -496,7 +496,7 @@ describe('testRoutes.js List API', () => {
         }
       };
 
-      lastItems[1] = Utils.objWithout(secondItem, Globals.parentIdFieldName);
+      lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
 
       chai.request(server)
           .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
@@ -622,7 +622,7 @@ describe('testRoutes.js List API', () => {
                 field4: 'field4 value4'
               }
             }
-            lastItems[1] = Utils.objWithout(secondItem, Globals.parentIdFieldName);
+            lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
 
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -752,7 +752,7 @@ describe('testRoutes.js List API', () => {
           .post('/api/' + Globals.listitemAPIKeyword)
           .send(
             {
-              [Globals.parentIdFieldName]: listIdToPatch,
+              [Globals.listIdFieldName]: listIdToPatch,
               field1: "field1val5",
               field2: "field2val5",
               field4: "field4 value4"
@@ -770,7 +770,7 @@ describe('testRoutes.js List API', () => {
     it('9.3 - Post a non duplicate list item', (done) => {
       var dupListItem = 
             {
-              [Globals.parentIdFieldName]: listIdToPatch,
+              [Globals.listIdFieldName]: listIdToPatch,
               field1: "field1val5",
               field2: "field2val5",
               field4: "field4 value5"
@@ -786,7 +786,7 @@ describe('testRoutes.js List API', () => {
               ...dupListItem,
               field2: dupListItem.field2.toUpperCase(),
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
-            }, Globals.parentIdFieldName);
+            }, Globals.listIdFieldName);
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(
@@ -822,7 +822,7 @@ describe('testRoutes.js List API', () => {
 
     it('10.1 - Register a new user', (done) => {
       newUser = {
-        [Globals.parentIdFieldName]: Globals.userListId,
+        [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'Pedro',
         'lastname': 'Root',
         'organisation': 'Myself',
@@ -877,7 +877,7 @@ describe('testRoutes.js List API', () => {
     it('10.3 - Register another user with the same email', (done) => {
       const pw = 'mypassword';
       var newUser2 = {
-        [Globals.parentIdFieldName]: Globals.userListId,
+        [Globals.listIdFieldName]: Globals.userListId,
         'firstname': 'Pedro2',
         'lastname': 'Root2',
         'organisation': 'Myself2',
@@ -1012,7 +1012,7 @@ describe('testRoutes.js List API', () => {
           .get('/api/' + Globals.listitemAPIKeyword + '/' + Globals.listofAllListId)
           //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
-            listOfAllList.items.forEach(function(v){ delete v[Globals.parentIdFieldName] });
+            listOfAllList.items.forEach(function(v){ delete v[Globals.listIdFieldName] });
 
             expect(response).to.have.status(200);
             expect(response.body).to.be.an('object');
@@ -1022,15 +1022,18 @@ describe('testRoutes.js List API', () => {
     });
   });
 
+
   describe('12 - Test views and referenced lists', () => {
+    var newView;
+
     it('12.1 - Create a new view', (done) => {
       newView = {
-        [Globals.parentIdFieldName]: Globals.listofAllViewId,
+        [Globals.listIdFieldName]: Globals.listofAllViewId,
         name: 'First view',
         [Globals.ownerFieldName]: 'p@gmail.com',
         [Globals.listConfPermFieldName]: '@listowner',
         item_template: '',
-        _childlistid: listIdToPatch
+        _childlist: listIdToPatch
       };
       chai.request(server)
           .post('/api/' + Globals.listitemAPIKeyword)
@@ -1043,9 +1046,26 @@ describe('testRoutes.js List API', () => {
             };
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(newList);
+            expect(response.body).to.deep.equal(newView);
             done();
           });
+    });
+
+    it('12.2 - Get the view with the embedded list and the list items', (done) => {
+      chai.request(server)
+      .get('/api/' + Globals.listitemAPIKeyword + '/' + newView[Globals.itemIdFieldName])
+      .send(newView)
+      //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+      .end((err, response) => {
+        expect(response).to.have.status(200);
+        expect(response.body).to.be.an('object');
+        expect(response.body).to.deep.equal(
+          {
+            ...newView,
+            _childlist: lastList
+          });
+        done();
+      });
     });
 
   });

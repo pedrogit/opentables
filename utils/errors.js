@@ -49,6 +49,7 @@ var ErrMsg = {
   'ItemSchema_InvalidSchema': 'Invalid schema (%s). %s...',
   'ItemSchema_InvalidSchemaParameter': 'Invalid schema parameter (%s) for field "%s"...',
   'ItemSchema_NotUnique': 'JSON object is not valid. Field "%s" should be unique but value (%s) already exists...',
+  'ItemSchema_NoControler': 'No controler provided to ItemSchema...',
   'List_NotFound': 'Could not find list (%s)...',
   'ListItem_NotFound': 'Could not find list item (%s)...',
   'ListItem_Invalid': 'Invalid item...',
