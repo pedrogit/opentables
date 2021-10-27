@@ -112,6 +112,28 @@ class ListItemControler {
     return parentList;
   };
 
+  /*makePipeline() {
+
+  }
+
+  traverseItem(user, item, filter, listitems = true, embedded = true) {
+  // if the item is a list
+    // check permission from the item itself
+    // append a lookup to the pipeline with the filter
+  
+  // for every item property
+      // check permission from the parent list
+      // if its an embedded list, append a lookup to the pipeline
+  }
+
+  async findWithEmbedded(user, itemid, filter, listitems = true, embedded = true) {
+    // find the item
+
+    // traverse the item to build the pipeline
+
+    // query
+  }*/
+
   async findWithItems(user, itemid, filter, noitems = false) {
     if (!(MongoDB.ObjectId.isValid(itemid))) {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));

@@ -119,7 +119,7 @@ class ItemSchema {
         await callbacks[level](key, obj, parentKey);
       }
 
-      if (obj[key] !== null && typeof(obj[key]) == "object") {
+      if (obj[key] !== null && typeof(obj[key]) == "object" && obj[key].constructor.name != 'ObjectId') {
           //going one step down in the object tree!!
           await this.traverse(obj[key], key, ++level, callbacks);
           level--;
@@ -186,6 +186,9 @@ class ItemSchema {
   }
 
   validate_type_objectid(key, val) {
+    if (val === '') {
+      return val;
+    }
     if (!(MongoDB.ObjectId.isValid(val))) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'objectid'));
     }
@@ -200,6 +203,9 @@ class ItemSchema {
   }
 
   validate_type_embedded_itemid(key, val) {
+    if (val === '') {
+      return val;
+    }
     if (!(MongoDB.ObjectId.isValid(val))) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'embedded_itemid'));
     }

@@ -65,7 +65,7 @@ Globals = {
         [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
         [Globals.readWritePermFieldName]: '@owner',
         [Globals.itemReadWritePermFieldName]: '@owner',
-        [Globals.itemReadPermFieldName]: '@owner',
+        [Globals.itemReadPermFieldName]: '@all',
         [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
       }
 }

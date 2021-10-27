@@ -1012,6 +1012,9 @@ describe('testRoutes.js List API', () => {
           .get('/api/' + Globals.listitemAPIKeyword + '/' + Globals.listofAllListId)
           //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
+            //listOfAllList.items.push(Globals.listOfUsers);
+            listOfAllList.items.unshift(Globals.listOfUsers);
+            listOfAllList.items[0]._id = listOfAllList.items[0]._id.toString();
             listOfAllList.items.forEach(function(v){ delete v[Globals.listIdFieldName] });
 
             expect(response).to.have.status(200);
@@ -1022,39 +1025,10 @@ describe('testRoutes.js List API', () => {
     });
   });
 
-  describe('12 - Test embedded_itemid_lists', () => {
-    it('12.1 - Add an author list', (done) => {
-      authorList = {
-        [Globals.listIdFieldName]: Globals.listofAllListId,
-        name: 'List of authors',
-        [Globals.ownerFieldName]: 'pedro@gmail.com', 
-        [Globals.readWritePermFieldName]: '@owner',
-        [Globals.itemReadWritePermFieldName]: '@owner',
-        [Globals.itemReadPermFieldName]: '@all',
-        [Globals.listSchemaFieldName] :  'name: string, books: embedded_itemid_list'
-      };
-      chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
-          .send(authorList)
-          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
-          .end((err, response) => {
-            authorList = {
-              ...authorList,
-              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
-            };
-            expect(response).to.have.status(201);
-            expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal(authorList);
-            done();
-          });
-    });
-
-  });
-
-  describe('13 - Test views', () => {
+  describe('12 - Test views', () => {
     var newView;
 
-    it('13.1 - Create a new view', (done) => {
+    it('12.1 - Create a new view', (done) => {
       newView = {
         [Globals.listIdFieldName]: Globals.listofAllViewId,
         name: 'First view',
@@ -1079,10 +1053,9 @@ describe('testRoutes.js List API', () => {
           });
     });
 
-    it('13.2 - Get the view with the embedded list and the list items', (done) => {
+    it('12.2 - Get the view with the embedded list and the list items', (done) => {
       chai.request(server)
       .get('/api/' + Globals.listitemAPIKeyword + '/' + newView[Globals.itemIdFieldName])
-      .send(newView)
       //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
       .end((err, response) => {
         expect(response).to.have.status(200);
@@ -1096,7 +1069,7 @@ describe('testRoutes.js List API', () => {
       });
     });
 
-    it('13.3 - Patch the view with a new item_template', (done) => {
+    it('12.3 - Patch the view with a new item_template', (done) => {
       newView = {
         ...newView,
         item_template: "[[field1]]"
@@ -1113,4 +1086,156 @@ describe('testRoutes.js List API', () => {
           });
     });
   });
+
+  /*describe('13 - Test embedded_itemid and embedded_itemid_lists', () => {
+    var refItemListId;
+    var firstItemId;
+    var secondItemId;
+    var thirdItemId;
+    var embView;
+
+    it('13.1 - Add a list of referenced items', (done) => {
+      refItemList = {
+        [Globals.listIdFieldName]: Globals.listofAllListId,
+        name: 'List of referenced items',
+        [Globals.ownerFieldName]: 'pedro@gmail.com', 
+        [Globals.readWritePermFieldName]: '@owner',
+        [Globals.itemReadWritePermFieldName]: '@owner',
+        [Globals.itemReadPermFieldName]: '@all',
+        [Globals.listSchemaFieldName] :  'name: string, ref_item: embedded_itemid, ref_items: embedded_itemid_list'
+      };
+      chai.request(server)
+          .post('/api/' + Globals.listitemAPIKeyword)
+          .send(refItemList)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+          .end((err, response) => {
+            refItemListId = response.body[Globals.itemIdFieldName];
+            refItemList = {
+              ...refItemList,
+              [Globals.itemIdFieldName]: refItemListId
+            };
+            expect(response).to.have.status(201);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal(refItemList);
+            done();
+          });
+    });
+
+    it('13.2 - Post one item to this list', (done) => {
+      item = {
+        [Globals.listIdFieldName]: refItemListId, 
+        name: 'Item 1',
+        ref_item: '',
+        ref_items: []
+      };
+
+      chai.request(server)
+        .post('/api/' + Globals.listitemAPIKeyword)
+        .send(item)
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          firstItemId = response.body[Globals.itemIdFieldName];
+          item = {
+            ...item,
+            [Globals.itemIdFieldName]: firstItemId
+          };
+          expect(response).to.have.status(201);
+          expect(response.body).to.be.an('object');
+          expect(response.body).to.deep.equal(item);
+          done();
+        });
+    });
+
+    it('13.3 - Post a second item referencing the first', (done) => {
+      item = {
+        [Globals.listIdFieldName]: refItemListId, 
+        name: 'Item 2',
+        ref_item: firstItemId,
+        ref_items: [firstItemId]
+      };
+
+      chai.request(server)
+        .post('/api/' + Globals.listitemAPIKeyword)
+        .send(item)
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          secondItemId = response.body[Globals.itemIdFieldName];
+          item = {
+            ...item,
+            [Globals.itemIdFieldName]: secondItemId
+          };
+          expect(response).to.have.status(201);
+          expect(response.body).to.be.an('object');
+          expect(response.body).to.deep.equal(item);
+          done();
+        });
+    });
+
+    it('13.4 - Post a third item referencing the two first ones', (done) => {
+      item = {
+        [Globals.listIdFieldName]: refItemListId, 
+        name: 'Item 3',
+        ref_item: secondItemId,
+        ref_items: [firstItemId, secondItemId]
+      };
+
+      chai.request(server)
+        .post('/api/' + Globals.listitemAPIKeyword)
+        .send(item)
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          thirdItemId = response.body[Globals.itemIdFieldName];
+          item = {
+            ...item,
+            [Globals.itemIdFieldName]: thirdItemId
+          };
+          expect(response).to.have.status(201);
+          expect(response.body).to.be.an('object');
+          expect(response.body).to.deep.equal(item);
+          done();
+        });
+    });
+
+    it('13.4 - Create a view on the list', (done) => {
+      embView = {
+        [Globals.listIdFieldName]: Globals.listofAllViewId,
+        name: 'View on embedded items',
+        [Globals.ownerFieldName]: 'p@gmail.com',
+        [Globals.readWritePermFieldName]: '@owner',
+        item_template: '',
+        _childlist: refItemListId
+      };
+      chai.request(server)
+          .post('/api/' + Globals.listitemAPIKeyword)
+          .send(embView)
+          .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+          .end((err, response) => {
+            embView = {
+              ...embView,
+              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
+            };
+            expect(response).to.have.status(201);
+            expect(response.body).to.be.an('object');
+            expect(response.body).to.deep.equal(embView);
+            done();
+          });
+    });
+
+    it('13.5 - Get the view with the embedded list and the embedded list items', (done) => {
+      chai.request(server)
+      .get('/api/' + Globals.listitemAPIKeyword + '/' + embView[Globals.itemIdFieldName])
+      //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+      .end((err, response) => {
+        expect(response).to.have.status(200);
+        expect(response.body).to.be.an('object');
+        expect(response.body).to.deep.equal(
+          {
+            ...embView,
+            _childlist: lastList
+          });
+        done();
+      });
+    });
+  });*/
+
 });
