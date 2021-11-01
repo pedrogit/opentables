@@ -2,12 +2,12 @@ const MongoDB = require('mongodb');
 const Errors = require('./errors');
 const Utils = require('./utils');
 const Globals = require('./globals');
-const ItemSchema = require('./listItemSchema');
-const ItemFilter = require('./listItemFilter');
+const Schema = require('./schema');
+const Filter = require('./filter');
 
 const NodeUtil = require('util');
 
-class ListItemControler {
+class Controler {
   constructor() {
     MongoDB.MongoClient.connect(process.env.MONGODB_ADDRESS, (err, ldb) => {
       if (err) {
@@ -46,7 +46,7 @@ class ListItemControler {
   static isList(item) {
     return item[Globals.listIdFieldName] && 
            (item[Globals.listIdFieldName].toString() === Globals.listofAllListId ||
-           ListItemControler.hasVoidParent(item));
+           Controler.hasVoidParent(item));
   };
   
   static hasVoidParent(item) {
@@ -98,9 +98,9 @@ class ListItemControler {
   async getParentList(item) {
     var parentList;
     if (!(item[Globals.listIdFieldName])) {
-      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.listIdFieldName));
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, Globals.listIdFieldName));
     }
-    if (ListItemControler.isOrphanList(item[Globals.itemIdFieldName])) {
+    if (Controler.isOrphanList(item[Globals.itemIdFieldName])) {
       parentList = Globals.listOfAllLists;
     }
     else {
@@ -116,7 +116,7 @@ class ListItemControler {
 
   }
 
-  traverseItem(user, item, filter, listitems = true, embedded = true) {
+  traverseItem(user, item, filter, embeditems = true, embedded = true) {
   // if the item is a list
     // check permission from the item itself
     // append a lookup to the pipeline with the filter
@@ -126,7 +126,7 @@ class ListItemControler {
       // if its an embedded list, append a lookup to the pipeline
   }
 
-  async findWithEmbedded(user, itemid, filter, listitems = true, embedded = true) {
+  async findWithEmbedded(user, itemid, filter, embeditems = true, embedded = true) {
     // find the item
 
     // traverse the item to build the pipeline
@@ -142,18 +142,18 @@ class ListItemControler {
     var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
 
     if (!item) {
-      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.Item_NotFound, itemid));
     };
 
-    if (ListItemControler.isList(item)) {
+    if (Controler.isList(item)) {
       // validate permissions
-      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName], item[Globals.itemReadWritePermFieldName], item[Globals.itemReadPermFieldName]);
+      Controler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName], item[Globals.itemReadWritePermFieldName], item[Globals.itemReadPermFieldName]);
 
       if (!noitems) {
         var lookup = {from: Globals.mongoCollectionName, localField: Globals.itemIdFieldName, foreignField: Globals.listIdFieldName, as: 'items'};
 
         if (filter) {
-          var mongoDBFilter = new ItemFilter(filter);
+          var mongoDBFilter = new Filter(filter);
           var jsonFilter = mongoDBFilter.final();
           lookup.let = {x: '$' + Globals.itemIdFieldName};
           lookup.pipeline = [{$match: 
@@ -178,7 +178,7 @@ class ListItemControler {
         // if the requested list is the list of list, remove list for which the user deon not have read permissions
         if (itemid === Globals.listofAllListId) {
           item.items = item.items.filter(item => {
-            return ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName], item[Globals.itemReadWritePermFieldName], item[Globals.itemReadPermFieldName], false);
+            return Controler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName], item[Globals.itemReadWritePermFieldName], item[Globals.itemReadPermFieldName], false);
           });
         }
         if (item.items.length === 0) {
@@ -187,14 +187,14 @@ class ListItemControler {
       }
     }
     else {
-      // find listitem schema
+      // find item schema
       var parentList = await this.getParentList(item);
       
       // validate permissions
-      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName], parentList[Globals.itemReadPermFieldName]);
+      Controler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName], parentList[Globals.itemReadPermFieldName]);
     
       // add embedded items if there are any
-      const schema = new ItemSchema(parentList[Globals.listSchemaFieldName]);
+      const schema = new Schema(parentList[Globals.listSchemaFieldName]);
       await Promise.all(schema.getEmbeddedItems().map(async embItem => {
         var propName = Object.keys(embItem)[0];
         item[propName] = await this.findWithItems(user, item[propName]);
@@ -212,7 +212,7 @@ class ListItemControler {
     var newItems;
     // validate provided JSON against the schema
     try {
-      const schema = new ItemSchema(schemaStr, this, item[Globals.listIdFieldName]);
+      const schema = new Schema(schemaStr, this, item[Globals.listIdFieldName]);
 
       // add the schema description for the listid property
       schema.schema[Globals.listIdFieldName] = {type: 'objectid', required: true};      
@@ -244,11 +244,11 @@ class ListItemControler {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 
-    // find listitem schema
+    // find item schema
     var parentList = await this.getParentList(item);
 
     // validate permissions
-    ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
+    Controler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
     
     // validate item against schema
     var newitems = await this.validateItems(parentList[Globals.listSchemaFieldName], item);
@@ -262,7 +262,7 @@ class ListItemControler {
     }
 
     if (!newitems || (newitems.acknowledged !== undefined && !newitems.acknowledged)) {
-      throw new Errors.InternalServerError(Errors.ErrMsg.ListItem_CouldNotCreate);
+      throw new Errors.InternalServerError(Errors.ErrMsg.Item_CouldNotCreate);
     }
 
     // delete the acknowledgment property if there was many items
@@ -286,22 +286,22 @@ class ListItemControler {
     // find the item to get it's parent list schema
     var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
     if (!item) {
-      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.Item_NotFound, itemid));
     }
 
     if (item[Globals.listIdFieldName]) {
       newitem[Globals.listIdFieldName] = item[Globals.listIdFieldName];
     }
 
-    // find listitem schema
+    // find item schema
     var parentList = await this.getParentList(newitem);
 
     // validate permissions
-    if (ListItemControler.isList(item)) { // list patch permissions are defined at the list level (not the parent level)
-      ListItemControler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName]);
+    if (Controler.isList(item)) { // list patch permissions are defined at the list level (not the parent level)
+      Controler.validatePerm(user, item[Globals.ownerFieldName], item[Globals.readWritePermFieldName]);
     }
     else {
-      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
+      Controler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
     }
 
     // validate item against schema
@@ -310,7 +310,7 @@ class ListItemControler {
     // update it
     item = await this.coll.findOneAndUpdate({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}, {$set: newitem}, {returnDocument: 'after'});
     if (!(item.ok)) {
-      throw new Errors.InternalServerError(Errors.ErrMsg.ListItem_CouldNotUpdate);
+      throw new Errors.InternalServerError(Errors.ErrMsg.Item_CouldNotUpdate);
     }
     return item.value;
   };
@@ -339,29 +339,29 @@ class ListItemControler {
       throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.MalformedID, itemid));
     }
 
-    // find the item to check if it is a list or a listitem
+    // find the item to check if it is a list or an item
     var item = await this.coll.findOne({[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)});
     if (!item) {
-      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, itemid));
+      throw new Errors.NotFound(NodeUtil.format(Errors.ErrMsg.Item_NotFound, itemid));
     }
 
-    // find listitem schema
+    // find item schema
     var parentList = await this.getParentList(item);
 
     // check user permissions
-    if (ListItemControler.isList(item)) {
+    if (Controler.isList(item)) {
       if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
         throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
       }
-      // delete all associated listitem
+      // delete all associated items
       this.coll.deleteMany({[Globals.listIdFieldName]: MongoDB.ObjectId(item[Globals.listIdFieldName])});
     }
     else {
-      ListItemControler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
+      Controler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
     }
 
     return this.coll.deleteOne({[Globals.listIdFieldName]: itemid});
   };
 }
 
-module.exports = new ListItemControler;
+module.exports = new Controler;

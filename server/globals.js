@@ -13,9 +13,9 @@ var Globals = {
     'readWritePermFieldName': 'readwritep',
     'itemReadWritePermFieldName': 'itemreadwritep',
     'itemReadPermFieldName': 'itemreadp',
-    'mongoCollectionName': 'listitem',
+    'mongoCollectionName': 'items',
     'mongoDatabaseName': 'listitdata',
-    'listitemAPIKeyword': 'opentables',
+    'APIKeyword': 'opentables',
     'unauthUserName': '@unauth'
 }
 

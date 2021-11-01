@@ -5,8 +5,8 @@ const asyncHandler = require('express-async-handler');
 
 const Globals = require('./globals');
 const Utils = require('./utils');
-const ItemSchema = require('./listItemSchema');
-const listItemControler = require('./listItemControler');
+const Schema = require('./schema');
+const controler = require('./controler');
 
 var isNewUser = function(item) {
   return item.hasOwnProperty(Globals.listIdFieldName) &&
@@ -14,33 +14,33 @@ var isNewUser = function(item) {
   item.hasOwnProperty('email');
 }
 
-const listItemRouter = express.Router();
+const router = express.Router();
 /************************************************************************
-  GET /api/listitem/logout
+  GET /api/APIKeyword/logout
 
   Logout (forget the token)
 
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listItemRouter.get('/login', asyncHandler(async (req, res) => {
+router.get('/login', asyncHandler(async (req, res) => {
   res.status(200).send();
 }));
 
 /************************************************************************
-  GET /api/listitem/logout
+  GET /api/APIKeyword/logout
 
   Logout (forget the token)
 
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listItemRouter.get('/logout', asyncHandler(async (req, res) => {
+router.get('/logout', asyncHandler(async (req, res) => {
   res.status(200).send();
 }));
 
 /************************************************************************
-  GET /api/listitem/:itemid
+  GET /api/APIKeyword/:itemid
 
   Get a list item by id if has list read permission.
 
@@ -50,27 +50,27 @@ listItemRouter.get('/logout', asyncHandler(async (req, res) => {
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-listItemRouter.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
+router.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
   const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-  const item = await listItemControler.findWithItems(req.user, req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
+  const item = await controler.findWithItems(req.user, req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
   res.status(200).send(item);
 }));
 
 /************************************************************************
-  POST /api/listitem/
+  POST /api/APIKeyword/
 
   Post one or many new list items if has list edit permission.
 
   Return status: 201, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.post('', asyncHandler(async (req, res) => {
+router.post('', asyncHandler(async (req, res) => {
   // register new users as admin
   if (isNewUser(req.body)) {
     req.user = process.env.ADMIN_EMAIL;
   }
 
-  const item = await listItemControler.insertMany(req.user, req.body);
+  const item = await controler.insertMany(req.user, req.body);
 
   // convert email to cookie token when registering
   if (isNewUser(item)) {
@@ -81,7 +81,7 @@ listItemRouter.post('', asyncHandler(async (req, res) => {
 }));
 
 /************************************************************************
-  POST /api/listitem/:itemid
+  POST /api/APIKeyword/:itemid
   
   Clone an item if has list edit permission.
 
@@ -89,47 +89,47 @@ listItemRouter.post('', asyncHandler(async (req, res) => {
 *************************************************************************/
 
 /************************************************************************
-  PATCH /api/listitem/:itemid
+  PATCH /api/APIKeyword/:itemid
   
   Patch a list item if has list edit permission.
 
   Return status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.patch('/:itemid', asyncHandler(async (req, res) => {
-  const newitem = await listItemControler.patch(req.user, req.params.itemid, req.body);
+router.patch('/:itemid', asyncHandler(async (req, res) => {
+  const newitem = await controler.patch(req.user, req.params.itemid, req.body);
   res.status(200).send(newitem);
 }));
 
 /************************************************************************
-  DELETE /api/listitem/ 
+  DELETE /api/APIKeyword/ 
   
   Delete all listsItems! For testing purpose only
   
   Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.delete('', asyncHandler(async (req, res) => {
-  const result = await listItemControler.deleteAll(req.user)  
+router.delete('', asyncHandler(async (req, res) => {
+  const result = await controler.deleteAll(req.user)  
   // if DELETE fails let the server default error handler return 500
   if (result.acknowledged) {
     res.status(200).send({'deletedCount': result.deletedCount});
 }
 }));
 /************************************************************************
-  DELETE /api/listitem/:itemid  // Delete one or many list items if has list edit permission
+  DELETE /api/APIKeyword/:itemid  // Delete one or many list items if has list edit permission
                                 // Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-listItemRouter.delete('/:itemid', asyncHandler(async (req, res) => {
-  const result = await listItemControler.delete(req.user, req.params.itemid)  
+router.delete('/:itemid', asyncHandler(async (req, res) => {
+  const result = await controler.delete(req.user, req.params.itemid)  
   // if DELETE fails let the server default error handler return 500
   if (result.acknowledged) {
     res.status(200).send({'deletedCount': result.deletedCount});
 }
 }));
 
-module.exports = listItemRouter;
+module.exports = router;
 
 /*
 View API

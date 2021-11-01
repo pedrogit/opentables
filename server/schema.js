@@ -6,16 +6,16 @@ const NodeUtil = require('util');
 const bcrypt = require('bcrypt');
 const Globals = require('./globals');
 
-class ItemSchema {
+class Schema {
   constructor(schema, controler = null, listid = null) {
     if (schema == null) {
-      throw new Error(Errors.ErrMsg.ItemSchema_Null);
+      throw new Error(Errors.ErrMsg.Schema_Null);
     }
     if (typeof schema === 'string') {
       try {
          this.schema = Utils.simpleJSONToJSON(schema);
       } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema, err.message));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, schema, err.message));
       }
     }
     else {
@@ -31,7 +31,7 @@ class ItemSchema {
     }
 
     if (typeof this.schema !== 'object') {
-      throw new Error(Errors.ErrMsg.ItemSchema_Malformed);
+      throw new Error(Errors.ErrMsg.Schema_Malformed);
     }
     this.requiredFields = [];
     this.validate();
@@ -66,7 +66,7 @@ class ItemSchema {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
       
       if (level == 3) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_TooManyLevels, this.schema));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema));
       }
       else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
         callbacks[level](key, obj, parentKey);
@@ -92,7 +92,7 @@ class ItemSchema {
   validateSchemaFirstLevelProperties(key, obj, parentKey) {
     if (obj[key] !== null && typeof(obj[key]) !== "object") {
       if (this['validate_type_' +  obj[key]] === undefined) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, obj[key], key));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, obj[key], key));
       }
     }
   }
@@ -103,7 +103,7 @@ class ItemSchema {
       this.requiredFields.push(parentKey);
     }
     else if (this['validate_' +  key] === undefined) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidValue, key, parentKey));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidValue, key, parentKey));
     }
   }
 
@@ -113,7 +113,7 @@ class ItemSchema {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
       
       if (level == 3) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_TooManyLevels, this.schema));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema));
       }
       else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
         await callbacks[level](key, obj, parentKey);
@@ -134,7 +134,7 @@ class ItemSchema {
       try {
         json = Utils.simpleJSONToJSON(jsonstr);
       } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchema, schema, err.message));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, schema, err.message));
       }
     }
     else {
@@ -149,7 +149,7 @@ class ItemSchema {
       if (!(jsonkeys === null) && 
             !(jsonkeys.length === 0) && 
             !(this.requiredFields.every(field => {var inc = jsonkeys.includes(field); if (!inc) {missingField = field}; return inc}))) {
-              throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, missingField));
+              throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, missingField));
       }
     }
 
@@ -162,7 +162,7 @@ class ItemSchema {
   // validate passed JSON fields
   async validateField(key, obj, parentKey) {
     if (!(Object.keys(this.schema).includes(key))) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, key));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, key));
     };
     // if this.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
     if (typeof(this.schema[key]) === "object") {
@@ -190,14 +190,14 @@ class ItemSchema {
       return val;
     }
     if (!(MongoDB.ObjectId.isValid(val))) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'objectid'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'objectid'));
     }
     return MongoDB.ObjectId(val);
   }
 
   validate_type_embedded_listid(key, val) {
     if (!(MongoDB.ObjectId.isValid(val))) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'embedded_listid'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'embedded_listid'));
     }
     return MongoDB.ObjectId(val);
   }
@@ -207,7 +207,7 @@ class ItemSchema {
       return val;
     }
     if (!(MongoDB.ObjectId.isValid(val))) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'embedded_itemid'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'embedded_itemid'));
     }
     return MongoDB.ObjectId(val);
   }
@@ -222,7 +222,7 @@ class ItemSchema {
         this.validate_type_embedded_itemid(key, v);
       });
     } catch(err) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'user_array'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'user_array'));
     }
     return val;
   }
@@ -235,7 +235,7 @@ class ItemSchema {
     try {
       val = this.validate_type_email(key, val);
     } catch (err) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'user'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'user'));
     }
     return val;
   }
@@ -250,21 +250,21 @@ class ItemSchema {
         this.validate_type_user(key, v);
       });
     } catch(err) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'user_array'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'user_array'));
     }
     return val.toLowerCase();
   }
 
   validate_type_string(key, val) {
     if (typeof val !== 'string') {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'string'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'string'));
     }
     return val;
   }
 
    async validate_type_encrypted_string(key, val) {
     if (typeof val !== 'string') {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'encrypted_string'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'encrypted_string'));
     }
     var encryptedStr = await this.validate_encrypt(null, key, val);
     return encryptedStr;
@@ -272,21 +272,21 @@ class ItemSchema {
 
   validate_type_number(key, val) {
     if (typeof val !== 'number') {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'number'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'number'));
     }
     return val;
   }
 
   validate_type_schema(key, val) {
     if (typeof val !== 'string') {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, val, 'schema'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, val, 'schema'));
     }
-    new ItemSchema(val);
+    new Schema(val);
     return val;
   }
 
   validate_type_email(key, email) {
-    const emailError = new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, key, email, 'email'));
+    const emailError = new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, key, email, 'email'));
     var emailRegExp = new RegExp('^[-!#$%&\'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&\'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$');
     if (!email) {
       throw emailError;
@@ -337,17 +337,17 @@ class ItemSchema {
   async validate_unique(type, key, val) {
     // search for an identique value
       if (!(this.controler)) {
-        throw new Error(Errors.ErrMsg.ItemSchema_NoControler);
+        throw new Error(Errors.ErrMsg.Schema_NoControler);
       }
 
       const item = await this.controler.simpleFind(this.listid, {[key]: val});
       
       if (item){
-        throw new Error(NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, key, val));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, key, val));
       }
 
     return val;
   }
 };
 
-module.exports = ItemSchema;
+module.exports = Schema;

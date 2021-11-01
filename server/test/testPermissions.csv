@@ -1,4 +1,4 @@
-testnb,listwrite,listitemwrite,listitemread,listcopy,user,createlist,deletelist,deletealllists,clonelist,patchlist,getlist,createlistitem,clonelistitem,patchlistitem,deletelistitem
+testnb,listwrite,itemwrite,itemread,listcopy,user,createlist,deletelist,deletealllists,clonelist,patchlist,getlist,createitem,cloneitem,patchitem,deleteitem
 0,whatever,whatever,whatever,whatever,auth,yes,no,no,no,no,no,no,no,no,no
 1,whatever,whatever,whatever,whatever,unauth,no,no,no,no,no,no,no,no,no,no
 2,whatever,whatever,whatever,whatever,owner,yes,yes,no,yes,yes,yes,yes,yes,yes,yes

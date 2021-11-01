@@ -36,7 +36,7 @@ describe('testRoutes.js List API', () => {
 
     it('1.2 - Delete all the lists from the DB', (done) => {
       chai.request(server)
-          .delete('/api/' + Globals.listitemAPIKeyword)
+          .delete('/api/' + Globals.APIKeyword)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(200);
@@ -58,13 +58,13 @@ describe('testRoutes.js List API', () => {
         [Globals.listSchemaFieldName]: '{}'
       };
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(lastList)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.ownerFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, Globals.ownerFieldName)});
             done();
           });
     });
@@ -77,13 +77,13 @@ describe('testRoutes.js List API', () => {
       };
       delete lastList['x' + Globals.ownerFieldName];
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(lastList)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'x', 'toto')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'x', 'toto')});
             done();
           });
     });
@@ -94,7 +94,7 @@ describe('testRoutes.js List API', () => {
         [Globals.listSchemaFieldName]: '{}'
       };
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(lastList)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -113,7 +113,7 @@ describe('testRoutes.js List API', () => {
 
     it('2.4 - Get list with a malformed id', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/toto')
+          .get('/api/' + Globals.APIKeyword + '/toto')
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
@@ -124,18 +124,18 @@ describe('testRoutes.js List API', () => {
 
     it('2.5 - Get list with an invalid id', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/6102f9efc3b25831e42fec8b')
+          .get('/api/' + Globals.APIKeyword + '/6102f9efc3b25831e42fec8b')
           .end((err, response) => {
             expect(response).to.have.status(404);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, '6102f9efc3b25831e42fec8b')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Item_NotFound, '6102f9efc3b25831e42fec8b')});
             done();
           });
     });
 
     it('2.6 - Get the last list by id', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .end((err, response) => {
             lastList = {
               ...lastList
@@ -155,7 +155,7 @@ describe('testRoutes.js List API', () => {
 
     it('3.1 - Patch with an invalid id', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/aaaa')
+          .patch('/api/' + Globals.APIKeyword + '/aaaa')
           .send(listPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -168,26 +168,26 @@ describe('testRoutes.js List API', () => {
 
     it('3.2 - Patch a non existing list', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/61156c3f52de9f98d61f9a23')
+          .patch('/api/' + Globals.APIKeyword + '/61156c3f52de9f98d61f9a23')
           .send(listPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(404);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ListItem_NotFound, '61156c3f52de9f98d61f9a23')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Item_NotFound, '61156c3f52de9f98d61f9a23')});
             done();
           });
     });
 
     it('3.3 - Patch the last list with an invalid field', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send(listPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, 'xlistschema')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, 'xlistschema')});
             done();
           });
     });
@@ -198,7 +198,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send(listPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -217,7 +217,7 @@ describe('testRoutes.js List API', () => {
 
   var firstItem;
   var secondItem;
-  describe('4 - POST on ' + Globals.listitemAPIKeyword, () => {
+  describe('4 - POST on ' + Globals.APIKeyword, () => {
     it('4.1 - Post a list item having no listid', (done) => {
       firstItem = {
         'field1': 'field1val1',
@@ -225,13 +225,13 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(firstItem)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, Globals.listIdFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, Globals.listIdFieldName)});
             done();
           });
     });
@@ -243,7 +243,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(firstItem)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -261,20 +261,20 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send({...firstItem, field3: 'field3val1'})
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, 'field3')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, 'field3')});
             done();
           });
     });
 
     it('4.4 - Post a list item with a missing field', (done) => {
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send({
             [Globals.listIdFieldName]: listIdToPatch, 
             ...{field1: firstItem.field1}
@@ -283,14 +283,14 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_MissingProp, 'field2')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, 'field2')});
             done();
           });
     });
 
     it('4.5 - Post a first valid list item', (done) => {
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(firstItem)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -314,14 +314,14 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(secondItem)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
-            listItemIdToPatch = response.body[Globals.itemIdFieldName];
+            itemIdToPatch = response.body[Globals.itemIdFieldName];
             secondItem = {
               ...secondItem,
-              [Globals.itemIdFieldName]: listItemIdToPatch
+              [Globals.itemIdFieldName]: itemIdToPatch
             }
             lastItems.push(Utils.objWithout(secondItem, Globals.listIdFieldName));
             expect(response).to.have.status(201);
@@ -346,7 +346,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(twoItems)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -363,7 +363,7 @@ describe('testRoutes.js List API', () => {
 
     it('4.8 - Get the list to check if new items were created', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -377,7 +377,7 @@ describe('testRoutes.js List API', () => {
 
     it('4.9 - Get the list again but without the list of items', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '/noitems')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '/noitems')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -387,10 +387,10 @@ describe('testRoutes.js List API', () => {
     });
   });
 
-  describe('5 - PATCH on listitem', () => {
+  describe('5 - PATCH on item', () => {
     it('5.1 - Patch the second list item with a non existing field', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send({
             "field3": "field2 value222"
           })
@@ -398,14 +398,14 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidProp, 'field3')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, 'field3')});
             done();
           });
     });
 
     it('5.2 - Patch the second list item with a value of the wrong type', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send({
             "field2": 222
           })
@@ -413,7 +413,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field2', '222', 'string')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field2', '222', 'string')});
             done();
           });
     });
@@ -424,7 +424,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send(secondItemPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -442,7 +442,7 @@ describe('testRoutes.js List API', () => {
 
     it('5.4 - Get the last posted item', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .get('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.deep.equal(secondItem);
@@ -452,7 +452,7 @@ describe('testRoutes.js List API', () => {
 
     it('5.5 - Get the list to check if new items were modified', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -473,7 +473,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send(newListSchema)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -499,7 +499,7 @@ describe('testRoutes.js List API', () => {
       lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send(secondItemPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -520,7 +520,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send(listSchemaPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -538,7 +538,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send(secondItemPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -558,12 +558,12 @@ describe('testRoutes.js List API', () => {
   describe('7 - Test "string", "number" and "encrypted_string" as basic types', () => {
     it('7.1 - Patch listschema with an invalid type for field4', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": "encrypted_string", "field4": "toto"}'})
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidSchemaParameter, 'toto', 'field4')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'toto', 'field4')});
             done();
           });
     });
@@ -577,7 +577,7 @@ describe('testRoutes.js List API', () => {
         ...listSchemaPatch
       }
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send(listSchemaPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -590,7 +590,7 @@ describe('testRoutes.js List API', () => {
 
     it('7.3 - Patch with a non string value', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send({"field4": 123})
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -598,7 +598,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.be.a('object');
             expect(response.body).to.deep.equal(
               {
-                "err": NodeUtil.format(Errors.ErrMsg.ItemSchema_InvalidType, 'field4', '123', 'string')
+                "err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field4', '123', 'string')
               }
             );
             done();
@@ -611,7 +611,7 @@ describe('testRoutes.js List API', () => {
         'field4': 'field4 value4'
       }
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send(patch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -636,7 +636,7 @@ describe('testRoutes.js List API', () => {
   describe('8 - Test GET with filter', () => {
     it('8.1 - Test case sensitive constains returning something', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '?filter=$contains:[$field1, "field1val1"]')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '?filter=$contains:[$field1, "field1val1"]')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -652,7 +652,7 @@ describe('testRoutes.js List API', () => {
 
     it('8.2 - Test case insensitive constains', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '?filter=$contains_i:[$field1, "FIELd1val1"]')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '?filter=$contains_i:[$field1, "FIELd1val1"]')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -668,7 +668,7 @@ describe('testRoutes.js List API', () => {
 
     it('8.3 - Test case sensitive constains returning nothing', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '?filter=$contains:[$field1, "xxx"]')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '?filter=$contains:[$field1, "xxx"]')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -679,7 +679,7 @@ describe('testRoutes.js List API', () => {
 
     it('8.4 - Test successful case sensitive isexactly returning something', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '?filter=$isexactly:[$field1, "field1val1"]')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '?filter=$isexactly:[$field1, "field1val1"]')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -695,7 +695,7 @@ describe('testRoutes.js List API', () => {
 
     it('8.5 - Test case insensitive isexactly', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '?filter=$isexactly_i:[$field1, "FIeld1val1"]')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '?filter=$isexactly_i:[$field1, "FIeld1val1"]')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -711,7 +711,7 @@ describe('testRoutes.js List API', () => {
 
     it('8.6 - Test successful case sensitive isexactly returning nothing', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch + '?filter=$isexactly:[$field1, "xxx"]')
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch + '?filter=$isexactly:[$field1, "xxx"]')
           .end((err, response) => {
             expect(response).to.have.status(200);
             expect(response.body).to.be.a('object');
@@ -736,7 +736,7 @@ describe('testRoutes.js List API', () => {
       listOfAllList['items'].push(lastList);
 
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .send(listSchemaPatch)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -749,7 +749,7 @@ describe('testRoutes.js List API', () => {
 
     it('9.2 - Post a duplicate list item', (done) => {
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(
             {
               [Globals.listIdFieldName]: listIdToPatch,
@@ -762,13 +762,13 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'field4', 'field4 value4')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, 'field4', 'field4 value4')});
             done();
           });
     });
 
     it('9.3 - Post a non duplicate list item', (done) => {
-      var dupListItem = 
+      var dupItem = 
             {
               [Globals.listIdFieldName]: listIdToPatch,
               field1: "field1val5",
@@ -778,21 +778,21 @@ describe('testRoutes.js List API', () => {
 
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
-          .send(dupListItem)
+          .post('/api/' + Globals.APIKeyword)
+          .send(dupItem)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             lastItems[4] = Utils.objWithout({
-              ...dupListItem,
-              field2: dupListItem.field2.toUpperCase(),
+              ...dupItem,
+              field2: dupItem.field2.toUpperCase(),
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
             }, Globals.listIdFieldName);
             expect(response).to.have.status(201);
             expect(response.body).to.be.an('object');
             expect(response.body).to.deep.equal(
               {
-                ...dupListItem,
-                field2: dupListItem.field2.toUpperCase(),
+                ...dupItem,
+                field2: dupItem.field2.toUpperCase(),
                 [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
               }
             );
@@ -802,13 +802,13 @@ describe('testRoutes.js List API', () => {
 
     it('9.4 - Patch with a duplicate list item', (done) => {
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + listItemIdToPatch)
+          .patch('/api/' + Globals.APIKeyword + '/' + itemIdToPatch)
           .send({field4: "field4 value4"})
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'field4', 'field4 value4')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, 'field4', 'field4 value4')});
             done();
           });
     });
@@ -830,7 +830,7 @@ describe('testRoutes.js List API', () => {
         'password': pw
       }
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(newUser)
           .end((err, response) => {
             newUser = {
@@ -859,7 +859,7 @@ describe('testRoutes.js List API', () => {
       });
 
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .set('Cookie', newCookie)
           .end((err, response) => {
             lastList = {
@@ -890,20 +890,20 @@ describe('testRoutes.js List API', () => {
       });
 
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .set('Cookie', newCookie)
           .send(newUser2)
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.ItemSchema_NotUnique, 'email', 'pedro@gmail.com')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, 'email', 'pedro@gmail.com')});
             done();
           });
     });
 
     it('10.4 - Logout the user', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/logout')
+          .get('/api/' + Globals.APIKeyword + '/logout')
           .send()
           .end((err, response) => {
             expect(response).to.have.status(200);
@@ -915,7 +915,7 @@ describe('testRoutes.js List API', () => {
 
     it('10.5 - Login the user using an invalid email', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/login')
+          .get('/api/' + Globals.APIKeyword + '/login')
           .auth('x' + newUser.email, pw)
           .end((err, response) => {
             expect(response).to.have.status(401);
@@ -928,7 +928,7 @@ describe('testRoutes.js List API', () => {
     
     it('10.6 - Login the user using an invalid password', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/login')
+          .get('/api/' + Globals.APIKeyword + '/login')
           .auth(newUser.email, 'x' + pw)
           .end((err, response) => {
             expect(response).to.have.status(401);
@@ -941,7 +941,7 @@ describe('testRoutes.js List API', () => {
 
     it('10.7 - Login the user', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/login')
+          .get('/api/' + Globals.APIKeyword + '/login')
           .auth(newUser.email, pw)
           .end((err, response) => {
             expect(response).to.have.status(200);
@@ -953,7 +953,7 @@ describe('testRoutes.js List API', () => {
 
     it('10.8 - Logout the user', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/logout')
+          .get('/api/' + Globals.APIKeyword + '/logout')
           .send()
           .end((err, response) => {
             expect(response).to.have.status(200);
@@ -965,7 +965,7 @@ describe('testRoutes.js List API', () => {
 
     it('10.9 - Get the last list with authorization', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + listIdToPatch)
+          .get('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
           .auth(newUser.email, pw)
           .end((err, response) => {
             lastList = {
@@ -991,7 +991,7 @@ describe('testRoutes.js List API', () => {
       delete newList.items;
       delete newList[Globals.itemIdFieldName]
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(newList)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -1009,7 +1009,7 @@ describe('testRoutes.js List API', () => {
 
     it('11.2 - Get the list of all lists (except the list of users)', (done) => {
       chai.request(server)
-          .get('/api/' + Globals.listitemAPIKeyword + '/' + Globals.listofAllListId)
+          .get('/api/' + Globals.APIKeyword + '/' + Globals.listofAllListId)
           //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             //listOfAllList.items.push(Globals.listOfUsers);
@@ -1038,7 +1038,7 @@ describe('testRoutes.js List API', () => {
         _childlist: listIdToPatch
       };
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(newView)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -1055,7 +1055,7 @@ describe('testRoutes.js List API', () => {
 
     it('12.2 - Get the view with the embedded list and the list items', (done) => {
       chai.request(server)
-      .get('/api/' + Globals.listitemAPIKeyword + '/' + newView[Globals.itemIdFieldName])
+      .get('/api/' + Globals.APIKeyword + '/' + newView[Globals.itemIdFieldName])
       //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
       .end((err, response) => {
         expect(response).to.have.status(200);
@@ -1075,7 +1075,7 @@ describe('testRoutes.js List API', () => {
         item_template: "[[field1]]"
       }
       chai.request(server)
-          .patch('/api/' + Globals.listitemAPIKeyword + '/' + newView[Globals.itemIdFieldName])
+          .patch('/api/' + Globals.APIKeyword + '/' + newView[Globals.itemIdFieldName])
           .send({item_template: newView.item_template})
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -1105,7 +1105,7 @@ describe('testRoutes.js List API', () => {
         [Globals.listSchemaFieldName] :  'name: string, ref_item: embedded_itemid, ref_items: embedded_itemid_list'
       };
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(refItemList)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -1130,7 +1130,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-        .post('/api/' + Globals.listitemAPIKeyword)
+        .post('/api/' + Globals.APIKeyword)
         .send(item)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -1155,7 +1155,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-        .post('/api/' + Globals.listitemAPIKeyword)
+        .post('/api/' + Globals.APIKeyword)
         .send(item)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -1180,7 +1180,7 @@ describe('testRoutes.js List API', () => {
       };
 
       chai.request(server)
-        .post('/api/' + Globals.listitemAPIKeyword)
+        .post('/api/' + Globals.APIKeyword)
         .send(item)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -1206,7 +1206,7 @@ describe('testRoutes.js List API', () => {
         _childlist: refItemListId
       };
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(embView)
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
@@ -1223,7 +1223,7 @@ describe('testRoutes.js List API', () => {
 
     it('13.5 - Get the view with the embedded list and the embedded list items', (done) => {
       chai.request(server)
-      .get('/api/' + Globals.listitemAPIKeyword + '/' + embView[Globals.itemIdFieldName])
+      .get('/api/' + Globals.APIKeyword + '/' + embView[Globals.itemIdFieldName])
       //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
       .end((err, response) => {
         expect(response).to.have.status(200);

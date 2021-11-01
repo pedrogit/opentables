@@ -32,7 +32,7 @@ function userPw(user) {
 function reset() {
   it('1 - Delete all the lists from the DB', (done) => {
     chai.request(server)
-        .delete('/api/' + Globals.listitemAPIKeyword)
+        .delete('/api/' + Globals.APIKeyword)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
@@ -60,7 +60,7 @@ function init() {
         'password': pw
       }
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(newUser)
           .end((err, response) => {
             newUser = {
@@ -90,7 +90,7 @@ function init() {
         'password': pw
       }
       chai.request(server)
-          .post('/api/' + Globals.listitemAPIKeyword)
+          .post('/api/' + Globals.APIKeyword)
           .send(newUser)
           .end((err, response) => {
             newUser = {
@@ -137,7 +137,7 @@ try {
       describe('Test ' + i, () => {
         it(i + '.1 - Create list as ' + permissionTests[i].user, (done) => {
           chai.request(server)
-              .post('/api/' + Globals.listitemAPIKeyword)
+              .post('/api/' + Globals.APIKeyword)
               .send(lastList)
               .auth(userEmail(permissionTests[i].user), userPw(permissionTests[i].user))
               .end((err, response) => {
@@ -160,7 +160,7 @@ try {
 
         it(i + '.2 - Delete list as ' + permissionTests[i].user, (done) => {
           chai.request(server)
-              .delete('/api/' + Globals.listitemAPIKeyword + '/' + lastListID)
+              .delete('/api/' + Globals.APIKeyword + '/' + lastListID)
               .auth(userEmail(permissionTests[i].user), userPw(permissionTests[i].user))
               .end((err, response) => {
                 if (permissionTests[i].deletelist == 'yes' || permissionTests[i].deletelist == 'granted') {
@@ -176,7 +176,7 @@ try {
 
         it(i + '.3 - Delete all list as ' + permissionTests[i].user, (done) => {
           chai.request(server)
-              .delete('/api/' + Globals.listitemAPIKeyword)
+              .delete('/api/' + Globals.APIKeyword)
               .auth(userEmail(permissionTests[i].user), userPw(permissionTests[i].user))
               .end((err, response) => {
                 if (permissionTests[i].deletealllists == 'yes' || permissionTests[i].deletealllists == 'granted') {
@@ -209,7 +209,7 @@ try {
       describe('Test ' + j + ' - ' + (j + 2), () => {
         it('Create a list as ' + permissionTests[j].user, (done) => {
           chai.request(server)
-              .post('/api/' + Globals.listitemAPIKeyword)
+              .post('/api/' + Globals.APIKeyword)
               .send(lastList)
               .auth(userEmail(permissionTests[j].user), userPw(permissionTests[j].user))
               .end((err, response) => {
@@ -227,15 +227,15 @@ try {
         for (let k = 0; k < 3; k++) {
             let l = j + k;
 
-            it(l + '.1 - Patch the list as ' + permissionTests[l].user + ' (' + permissionTests[l].patchlist + ') with c=' + permissionTests[l].listwrite + ', w=' + permissionTests[l].listitemwrite + ', r=' + permissionTests[l].listitemread, (done) => {
+            it(l + '.1 - Patch the list as ' + permissionTests[l].user + ' (' + permissionTests[l].patchlist + ') with c=' + permissionTests[l].listwrite + ', w=' + permissionTests[l].itemwrite + ', r=' + permissionTests[l].itemread, (done) => {
               listPatch = {
                 [Globals.readWritePermFieldName]: permissionTests[l].listwrite,
-                [Globals.itemReadWritePermFieldName]: permissionTests[l].listitemwrite,
-                [Globals.itemReadPermFieldName]: permissionTests[l].listitemread        
+                [Globals.itemReadWritePermFieldName]: permissionTests[l].itemwrite,
+                [Globals.itemReadPermFieldName]: permissionTests[l].itemread        
               };
         
               chai.request(server)
-                  .patch('/api/' + Globals.listitemAPIKeyword + '/' + lastListID)
+                  .patch('/api/' + Globals.APIKeyword + '/' + lastListID)
                   .send(listPatch)
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
                   .end((err, response) => {
@@ -251,18 +251,18 @@ try {
                   });
             });
 
-            it(l + '.2 - Add list item as ' + permissionTests[l].user + ' (' + permissionTests[l].createlistitem + ')', (done) => {
+            it(l + '.2 - Add list item as ' + permissionTests[l].user + ' (' + permissionTests[l].createitem + ')', (done) => {
               lastItem = {
                 field1: 'val1',
                 [Globals.listIdFieldName]: lastListID
               };
         
               chai.request(server)
-                  .post('/api/' + Globals.listitemAPIKeyword)
+                  .post('/api/' + Globals.APIKeyword)
                   .send(lastItem)
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
                   .end((err, response) => {
-                    if (permissionTests[l].createlistitem == 'yes' || permissionTests[l].createlistitem == 'granted') {
+                    if (permissionTests[l].createitem == 'yes' || permissionTests[l].createitem == 'granted') {
                       expect(response).to.have.status(201);
                       lastItemID = response.body[Globals.itemIdFieldName];
                     }
@@ -274,13 +274,13 @@ try {
                   });
             });
 
-            it(l + '.3 - Patch list item as ' + permissionTests[l].user + ' (' + permissionTests[l].patchlistitem + ')', (done) => {
+            it(l + '.3 - Patch list item as ' + permissionTests[l].user + ' (' + permissionTests[l].patchitem + ')', (done) => {
               chai.request(server)
-                  .patch('/api/' + Globals.listitemAPIKeyword + '/' + lastItemID)
+                  .patch('/api/' + Globals.APIKeyword + '/' + lastItemID)
                   .send({field1: 'val2'})
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
                   .end((err, response) => {
-                    if (permissionTests[l].patchlistitem == 'yes' || permissionTests[l].patchlistitem == 'granted') {
+                    if (permissionTests[l].patchitem == 'yes' || permissionTests[l].patchitem == 'granted') {
                       expect(response).to.have.status(200);
                     }
                     else {
@@ -291,12 +291,12 @@ try {
                   });
             });
             
-            it(l + '.4 - Delete list item as ' + permissionTests[l].user + ' (' + permissionTests[l].deletelistitem + ')', (done) => {
+            it(l + '.4 - Delete list item as ' + permissionTests[l].user + ' (' + permissionTests[l].deleteitem + ')', (done) => {
               chai.request(server)
-                  .delete('/api/' + Globals.listitemAPIKeyword + '/' + lastItemID)
+                  .delete('/api/' + Globals.APIKeyword + '/' + lastItemID)
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
                   .end((err, response) => {
-                    if (permissionTests[l].deletelistitem == 'yes' || permissionTests[l].deletelistitem == 'granted') {
+                    if (permissionTests[l].deleteitem == 'yes' || permissionTests[l].deleteitem == 'granted') {
                       expect(response).to.have.status(200);
                     }
                     else {
@@ -307,17 +307,17 @@ try {
                   });
             });
 
-            it(l + '.5 - Add list item as ' + permissionTests[l].user + ' for the next user' + ' (' + permissionTests[l].createlistitem + ')', (done) => {
+            it(l + '.5 - Add list item as ' + permissionTests[l].user + ' for the next user' + ' (' + permissionTests[l].createitem + ')', (done) => {
               lastItem = {
                 field1: 'val3',
                 [Globals.listIdFieldName]: lastListID
               };
               chai.request(server)
-                  .post('/api/' + Globals.listitemAPIKeyword)
+                  .post('/api/' + Globals.APIKeyword)
                   .send(lastItem)
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
                   .end((err, response) => {
-                    if (permissionTests[l].createlistitem == 'yes' || permissionTests[l].createlistitem == 'granted') {
+                    if (permissionTests[l].createitem == 'yes' || permissionTests[l].createitem == 'granted') {
                       expect(response).to.have.status(201);
                       lastItemID = response.body[Globals.itemIdFieldName];
                     }
@@ -331,7 +331,7 @@ try {
 
             it(l + '.6 - Get the list as ' + permissionTests[l].user + ' (' + permissionTests[l].getlist + ')', (done) => {
               chai.request(server)
-                  .get('/api/' + Globals.listitemAPIKeyword + '/' + lastListID)
+                  .get('/api/' + Globals.APIKeyword + '/' + lastListID)
                   .auth(userEmail(permissionTests[l].user), userPw(permissionTests[l].user))
                   .end((err, response) => {
                     if (permissionTests[l].getlist == 'yes' || permissionTests[l].getlist == 'granted') {
@@ -349,7 +349,7 @@ try {
 
       it('Delete all list', (done) => {
         chai.request(server)
-            .delete('/api/' + Globals.listitemAPIKeyword)
+            .delete('/api/' + Globals.APIKeyword)
             .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
             .end((err, response) => {
               expect(response).to.have.status(200);

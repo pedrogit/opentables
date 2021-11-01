@@ -2,7 +2,7 @@ const Utils = require('./utils');
 const Errors = require('./errors');
 const NodeUtil = require('util');
 
-class listItemFilter {
+class listFilter {
   constructor(filter) {
       if (typeof filter === 'string') {
         try {
@@ -77,4 +77,4 @@ class listItemFilter {
   };
 };
 
-module.exports = listItemFilter;
+module.exports = listFilter;

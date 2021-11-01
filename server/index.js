@@ -10,8 +10,8 @@ const Globals = require('./globals');
 const Errors = require('./errors');
 const Utils = require('./utils');
 
-const listItemControler = require('./listItemControler');
-const listItemRouter = require('./listItemRouter');
+const controler = require('./controler');
+const router = require('./router');
 
 const app = express();
 const PORT = 3000;
@@ -40,7 +40,7 @@ app.use(async (req, res, next) => {
       Utils.setCookieJWT(req, res, {email: email});
     }
     else if (email !== '') {
-      item = await listItemControler.simpleFind(Globals.userListId, {email: email});
+      item = await controler.simpleFind(Globals.userListId, {email: email});
       if (!item){
         next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.InvalidUser)));
       }
@@ -69,8 +69,8 @@ app.use(async (req, res, next) => {
 // Make the server able to server filesystem files from the public folder
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Handle the REST listitem API
-app.use('/api/' + Globals.listitemAPIKeyword, listItemRouter);
+// Handle the REST API
+app.use('/api/' + Globals.APIKeyword, router);
 
 // Implement a generic error sending middleware
 app.use((err, req, res, next) => {
