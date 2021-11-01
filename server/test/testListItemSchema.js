@@ -2,8 +2,8 @@
 const chai = require('chai');
 const ItemSchema = require('../listItemSchema');
 
-const Utils = require('../utils/utils');
-const Errors = require('../utils/errors');
+const Utils = require('../utils');
+const Errors = require('../errors');
 const NodeUtil = require('util');
 
 var expect = chai.expect;

@@ -7,8 +7,8 @@ const bcrypt = require('bcrypt');
 const NodeUtil = require('util');
 
 const Globals = require('./globals');
-const Errors = require('./utils/errors');
-const Utils = require('./utils/utils');
+const Errors = require('./errors');
+const Utils = require('./utils');
 
 const listItemControler = require('./listItemControler');
 const listItemRouter = require('./listItemRouter');

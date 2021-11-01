@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 
 const Globals = require('../globals');
 const server = require('../index');
-const Errors = require('../utils/errors');
+const Errors = require('../errors');
 const { restart } = require('nodemon');
 
 chai.use(chaihttp);
@@ -116,7 +116,7 @@ init();
 
 try {
   csv()
-  .fromFile(path.resolve('./test/testPermissions.csv'))
+  .fromFile(path.resolve('./server/test/testPermissions.csv'))
   .then(function(permissionTests) {
     //console.log(permissionTests);
 

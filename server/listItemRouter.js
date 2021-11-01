@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
 const Globals = require('./globals');
-const Utils = require('./utils/utils');
+const Utils = require('./utils');
 const ItemSchema = require('./listItemSchema');
 const listItemControler = require('./listItemControler');
 

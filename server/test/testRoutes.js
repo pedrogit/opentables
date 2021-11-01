@@ -7,8 +7,8 @@ const setCookie = require('set-cookie-parser');
 const NodeUtil = require('util');
 
 const Globals = require('../globals');
-const Errors = require('../utils/errors');
-const Utils = require('../utils/utils');
+const Errors = require('../errors');
+const Utils = require('../utils');
 
 chai.use(chaihttp);
 

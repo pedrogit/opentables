@@ -1,5 +1,5 @@
-const Utils = require('./utils/utils');
-const Errors = require('./utils/errors');
+const Utils = require('./utils');
+const Errors = require('./errors');
 const NodeUtil = require('util');
 
 class listItemFilter {
