@@ -67,7 +67,7 @@ app.use(async (req, res, next) => {
 });
 
 // Make the server able to server filesystem files from the public folder
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Handle the REST API
 app.use('/api/' + Globals.APIKeyword, router);
