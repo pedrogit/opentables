@@ -14,7 +14,7 @@ const controler = require('./controler');
 const router = require('./router');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(express.urlencoded({extended: true}));
 //app.use(logger('short'));
@@ -67,7 +67,8 @@ app.use(async (req, res, next) => {
 });
 
 // Make the server able to server filesystem files from the public folder
-app.use(express.static(path.join(__dirname, '../public')));
+//app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../client/public')));
 
 // Handle the REST API
 app.use('/api/' + Globals.APIKeyword, router);
