@@ -16,9 +16,9 @@ var isNewUser = function(item) {
 
 const router = express.Router();
 /************************************************************************
-  GET /api/APIKeyword/logout
+  GET /api/APIKeyword/login
 
-  Logout (forget the token)
+  Login
 
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
