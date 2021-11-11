@@ -15,11 +15,7 @@ class SchemaValidator {
 
     if (!Schema.prototype.isPrototypeOf(schema) && (typeof schema === 'string' ||
     typeof schema === 'object')) {
-      try {
-         this.schema = new Schema(schema);
-      } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, schema, err.message));
-      }
+      this.schema = new Schema(schema);
     }
     else {
       this.schema = schema;

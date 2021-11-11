@@ -27,7 +27,7 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
   });
 
   it('1.2 Pass invalid schema string', () => {
-    expect(function(){new SchemaValidator('toto');}).to.throw(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, 'toto', 'Unexpected token } in JSON at position 7'));
+    expect(function(){new SchemaValidator('toto');}).to.throw(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'true', 'toto'));
   });
 
   it('1.3 Pass a string schema', () => {

@@ -1,6 +1,5 @@
 require('dotenv').config();
 const { assert } = require("chai");
-const NodeUtil = require('util');
 const jwt = require('jsonwebtoken');
 
 const Globals = require('./globals');
@@ -79,10 +78,20 @@ exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trim
 
 exports.completeTrueValues = function(jsonstr) {
   const nonQuotedOrQuotedId = Globals.identifierRegEx + '|"' + Globals.identifierRegEx + '"';
+
+  // replace identifier at the beginning of a simple JSON string
   var regex = new RegExp('{\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonKeyRegEx, 'ig');
   jsonstr = jsonstr.replace(regex, '{$1: true');
+
+  // replace identifier following first properties
   regex = new RegExp(',\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonKeyRegEx, 'ig');
-  return jsonstr.replace(regex, ', $1: true');
+  jsonstr = jsonstr.replace(regex, ', $1: true');
+
+  // replace unique identifiers
+  regex = new RegExp('^\\s*(' + nonQuotedOrQuotedId + ')\\s*$', 'i');
+  jsonstr = jsonstr.replace(regex, '$1: true');
+
+  return jsonstr;
 }
 
 exports.doubleQuoteKeys = function(jsonstr) {
@@ -108,7 +117,7 @@ exports.simpleJSONToJSON = function(simpleJSONStr) {
   //  - keys do not have to be quoted
   //  - keys without values are interpreted as boolean TRUE
   //  - whole word values do not have to be quoted
-  // e.g. 'field1: {type: string, required}' is quivalent to 
+  // e.g. 'field1: {type: string, required}' is equivalent to 
   //      the JSON string '{"field1": {"type": "string", "required": true}}'
 
   // Simple, unbraced strings (e.g. 'simple_string') are 

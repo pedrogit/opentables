@@ -63,6 +63,11 @@ describe('testUtils.js Test Utils functions', () => {
       expect(result).to.equal('{field1: {required: true}}');
     });
 
+    it('Simple string', () => {
+      var result = Utils.completeTrueValues('field1');
+      expect(result).to.equal('field1: true');
+    });
+
     it('No spaces', () => {
       var result = Utils.completeTrueValues('{field1:{required}}');
       expect(result).to.equal('{field1:{required: true}}');
@@ -199,6 +204,11 @@ describe('testUtils.js Test Utils functions', () => {
       expect(result).to.deep.equal({});
     });
   
+    it('Test simple string', () => {
+      var result = Utils.simpleJSONToJSON('abc');
+      expect(result).to.deep.equal({"abc": true});
+    });
+
     it('Simple test with two values', () => {
       var result = Utils.simpleJSONToJSON('a: {b, c}');
       expect(result).to.deep.equal({"a": {"b": true, "c": true}});

@@ -1,12 +1,10 @@
 import React from "react";
-const Template = require('./common/template');
 
-function Item({template, schema, item}) {
-  var newTemplate = new Template(template, schema);
-
-  return (
+//function Item({template, item}) {
+function Item(props) {
+    return (
     <div>
-      {newTemplate.replaceValues(item)}
+      {props.template.render(props.item)}
     <br /><br />
     </div>
   );
