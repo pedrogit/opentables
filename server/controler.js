@@ -376,7 +376,7 @@ class Controler {
         throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
       }
       // delete all associated items
-      this.coll.deleteMany({[Globals.listIdFieldName]: MongoDB.ObjectId(item[Globals.listIdFieldName])});
+      this.coll.deleteMany({[Globals.listIdFieldName]: MongoDB.ObjectId(item[Globals.itemIdFieldName])});
     }
     else {
       Controler.validatePerm(user, parentList[Globals.ownerFieldName], parentList[Globals.readWritePermFieldName], parentList[Globals.itemReadWritePermFieldName]);
