@@ -1,14 +1,18 @@
 const chai = require('chai');
 const chaihttp = require('chai-http');
-const server = require('../index');
 const bcrypt = require('bcrypt');
 const libCookie = require('cookie');
 const setCookie = require('set-cookie-parser');
 const NodeUtil = require('util');
 
-const Globals = require('../globals');
-const Errors = require('../errors');
-const Utils = require('../utils');
+const Globals = require('../../client/src/common/globals');
+const Errors = require('../../client/src/common/errors');
+const Utils = require('../../client/src/common/utils');
+
+const server = require('../index');
+const controler = require('../controler');
+
+controler.init();
 
 chai.use(chaihttp);
 

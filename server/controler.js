@@ -1,11 +1,14 @@
 const MongoDB = require('mongodb');
-const Errors = require('./errors');
-const Utils = require('./utils');
-const Globals = require('./globals');
-const Schema = require('./schema');
-const Filter = require('./filter');
-
 const NodeUtil = require('util');
+
+const Errors = require('../client/src/common/errors');
+const Utils = require('../client/src/common/utils');
+const Globals = require('../client/src/common/globals');
+const Filter = require('../client/src/common/filter');
+const Schema = require('../client/src/common/schema');
+
+const SchemaValidator = require('./schemaValidator');
+
 
 class Controler {
   constructor() {
@@ -14,12 +17,17 @@ class Controler {
         throw new Errors.InternalServerError(Errors.ErrMsg.Database_CouldNotConnect);
       };
       this.coll = ldb.db(Globals.mongoDatabaseName).collection(Globals.mongoCollectionName);
-      this.init();
+      if (this.reset) {
+        this.createBaseTables();
+      }
     });
   };
 
-  async init() {
+  init() {
+    this.reset = true;
+  }
 
+  async createBaseTables() {
     // clean the database
     await this.deleteAll(process.env.ADMIN_EMAIL, true);
 
@@ -35,12 +43,23 @@ class Controler {
       console.log('Could not create the list of all views...');
     }
 
+    console.log('Create the view on all views...');
+    item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.viewOnTheListOfAllViews);
+    if (!item) {
+      console.log('Could not create the view on the list of all views...');
+    }
+
     console.log('Create the list of users...');
     item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfUsers);
     if (!item) {
-      console.log('Could not create the list of all views...');
+      console.log('Could not create the list of users...');
     }
-
+    
+    console.log('Create the view on the list of users...');
+    item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.viewOnTheListOfUsers);
+    if (!item) {
+      console.log('Could not create the view on the list of all views...');
+    }
   }
 
   static isList(item) {
@@ -212,7 +231,8 @@ class Controler {
     var newItems;
     // validate provided JSON against the schema
     try {
-      const schema = new Schema(schemaStr, this, item[Globals.listIdFieldName]);
+      const schema = new Schema(schemaStr);
+      const schemaValidator = new SchemaValidator(schema, this, item[Globals.listIdFieldName]);
 
       // add the schema description for the listid property
       schema.schema[Globals.listIdFieldName] = {type: 'objectid', required: true};      
@@ -224,12 +244,12 @@ class Controler {
           if (strict && item[Globals.listIdFieldName]) {
             thisitem[Globals.listIdFieldName] = item[Globals.listIdFieldName];
           }
-          var newItem = await schema.validateJson(thisitem, strict);
+          var newItem = await schemaValidator.validateJson(thisitem, strict);
           return newItem;
         }))
       }
       else { // validate only one
-        newItems = await schema.validateJson(item, strict);
+        newItems = await schemaValidator.validateJson(item, strict);
 
       }
     } catch(err) {
@@ -244,7 +264,7 @@ class Controler {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 
-    // find item schema
+    // find the parent list
     var parentList = await this.getParentList(item);
 
     // validate permissions
@@ -322,9 +342,11 @@ class Controler {
 
     var filter = {};
     if (!all) {
-      filter = {$and: [ {[Globals.listIdFieldName]: {$ne: MongoDB.ObjectId(Globals.voidListId)}},
-                        {[Globals.listIdFieldName]: {$ne: MongoDB.ObjectId(Globals.userListId)}},
-                        {[Globals.itemIdFieldName]: {$ne: MongoDB.ObjectId(Globals.userListId)}} ]}
+      filter = {$and: [ {[Globals.listIdFieldName]: {$ne: MongoDB.ObjectId(Globals.voidListId)}}, // list of all lists and list of all views
+                        {[Globals.listIdFieldName]: {$ne: MongoDB.ObjectId(Globals.userListId)}}, // users
+                        {[Globals.itemIdFieldName]: {$ne: MongoDB.ObjectId(Globals.userListId)}}, // users list
+                        {[Globals.itemIdFieldName]: {$ne: MongoDB.ObjectId(Globals.viewOnUserListViewId)}}, // users list view
+                        {[Globals.itemIdFieldName]: {$ne: MongoDB.ObjectId(Globals.viewOnAllViewViewId)}} ]} // view on list of views
     }
     return this.coll.deleteMany(filter);
   };

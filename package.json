@@ -4,10 +4,11 @@
   "description": "Restful server of configurable and formattable tables",
   "main": "server/index.js",
   "scripts": {
-    "test-server": "nodemon --exec \"mocha server/test/testUtils.js server/test/testFilter.js server/test/testSchema.js server/test/testRoutes.js server/test/testPermissions.js --timeout 0\"",
-    "test-routes": "nodemon --exec \"mocha server/test/testRoutes.js --timeout 0\"",
+    "test-common": "nodemon  --inspect --exec \"mocha client/src/common/test/testUtils.js client/src/common/test/testFilter.js server/test/testSchemaValidator.js client/src/common/test/testTemplate.js --timeout 0\"",
+    "test-server": "nodemon  --inspect --exec \"mocha server/test/testRoutes.js server/test/testPermissions.js --timeout 0\"",
+    "test-routes": "nodemon --inspect --exec \"mocha server/test/testRoutes.js --timeout 0\"",
     "start-server": "node server/index.js",
-    "debug-server": "nodemon --nolazy --inspect server/index.js",
+    "debug-server": "nodemon --nolazy --inspect --watch server server/index.js",
     "build-client": "webpack --mode production"
   },
   "repository": {

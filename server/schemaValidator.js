@@ -1,25 +1,28 @@
 const MongoDB = require('mongodb');
-const Utils = require('./utils');
-const Errors = require('./errors');
 const NodeUtil = require('util');
-
 const bcrypt = require('bcrypt');
-const Globals = require('./globals');
 
-class Schema {
+const Globals = require('../client/src/common/globals');
+const Errors = require('../client/src/common/errors');
+const Utils = require('../client/src/common/utils');
+const Schema = require('../client/src/common/schema');
+
+class SchemaValidator {
   constructor(schema, controler = null, listid = null) {
     if (schema == null) {
       throw new Error(Errors.ErrMsg.Schema_Null);
     }
-    if (typeof schema === 'string') {
+
+    if (!Schema.prototype.isPrototypeOf(schema) && (typeof schema === 'string' ||
+    typeof schema === 'object')) {
       try {
-         this.schema = Utils.simpleJSONToJSON(schema);
+         this.schema = new Schema(schema);
       } catch(err) {
         throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, schema, err.message));
       }
     }
     else {
-      this.schema = schema;      
+      this.schema = schema;
     }
 
     if (listid !== null) {
@@ -30,82 +33,10 @@ class Schema {
       this.controler = controler;
     }
 
-    if (typeof this.schema !== 'object') {
+    if (!Schema.prototype.isPrototypeOf(this.schema)) {
       throw new Error(Errors.ErrMsg.Schema_Malformed);
     }
-    this.requiredFields = [];
-    this.validate();
   };
-
-  schemaAsJson() {
-    return this.schema;
-  }
-
-  getEmbeddedItems() {
-    var embItems = [];
-    for (var key in this.schema) {
-      if (this.schema[key] === 'embedded_itemid' || 
-          this.schema[key] === 'embedded_listid' ||
-          this.schema[key] === 'embedded_itemid_list' ){
-        var item = {};
-        item.type = this.schema[key];
-        embItems.push({[key]: item});
-      }
-      else if (this.schema[key].type === 'embedded_itemid' || 
-               this.schema[key].type === 'embedded_itemid_list') {
-        embItems.push({[key]: this.schema[key]});
-      }
-    }
-
-    return embItems;
-  }
-
-  // traverse a json object calling provided callbacks according to the right level
-  traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
-    for (var key in obj) {
-      //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
-      
-      if (level == 3) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema));
-      }
-      else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
-        callbacks[level](key, obj, parentKey);
-      }
-
-      if (obj[key] !== null && typeof(obj[key]) == "object") {
-          //going one step down in the object tree!!
-            this.traverseSync(obj[key], key, ++level, callbacks);
-          level--;
-      };
-    };
-  };
-
-  // validate that this schema is valid
-  validate() {
-    this.traverseSync(this.schema, null, 0, [this.validateSchemaFirstLevelProperties.bind(this), 
-                                         this.validateSchemaSecondLevelProperties.bind(this), 
-                                         null]);
-    return true;
-  };
-
-  // validate this.schema first level properties
-  validateSchemaFirstLevelProperties(key, obj, parentKey) {
-    if (obj[key] !== null && typeof(obj[key]) !== "object") {
-      if (this['validate_type_' +  obj[key]] === undefined) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, obj[key], key));
-      }
-    }
-  }
-
-  // validate this.schema second level properties
-  validateSchemaSecondLevelProperties(key, obj, parentKey) {
-    if (key === 'required') {
-      this.requiredFields.push(parentKey);
-    }
-    else if (this['validate_' +  key] === undefined) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidValue, key, parentKey));
-    }
-  }
 
   // traverse a json object calling provided callbacks according to the right level
   async traverse(obj, parentKey = null, level = 0, callbacks = null) {
@@ -113,7 +44,7 @@ class Schema {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
       
       if (level == 3) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema.schema));
       }
       else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
         await callbacks[level](key, obj, parentKey);
@@ -134,7 +65,7 @@ class Schema {
       try {
         json = Utils.simpleJSONToJSON(jsonstr);
       } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, schema, err.message));
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, this.schema, err.message));
       }
     }
     else {
@@ -148,7 +79,7 @@ class Schema {
       var missingField = '';
       if (!(jsonkeys === null) && 
             !(jsonkeys.length === 0) && 
-            !(this.requiredFields.every(field => {var inc = jsonkeys.includes(field); if (!inc) {missingField = field}; return inc}))) {
+            !(this.schema.requiredProps.every(field => {var inc = jsonkeys.includes(field); if (!inc) {missingField = field}; return inc}))) {
               throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, missingField));
       }
     }
@@ -161,21 +92,21 @@ class Schema {
 
   // validate passed JSON fields
   async validateField(key, obj, parentKey) {
-    if (!(Object.keys(this.schema).includes(key))) {
+    if (!(Object.keys(this.schema.schema).includes(key))) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, key));
     };
-    // if this.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
-    if (typeof(this.schema[key]) === "object") {
-      for (var property in this.schema[key]) {
+    // if this.schema.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
+    if (typeof(this.schema.schema[key]) === "object") {
+      for (var property in this.schema.schema[key]) {
         if (property != 'required') {
           var validatorName = 'validate_' +  property;
-          obj[key] = await this[validatorName](this.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
+          obj[key] = await this[validatorName](this.schema.schema[key][property], key, obj[key]); // pass object by value so the validator can modify it directly
         }
       }
     }
-    // if this.schema[key] is a simple type validate it
+    // if this.schema.schema[key] is a simple type validate it
     else {
-      obj[key] = await this.validate_type(this.schema[key], key, obj[key]);
+      obj[key] = await this.validate_type(this.schema.schema[key], key, obj[key]);
     }
   }
 
@@ -350,4 +281,4 @@ class Schema {
   }
 };
 
-module.exports = Schema;
+module.exports = SchemaValidator;

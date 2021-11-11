@@ -3,9 +3,9 @@ const url = require('url');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
-const Globals = require('./globals');
-const Utils = require('./utils');
-const Schema = require('./schema');
+const Globals = require('../client/src/common/globals');
+const Utils = require('../client/src/common/utils');
+
 const controler = require('./controler');
 
 var isNewUser = function(item) {
@@ -51,6 +51,7 @@ router.get('/logout', asyncHandler(async (req, res) => {
 
 *************************************************************************/
 router.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
+  // construct the full URL so we can then extract the filter parameter
   const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
   const item = await controler.findWithItems(req.user, req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
   res.status(200).send(item);

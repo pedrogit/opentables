@@ -4,10 +4,13 @@ const csv = require('csvtojson');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
-const Globals = require('../globals');
+const Globals = require('../../client/src/common/globals');
+const Errors = require('../../client/src/common/errors');
+
 const server = require('../index');
-const Errors = require('../errors');
-const { restart } = require('nodemon');
+const controler = require('../controler');
+
+controler.init();
 
 chai.use(chaihttp);
 

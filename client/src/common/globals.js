@@ -1,4 +1,3 @@
-const MongoDB = require('mongodb');
 require('dotenv').config()
 
 var Globals = {
@@ -6,6 +5,9 @@ var Globals = {
     'listofAllListId': '000000000000000000000001',
     'listofAllViewId': '000000000000000000000002',
     'userListId':      '000000000000000000000003',
+    'viewOnAllViewViewId': '000000000000000000000004',
+    'viewOnUserListViewId': '000000000000000000000005',
+
     'itemIdFieldName':'_id', // do not change
     'listIdFieldName':'_listid',
     'ownerFieldName': 'owner',
@@ -16,7 +18,10 @@ var Globals = {
     'mongoCollectionName': 'items',
     'mongoDatabaseName': 'listitdata',
     'APIKeyword': 'opentables',
-    'unauthUserName': '@unauth'
+    'unauthUserName': '@unauth',
+
+    'identifierRegEx' : '\\$?[a-zA-Z0-9_-]+'
+
 }
 
 Globals = {
@@ -67,6 +72,24 @@ Globals = {
         [Globals.itemReadWritePermFieldName]: '@owner',
         [Globals.itemReadPermFieldName]: '@all',
         [Globals.listSchemaFieldName]: 'firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string'
+      },
+      viewOnTheListOfUsers: {
+        [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
+        [Globals.listIdFieldName]: Globals.listofAllViewId,
+        name: 'View on the list of users',
+        [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
+        [Globals.readWritePermFieldName]: '@owner',
+        item_template: '',
+        _childlist: Globals.userListId
+      },
+      viewOnTheListOfAllViews: {
+        [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
+        [Globals.listIdFieldName]: Globals.listofAllViewId,
+        name: 'View on the list of all views',
+        [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
+        [Globals.readWritePermFieldName]: '@owner',
+        item_template: '',
+        _childlist: Globals.listofAllViewId
       }
 }
 

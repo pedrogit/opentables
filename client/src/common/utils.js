@@ -3,7 +3,8 @@ const { assert } = require("chai");
 const NodeUtil = require('util');
 const jwt = require('jsonwebtoken');
 
-const identifierRegEx = '\\$?[a-zA-Z0-9_-]+';
+const Globals = require('./globals');
+
 const afterJsonKeyRegEx = '(?=[\\,\\}]|$)';
 const afterJsonValueRegEx = '(?=[\\,\\}\\]]|$)';
 const anythingDoubleQuoted = '"(?:[^"\\\\]|\\\\.)*"';
@@ -25,15 +26,15 @@ exports.isSurroundedBy = function(str, edges){
   else {
     edgeArr.push(edges);
   }
-  if (edgeArr.length == 1) {
+  if (edgeArr.length === 1) {
     edgeArr.push(edgeArr[0]);
   }
-  assert(edgeArr.length == 2);
-  assert(edgeArr[0].length == 1);
-  assert(edgeArr[1].length == 1);
+  assert(edgeArr.length === 2);
+  assert(edgeArr[0].length === 1);
+  assert(edgeArr[1].length === 1);
   return str.length > 1 && 
-         str.slice(0, 1) == edgeArr[0] && 
-         str.slice(-1) == edgeArr[1];
+         str.slice(0, 1) === edgeArr[0] && 
+         str.slice(-1) === edgeArr[1];
 }
 
 exports.prefixAllKeys = function(obj, prefix) {
@@ -52,12 +53,12 @@ exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trim
   else {
     trimArr.push(trim);
   }
-  if (trimArr.length == 1) {
+  if (trimArr.length === 1) {
     trimArr.push(trimArr[0]);
   }
-  assert(trimArr.length == 2);
-  assert(trimArr[0].length == 1);
-  assert(trimArr[1].length == 1);
+  assert(trimArr.length === 2);
+  assert(trimArr[0].length === 1);
+  assert(trimArr[1].length === 1);
 
   // remove trimming spaces before trimming provided characters if requested
   if (trimSpacesBefore) {
@@ -77,7 +78,7 @@ exports.trimFromEdges = function(str, trim = '"', trimSpacesBefore = false, trim
 }
 
 exports.completeTrueValues = function(jsonstr) {
-  const nonQuotedOrQuotedId = identifierRegEx + '|"' + identifierRegEx + '"';
+  const nonQuotedOrQuotedId = Globals.identifierRegEx + '|"' + Globals.identifierRegEx + '"';
   var regex = new RegExp('{\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonKeyRegEx, 'ig');
   jsonstr = jsonstr.replace(regex, '{$1: true');
   regex = new RegExp(',\\s*(' + nonQuotedOrQuotedId + ')\\s*' + afterJsonKeyRegEx, 'ig');
@@ -85,12 +86,12 @@ exports.completeTrueValues = function(jsonstr) {
 }
 
 exports.doubleQuoteKeys = function(jsonstr) {
-  const regex = new RegExp('(' + identifierRegEx + ')\\s*:', 'ig');
+  const regex = new RegExp('(' + Globals.identifierRegEx + ')\\s*:', 'ig');
   return jsonstr.replace(regex, '"$1":');
 }
 
 exports.doubleQuoteWordValues = function(jsonstr) {
-  const regex = new RegExp('(' + anythingDoubleQuoted + '|' + identifierRegEx + ')\\s*' + afterJsonValueRegEx, 'ig');
+  const regex = new RegExp('(' + anythingDoubleQuoted + '|' + Globals.identifierRegEx + ')\\s*' + afterJsonValueRegEx, 'ig');
   jsonstr = jsonstr.replace(regex, (match, p1, p2, p3, offset, string) => {
     const boolAndNumberRegex = new RegExp('^(true|false|-?[0-9]+(.[0-9]+)?)$', 'i');
     if (exports.isSurroundedBy(match, "'") || exports.isSurroundedBy(match, '"') || boolAndNumberRegex.test(match)) {

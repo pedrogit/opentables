@@ -1,37 +1,33 @@
 import React from "react";
-import logo from './logo.svg';
-import './App.css';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import List from './List';
 
 function App() {
-  //fetch('http://localhost:3001/api/opentables/000000000000000000000001/')
-  fetch('/api/opentables/000000000000000000000001/')
-    .then(response => response.json())
-    .then(data => console.log(data));
-
-  /*const [data, setData] = React.useState(null);
+  const [listData, setData] = React.useState(null);
 
   React.useEffect(() => {
-    fetch("/api")
-      .then((res) => res.json())
-      .then((data) => setData(data.message));
-  }, []);*/
+    fetch('http://localhost:3000/api/opentables/000000000000000000000005')
+      .then(response => response.json())
+      .then(data => {
+        return setData({
+          template: data.item_template, 
+          schema: data._childlist.listschema,
+          items: data._childlist.items
+        });
+      });
+    }, []);
+
+  console.log('App rendered');
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reloadx.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App" style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'}}>
+      {<Box sx={{ display: 'flex'}}>
+        {listData ? <List {...listData}/> : <CircularProgress />}
+      </Box>}
     </div>
   );
 }

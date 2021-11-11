@@ -1,14 +1,13 @@
 const express = require('express');
 const cookieParser = require('cookie-parser')
-//const logger = require("morgan");
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const NodeUtil = require('util');
 
-const Globals = require('./globals');
-const Errors = require('./errors');
-const Utils = require('./utils');
+const Globals = require('../client/src/common/globals');
+const Errors = require('../client/src/common/errors');
+const Utils = require('../client/src/common/utils');
 
 const controler = require('./controler');
 const router = require('./router');
@@ -17,7 +16,6 @@ const app = express();
 const PORT = 3001;
 
 app.use(express.urlencoded({extended: true}));
-//app.use(logger('short'));
 app.use(express.json());
 app.use(cookieParser());
 
