@@ -117,7 +117,7 @@ class Controler {
   async getParentList(item) {
     var parentList;
     if (!(item[Globals.listIdFieldName])) {
-      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, Globals.listIdFieldName));
+      throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, Globals.listIdFieldName));
     }
     if (Controler.isOrphanList(item[Globals.itemIdFieldName])) {
       parentList = Globals.listOfAllLists;

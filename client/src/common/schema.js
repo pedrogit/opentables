@@ -1,4 +1,5 @@
 const NodeUtil = require('util');
+const Ajv = require("ajv")
 
 const Errors = require('./errors');
 const Utils = require('./utils');
@@ -16,14 +17,44 @@ class Schema {
       }
     }
     else {
-      this.schema = schema;      
+      this.schema = schema;
     }
 
     if (typeof this.schema !== 'object') {
       throw new Error(Errors.ErrMsg.Schema_Malformed);
     }
-    this.requiredProps = [];
-    this.validate();
+    //this.requiredProps = [];
+    var jsonschema = {
+      "$defs": {
+        "onelevel": {
+          "type" : "string",
+          "enum": ["objectid", "embedded_listid", "embedded_itemid_list", "user", "user_list", "string", "encrypted_string", "number", "schema", "email"]
+        }
+      },
+      "patternProperties": {
+        "^[a-z0-9_]+$": {
+          "anyOf": [{"$ref": "#/$defs/onelevel"},
+                    {"type": "object",
+                      "properties": {
+                        "type": {"$ref": "#/$defs/onelevel"},
+                        "upper": {"type": "boolean"}, 
+                        "lower": {"type": "boolean"}, 
+                        "encrypt": {"type": "boolean"}, 
+                        "unique": {"type": "boolean"}, 
+                        "required": {"type": "boolean"}
+                      },
+                      "additionalProperties": false
+                    }
+                    ]
+        }
+      },
+      "additionalProperties": false  
+    }
+    var ajv = new Ajv({allErrors: true});
+    var validate = ajv.compile(jsonschema);
+    if (!validate(this.schema)) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, (typeof schema === 'object' ? JSON.stringify(schema) : '"' + schema + '"')));
+    };
   };
 
   schemaAsJson() {
@@ -31,7 +62,13 @@ class Schema {
   }
 
   getRequired() {
-    return this.requiredProps;
+    var required = [];
+    for (var key in this.schema) {
+      if (this.schema[key]['required']) {
+        required.push(key);
+      }
+    }
+    return required;
   }
 
   getEmbeddedItems() {
@@ -53,7 +90,7 @@ class Schema {
     return embItems;
   }
 
-  // traverse a json object calling provided callbacks according to the right level
+ /* // traverse a json object calling provided callbacks according to the right level
   traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
@@ -131,6 +168,8 @@ class Schema {
       };
     };
   };
+*/
 };
+
 
 module.exports = Schema;

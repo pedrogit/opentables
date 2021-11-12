@@ -68,7 +68,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, Globals.ownerFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, Globals.ownerFieldName)});
             done();
           });
     });
@@ -87,7 +87,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'x', 'toto')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"' + lastList[Globals.listSchemaFieldName] + '"')});
             done();
           });
     });
@@ -191,7 +191,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, 'xlistschema')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidProp, 'xlistschema')});
             done();
           });
     });
@@ -235,7 +235,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, Globals.listIdFieldName)});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, Globals.listIdFieldName)});
             done();
           });
     });
@@ -271,7 +271,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, 'field3')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidProp, 'field3')});
             done();
           });
     });
@@ -287,7 +287,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, 'field2')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, 'field2')});
             done();
           });
     });
@@ -402,7 +402,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidProp, 'field3')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidProp, 'field3')});
             done();
           });
     });
@@ -417,7 +417,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.a('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field2', '222', 'string')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, 'field2', '222', 'string')});
             done();
           });
     });
@@ -561,13 +561,15 @@ describe('testRoutes.js List API', () => {
 
   describe('7 - Test "string", "number" and "encrypted_string" as basic types', () => {
     it('7.1 - Patch listschema with an invalid type for field4', (done) => {
+      var invalidSchema = '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": "encrypted_string", "field4": "toto"}';
+      //var invalidSchema = "{\"field1\": {\"type\": \"string\", required, lower}, \"field2\": {\"type\": \"string\", required, upper}, \"field3\": \"encrypted_string\", \"field4\": \"toto\"}";
       chai.request(server)
           .patch('/api/' + Globals.APIKeyword + '/' + listIdToPatch)
-          .send({[Globals.listSchemaFieldName]: '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": "encrypted_string", "field4": "toto"}'})
+          .send({[Globals.listSchemaFieldName]: invalidSchema})
           .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
           .end((err, response) => {
             expect(response).to.have.status(400);
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'toto', 'field4')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"' + invalidSchema + '"')});
             done();
           });
     });
@@ -602,7 +604,7 @@ describe('testRoutes.js List API', () => {
             expect(response.body).to.be.a('object');
             expect(response.body).to.deep.equal(
               {
-                "err": NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field4', '123', 'string')
+                "err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, 'field4', '123', 'string')
               }
             );
             done();
@@ -766,7 +768,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, 'field4', 'field4 value4')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_NotUnique, 'field4', 'field4 value4')});
             done();
           });
     });
@@ -812,7 +814,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, 'field4', 'field4 value4')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_NotUnique, 'field4', 'field4 value4')});
             done();
           });
     });
@@ -900,7 +902,7 @@ describe('testRoutes.js List API', () => {
           .end((err, response) => {
             expect(response).to.have.status(400);
             expect(response.body).to.be.an('object');
-            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.Schema_NotUnique, 'email', 'pedro@gmail.com')});
+            expect(response.body).to.deep.equal({"err": NodeUtil.format(Errors.ErrMsg.SchemaValidator_NotUnique, 'email', 'pedro@gmail.com')});
             done();
           });
     });

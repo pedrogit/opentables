@@ -27,7 +27,7 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
   });
 
   it('1.2 Pass invalid schema string', () => {
-    expect(function(){new SchemaValidator('toto');}).to.throw(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'true', 'toto'));
+    expect(function(){new SchemaValidator('toto');}).to.throw(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"toto"'));
   });
 
   it('1.3 Pass a string schema', () => {
@@ -51,12 +51,13 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
   });
 
   it('1.6 Test an invalid level one schema parameter', () => {
-    expect(function() {new SchemaValidator('field1: upper')}).to.throw(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, 'upper', 'field1'));
+    var schema = 'field1: upper';
+    expect(function() {new SchemaValidator(schema)}).to.throw(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"' + schema + '"'));
   });
 
   it('1.7 Validate a string value against a one level schema of type number', async () => {
     var schemaValidator = new SchemaValidator('field1: number');
-    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": "toto"}'), NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field1', 'toto', 'number'))
+    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": "toto"}'), NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, 'field1', 'toto', 'number'))
    });
 
   it('1.8 Validate a number against a one level schema of type number', async () => {
@@ -84,8 +85,10 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
   });
 
   it('1.11 Validate a missing field', async () => {
-    var schemaValidator = new SchemaValidator('field1: {type: string, required}');
-    await expectThrowsAsync(() => schemaValidator.validateJson('{"field": "toto"}'), NodeUtil.format(Errors.ErrMsg.Schema_MissingProp, 'field1'))
+    var schema = 'field1: {type: string, required}';
+    var jsonStr = '{"field": "toto"}'
+    var schemaValidator = new SchemaValidator(schema);
+    await expectThrowsAsync(() => schemaValidator.validateJson(jsonStr), NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, 'field1'))
   });
 
   it('1.12 Valid type', async () => {
@@ -98,7 +101,7 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
 
   it('1.13 Invalid type (number instead of string)', async () => {
     var schemaValidator = new SchemaValidator('{field1: {type:string, required}}');
-    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": 123}'), NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field1', '123', 'string'))
+    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": 123}'), NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, 'field1', '123', 'string'))
   });
 
   it('1.14 Validate upper', async () => {
@@ -111,7 +114,7 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
 
   it('1.15 Invalid email', async () => {
     var schemaValidator = new SchemaValidator('{field1: email}');
-    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": "aaaa"}'), NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field1', 'aaaa', 'email'))
+    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": "aaaa"}'), NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, 'field1', 'aaaa', 'email'))
   });
 
   it('1.16 Valid email', async () => {
@@ -124,7 +127,7 @@ describe('1 testSchemaValidator.js List Item Schema', () => {
 
   it('1.17 Invalid user_array', async () => {
     var schemaValidator = new SchemaValidator('field1: user_list');
-    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": "aa, bb"}'), NodeUtil.format(Errors.ErrMsg.Schema_InvalidType, 'field1', 'aa, bb', 'user_array'))
+    await expectThrowsAsync(() => schemaValidator.validateJson('{"field1": "aa, bb"}'), NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, 'field1', 'aa, bb', 'user_array'))
   });
 
   it('1.18 Valid user_array', async () => {
