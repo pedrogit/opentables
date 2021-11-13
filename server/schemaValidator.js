@@ -6,6 +6,7 @@ const Globals = require('../client/src/common/globals');
 const Errors = require('../client/src/common/errors');
 const Utils = require('../client/src/common/utils');
 const Schema = require('../client/src/common/schema');
+const Template = require('../client/src/common/template');
 
 class SchemaValidator {
   constructor(schema, controler = null, listid = null) {
@@ -32,8 +33,6 @@ class SchemaValidator {
     if (controler !== null) {
       this.controler = controler;
     }
-
-
   };
 
   // traverse a json object calling provided callbacks according to the right level
@@ -208,6 +207,14 @@ class SchemaValidator {
       throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, key, val, 'schema'));
     }
     new Schema(val);
+    return val;
+  }
+
+  validate_type_template(key, val) {
+    if (typeof val !== 'string') {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, key, val, 'template'));
+    }
+    new Template(val);
     return val;
   }
 

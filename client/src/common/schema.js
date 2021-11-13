@@ -1,6 +1,7 @@
 const NodeUtil = require('util');
 const Ajv = require("ajv")
 
+const Globals = require('./globals');
 const Errors = require('./errors');
 const Utils = require('./utils');
 
@@ -23,39 +24,47 @@ class Schema {
     if (typeof this.schema !== 'object') {
       throw new Error(Errors.ErrMsg.Schema_Malformed);
     }
-    //this.requiredProps = [];
+
+    if (!this.validate()) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, (typeof schema === 'object' ? JSON.stringify(schema) : '"' + schema + '"')));
+    }
+  };
+
+  validate() {
     var jsonschema = {
       "$defs": {
         "onelevel": {
-          "type" : "string",
-          "enum": ["objectid", "embedded_listid", "embedded_itemid_list", "user", "user_list", "string", "encrypted_string", "number", "schema", "email"]
+          "type": "string",
+          "enum": ["objectid", "embedded_listid", "embedded_itemid_list",
+                   "user", "user_list", "string", "encrypted_string",
+                   "number", "schema", "email", "template"]
         }
       },
       "patternProperties": {
-        "^[a-z0-9_]+$": {
-          "anyOf": [{"$ref": "#/$defs/onelevel"},
-                    {"type": "object",
-                      "properties": {
-                        "type": {"$ref": "#/$defs/onelevel"},
-                        "upper": {"type": "boolean"}, 
-                        "lower": {"type": "boolean"}, 
-                        "encrypt": {"type": "boolean"}, 
-                        "unique": {"type": "boolean"}, 
-                        "required": {"type": "boolean"}
-                      },
-                      "additionalProperties": false
-                    }
-                    ]
+        [Globals.identifierRegEx]: {
+          "anyOf": [
+            {"$ref": "#/$defs/onelevel"},
+            {
+              "type": "object",
+              "properties": {
+                "type": {"$ref": "#/$defs/onelevel"},
+                "upper": {"type": "boolean"},
+                "lower": {"type": "boolean"},
+                "encrypt": {"type": "boolean"},
+                "unique": {"type": "boolean"},
+                "required": {"type": "boolean"}
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       },
-      "additionalProperties": false  
+      "additionalProperties": false
     }
-    var ajv = new Ajv({allErrors: true});
+    var ajv = new Ajv({allErrors: false});
     var validate = ajv.compile(jsonschema);
-    if (!validate(this.schema)) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, (typeof schema === 'object' ? JSON.stringify(schema) : '"' + schema + '"')));
-    };
-  };
+    return validate(this.schema);
+  }
 
   schemaAsJson() {
     return this.schema;

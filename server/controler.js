@@ -32,32 +32,42 @@ class Controler {
     await this.deleteAll(process.env.ADMIN_EMAIL, true);
 
     console.log('Create the list of all lists...');
-    var item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfAllLists);
-    if (!item) {
+    try {
+      var item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfAllLists);
+    }
+    catch (err) {
       console.log('Could not create the list of all lists...');
     }
 
     console.log('Create the list of all views...');
-    item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfAllViews);
-    if (!item) {
+    try {
+      item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfAllViews);
+    }
+    catch (err) {
       console.log('Could not create the list of all views...');
     }
 
     console.log('Create the view on all views...');
-    item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.viewOnTheListOfAllViews);
-    if (!item) {
+    try {
+      item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.viewOnTheListOfAllViews);
+    }
+    catch (err) {
       console.log('Could not create the view on the list of all views...');
     }
 
     console.log('Create the list of users...');
-    item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfUsers);
-    if (!item) {
+    try {
+      item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.listOfUsers);
+    }
+    catch (err) {
       console.log('Could not create the list of users...');
     }
     
     console.log('Create the view on the list of users...');
-    item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.viewOnTheListOfUsers);
-    if (!item) {
+    try {
+      item = await this.insertMany(process.env.ADMIN_EMAIL, Globals.viewOnTheListOfUsers);
+    }
+    catch (err) {
       console.log('Could not create the view on the list of all views...');
     }
   }

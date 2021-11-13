@@ -62,7 +62,7 @@ var ErrMsg = {
   'Filter_Null': 'Filter can not be null...',
   'Filter_InvalidFilter': 'Invalid filter (%s)...',
   'Filter_Malformed': 'JSON filter is not well formed...',
-  'Component_Malformed': 'JSON component is not well formed...'
+  'Component_Invalid': 'Invalid component description (%s)...'
 }
 
 module.exports = {

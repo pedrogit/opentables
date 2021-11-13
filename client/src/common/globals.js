@@ -59,7 +59,7 @@ Globals = {
           + 'name: {type: string, required}, '
           + Globals.ownerFieldName + ': {type: user, required},  '
           + Globals.readWritePermFieldName + ':  {type: user_list, required, lower},  '
-          + 'item_template: string, '
+          + 'item_template: template, '
           + '_childlist: embedded_listid'
           + '}'
       },
