@@ -12,8 +12,8 @@ class Component {
     } catch(err) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"[[' + componentStr + ']]"'));
     };
-    this.targetVar = Object.keys(this.component)[0];
-    if (!this.validate()) {
+    this.targetProp = Object.keys(this.component)[0];
+    if (Utils.isObjEmpty(this.component) || !this.validate()) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"[[' + componentStr + ']]"'));
     }
   }
@@ -49,12 +49,12 @@ class Component {
     };
     var ajv = new Ajv({allErrors: false});
     var validate = ajv.compile(jsonschema);
-    return validate(this.component);
-
+    var result = validate(this.component);
+    return result;
   };
 
   render(values) {
-    var result = values[this.targetVar];
+    var result = values[this.targetProp];
     return result === undefined ? '' : result;
   }
 }

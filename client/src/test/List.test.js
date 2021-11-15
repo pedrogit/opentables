@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import List from './List';
+import List from '../List';
 
 test('renders learn react link', () => {
   render(<List />);
