@@ -99,6 +99,10 @@ class Schema {
     return embItems;
   }
 
+  getProps() {
+    return Object.keys(this.schema);
+  }
+
  /* // traverse a json object calling provided callbacks according to the right level
   traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {

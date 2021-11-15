@@ -18,11 +18,14 @@ describe('testTemplate.js List Item Template', () => {
   });
 
   it('Test a non existing property', () => {
-    var template = new Template('[[prop3]]', schema);
+    /*var template = new Template('[[prop3]]', schema);
     var replStr  = template.render({prop1: "prop1_val", prop2: "prop2_val"});
 
     expect(replStr).to.be.an('string');
-    expect(replStr).to.equal('');
+    expect(replStr).to.equal('');*/
+    var tmpStr = '[[prop3]]';
+
+    expect(function(){new Template(tmpStr, schema);}).to.throw(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"' + tmpStr + '"'));
   });
 
   it('Test a more complet template', () => {

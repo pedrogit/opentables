@@ -12,10 +12,15 @@ class Component {
     } catch(err) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"[[' + componentStr + ']]"'));
     };
-    this.targetProp = Object.keys(this.component)[0];
     if (Utils.isObjEmpty(this.component) || !this.validate()) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"[[' + componentStr + ']]"'));
     }
+    this.targetProp = Object.keys(this.component)[0];
+    this.control = (this.component[this.targetProp].hasOwnProperty('control') ? this.component[this.targetProp].control : 'text');
+  }
+
+  getTargetProp() {
+    return this.targetProp;
   }
 
   validate() {
@@ -54,8 +59,8 @@ class Component {
   };
 
   render(values) {
-    var result = values[this.targetProp];
-    return result === undefined ? '' : result;
+    var result = values[this.targetProp] === undefined ? '' : values[this.targetProp];
+    return result;
   }
 }
 

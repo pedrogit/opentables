@@ -17,7 +17,7 @@ describe('testcomponent.js List Item component', () => {
     var component = new Component('prop3');
 
     expect(component).to.be.an('object');
-    expect(component).to.deep.equal({component: {prop3: true}, targetProp: 'prop3'});
+    expect(component).to.deep.equal({component: {prop3: true}, targetProp: 'prop3', control: 'text'});
   });
 
   it('Test an invalid property name', () => {
@@ -31,6 +31,12 @@ describe('testcomponent.js List Item component', () => {
     expect(component).to.be.an('object');
     expect(component.component).to.deep.equal({prop1: {control: 'text'}});
     expect(component.targetProp).to.equal('prop1');
+    expect(component.control).to.equal('text');
+  });
+
+  it('Make sure defining two properties results in invalid', () => {
+    var cmpStr = 'prop1, prop2';
+    expect(function(){new Component(cmpStr);}).to.throw(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"[[' + cmpStr + ']]"'));
   });
 
 });

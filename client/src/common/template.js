@@ -29,6 +29,9 @@ class Template {
     // for now only validate component json strings
     for (const componentStr of this.template.matchAll(componentRE)) {
       var component = new Component(componentStr[1]);
+      if (this.schema && !this.schema.getProps().includes(component.getTargetProp())) {
+        throw new Error(NodeUtil.format(Errors.ErrMsg.Component_Invalid, '"[[' + componentStr[1] + ']]"'));
+      }
     }
     return true;
   }
