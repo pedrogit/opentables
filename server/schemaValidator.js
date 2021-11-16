@@ -6,7 +6,7 @@ const Globals = require('../client/src/common/globals');
 const Errors = require('../client/src/common/errors');
 const Utils = require('../client/src/common/utils');
 const Schema = require('../client/src/common/schema');
-const Template = require('../client/src/common/template');
+const TemplateParser = require('../client/src/common/TemplateParser');
 
 class SchemaValidator {
   constructor(schema, controler = null, listid = null) {
@@ -212,9 +212,9 @@ class SchemaValidator {
 
   validate_type_template(key, val) {
     if (typeof val !== 'string') {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, key, val, 'template'));
+      throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, key, val, 'TemplateParser'));
     }
-    new Template(val);
+    new TemplateParser(val);
     return val;
   }
 

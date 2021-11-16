@@ -1,11 +1,9 @@
 import React from "react";
 
 function Item({template, item}) {
-//function Item(props) {
     return (
-    <div>
+    <div class='item'>
       {template.render(item)}
-    <br /><br />
     </div>
   );
 }

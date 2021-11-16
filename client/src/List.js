@@ -1,6 +1,6 @@
 import React from "react";
 import Item from './Item';
-const Template = require('./common/template');
+import Template from './template';
 
 // a list receive a schema, a template and a list of items
 function List(props) {
