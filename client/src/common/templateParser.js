@@ -41,7 +41,7 @@ class TemplateParser {
   setDefTemplate() {
     this.template = '';
     if (this.schema) {
-      this.template = this.schema.getRequired().map(prop => '[[' + prop + ': {control: text}]]' + '<b>[[' + prop + ': {control: text}]]</b>').join();
+      this.template = this.schema.getRequired().map(prop => '[[' + prop + ': {control: text}]]').join();
     }
   }
 };

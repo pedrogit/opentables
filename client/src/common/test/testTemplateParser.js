@@ -13,7 +13,7 @@ describe('testTemplateParser.js List Item TemplateParser', () => {
     var templateParser = new TemplateParser('', schema);
 
     expect(templateParser).to.be.an('object');
-    expect(templateParser.template).to.equal('[[prop2: {control: text}]]<b>[[prop2: {control: text}]]</b>');
+    expect(templateParser.template).to.equal('[[prop2: {control: text}]]');
   });
 
   it('Test a non existing property', () => {
