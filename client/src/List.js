@@ -1,15 +1,17 @@
 import React from "react";
 import Item from './Item';
-import Template from './template';
+import TemplateParser from './common/templateParser';
+
 
 // a list receive a schema, a template and a list of items
-function List(props) {
-  var newTemplate = new Template(props.template, props.schema);
+function List({template, schema, items}) {
+  var parsedTemplate = new TemplateParser(template, schema);
+
   return (
     <div>
     {
-      props.items.map(item => {
-        return <Item key={item._id} template={newTemplate} item={item} />
+      items.map(item => {
+        return <Item key={item._id} parsedTemplate={parsedTemplate} item={item} />
       })
     }
     </div>
