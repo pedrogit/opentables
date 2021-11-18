@@ -1,9 +1,13 @@
 import React from "react";
 
 function Mytext({val}) {
-    return (
-        <span>{val}</span>
-    );
-}
+  return (
+    <span>{val}</span>
+  );
+};
 
-export default Mytext;
+function allComponentsAsJson() {
+  return {Mytext};
+};
+
+export {Mytext, allComponentsAsJson};

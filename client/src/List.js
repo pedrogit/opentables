@@ -6,16 +6,20 @@ import Schema from './common/schema';
 function List({template, schema, items}) {
   var parsedSchema = new Schema(schema);
   if (template === '') {
-    var startStr = '<Mytext val={item.';
-    var endstr = '}/>';
-    template = startStr + parsedSchema.getRequired().join(endstr + startStr) + endstr;
+    var startStr = '<Hrx>hhhrxxxx</Hrx><Mytext val={item.';
+    var endStr = '}/>';
+    template = startStr + parsedSchema.getRequired().join(endStr + startStr) + endStr;
   }
 
   return (
     <div>
     {
       items.map(item => {
-        return <Item key={item._id} template={template} item={item} />
+        return  <Item 
+                  key={item._id} 
+                  template={template} 
+                  item={item} 
+                />
       })
     }
     </div>
