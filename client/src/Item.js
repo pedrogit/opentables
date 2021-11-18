@@ -1,30 +1,15 @@
 import React from "react";
+import JsxParser from 'react-jsx-parser'
 
-import Component from './component';
+import Mytext from './components';
 
-const reactStringReplace = require('react-string-replace');
-
-function Item({parsedTemplate, item}) {
-  //var templateParser = new TemplateParser(template, schema);
-  /*var test = reactStringReplace(templateParser.template, 
-    new RegExp('\\[\\[(.+?)\\]\\]', 'g'),
-    (match, i) => (
-      <span>{React.createElement(Component, {propStr: "email: {control: text}", values: values})}</span>
-    )
-  );*/
+function Item({template, item}) {
   return (
-    <div class='item'>
-      {
-        reactStringReplace(
-          parsedTemplate.template, 
-          new RegExp('\\[\\[(.+?)\\]\\]', 'g'), (match, i) => (
-            React.createElement(Component, {key: i, propStr: "email: {control: text}", values: item})
-          )
-        )
-        .filter(item => item !== '')
-        .map(item => (typeof item === 'object' ? item : <span class='dangerouslySetInnerHTML' dangerouslySetInnerHTML={{__html: item}}/>))
-      }
-    </div>
+      <JsxParser
+        bindings={{item: item}}
+        components={{Mytext}}
+        jsx={template}
+      />
   );
 }
 
