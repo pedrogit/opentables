@@ -3,13 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
-ReactDOM.render(
-  /*<React.StrictMode>*/
-    <App />
-  /*</React.StrictMode>*/,
-  document.getElementById('root')
-);
+// Find all widget divs
+const widgetDivs = document.querySelectorAll('.opentable');
 
-/*var element = React.createElement('h1', { className: 'greeting' }, 'Hello, woxrld!');
-ReactDOM.render(element, document.getElementById('root'));*/
-
+// Inject our React App into each class
+widgetDivs.forEach(div => {
+    ReactDOM.render(
+      /*<React.StrictMode>*/
+        <App viewid={div.dataset.viewid}/>
+      /*</React.StrictMode>*/,
+        div
+    );
+});

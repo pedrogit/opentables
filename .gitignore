@@ -351,3 +351,5 @@ MigrationBackup/
 .env
 public/bundle.js
 public/bundle.js.LICENSE.txt
+public/index.js
+public/index.css

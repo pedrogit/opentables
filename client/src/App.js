@@ -3,16 +3,14 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import List from './List';
 
-function App() {
+function App({viewid}) {
   const [data, setData] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('http://localhost:3000/api/opentables/000000000000000000000005')
+    fetch('http://localhost:3001/api/opentables/' + viewid)
       .then(response => response.json())
       .then(data => setData(data));
     }, []);
-
-  console.log('App rendered');
 
   return (
     <div className="App" style={{
