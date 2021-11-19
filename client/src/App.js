@@ -7,9 +7,18 @@ function App({viewid}) {
   const [data, setData] = React.useState(null);
 
   React.useEffect(() => {
+    
     fetch('http://localhost:3001/api/opentables/' + viewid)
-      .then(response => response.json())
-      .then(data => setData(data));
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Something went wrong');
+        }
+      })
+      .then(data => 
+        setData(data)
+      );
     }, []);
 
   return (

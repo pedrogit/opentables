@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors');
 const cookieParser = require('cookie-parser')
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -15,6 +16,7 @@ const router = require('./router');
 const app = express();
 const PORT = 3001;
 
+app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cookieParser());
