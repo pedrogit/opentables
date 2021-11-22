@@ -5,7 +5,7 @@ import * as Components from './components';
 
 // Define all components in the current scope 
 // so they can be used directly, without 
-// namespace (e.g. Components.Mytext), in the template
+// namespace (e.g. Components.Text), in the template
 for (let name in Components) {
   global[name] = Components[name];
 }

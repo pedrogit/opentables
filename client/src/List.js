@@ -6,8 +6,8 @@ const Schema = require('./common/schema');
 function List({template, schema, items}) {
   var parsedSchema = new Schema(schema);
   if (template === '') {
-    var startStr = '<Hrx>hhhrxxxx</Hrx><Mytext val={item.';
-    var endStr = '}/>';
+    var startStr = '<Text val={item.';
+    var endStr = '}/> ';
     template = startStr + parsedSchema.getRequired().join(endStr + startStr) + endStr;
   }
 

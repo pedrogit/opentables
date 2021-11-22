@@ -1,13 +1,14 @@
 import React from "react";
 
-function Mytext({val}) {
+function Text(props) {
+  var labelTag = props.nolabel ? '' : <span>{(props.label ? props.label : 'toto')}</span>;
   return (
-    <span>{val}</span>
+    <>{labelTag}<span>{props.val}</span></>
   );
 };
 
 function allComponentsAsJson() {
-  return {Mytext};
+  return {Text};
 };
 
-export {Mytext, allComponentsAsJson};
+export {Text, allComponentsAsJson};
