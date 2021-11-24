@@ -9,10 +9,8 @@ function Label(props) {
 };
 
 function Text(props) {
-  var labelText = props.label ? props.label : 'toto';
-  var labelTag = (props.nolabel ? '' : <Label label={labelText}/>);
-  return (
-    <>{labelTag}<span>{props.val}</span></>
+return (
+    <>{(props.label ? <Label label={props.label}/> : '')}<span>{props.val}</span></>
   );
 };
 
