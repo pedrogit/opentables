@@ -13,17 +13,22 @@ for (let name in Components) {
 function Item({template, item}) {
   // reassign item properties with a two propety object 
   // including the name of the property so components can acces it
-  var newItem = {};
-  for (var key in item){
-    if (item.hasOwnProperty(key)) {
-      newItem[key] = {prop: key, val: item[key]}
+  //var newItem = {};
+
+  var setBindings = function (item) {
+    var result = {};
+    for (var key in item){
+      if (item.hasOwnProperty(key)) {
+        result[key] = {prop: key, val: item[key]}
+      }
     }
+    return result;
   }
 
   return (
     <div className='item'>
       <JsxParser 
-        bindings={{item: newItem}}
+        bindings={setBindings(item)}
         components={Components.allComponentsAsJson()}
         jsx={template}
         renderInWrapper={false}

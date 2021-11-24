@@ -7,7 +7,7 @@ function List({template, schema, items}) {
   var parsedSchema = new Schema(schema);
   if (template === '') {
     template = parsedSchema.getRequired().map(prop => 
-      '<Text val={item.' + prop + '}/> '
+      '<Text val={' + prop + '}/> '
     ).join('');
   }
 
