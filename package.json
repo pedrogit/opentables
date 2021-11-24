@@ -8,7 +8,7 @@
     "test-server": "nodemon  --inspect --exec \"mocha server/test/testRoutes.js server/test/testPermissions.js --timeout 0\"",
     "test-routes": "nodemon --inspect --exec \"mocha server/test/testRoutes.js --timeout 0\"",
     "start-server": "node server/index.js",
-    "debug-server": "nodemon --nolazy --inspect --watch client/common server server/index.js",
+    "debug-server": "nodemon --nolazy --inspect --watch client/common --watch server server/index.js",
     "build-client": "webpack --mode production"
   },
   "repository": {
