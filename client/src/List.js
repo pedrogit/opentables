@@ -6,9 +6,10 @@ const Schema = require('./common/schema');
 function List({template, schema, items}) {
   var parsedSchema = new Schema(schema);
   if (template === '') {
-    var startStr = '<Text val={item.';
-    var endStr = '}/> ';
-    template = startStr + parsedSchema.getRequired().join(endStr + startStr) + endStr;
+    template = parsedSchema.getRequired().map(prop => 
+      '<Text val={item.' + prop + '} label=\'' + prop + '\'/> '
+      //'<Text val={{key: ' + prop + ', val.' + prop + '}} label=\'' + prop + '\'/> '
+    ).join('');
   }
 
   return (
@@ -16,9 +17,9 @@ function List({template, schema, items}) {
     {
       items.map(item => {
         return  <Item 
-                  key={item._id} 
-                  template={template} 
-                  item={item} 
+                  key={item._id}
+                  template={template}
+                  item={item}
                 />
       })
     }
