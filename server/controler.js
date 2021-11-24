@@ -198,8 +198,7 @@ class Controler {
         };
 
         var pipeline = [{$match: {[Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)}},
-                        {$lookup: lookup},
-                        {$unset: 'items.' + Globals.listIdFieldName}
+                        {$lookup: lookup}
                       ];
         item = await this.coll.aggregate(pipeline).toArray();
         item = item[0];
