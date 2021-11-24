@@ -19,7 +19,7 @@ function App({viewid}) {
       .then(data => 
         setData(data)
       );
-    }, []);
+    }, [viewid]);
 
   return (
     <div className="App" style={{
