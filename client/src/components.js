@@ -1,16 +1,20 @@
 import React from "react";
 
+function labelVal(props) {
+  return (props.nolabel ? '' : <Label val={(props.label ? props.label : props.val.prop)}/>);
+}
+
 function Label(props) {
-  var defaultSx = {color: 'red'};
-  var style = {...props.xs, ...defaultSx};
+  var defaultSx = {color: 'red', };
+  var style = {...defaultSx, ...props.xs };
   return (
-    <><span style={style}>{props.label}: </span></>
+    <><span style={style}>{props.val}: </span></>
   );
 };
 
 function Text(props) {
-return (
-    <>{(props.label ? <Label label={props.label}/> : '')}<span>{props.val}</span></>
+  return (
+    <>{labelVal(props)}<span>{props.val.val}</span></>
   );
 };
 

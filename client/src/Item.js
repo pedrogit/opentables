@@ -11,10 +11,19 @@ for (let name in Components) {
 }
 
 function Item({template, item}) {
+  // reassign item properties with a two propety object 
+  // including the name of the property so components can acces it
+  var newItem = {};
+  for (var key in item){
+    if (item.hasOwnProperty(key)) {
+      newItem[key] = {prop: key, val: item[key]}
+    }
+  }
+
   return (
     <div className='item'>
       <JsxParser 
-        bindings={{item: item}}
+        bindings={{item: newItem}}
         components={Components.allComponentsAsJson()}
         jsx={template}
         renderInWrapper={false}
