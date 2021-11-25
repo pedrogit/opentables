@@ -10,10 +10,9 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({template, item}) {
+function Item({template, item, sx}) {
   // reassign item properties with a two propety object 
   // including the name of the property so components can acces it
-  //var newItem = {};
 
   var setBindings = function (item) {
     var result = {};
@@ -26,7 +25,7 @@ function Item({template, item}) {
   }
 
   return (
-    <div className='item'>
+    <div className='item' style={sx}>
       <JsxParser 
         bindings={setBindings(item)}
         components={Components.allComponentsAsJson()}
