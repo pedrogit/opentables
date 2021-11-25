@@ -1,5 +1,7 @@
 import React from "react";
 import JsxParser from 'react-jsx-parser';
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
 import * as Components from './components';
 
@@ -10,9 +12,10 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({template, item, sx}) {
+function Item({template, item, rowNb}) {
   // reassign item properties with a two propety object 
   // including the name of the property so components can acces it
+  var defaultSx = {bgcolor: (rowNb % 2 ? '#FFF' : '#EEE'), padding: 1};
 
   var setBindings = function (item) {
     var result = {};
@@ -25,10 +28,10 @@ function Item({template, item, sx}) {
   }
 
   return (
-    <div className='item' style={sx}>
+    <Box className='item' sx={defaultSx}>
       <JsxParser 
         bindings={setBindings(item)}
-        components={Components.allComponentsAsJson()}
+        components={{...Components.allComponentsAsJson(), Box, Stack}}
         jsx={template}
         renderInWrapper={false}
         onError={() => {}}
@@ -37,7 +40,7 @@ function Item({template, item, sx}) {
         allowUnknownElements = {false}
         renderUnrecognized={tagName => <span style={{color: "red"}}>Error: unrecognized tag ({tagName})...</span>} 
       />
-    </div>
+    </Box>
   );
 }
 

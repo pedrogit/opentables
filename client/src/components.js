@@ -1,14 +1,21 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
 function labelVal(props) {
-  return (props.nolabel ? '' : <Label sx={props.labelSx} val={(props.label ? props.label : props.val.prop.capitalize())} separator={!(props.vertical)}/>);
+  var fs = props.vertical ? '0.8em' : null;
+  var sx = {...props.labelSx, fontSize: fs};
+  return (props.nolabel ? '' : <Label sx={sx} val={(props.label ? props.label : props.val.prop.capitalize())} separator={!(props.vertical)}/>);
 }
 
 function Label(props) {
-  var defaultSx = {color: 'red', fontWeight: 'bold', marginRight: 5};
+  var defaultSx = {color: 'red', fontWeight: 'bold', marginRight: 1};
   return (
-    <><div style={{...defaultSx, ...props.sx}}>{props.val}{props.separator ? <span> :</span> : ''}</div></>
+    <>
+      <Box sx={{...defaultSx, ...props.sx}}>
+        {props.val}{props.separator ? <> :</> : null}
+      </Box>
+    </>
   );
 };
 
@@ -18,8 +25,11 @@ function Text(props) {
     <>
       <Stack direction={props.vertical ? 'column' : 'row'}>
         {labelVal(props)}
-        <div style={props.xs}>{props.val.val}</div>
-      </Stack></>
+        <Box sx={{...defaultSx, ...props.sx}}>
+          {props.val.val}
+        </Box>
+      </Stack>
+    </>
   );
 };
 

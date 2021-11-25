@@ -8,23 +8,26 @@ const Schema = require('./common/schema');
 function List({template, schema, items}) {
   var parsedSchema = new Schema(schema);
   if (template === '') {
-    template = parsedSchema.getRequired().map(prop => 
+    /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
       '<Text val={' + prop + '} /> '
+    ).join('') + '</Box>';*/
+    template = parsedSchema.getRequired().map(prop => 
+      '<Text val={' + prop + '}/> '
     ).join('');
   }
 
-  var i = 0;
+  var rowNb = 0;
 
   return (
     <Stack>
     {
       items.map(item => {
-        i = 1 - i;
+        rowNb = rowNb + 1;
         return  <Item 
                   key={item._id}
                   template={template}
                   item={item}
-                  sx={{backgroundColor: (i ? '#FFF' : '#EEE')}}
+                  rowNb={rowNb}
                 />
       })
     }
