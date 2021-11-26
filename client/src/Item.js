@@ -21,7 +21,7 @@ function Item({template, item, rowNb}) {
     var result = {};
     for (var key in item){
       if (item.hasOwnProperty(key)) {
-        result[key] = {prop: key, val: item[key]}
+        result[key] = {prop: key, val: item[key] ? item[key] : ''}
       }
     }
     return result;
