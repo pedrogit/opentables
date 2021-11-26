@@ -25,9 +25,11 @@ function Label(props) {
 function Text(props) {
   var defaultSx = {};
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [elWidth, setElWidth] = React.useState(0);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
+    setElWidth(event.currentTarget.offsetWidth);
   };
 
   const handleClose = () => {
@@ -37,8 +39,11 @@ function Text(props) {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  const editLabel = () => 'Edit the "' +  props.val.prop + '" property...';
-  const getWidth = () => 8*Math.max(props.val.val.length, editLabel().length);
+  const inputLabel = () => 'Edit "' +  props.val.prop + '"...';
+  const getWidth = () => {
+    var labelW = 5 * (inputLabel().length);
+    return Math.max(elWidth + 34, labelW + 28);
+  }
 
   return (
     <>
@@ -59,14 +64,14 @@ function Text(props) {
         }}
       >
         <Box sx={{p: 1, width: getWidth()}}>
-          <Label val={editLabel()} sx={{fontSize: 12}}/>
           <TextField 
              fullWidth 
-             id="filled-basic" 
-             xlabel={'Edit the "' +  props.val.prop + '" property...'} 
-             variant="filled" 
-             defaultValue={props.val.val}
-             size="small"/>
+             id="outlined-basic" 
+             variant="outlined" 
+             size="small"
+             label={inputLabel()}
+             value={props.val.val}
+          />
         </Box>
       </Popover>
     </>
