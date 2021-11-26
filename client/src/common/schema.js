@@ -70,10 +70,10 @@ class Schema {
     return this.schema;
   }
 
-  getRequired() {
+  getRequired(removeHidden = false) {
     var required = [];
     for (var key in this.schema) {
-      if (this.schema[key]['required']) {
+      if (!(removeHidden && key.charAt(0) === '_') && this.schema[key]['required']) {
         required.push(key);
       }
     }

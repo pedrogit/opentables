@@ -11,7 +11,7 @@ function List({template, schema, items}) {
     /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
       '<Text val={' + prop + '} /> '
     ).join('') + '</Box>';*/
-    template = parsedSchema.getRequired().map(prop => 
+    template = parsedSchema.getRequired(true).map(prop => 
       '<Text val={' + prop + '}/> '
     ).join('');
   }
