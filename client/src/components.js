@@ -25,9 +25,11 @@ function Label(props) {
 function Text(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [elWidth, setElWidth] = React.useState(0);
+  const [editVal, setEditVal] = React.useState(props.val.val);
+  const [savedVal, setSavedVal] = React.useState(props.val.val);
+
   if (props.val) {
     var defaultSx = {};
-
 
     const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -36,7 +38,12 @@ function Text(props) {
 
     const handleClose = () => {
       setAnchorEl(null);
+      setSavedVal(editVal);
     };
+
+    const handleChange = (val) => {
+      setEditVal(val);
+    }
 
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
@@ -47,14 +54,13 @@ function Text(props) {
       return Math.max(elWidth + 34, labelW + 28);
     }
 
-    const getVal = () => props.val.val ? props.val.val : '';
 
     return (
       <>
         <Stack direction={props.vertical ? 'column' : 'row'}>
           {labelVal(props)}
           <Typography sx={{...defaultSx, ...props.sx}} onDoubleClick={handleClick}>
-            {getVal()}
+            {savedVal}
           </Typography>
         </Stack>
         <Popover
@@ -74,7 +80,8 @@ function Text(props) {
               variant="outlined" 
               size="small"
               label={inputLabel()}
-              value={getVal()}
+              value={editVal}
+              onChange={e => handleChange(e.target.value)}
             />
           </Box>
         </Popover>
