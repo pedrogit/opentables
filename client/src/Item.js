@@ -2,6 +2,8 @@ import React from "react";
 import JsxParser from 'react-jsx-parser';
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
+import { useTheme } from '@mui/material/styles';
+
 
 import * as Components from './components';
 
@@ -13,7 +15,9 @@ for (let name in Components) {
 }
 
 function Item({template, item, rowNb}) {
-  // reassign item properties with a two propety object 
+  const theme = useTheme();
+
+  // reassign item properties with a two property object 
   // including the name of the property so components can acces it
   var defaultSx = {bgcolor: (rowNb % 2 ? '#FFF' : '#EEE'), padding: 1};
 
@@ -38,7 +42,7 @@ function Item({template, item, rowNb}) {
         renderError={({error}) => <span>{error}</span>}
         showWarnings={false}
         allowUnknownElements = {false}
-        renderUnrecognized={tagName => <span style={{color: "red"}}>Error: unrecognized tag ({tagName})...</span>} 
+        renderUnrecognized={tagName => <span style={{color: theme.palette.primary.main}}>Error: unrecognized tag ({tagName})...</span>} 
       />
     </Box>
   );

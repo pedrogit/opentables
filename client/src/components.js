@@ -4,24 +4,31 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
+import { useTheme, useThemeProps } from '@mui/material/styles';
 
-function labelVal(props) {
-  var fs = props.vertical ? '0.8em' : null;
-  var sx = {...props.labelSx, fontSize: fs};
-  return (props.nolabel ? '' : <Label sx={sx} val={(props.label ? props.label : props.val.prop.capitalize())} separator={!(props.vertical)}/>);
-}
-
+/********************
+*  Label component
+********************/
 function Label(props) {
-  var defaultSx = {color: 'red', fontWeight: 'bold', marginRight: 1};
-  return (
-    <>
-      <Typography sx={{...defaultSx, ...props.sx}}>
-        {props.val}{props.separator ? <> :</> : null}
-      </Typography>
-    </>
-  );
+  const theme = useTheme();
+  var fontSize = props.vertical ? theme.typography.caption : theme.typography.body1;
+  var defaultSx = {fontSize: fontSize, color: theme.palette.primary.main, fontWeight: 'bold', marginRight: 1};
+  var sx = {...defaultSx, ...props.labelSx, ...props.sx};
+  
+  if (!props.nolabel) {
+    var labelStr = props.label ? props.label : props.val.capitalize();
+    var separator = props.vertical ? null : <> :</>
+    return (
+      <Typography sx={sx}>{labelStr}{separator}</Typography>
+    );
+  }
+
+  return null;
 };
 
+/********************
+*  Text component
+********************/
 function Text(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [elWidth, setElWidth] = React.useState(0);
@@ -54,11 +61,10 @@ function Text(props) {
       return Math.max(elWidth + 34, labelW + 28);
     }
 
-
     return (
       <>
         <Stack direction={props.vertical ? 'column' : 'row'}>
-          {labelVal(props)}
+          <Label {...{...props, val: props.val.prop}}/>
           <Typography sx={{...defaultSx, ...props.sx}} onDoubleClick={handleClick}>
             {savedVal}
           </Typography>

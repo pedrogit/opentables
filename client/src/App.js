@@ -1,7 +1,28 @@
 import React from "react";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { deepOrange, orange, purple } from '@mui/material/colors';
+
+
 import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import List from './List';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: deepOrange[900] //#bf360c
+    },
+    secondary: {
+      main: orange['A200'] //#ffab40
+    },
+    error: {
+      main: purple[800] //#6a1b9a
+    },
+    warning: {
+      main: orange['A200'] //#ffab40
+    }
+  },
+});
 
 function App({viewid}) {
   const [data, setData] = React.useState(null);
@@ -22,17 +43,14 @@ function App({viewid}) {
     }, [viewid]);
 
   return (
-    <div className="App" style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'}}>
-      {<Box sx={{ display: 'flex'}}>
+    <ThemeProvider theme={theme}>
+      <Container className="App" maxWidth="sm">
         {data ? <List template = {data.item_template} 
                       schema = {data._childlist.listschema}
                       items = {data._childlist.items}
                       /> : <CircularProgress />}
-      </Box>}
-    </div>
+      </Container>
+    </ThemeProvider>
   );
 }
 
