@@ -21,7 +21,7 @@ const theme = createTheme({
     warning: {
       main: orange['A200'] //#ffab40
     }
-  },
+  }
 });
 
 function App({viewid}) {

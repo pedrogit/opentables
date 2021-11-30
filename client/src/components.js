@@ -30,6 +30,7 @@ function Label(props) {
 *  Text component
 ********************/
 function Text(props) {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [elWidth, setElWidth] = React.useState(0);
   const [editVal, setEditVal] = React.useState(props.val.val);
@@ -55,10 +56,14 @@ function Text(props) {
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
-    const inputLabel = () => 'Edit "' +  props.val.prop + '"...';
+    const inputLabel = 'Edit "' +  props.val.prop + '"...';
     const getWidth = () => {
-      var labelW = 5 * (inputLabel().length);
-      return Math.max(elWidth + 34, labelW + 28);
+      const labelFontWidth = 0.75 * theme.typography.fontSize * 0.4;
+      const labelW = labelFontWidth * inputLabel.length;
+      const inputPadding = 28;
+      const popoverPadding = 16;
+      return Math.max(elWidth + inputPadding + popoverPadding, 
+                      labelW + 2 * labelFontWidth + inputPadding + popoverPadding);
     }
 
     return (
@@ -85,7 +90,7 @@ function Text(props) {
               id="outlined-basic" 
               variant="outlined" 
               size="small"
-              label={inputLabel()}
+              label={inputLabel}
               value={editVal}
               onChange={e => handleChange(e.target.value)}
             />
