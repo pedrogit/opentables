@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
-import { useTheme, useThemeProps } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 /********************
 *  Label component
@@ -39,19 +39,31 @@ function Text(props) {
   if (props.val) {
     var defaultSx = {};
 
-    const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-      setElWidth(event.currentTarget.offsetWidth);
+    const handleClick = (e) => {
+      e.preventDefault();
+      setAnchorEl(e.currentTarget);
+      setElWidth(e.currentTarget.offsetWidth);
     };
 
     const handleClose = () => {
       setAnchorEl(null);
-      setSavedVal(editVal);
     };
 
     const handleChange = (val) => {
       setEditVal(val);
     }
+
+    const handleSave = () => {
+      if (props.val.patchHandler({[props.val.prop]: editVal})) {
+        setSavedVal(editVal);
+      }
+    }
+
+    const keyPressed = (e) => {
+      if(e.keyCode === 13){
+         handleSave();
+      }
+   }
 
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
@@ -93,6 +105,7 @@ function Text(props) {
               label={inputLabel}
               value={editVal}
               onChange={e => handleChange(e.target.value)}
+              onKeyDown={e => keyPressed(e)}
             />
           </Box>
         </Popover>

@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 const Schema = require('./common/schema');
 
 // a list receive a schema, a template and a list of items
-function List({template, schema, items}) {
+function List({template, schema, items, toggleLogin}) {
   var parsedSchema = new Schema(schema);
   if (template === '') {
     /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
@@ -28,6 +28,7 @@ function List({template, schema, items}) {
                   template={template}
                   item={item}
                   rowNb={rowNb}
+                  toggleLogin={toggleLogin}
                 />
       })
     }

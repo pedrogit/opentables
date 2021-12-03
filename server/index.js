@@ -33,22 +33,28 @@ app.use(async (req, res, next) => {
     const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
     var [email, password] = Buffer.from(b64auth, 'base64').toString().split(':');
     email = email.toLowerCase();
-    if (email === process.env.ADMIN_EMAIL) {
-      if (password !== process.env.ADMIN_PASSWORD){
-        next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
+
+    if (email !== '') {
+      if (password === '') {
+        return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
+      }
+
+      if (email === process.env.ADMIN_EMAIL) {
+        if (password !== process.env.ADMIN_PASSWORD) {
+          return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
+        }
+      }
+      else {
+        item = await controler.simpleFind(Globals.userListId, {email: email});
+
+        if (!item){
+          return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.InvalidUser)));
+        }
+        if (!item.password || !(bcrypt.compareSync(password, item.password))) {
+          return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
+        }
       }
       Utils.setCookieJWT(req, res, {email: email});
-    }
-    else if (email !== '') {
-      item = await controler.simpleFind(Globals.userListId, {email: email});
-      if (!item){
-        next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.InvalidUser)));
-      }
-      if (!(bcrypt.compareSync(password, item.password))) {
-        next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
-      }
-      Utils.setCookieJWT(req, res, {email: email});
-      req.user = email;
     }
   }
 
@@ -56,14 +62,14 @@ app.use(async (req, res, next) => {
   else if (req.cookies.authtoken) {
     try {
       jwt.verify(req.cookies.authtoken, process.env.TOKEN_SECRET, { algorithms: ['HS256'] });
-      //resend the cookie
+      // resend the cookie
       res.cookie('authtoken', req.cookies.authtoken);
     }
     catch(err){
-      next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
+      return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
     }
   }
-  next();
+  return next();
 });
 
 // Make the server able to server filesystem files from the public folder

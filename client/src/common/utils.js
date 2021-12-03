@@ -155,7 +155,7 @@ exports.objWithout = function(obj, without) {
 
 exports.setCookieJWT = function(req, res, payload) {
   var jwtoken = jwt.sign(payload, process.env.TOKEN_SECRET, {algorithm: 'HS256'});
-  res.cookie('authtoken', jwtoken, {httpOnly: true});
+  res.cookie('authtoken', jwtoken, {httpOnly: false});
   req.user = payload.email;
 }
 

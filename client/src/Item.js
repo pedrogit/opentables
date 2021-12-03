@@ -3,7 +3,7 @@ import JsxParser from 'react-jsx-parser';
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import { useTheme } from '@mui/material/styles';
-
+import axios from 'axios';
 
 import * as Components from './components';
 
@@ -14,18 +14,52 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({template, item, rowNb}) {
+function Item({template, item, rowNb, toggleLogin}) {
+  const [newItem, setItem] = React.useState(item);
+
   const theme = useTheme();
 
-  // reassign item properties with a two property object 
-  // including the name of the property so components can acces it
   var defaultSx = {bgcolor: (rowNb % 2 ? '#FFF' : '#EEE'), padding: 1};
 
+  var patchHandler = function(val) {
+    /*axios.patch('http://localhost:3001/api/opentables/' + item._id, val)
+    .then(res => {
+      if (res.status === 200 || res.statusText === 'ok') {
+        return true;
+      }
+      console.log(JSON.stringify(res.data))
+    })
+    .catch(error => {*/
+      toggleLogin(false, {
+        severity: "warning",
+        title: 'Permission denied',
+        msg: 'You do not have permissions to edit "' + Object.keys(val)[0] + '". Please login with valid credentials...',
+        action: {
+          method: 'patch',
+          url: 'http://localhost:3001/api/opentables/' + newItem._id,
+          data: val,
+          callback: (success, data) => {
+            if (success) {
+              setItem(data);
+            }
+          }
+        }
+      });
+      /*console.log(JSON.stringify(error))
+    });*/
+    return false;
+  }
+
   var setBindings = function (item) {
+    // add property name and rest handlers
     var result = {};
     for (var key in item){
       if (item.hasOwnProperty(key)) {
-        result[key] = {prop: key, val: item[key] ? item[key] : ''}
+        result[key] = {
+          patchHandler: patchHandler, 
+          prop: key, 
+          val: item[key] ? item[key] : ''
+        }
       }
     }
     return result;
@@ -34,7 +68,7 @@ function Item({template, item, rowNb}) {
   return (
     <Box className='item' sx={defaultSx}>
       <JsxParser 
-        bindings={setBindings(item)}
+        bindings={setBindings(newItem)}
         components={{...Components.allComponentsAsJson(), Box, Stack}}
         jsx={template}
         renderInWrapper={false}
