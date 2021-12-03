@@ -16,7 +16,12 @@ const router = require('./router');
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  preflightContinue: true,
+  credentials: true,
+}));
+
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cookieParser());
@@ -54,6 +59,7 @@ app.use(async (req, res, next) => {
           return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
         }
       }
+
       Utils.setCookieJWT(req, res, {email: email});
     }
   }
@@ -68,6 +74,7 @@ app.use(async (req, res, next) => {
     catch(err){
       return next(new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin)));
     }
+    req.user = jwt.decode(req.cookies.authtoken).email;
   }
   return next();
 });
