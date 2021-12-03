@@ -22,31 +22,22 @@ function Item({template, item, rowNb, toggleLogin}) {
   var defaultSx = {bgcolor: (rowNb % 2 ? '#FFF' : '#EEE'), padding: 1};
 
   var patchHandler = function(val) {
-    /*axios.patch('http://localhost:3001/api/opentables/' + item._id, val)
-    .then(res => {
-      if (res.status === 200 || res.statusText === 'ok') {
-        return true;
-      }
-      console.log(JSON.stringify(res.data))
-    })
-    .catch(error => {*/
-      toggleLogin(false, {
-        severity: "warning",
-        title: 'Permission denied',
-        msg: 'You do not have permissions to edit "' + Object.keys(val)[0] + '". Please login with valid credentials...',
-        action: {
-          method: 'patch',
-          url: 'http://localhost:3001/api/opentables/' + newItem._id,
-          data: val,
-          callback: (success, data) => {
-            if (success) {
-              setItem(data);
-            }
+    toggleLogin(false, {
+      severity: "warning",
+      title: 'Permission denied',
+      msg: 'You do not have permissions to edit "' + Object.keys(val)[0] + '". Please login with valid credentials...',
+      action: {
+        method: 'patch',
+        //url: 'http://localhost:3001/api/opentables/' + newItem._id,
+        url: '/api/opentables/' + newItem._id,
+        data: val,
+        callback: (success, data) => {
+          if (success) {
+            setItem(data);
           }
         }
-      });
-      /*console.log(JSON.stringify(error))
-    });*/
+      }
+    });
     return false;
   }
 
