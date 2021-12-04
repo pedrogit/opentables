@@ -32,8 +32,8 @@ function App({viewid}) {
   const [loginMsg, setLoginMsg] = React.useState(null);
 
   React.useEffect(() => {
-    //axios.get('http://localhost:3001/api/opentables/' + viewid)
-    axios.get('/api/opentables/' + viewid)
+    axios.get('http://localhost:3001/api/opentables/' + viewid)
+    //axios.get('/api/opentables/' + viewid)
     .then(res => {
       if (res.status === 200 || res.statusText === 'ok') {
         setData(res.data)

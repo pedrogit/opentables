@@ -28,8 +28,8 @@ function Item({template, item, rowNb, toggleLogin}) {
       msg: 'You do not have permissions to edit "' + Object.keys(val)[0] + '". Please login with valid credentials...',
       action: {
         method: 'patch',
-        //url: 'http://localhost:3001/api/opentables/' + newItem._id,
-        url: '/api/opentables/' + newItem._id,
+        url: 'http://localhost:3001/api/opentables/' + newItem._id,
+        //url: '/api/opentables/' + newItem._id,
         data: val,
         callback: (success, data) => {
           if (success) {

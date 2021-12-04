@@ -54,7 +54,8 @@ function LoginForm({isVisible, msg, toggleLogin}) {
           }
         }
       }
-      axios(msg.action)
+      axios({...msg.action, withCredentials: true})
+      //axios(msg.action)
       .then(res => {
         if (res.status === 200 || res.statusText.toUpperCase() === 'OK') {
           handleClose();
