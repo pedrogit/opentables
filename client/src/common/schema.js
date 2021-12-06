@@ -1,67 +1,89 @@
-const NodeUtil = require('util');
-const Ajv = require("ajv")
+const NodeUtil = require("util");
+const Ajv = require("ajv");
 
-const Globals = require('./globals');
-const Errors = require('./errors');
-const Utils = require('./utils');
+const Globals = require("./globals");
+const Errors = require("./errors");
+const Utils = require("./utils");
 
 class Schema {
   constructor(schema) {
     if (schema == null) {
       throw new Error(Errors.ErrMsg.Schema_Null);
     }
-    if (typeof schema === 'string') {
+    if (typeof schema === "string") {
       try {
-         this.schema = Utils.simpleJSONToJSON(schema);
-      } catch(err) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, schema, err.message));
+        this.schema = Utils.simpleJSONToJSON(schema);
+      } catch (err) {
+        throw new Error(
+          NodeUtil.format(
+            Errors.ErrMsg.Schema_InvalidSchema,
+            schema,
+            err.message
+          )
+        );
       }
-    }
-    else {
+    } else {
       this.schema = schema;
     }
 
-    if (typeof this.schema !== 'object') {
+    if (typeof this.schema !== "object") {
       throw new Error(Errors.ErrMsg.Schema_Malformed);
     }
 
     if (!this.validate()) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, (typeof schema === 'object' ? JSON.stringify(schema) : '"' + schema + '"')));
+      throw new Error(
+        NodeUtil.format(
+          Errors.ErrMsg.Schema_InvalidSchema,
+          typeof schema === "object"
+            ? JSON.stringify(schema)
+            : '"' + schema + '"'
+        )
+      );
     }
-  };
+  }
 
   validate() {
     var jsonschema = {
-      "$defs": {
-        "onelevel": {
-          "type": "string",
-          "enum": ["objectid", "embedded_listid", "embedded_itemid_list",
-                   "user", "user_list", "string", "encrypted_string",
-                   "number", "schema", "email", "template"]
-        }
+      $defs: {
+        onelevel: {
+          type: "string",
+          enum: [
+            "objectid",
+            "embedded_listid",
+            "embedded_itemid_list",
+            "user",
+            "user_list",
+            "string",
+            "encrypted_string",
+            "number",
+            "schema",
+            "email",
+            "template",
+          ],
+        },
       },
-      "patternProperties": {
+      patternProperties: {
         [Globals.identifierRegEx]: {
-          "anyOf": [
-            {"$ref": "#/$defs/onelevel"},
+          anyOf: [
+            { $ref: "#/$defs/onelevel" },
             {
-              "type": "object",
-              "properties": {
-                "type": {"$ref": "#/$defs/onelevel"},
-                "upper": {"type": "boolean"},
-                "lower": {"type": "boolean"},
-                "encrypt": {"type": "boolean"},
-                "unique": {"type": "boolean"},
-                "required": {"type": "boolean"}
+              type: "object",
+              properties: {
+                type: { $ref: "#/$defs/onelevel" },
+                upper: { type: "boolean" },
+                lower: { type: "boolean" },
+                encrypt: { type: "boolean" },
+                unique: { type: "boolean" },
+                required: { type: "boolean" },
               },
-              "additionalProperties": false
-            }
-          ]
-        }
+              additionalProperties: false,
+            },
+          ],
+        },
       },
-      "additionalProperties": false
-    }
-    var ajv = new Ajv({allErrors: false});
+      additionalProperties: false,
+    };
+    var ajv = new Ajv({ allErrors: false });
     var validate = ajv.compile(jsonschema);
     return validate(this.schema);
   }
@@ -73,7 +95,10 @@ class Schema {
   getRequired(removeHidden = false) {
     var required = [];
     for (var key in this.schema) {
-      if (!(removeHidden && key.charAt(0) === '_') && this.schema[key]['required']) {
+      if (
+        !(removeHidden && key.charAt(0) === "_") &&
+        this.schema[key]["required"]
+      ) {
         required.push(key);
       }
     }
@@ -83,16 +108,19 @@ class Schema {
   getEmbeddedItems() {
     var embItems = [];
     for (var key in this.schema) {
-      if (this.schema[key] === 'embedded_itemid' || 
-          this.schema[key] === 'embedded_listid' ||
-          this.schema[key] === 'embedded_itemid_list' ){
+      if (
+        this.schema[key] === "embedded_itemid" ||
+        this.schema[key] === "embedded_listid" ||
+        this.schema[key] === "embedded_itemid_list"
+      ) {
         var item = {};
         item.type = this.schema[key];
-        embItems.push({[key]: item});
-      }
-      else if (this.schema[key].type === 'embedded_itemid' || 
-               this.schema[key].type === 'embedded_itemid_list') {
-        embItems.push({[key]: this.schema[key]});
+        embItems.push({ [key]: item });
+      } else if (
+        this.schema[key].type === "embedded_itemid" ||
+        this.schema[key].type === "embedded_itemid_list"
+      ) {
+        embItems.push({ [key]: this.schema[key] });
       }
     }
 
@@ -103,7 +131,7 @@ class Schema {
     return Object.keys(this.schema);
   }
 
- /* // traverse a json object calling provided callbacks according to the right level
+  /* // traverse a json object calling provided callbacks according to the right level
   traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
@@ -182,7 +210,6 @@ class Schema {
     };
   };
 */
-};
-
+}
 
 module.exports = Schema;

@@ -1,18 +1,20 @@
-const express = require('express');
-const url = require('url');
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
+const express = require("express");
+const url = require("url");
+const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 
-const Globals = require('../client/src/common/globals');
-const Utils = require('../client/src/common/utils');
+const Globals = require("../client/src/common/globals");
+const Utils = require("../client/src/common/utils");
 
-const controler = require('./controler');
+const controler = require("./controler");
 
-var isNewUser = function(item) {
-  return item.hasOwnProperty(Globals.listIdFieldName) &&
-  item[Globals.listIdFieldName].toString() === Globals.userListId &&
-  item.hasOwnProperty('email');
-}
+var isNewUser = function (item) {
+  return (
+    item.hasOwnProperty(Globals.listIdFieldName) &&
+    item[Globals.listIdFieldName].toString() === Globals.userListId &&
+    item.hasOwnProperty("email")
+  );
+};
 
 const router = express.Router();
 /************************************************************************
@@ -23,9 +25,12 @@ const router = express.Router();
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-router.get('/login', asyncHandler(async (req, res) => {
-  res.status(200).send();
-}));
+router.get(
+  "/login",
+  asyncHandler(async (req, res) => {
+    res.status(200).send();
+  })
+);
 
 /************************************************************************
   GET /api/APIKeyword/logout
@@ -35,9 +40,12 @@ router.get('/login', asyncHandler(async (req, res) => {
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-router.get('/logout', asyncHandler(async (req, res) => {
-  res.status(200).send();
-}));
+router.get(
+  "/logout",
+  asyncHandler(async (req, res) => {
+    res.status(200).send();
+  })
+);
 
 /************************************************************************
   GET /api/APIKeyword/:itemid
@@ -50,12 +58,22 @@ router.get('/logout', asyncHandler(async (req, res) => {
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
 *************************************************************************/
-router.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
-  // construct the full URL so we can then extract the filter parameter
-  const fullURL = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-  const item = await controler.findWithItems(req.user, req.params.itemid, fullURL.searchParams.get('filter'), req.params.noitems === 'noitems' )
-  res.status(200).send(item);
-}));
+router.get(
+  "/:itemid/:noitems?",
+  asyncHandler(async (req, res) => {
+    // construct the full URL so we can then extract the filter parameter
+    const fullURL = new URL(
+      req.protocol + "://" + req.get("host") + req.originalUrl
+    );
+    const item = await controler.findWithItems(
+      req.user,
+      req.params.itemid,
+      fullURL.searchParams.get("filter"),
+      req.params.noitems === "noitems"
+    );
+    res.status(200).send(item);
+  })
+);
 
 /************************************************************************
   POST /api/APIKeyword/
@@ -65,21 +83,24 @@ router.get('/:itemid/:noitems?', asyncHandler(async (req, res) => {
   Return status: 201, 400 invalid json, 401, 403
 
 *************************************************************************/
-router.post('', asyncHandler(async (req, res) => {
-  // register new users as admin
-  if (isNewUser(req.body)) {
-    req.user = process.env.ADMIN_EMAIL;
-  }
+router.post(
+  "",
+  asyncHandler(async (req, res) => {
+    // register new users as admin
+    if (isNewUser(req.body)) {
+      req.user = process.env.ADMIN_EMAIL;
+    }
 
-  const item = await controler.insertMany(req.user, req.body);
+    const item = await controler.insertMany(req.user, req.body);
 
-  // convert email to cookie token when registering
-  if (isNewUser(item)) {
-    Utils.setCookieJWT(req, res, {email: item.email});
-  }
+    // convert email to cookie token when registering
+    if (isNewUser(item)) {
+      Utils.setCookieJWT(req, res, { email: item.email });
+    }
 
-  res.status(201).send(item);
-}));
+    res.status(201).send(item);
+  })
+);
 
 /************************************************************************
   POST /api/APIKeyword/:itemid
@@ -97,10 +118,17 @@ router.post('', asyncHandler(async (req, res) => {
   Return status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-router.patch('/:itemid', asyncHandler(async (req, res) => {
-  const newitem = await controler.patch(req.user, req.params.itemid, req.body);
-  res.status(200).send(newitem);
-}));
+router.patch(
+  "/:itemid",
+  asyncHandler(async (req, res) => {
+    const newitem = await controler.patch(
+      req.user,
+      req.params.itemid,
+      req.body
+    );
+    res.status(200).send(newitem);
+  })
+);
 
 /************************************************************************
   DELETE /api/APIKeyword/ 
@@ -110,25 +138,31 @@ router.patch('/:itemid', asyncHandler(async (req, res) => {
   Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-router.delete('', asyncHandler(async (req, res) => {
-  const result = await controler.deleteAll(req.user)  
-  // if DELETE fails let the server default error handler return 500
-  if (result.acknowledged) {
-    res.status(200).send({'deletedCount': result.deletedCount});
-}
-}));
+router.delete(
+  "",
+  asyncHandler(async (req, res) => {
+    const result = await controler.deleteAll(req.user);
+    // if DELETE fails let the server default error handler return 500
+    if (result.acknowledged) {
+      res.status(200).send({ deletedCount: result.deletedCount });
+    }
+  })
+);
 /************************************************************************
   DELETE /api/APIKeyword/:itemid  // Delete one or many list items if has list edit permission
                                 // Status: 200, 400 invalid json, 401, 403
 
 *************************************************************************/
-router.delete('/:itemid', asyncHandler(async (req, res) => {
-  const result = await controler.delete(req.user, req.params.itemid)  
-  // if DELETE fails let the server default error handler return 500
-  if (result.acknowledged) {
-    res.status(200).send({'deletedCount': result.deletedCount});
-}
-}));
+router.delete(
+  "/:itemid",
+  asyncHandler(async (req, res) => {
+    const result = await controler.delete(req.user, req.params.itemid);
+    // if DELETE fails let the server default error handler return 500
+    if (result.acknowledged) {
+      res.status(200).send({ deletedCount: result.deletedCount });
+    }
+  })
+);
 
 module.exports = router;
 
@@ -177,4 +211,3 @@ Response status codes
   - 500 Internal Server Error – a generic error occurred on the server
   - 503 Service Unavailable – the requested service is not available
 */
-
