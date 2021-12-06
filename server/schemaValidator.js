@@ -6,7 +6,6 @@ const Globals = require("../client/src/common/globals");
 const Errors = require("../client/src/common/errors");
 const Utils = require("../client/src/common/utils");
 const Schema = require("../client/src/common/schema");
-const TemplateParser = require("../client/src/common/TemplateParser");
 
 class SchemaValidator {
   constructor(schema, controler = null, listid = null) {
@@ -327,7 +326,7 @@ class SchemaValidator {
         )
       );
     }
-    new TemplateParser(val);
+    // todo validate JSX template
     return val;
   }
 

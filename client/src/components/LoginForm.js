@@ -12,7 +12,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import axios from "axios";
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
-const Errors = require("../../client/src/common/errors");
+const Errors = require("../common/errors");
 
 function LoginForm({ isVisible, msg, toggleLogin }) {
   const emailRef = React.useRef();

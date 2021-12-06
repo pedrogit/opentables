@@ -2,7 +2,7 @@ import React from "react";
 import Item from "./Item";
 import Stack from "@mui/material/Stack";
 
-const Schema = require("./common/schema");
+const Schema = require("../common/schema");
 
 // a list receive a schema, a template and a list of items
 function List({ template, schema, items, toggleLogin }) {

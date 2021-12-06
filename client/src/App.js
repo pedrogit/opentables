@@ -5,8 +5,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import axios from "axios";
 
-import List from "./List";
-import LoginForm from "./LoginForm";
+import List from "./components/List";
+import LoginForm from "./components/LoginForm";
 
 const theme = createTheme({
   palette: {
