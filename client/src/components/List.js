@@ -14,6 +14,7 @@ function List({ template, schema, items, toggleLogin }) {
     template = parsedSchema
       .getRequired(true)
       .map((prop) => "<Text val={" + prop + "}/> ")
+      //.map((prop) => "<Text /> ")
       .join("");
   }
 

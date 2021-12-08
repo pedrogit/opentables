@@ -2,20 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import renderer from 'react-test-renderer';
 
-import List from './List';
+import VisibilityPasswordTextField from './VisibilityPasswordTextField';
 
-describe('List', () => {
+describe('VisibilityPasswordTextField', () => {
   it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(<List schema={{prop1: 'string'}} items={[{_id: 1, prop1: 'toto'}]}/>, div);
+    ReactDOM.render(<VisibilityPasswordTextField />, div);
   });
 
   it('has a valid snapshot', () => {
     const component = renderer.create(
-      <List schema={{prop1: 'string'}} items={[{_id: 1, prop1: 'toto'}]}/>
+      <VisibilityPasswordTextField />
     );
     let tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   });
-
 });

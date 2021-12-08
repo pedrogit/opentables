@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Text has a valid snapshot 1`] = `
+<div
+  className="css-m69qwo-MuiStack-root"
+>
+  <p
+    className="MuiTypography-root MuiTypography-body1 css-g9b4dn-MuiTypography-root"
+  >
+    Prop name
+     :
+  </p>
+  <p
+    className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+    onDoubleClick={[Function]}
+  >
+    prop value
+  </p>
+</div>
+`;

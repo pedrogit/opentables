@@ -68,15 +68,23 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
           }
         })
         .catch((error) => {
-          if (
-            error.response.data.err === Errors.ErrMsg.InvalidUser ||
-            error.response.data.err === Errors.ErrMsg.CouldNotLogin
-          ) {
-            setShowInvalidLoginHelper(true);
+          if (error && 
+              error.response && 
+              error.response.data && 
+              error.response.data.err) {
+            if (
+              error.response.data.err === Errors.ErrMsg.InvalidUser ||
+              error.response.data.err === Errors.ErrMsg.CouldNotLogin
+            ) {
+              setShowInvalidLoginHelper(true);
+            }
+            if (error.response.data.err === Errors.ErrMsg.Forbidden) {
+              toggleLogin(true, msg);
+              emailRef.current.focus();
+            }
           }
-          if (error.response.data.err === Errors.ErrMsg.Forbidden) {
-            toggleLogin(true, msg);
-            emailRef.current.focus();
+          else {
+            // show unknown error
           }
 
           return false;

@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Item has a valid snapshot 1`] = `
+<div
+  className="item MuiBox-root css-kc21a2"
+/>
+`;

@@ -23,7 +23,8 @@ function Label(props) {
   var sx = { ...defaultSx, ...props.labelSx, ...props.sx };
 
   if (!props.nolabel) {
-    var labelStr = props.label ? props.label : props.val.capitalize();
+    //var labelStr = props.label ? props.label : props.val.capitalize();
+    var labelStr = props.label ? props.label : props.val.charAt(0).toUpperCase() + props.val.slice(1)
     var separator = props.vertical ? null : <> :</>;
     return (
       <Typography sx={sx}>
@@ -40,13 +41,20 @@ function Label(props) {
  *  Text component
  ********************/
 function Text(props) {
+  const propName = props.val ? (props.val.prop ? props.val.prop : "Missing property name") : undefined;
+  const propVal = props.val ? (props.val.val ? props.val.val : "Missing value") : undefined
+  //props.val.prop = props.val.prop || "No prop name";
+  //props.val.val = props.val.val || "No value";
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [elWidth, setElWidth] = React.useState(0);
-  const [editVal, setEditVal] = React.useState(props.val.val);
-  const [savedVal, setSavedVal] = React.useState(props.val.val);
+  //const [editVal, setEditVal] = React.useState(props.val ? (props.val.val ? props.val.val : "No value") : undefined);
+  //const [savedVal, setSavedVal] = React.useState(props.val ? (props.val.val ? props.val.val : "No value") : undefined);
+  const [editVal, setEditVal] = React.useState(propVal);
+  const [savedVal, setSavedVal] = React.useState(propVal);
 
-  if (props.val) {
+  if (props.val && (propName || editVal)) {
+
     var defaultSx = {};
 
     const handleClick = (e) => {
@@ -64,7 +72,7 @@ function Text(props) {
     };
 
     const handleSave = () => {
-      if (props.val.patchHandler({ [props.val.prop]: editVal })) {
+      if (props.val.patchHandler({ [propName]: editVal })) {
         setSavedVal(editVal);
       }
     };
@@ -78,7 +86,7 @@ function Text(props) {
     const open = Boolean(anchorEl);
     const id = open ? "simple-popover" : undefined;
 
-    const inputLabel = 'Edit "' + props.val.prop + '"...';
+    const inputLabel = 'Edit "' + propName + '"...';
     const getWidth = () => {
       const labelFontWidth = 0.75 * theme.typography.fontSize * 0.4;
       const labelW = labelFontWidth * inputLabel.length;
@@ -93,7 +101,7 @@ function Text(props) {
     return (
       <>
         <Stack direction={props.vertical ? "column" : "row"}>
-          <Label {...{ ...props, val: props.val.prop }} />
+          <Label {...{ ...props, val: propName }} />
           <Typography
             sx={{ ...defaultSx, ...props.sx }}
             onDoubleClick={handleClick}
@@ -127,7 +135,9 @@ function Text(props) {
       </>
     );
   }
-  return "";
+  //return "<Text value is missing />";
+  return (<Typography color = 'red'>&lt;Text value is missing /&gt;</Typography>);
+
 }
 
 function allComponentsAsJson() {
