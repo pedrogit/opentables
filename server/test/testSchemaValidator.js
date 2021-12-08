@@ -2,7 +2,7 @@
 const chai = require("chai");
 const NodeUtil = require("util");
 
-const SchemaValidator = require("../schemavalidator");
+const SchemaValidator = require("../src/schemavalidator");
 const Errors = require("../../client/src/common/errors");
 
 var expect = chai.expect;

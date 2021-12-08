@@ -2,10 +2,10 @@ const MongoDB = require("mongodb");
 const NodeUtil = require("util");
 const bcrypt = require("bcrypt");
 
-const Globals = require("../client/src/common/globals");
-const Errors = require("../client/src/common/errors");
-const Utils = require("../client/src/common/utils");
-const Schema = require("../client/src/common/schema");
+const Globals = require("../../client/src/common/globals");
+const Errors = require("../../client/src/common/errors");
+const Utils = require("../../client/src/common/utils");
+const Schema = require("../../client/src/common/schema");
 
 class SchemaValidator {
   constructor(schema, controler = null, listid = null) {

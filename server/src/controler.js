@@ -1,11 +1,12 @@
 const MongoDB = require("mongodb");
 const NodeUtil = require("util");
+require("dotenv").config();
 
-const Errors = require("../client/src/common/errors");
-const Utils = require("../client/src/common/utils");
-const Globals = require("../client/src/common/globals");
-const Filter = require("../client/src/common/filter");
-const Schema = require("../client/src/common/schema");
+const Errors = require("../../client/src/common/errors");
+const Utils = require("../../client/src/common/utils");
+const Globals = require("../../client/src/common/globals");
+const Filter = require("../../client/src/common/filter");
+const Schema = require("../../client/src/common/schema");
 
 const SchemaValidator = require("./schemaValidator");
 

@@ -3,8 +3,8 @@ const url = require("url");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
-const Globals = require("../client/src/common/globals");
-const Utils = require("../client/src/common/utils");
+const Globals = require("../../client/src/common/globals");
+const Utils = require("../../client/src/common/utils");
 
 const controler = require("./controler");
 

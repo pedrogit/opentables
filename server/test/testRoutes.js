@@ -10,7 +10,7 @@ const Errors = require("../../client/src/common/errors");
 const Utils = require("../../client/src/common/utils");
 
 const server = require("../index");
-const controler = require("../controler");
+const controler = require("../src/controler");
 
 controler.init();
 

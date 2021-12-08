@@ -8,7 +8,7 @@ const Globals = require("../../client/src/common/globals");
 const Errors = require("../../client/src/common/errors");
 
 const server = require("../index");
-const controler = require("../controler");
+const controler = require("../src/controler");
 
 controler.init();
 

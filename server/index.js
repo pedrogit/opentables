@@ -10,8 +10,8 @@ const Globals = require("../client/src/common/globals");
 const Errors = require("../client/src/common/errors");
 const Utils = require("../client/src/common/utils");
 
-const controler = require("./controler");
-const router = require("./router");
+const controler = require("./src/controler");
+const router = require("./src/router");
 
 const app = express();
 const PORT = 3001;
