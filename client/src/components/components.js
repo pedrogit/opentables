@@ -23,7 +23,6 @@ function Label(props) {
   var sx = { ...defaultSx, ...props.labelSx, ...props.sx };
 
   if (!props.nolabel) {
-    //var labelStr = props.label ? props.label : props.val.capitalize();
     var labelStr = props.label ? props.label : props.val.charAt(0).toUpperCase() + props.val.slice(1)
     var separator = props.vertical ? null : <> :</>;
     return (
@@ -43,13 +42,10 @@ function Label(props) {
 function Text(props) {
   const propName = props.val ? (props.val.prop ? props.val.prop : "Missing property name") : undefined;
   const propVal = props.val ? (props.val.val ? props.val.val : "Missing value") : undefined
-  //props.val.prop = props.val.prop || "No prop name";
-  //props.val.val = props.val.val || "No value";
+
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [elWidth, setElWidth] = React.useState(0);
-  //const [editVal, setEditVal] = React.useState(props.val ? (props.val.val ? props.val.val : "No value") : undefined);
-  //const [savedVal, setSavedVal] = React.useState(props.val ? (props.val.val ? props.val.val : "No value") : undefined);
   const [editVal, setEditVal] = React.useState(propVal);
   const [savedVal, setSavedVal] = React.useState(propVal);
 
@@ -137,7 +133,6 @@ function Text(props) {
   }
   //return "<Text value is missing />";
   return (<Typography color = 'red'>&lt;Text value is missing /&gt;</Typography>);
-
 }
 
 function allComponentsAsJson() {
