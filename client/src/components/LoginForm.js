@@ -46,6 +46,8 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
     if (msg && msg.action !== undefined) {
       // do not perform the action on the next change of state (only when click on the ok button)
       setPerformAction(false);
+
+      // if credentials were entered add an authorization header
       if (emailRef.current.value || passwordRef.current.value) {
         msg.action = {
           ...msg.action,
@@ -59,7 +61,6 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
         };
       }
       axios({ ...msg.action, withCredentials: true })
-        //axios(msg.action)
         .then((res) => {
           if (res.status === 200 || res.statusText.toUpperCase() === "OK") {
             handleClose();
@@ -79,6 +80,7 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
               setShowInvalidLoginHelper(true);
             }
             if (error.response.data.err === Errors.ErrMsg.Forbidden) {
+              msg['iteration'] = msg['iteration'] === undefined ? 0 : msg['iteration'] + 1;
               toggleLogin(true, msg);
               emailRef.current.focus();
             }
@@ -103,7 +105,7 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
       <FormControl>
         <Stack spacing={2}>
           <Alert severity={msg.severity} color="primary">
-            <AlertTitle>{msg.title}</AlertTitle>
+            <AlertTitle>{msg.title + (msg.iteration > 0 ? ' (' + msg.iteration + ')': '')}</AlertTitle>
             {msg.msg}
           </Alert>
           <Stack direction="row" spacing={2}>
