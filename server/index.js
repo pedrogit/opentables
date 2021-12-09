@@ -18,9 +18,8 @@ const PORT = 3001;
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    //origin: "*",
-    preflightContinue: true,
+    origin: true,
+    //preflightContinue: true, // allow HTTP methods other than GET, HEAD and POST (e.g. PATCH and DELETE)
     credentials: true,
   })
 );
