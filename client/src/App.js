@@ -32,18 +32,21 @@ function App({ viewid }) {
   const [loginMsg, setLoginMsg] = React.useState(null);
 
   React.useEffect(() => {
-    axios
-      .get("http://localhost:3001/api/opentables/" + viewid)
-      //axios.get('/api/opentables/' + viewid)
-      .then((res) => {
-        if (res.status === 200 || res.statusText === "ok") {
-          setData(res.data);
+    toggleLogin(false, {
+      severity: "warning",
+      title: "Permission denied",
+      msg:
+        'You do not have permissions to view this list. Please login with valid credentials...',
+      action: {
+        method: "get",
+        url: "http://localhost:3001/api/opentables/" + viewid,
+        callback: (success, data) => {
+          if (success) {
+            setData(data);
+          }
         }
-        console.log(JSON.stringify(res.data));
-      })
-      .catch((error) => {
-        console.log(JSON.stringify(error));
-      });
+      },
+    });
   }, [viewid]);
 
   const toggleLogin = (open, msg) => {
