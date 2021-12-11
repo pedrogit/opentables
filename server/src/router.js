@@ -43,6 +43,7 @@ router.get(
 router.get(
   "/logout",
   asyncHandler(async (req, res) => {
+    res.clearCookie("authtoken");
     res.status(200).send();
   })
 );

@@ -8,6 +8,8 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
+import Cookies from 'js-cookie'
+import jwt from 'jsonwebtoken'
 
 import axios from "axios";
 
@@ -28,7 +30,8 @@ function LoginForm({ loginState, setLoginState }) {
     // reset the form
     emailRef.current.value = null;
     passwordRef.current.value = null;
-    setLoginState({open: false})
+    setLoginState({open: false});
+    setloginButtonDisabled(true);
   };
 
   const handleKeyDown = (e) => {
@@ -162,26 +165,41 @@ function LoginForm({ loginState, setLoginState }) {
 
 function LoginButton({ setLoginState }) {
   const [visible, setVisible] = React.useState(true);
+  var user = '';
+  var action = 'login';
+  var buttonText = 'Login';
+  var authtoken = Cookies.get('authtoken');
+  if (authtoken) {
+     user = jwt.decode(authtoken).email;
+     buttonText = 'Logout ' + user;
+  }
   return (
-    <Button color="inherit" onClick={() => {
-      setLoginState({
-        open: true, 
-        msg: {
-          severity: "info",
-          title: "Login",
-          text:  'Please login with valid credentials...'
-        },
-        action: {
-          method: "get",
-          url: "http://localhost:3001/api/opentables/login",
-          callback: (success, data) => {
-            if (success) {
-              setVisible(false);
+    <Button variant="outlined" color="inherit" onClick={() => {
+      if (user) {
+        Cookies.remove('authtoken');
+        setVisible(!visible);
+      }
+      else {
+        setLoginState({
+          open: (action === 'login'), 
+          msg: {
+            severity: "info",
+            title: "Login",
+            text:  'Please login with valid credentials...'
+          },
+          action: {
+            method: "get",
+            url: "http://localhost:3001/api/opentables/login",
+            callback: (success, data) => {
+              if (success) {
+                setVisible(true);
+              }
             }
-          }
-        }
-      });
-    }}>Login</Button>
+          },
+          tryFirst: (action === 'logout')
+        });        
+      }
+    }}>{buttonText}</Button>
   );
 }
 
