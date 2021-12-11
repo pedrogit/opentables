@@ -4,7 +4,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 function VisibilityPasswordTextField({ ...rest }) {
-  //const { isVisible, onVisibilityChange,  = props;
   const [isVisible, toggleVisible] = React.useState(false);
 
   return (
