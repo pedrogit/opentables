@@ -98,7 +98,9 @@ function App({ viewid }) {
             />
           </Stack>
         ) : (
-          <CircularProgress />
+          <Container className="progress" sx={{display: 'flex', justifyContent: 'center'}}>
+            <CircularProgress />
+          </Container>
         )}
       </Container>
     </ThemeProvider>
