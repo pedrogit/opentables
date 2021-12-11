@@ -14,43 +14,41 @@ import axios from "axios";
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 const Errors = require("../common/errors");
 
-function LoginForm({ isVisible, msg, toggleLogin }) {
+function LoginForm({ loginState, setLoginState }) {
   const emailRef = React.useRef();
   const passwordRef = React.useRef();
-  const [showInvalidLoginHelper, setShowInvalidLoginHelper] =
-    React.useState(false);
-  const [performAction, setPerformAction] = React.useState(true);
+  const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
+  const [loginButtonDisabled, setloginButtonDisabled] = React.useState(true);
 
-  msg = {
-    severity: "info",
-    title: "",
-    msg: "",
-    ...msg,
-  };
+  React.useEffect(() => {
+    emailRef.current.focus();
+  }, [loginState]);
 
   const handleClose = () => {
+    // reset the form
     emailRef.current.value = null;
     passwordRef.current.value = null;
-    toggleLogin(false, "");
-    setPerformAction(true);
-    setShowInvalidLoginHelper(false);
+    setLoginState({open: false})
   };
 
   const handleKeyDown = (e) => {
+    setShowInvalidLoginHelper(false);
     if (e.keyCode === 13) {
       doAction();
     }
   };
 
-  var doAction = function () {
-    if (msg && msg.action !== undefined) {
-      // do not perform the action on the next change of state (only when click on the ok button)
-      setPerformAction(false);
+  const handleChange = () => {
+    setloginButtonDisabled(!(emailRef.current.value && passwordRef.current.value));
+  }
 
+  var doAction = function () {
+    if (loginState.action !== undefined) {
       // if credentials were entered add an authorization header
-      if (emailRef.current.value || passwordRef.current.value) {
-        msg.action = {
-          ...msg.action,
+      if ((emailRef.current !== undefined && emailRef.current.value !== undefined && emailRef.current.value) || 
+          (passwordRef.current !== undefined && passwordRef.current.value !== undefined && passwordRef.current.value)) {
+        loginState.action = {
+          ...loginState.action,
           headers: {
             authorization:
               "Basic " +
@@ -60,11 +58,11 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
           },
         };
       }
-      axios({ ...msg.action, withCredentials: true })
+      axios({ ...loginState.action, withCredentials: true })
         .then((res) => {
           if (res.status === 200 || res.statusText.toUpperCase() === "OK") {
             handleClose();
-            msg.action.callback(true, res.data);
+            loginState.action.callback(true, res.data);
             return true;
           }
         })
@@ -80,9 +78,16 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
               setShowInvalidLoginHelper(true);
             }
             if (error.response.data.err === Errors.ErrMsg.Forbidden) {
-              msg['iteration'] = msg['iteration'] === undefined ? 0 : msg['iteration'] + 1;
-              toggleLogin(true, msg);
-              emailRef.current.focus();
+              setLoginState({
+                ...loginState,
+                open: true,
+                msg: {
+                  ...loginState.msg,
+                  iteration: (loginState.msg['iteration'] === undefined ? 0 : loginState.msg['iteration'] + 1)
+                },
+                tryFirst: false
+              });
+              //emailRef.current.focus();
             }
           }
           else {
@@ -96,17 +101,25 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
   };
 
   // try to perform the action before opening
-  if (performAction && doAction()) {
-    return null;
+  if (loginState.tryFirst !== undefined && loginState.tryFirst === true) {
+    doAction();
   }
 
   return (
-    <Collapse in={isVisible}>
+    <Collapse in={loginState.open}>
       <FormControl>
         <Stack spacing={2}>
-          <Alert severity={msg.severity} color="primary">
-            <AlertTitle>{msg.title + (msg.iteration > 0 ? ' (' + msg.iteration + ')': '')}</AlertTitle>
-            {msg.msg}
+          <Alert severity={
+              loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
+            } 
+            color="primary">
+            <AlertTitle>{
+              loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
+              (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
+            }
+            </AlertTitle>{
+              loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
+            }
           </Alert>
           <Stack direction="row" spacing={2}>
             <TextField
@@ -116,9 +129,10 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
               fullWidth
               label="Email Address"
               inputRef={emailRef}
-              onChange={() => setShowInvalidLoginHelper(false)}
+              onChange={() => handleChange()}
               onKeyDown={(e) => handleKeyDown(e)}
               error={showInvalidLoginHelper}
+              focused
             />
             <VisibilityPasswordTextField
               variant="outlined"
@@ -128,13 +142,13 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
               label="Password"
               autoComplete="off"
               inputRef={passwordRef}
-              onChange={() => setShowInvalidLoginHelper(false)}
+              onChange={() => handleChange()}
               onKeyDown={(e) => handleKeyDown(e)}
               error={showInvalidLoginHelper}
             />
             <ButtonGroup variant="contained" size="small">
               <Button onClick={() => handleClose()}>Cancel</Button>
-              <Button onClick={() => setPerformAction(true)}>Login</Button>
+              <Button onClick={() => doAction()} disabled={loginButtonDisabled}>Login</Button>
             </ButtonGroup>
           </Stack>
         </Stack>
@@ -146,4 +160,30 @@ function LoginForm({ isVisible, msg, toggleLogin }) {
   );
 }
 
-export default LoginForm;
+function LoginButton({ setLoginState }) {
+  const [visible, setVisible] = React.useState(true);
+  return (
+    <Button color="inherit" onClick={() => {
+      setLoginState({
+        open: true, 
+        msg: {
+          severity: "info",
+          title: "Login",
+          text:  'Please login with valid credentials...'
+        },
+        action: {
+          method: "get",
+          url: "http://localhost:3001/api/opentables/login",
+          callback: (success, data) => {
+            if (success) {
+              setVisible(false);
+            }
+          }
+        }
+      });
+    }}>Login</Button>
+  );
+}
+
+
+export {LoginForm, LoginButton};

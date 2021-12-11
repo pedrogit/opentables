@@ -3,7 +3,6 @@ import JsxParser from "react-jsx-parser";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
-import axios from "axios";
 
 import * as Components from "./components";
 
@@ -14,7 +13,7 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({ template, item, rowNb, toggleLogin }) {
+function Item({ template, item, rowNb, setLoginState }) {
   const [newItem, setItem] = React.useState(item);
 
   const theme = useTheme();
@@ -22,24 +21,27 @@ function Item({ template, item, rowNb, toggleLogin }) {
   var defaultSx = { bgcolor: rowNb % 2 ? "#FFF" : "#EEE", padding: 1 };
 
   var patchHandler = function (val) {
-    toggleLogin(false, {
-      severity: "warning",
-      title: "Permission denied",
-      msg:
+    setLoginState({
+      open: false,
+      msg: {
+        severity: "warning",
+        title: "Permission denied",
+        text:
         'You do not have permissions to edit "' +
         Object.keys(val)[0] +
         '". Please login with valid credentials...',
+      },
       action: {
         method: "patch",
         url: "http://localhost:3001/api/opentables/" + newItem._id,
-        //url: '/api/opentables/' + newItem._id,
         data: val,
         callback: (success, data) => {
           if (success) {
             setItem(data);
           }
-        },
+        }
       },
+      tryFirst: true
     });
     return false;
   };
