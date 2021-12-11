@@ -24,7 +24,7 @@ function Label(props) {
 
   if (!props.nolabel) {
     var labelStr = props.label ? props.label : props.val.charAt(0).toUpperCase() + props.val.slice(1)
-    var separator = props.vertical ? null : <> :</>;
+    var separator = props.vertical ? null : <>&nbsp;:</>;
     return (
       <Typography sx={sx}>
         {labelStr}
