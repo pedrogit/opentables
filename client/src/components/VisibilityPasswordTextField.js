@@ -11,6 +11,7 @@ function VisibilityPasswordTextField({ ...rest }) {
       {...rest}
       type={isVisible ? "text" : "password"}
       InputProps={{
+        id: "passwordinput",
         endAdornment: (
           <InputAdornment position="end">
             <IconButton

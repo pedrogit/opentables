@@ -32,6 +32,7 @@ function LoginForm({ loginState, setLoginState }) {
     passwordRef.current.value = null;
     setLoginState({open: false});
     setloginButtonDisabled(true);
+    setShowInvalidLoginHelper(false);
   };
 
   const handleKeyDown = (e) => {
@@ -110,7 +111,7 @@ function LoginForm({ loginState, setLoginState }) {
 
   return (
     <Collapse in={loginState.open}>
-      <FormControl>
+      <FormControl id="loginform">
         <Stack spacing={2}>
           <Alert severity={
               loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
@@ -136,6 +137,7 @@ function LoginForm({ loginState, setLoginState }) {
               onKeyDown={(e) => handleKeyDown(e)}
               error={showInvalidLoginHelper}
               focused
+              InputProps={{id: "emailinput"}}
             />
             <VisibilityPasswordTextField
               variant="outlined"
@@ -150,12 +152,12 @@ function LoginForm({ loginState, setLoginState }) {
               error={showInvalidLoginHelper}
             />
             <ButtonGroup variant="contained" size="small">
-              <Button onClick={() => handleClose()}>Cancel</Button>
-              <Button onClick={() => doAction()} disabled={loginButtonDisabled}>Login</Button>
+              <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
+              <Button id="loginbutton" onClick={() => doAction()} disabled={loginButtonDisabled}>Login</Button>
             </ButtonGroup>
           </Stack>
         </Stack>
-        <FormHelperText error={showInvalidLoginHelper}>
+        <FormHelperText id="loginhelper" error={showInvalidLoginHelper}>
           {showInvalidLoginHelper ? "Invalid email or password..." : " "}
         </FormHelperText>
       </FormControl>

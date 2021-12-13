@@ -26,7 +26,8 @@
     "updatetest": "react-scripts test -u",
     "eject": "react-scripts eject",
     "build:widget": "parcel build src/index.js --no-source-maps -d ../public",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "cypress:open": "cypress open"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +48,8 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^9.1.1",
+    "cypress-plugin-tab": "^1.0.5",
     "parcel-bundler": "^1.12.5",
     "prettier": "^2.5.1",
     "react-test-renderer": "^17.0.2",

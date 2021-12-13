@@ -2,8 +2,40 @@
 
 exports[`App has a valid snapshot 1`] = `
 <div
-  className="MuiContainer-root MuiContainer-maxWidthSm App css-cuefkz-MuiContainer-root"
+  className="MuiContainer-root MuiContainer-maxWidthLg MuiContainer-disableGutters App css-1p4tas-MuiContainer-root"
 >
+  <header
+    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionStatic css-1vbdj7k-MuiPaper-root-MuiAppBar-root"
+  >
+    <div
+      className="MuiToolbar-root MuiToolbar-gutters MuiToolbar-dense css-10ltm04-MuiToolbar-root"
+    >
+      <div
+        className="MuiBox-root css-i9gxme"
+      />
+      <button
+        className="MuiButton-root MuiButton-outlined MuiButton-outlinedInherit MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-ikb3mf-MuiButtonBase-root-MuiButton-root"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex={0}
+        type="button"
+      >
+        Login
+      </button>
+    </div>
+  </header>
   <div
     className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
     style={
@@ -25,7 +57,7 @@ exports[`App has a valid snapshot 1`] = `
             className="css-1p5q5e5-MuiStack-root"
           >
             <div
-              className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-t405ht-MuiPaper-root-MuiAlert-root"
+              className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1yf420b-MuiPaper-root-MuiAlert-root"
               role="alert"
             >
               <div
@@ -62,8 +94,8 @@ exports[`App has a valid snapshot 1`] = `
                 onKeyDown={[Function]}
               >
                 <label
-                  className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1k4rsau-MuiFormLabel-root-MuiInputLabel-root"
-                  data-shrink={false}
+                  className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-focused Mui-required css-19v7tfd-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
                 >
                   Email Address
                   <span
@@ -75,7 +107,7 @@ exports[`App has a valid snapshot 1`] = `
                   </span>
                 </label>
                 <div
-                  className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1d5hft2-MuiInputBase-root-MuiOutlinedInput-root"
+                  className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-sizeSmall css-1d5hft2-MuiInputBase-root-MuiOutlinedInput-root"
                   onClick={[Function]}
                 >
                   <input
@@ -95,7 +127,7 @@ exports[`App has a valid snapshot 1`] = `
                     className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
                   >
                     <legend
-                      className="css-173wfxe"
+                      className="css-1z7n62"
                     >
                       <span>
                         Email Address
@@ -216,8 +248,8 @@ exports[`App has a valid snapshot 1`] = `
                   Cancel
                 </button>
                 <button
-                  className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
-                  disabled={false}
+                  className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
+                  disabled={true}
                   onBlur={[Function]}
                   onClick={[Function]}
                   onContextMenu={[Function]}
@@ -231,7 +263,7 @@ exports[`App has a valid snapshot 1`] = `
                   onTouchEnd={[Function]}
                   onTouchMove={[Function]}
                   onTouchStart={[Function]}
-                  tabIndex={0}
+                  tabIndex={-1}
                   type="button"
                 >
                   Login
@@ -255,30 +287,34 @@ exports[`App has a valid snapshot 1`] = `
       </div>
     </div>
   </div>
-  <span
-    className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-wttjll-MuiCircularProgress-root"
-    role="progressbar"
-    style={
-      Object {
-        "height": 40,
-        "width": 40,
-      }
-    }
+  <div
+    className="MuiContainer-root MuiContainer-maxWidthLg progress css-1hmr31l-MuiContainer-root"
   >
-    <svg
-      className="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
-      viewBox="22 22 44 44"
+    <span
+      className="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-wttjll-MuiCircularProgress-root"
+      role="progressbar"
+      style={
+        Object {
+          "height": 40,
+          "width": 40,
+        }
+      }
     >
-      <circle
-        className="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
-        cx={44}
-        cy={44}
-        fill="none"
-        r={20.2}
-        strokeWidth={3.6}
-        style={Object {}}
-      />
-    </svg>
-  </span>
+      <svg
+        className="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+        viewBox="22 22 44 44"
+      >
+        <circle
+          className="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+          cx={44}
+          cy={44}
+          fill="none"
+          r={20.2}
+          strokeWidth={3.6}
+          style={Object {}}
+        />
+      </svg>
+    </span>
+  </div>
 </div>
 `;
