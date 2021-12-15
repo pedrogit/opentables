@@ -1,4 +1,4 @@
-import React from "react";
+import React, {memo} from "react";
 import JsxParser from "react-jsx-parser";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
@@ -61,6 +61,8 @@ function Item({ template, item, rowNb, setLoginState }) {
     return result;
   };
 
+  //console.log('Render item...');
+
   return (
     <Box className="item" sx={defaultSx}>
       <JsxParser
@@ -82,4 +84,4 @@ function Item({ template, item, rowNb, setLoginState }) {
   );
 }
 
-export default Item;
+export default memo(Item);
