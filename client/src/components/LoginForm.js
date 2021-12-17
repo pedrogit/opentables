@@ -8,9 +8,9 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
+import { useTheme, lighten } from "@mui/material/styles";
 import Cookies from 'js-cookie'
 import jwt from 'jsonwebtoken'
-
 import axios from "axios";
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
@@ -21,6 +21,7 @@ function LoginForm({ loginState, setLoginState }) {
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
   const [loginButtonDisabled, setloginButtonDisabled] = React.useState(true);
+  const theme = useTheme();
 
   React.useEffect(() => {
     emailRef.current.focus();
@@ -30,7 +31,7 @@ function LoginForm({ loginState, setLoginState }) {
     // reset the form
     emailRef.current.value = null;
     passwordRef.current.value = null;
-    setLoginState({open: false});
+    setLoginState({...loginState, open: false, tryFirst: false});
     setloginButtonDisabled(true);
     setShowInvalidLoginHelper(false);
   };
@@ -108,58 +109,69 @@ function LoginForm({ loginState, setLoginState }) {
   if (loginState.tryFirst !== undefined && loginState.tryFirst === true) {
     doAction();
   }
-
+// 
   return (
-    <Collapse in={loginState.open}>
-      <FormControl id="loginform">
-        <Stack spacing={2}>
+    <Collapse in={loginState.open} sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+      <FormControl id="loginform" sx={{width: '100%'}}>
+        <Stack spacing={2} fullWidth={true} padding='5px'>
           <Alert severity={
               loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
             } 
-            color="primary">
+            color="primary"
+            sx={{padding: '0px'}}>
             <AlertTitle>{
               loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
               (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
             }
-            </AlertTitle>{
-              loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
-            }
+            </AlertTitle>
+              {
+                loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
+              }
           </Alert>
-          <Stack direction="row" spacing={2}>
-            <TextField
-              variant="outlined"
-              required
-              size="small"
-              fullWidth
-              label="Email Address"
-              inputRef={emailRef}
-              onChange={() => handleChange()}
-              onKeyDown={(e) => handleKeyDown(e)}
-              error={showInvalidLoginHelper}
-              focused
-              InputProps={{id: "emailinput"}}
-            />
-            <VisibilityPasswordTextField
-              variant="outlined"
-              size="small"
-              required
-              fullWidth
-              label="Password"
-              autoComplete="off"
-              inputRef={passwordRef}
-              onChange={() => handleChange()}
-              onKeyDown={(e) => handleKeyDown(e)}
-              error={showInvalidLoginHelper}
-            />
-            <ButtonGroup variant="contained" size="small">
-              <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
-              <Button id="loginbutton" onClick={() => doAction()} disabled={loginButtonDisabled}>Login</Button>
-            </ButtonGroup>
+
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            spacing={2} 
+            fullWidth={true}>
+              <TextField
+                variant="outlined"
+                required
+                size="small"
+                fullWidth
+                label="Email Address"
+                inputRef={emailRef}
+                onChange={() => handleChange()}
+                onKeyDown={(e) => handleKeyDown(e)}
+                error={showInvalidLoginHelper}
+                InputProps={{id: "emailinput"}}
+              />
+              <VisibilityPasswordTextField
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                label="Password"
+                autoComplete="off"
+                inputRef={passwordRef}
+                onChange={() => handleChange()}
+                onKeyDown={(e) => handleKeyDown(e)}
+                error={showInvalidLoginHelper}
+              />
+            <Stack direction="row" justifyContent="flex-end">
+              <ButtonGroup variant="contained" size="small">
+                <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
+                <Button id="loginbutton" onClick={() => doAction()} disabled={loginButtonDisabled}>Login</Button>
+              </ButtonGroup>
+            </Stack>
           </Stack>
+          <FormHelperText 
+            id="loginhelper" 
+            error={showInvalidLoginHelper} 
+            sx={{mt: '2px', fontSize: '14px', fontStyle: 'italic'}}
+          >
+            {showInvalidLoginHelper ? "Invalid email or password..." : " "}
+          </FormHelperText>
         </Stack>
-        <FormHelperText id="loginhelper" error={showInvalidLoginHelper}>
-          {showInvalidLoginHelper ? "Invalid email or password..." : " "}
-        </FormHelperText>
       </FormControl>
     </Collapse>
   );
@@ -176,7 +188,7 @@ function LoginButton({ setLoginState }) {
      buttonText = 'Logout ' + user;
   }
   return (
-    <Button variant="outlined" color="inherit" onClick={() => {
+    <Button variant="text" color="inherit" onClick={() => {
       if (user) {
         Cookies.remove('authtoken');
         setVisible(!visible);

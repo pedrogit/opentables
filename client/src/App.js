@@ -8,7 +8,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
 
 import List from "./components/List";
 import {LoginForm, LoginButton} from "./components/LoginForm";
@@ -37,7 +36,6 @@ function App({ viewid }) {
   const [loginState, setLoginState] = React.useState({open: false});
 
   React.useEffect(() => {
-
     setLoginState({
       open: false,
       msg: {
@@ -60,7 +58,7 @@ function App({ viewid }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container className="App" disableGutters>
+      <Container className="App" disableGutters maxWidth="100%">
         <AppBar position="static">
           <Toolbar variant="dense">
             <Box sx={{ flexGrow: 1 }} />
