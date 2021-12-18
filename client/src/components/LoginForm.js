@@ -24,13 +24,20 @@ function LoginForm({ loginState, setLoginState }) {
   const theme = useTheme();
 
   React.useEffect(() => {
-    emailRef.current.focus();
-  }, [loginState]);
+    if (loginState.open) {
+      // dont' make the values disappear when closing
+      emailRef.current.value = null;
+      passwordRef.current.value = null;
+      emailRef.current.focus();
+    }
+  }, [loginState.open]);
 
   const handleClose = () => {
-    // reset the form
-    emailRef.current.value = null;
-    passwordRef.current.value = null;
+    if (emailRef.current.value === '') {
+      // reset the focus on the email to prevent it from flashing
+      emailRef.current.value = ' ';
+      emailRef.current.focus();
+    }
     setLoginState({...loginState, open: false, tryFirst: false});
     setloginButtonDisabled(true);
     setShowInvalidLoginHelper(false);
