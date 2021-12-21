@@ -46,7 +46,7 @@ function LoginForm({ loginState, setLoginState }) {
   const handleKeyDown = (e) => {
     setShowInvalidLoginHelper(false);
     if (e.keyCode === 13) {
-      doAction();
+      doAction(true);
     }
   };
 
@@ -54,11 +54,10 @@ function LoginForm({ loginState, setLoginState }) {
     setloginButtonDisabled(!(emailRef.current.value && passwordRef.current.value));
   }
 
-  var doAction = function () {
+  var doAction = function (addCredentials = false) {
     if (loginState.action !== undefined) {
       // if credentials were entered add an authorization header
-      if ((emailRef.current !== undefined && emailRef.current.value !== undefined && emailRef.current.value) || 
-          (passwordRef.current !== undefined && passwordRef.current.value !== undefined && passwordRef.current.value)) {
+      if (addCredentials) {
         loginState.action = {
           ...loginState.action,
           headers: {
@@ -170,7 +169,7 @@ function LoginForm({ loginState, setLoginState }) {
             <Stack direction="row" justifyContent="flex-end">
               <ButtonGroup variant="contained" size="small">
                 <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
-                <Button id="loginbutton" onClick={() => doAction()} disabled={loginButtonDisabled}>Login</Button>
+                <Button id="loginbutton" onClick={() => doAction(true)} disabled={loginButtonDisabled}>Login</Button>
               </ButtonGroup>
             </Stack>
           </Stack>
