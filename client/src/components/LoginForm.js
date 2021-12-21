@@ -26,18 +26,13 @@ function LoginForm({ loginState, setLoginState }) {
   React.useEffect(() => {
     if (loginState.open) {
       // dont' make the values disappear when closing
-      emailRef.current.value = null;
-      passwordRef.current.value = null;
+      emailRef.current.value = '';
+      passwordRef.current.value = '';
       emailRef.current.focus();
     }
-  }, [loginState.open]);
+  }, [loginState]);
 
   const handleClose = () => {
-    if (emailRef.current.value === '') {
-      // reset the focus on the email to prevent it from flashing
-      emailRef.current.value = ' ';
-      emailRef.current.focus();
-    }
     setLoginState({...loginState, open: false, tryFirst: false});
     setloginButtonDisabled(true);
     setShowInvalidLoginHelper(false);
@@ -152,7 +147,8 @@ function LoginForm({ loginState, setLoginState }) {
               onChange={() => handleChange()}
               onKeyDown={(e) => handleKeyDown(e)}
               error={showInvalidLoginHelper}
-              InputProps={{id: "emailinput"}}
+              InputProps={{id: "emailinput", sx:{backgroundColor: 'white'}}}
+              InputLabelProps={{shrink: true}}
             />
             <VisibilityPasswordTextField
               variant="outlined"
@@ -165,6 +161,7 @@ function LoginForm({ loginState, setLoginState }) {
               onChange={() => handleChange()}
               onKeyDown={(e) => handleKeyDown(e)}
               error={showInvalidLoginHelper}
+              InputLabelProps={{shrink: true}}
             />
             <Stack direction="row" justifyContent="flex-end">
               <ButtonGroup variant="contained" size="small">

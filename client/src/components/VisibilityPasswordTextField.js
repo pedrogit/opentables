@@ -12,6 +12,7 @@ function VisibilityPasswordTextField({ ...rest }) {
       type={isVisible ? "text" : "password"}
       InputProps={{
         id: "passwordinput",
+        sx: {backgroundColor: 'white'},
         endAdornment: (
           <InputAdornment position="end">
             <IconButton
