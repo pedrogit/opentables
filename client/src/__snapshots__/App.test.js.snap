@@ -2,7 +2,7 @@
 
 exports[`App has a valid snapshot 1`] = `
 <div
-  className="MuiContainer-root MuiContainer-maxWidthLg MuiContainer-disableGutters App css-1p4tas-MuiContainer-root"
+  className="MuiContainer-root MuiContainer-maxWidth100% MuiContainer-disableGutters App css-tco0qi-MuiContainer-root"
 >
   <header
     className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionStatic css-1vbdj7k-MuiPaper-root-MuiAppBar-root"
@@ -14,7 +14,7 @@ exports[`App has a valid snapshot 1`] = `
         className="MuiBox-root css-i9gxme"
       />
       <button
-        className="MuiButton-root MuiButton-outlined MuiButton-outlinedInherit MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-ikb3mf-MuiButtonBase-root-MuiButton-root"
+        className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-1y942vo-MuiButtonBase-root-MuiButton-root"
         disabled={false}
         onBlur={[Function]}
         onClick={[Function]}
@@ -37,7 +37,7 @@ exports[`App has a valid snapshot 1`] = `
     </div>
   </header>
   <div
-    className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+    className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-vfzlz2-MuiCollapse-root"
     style={
       Object {
         "minHeight": "0px",
@@ -51,13 +51,14 @@ exports[`App has a valid snapshot 1`] = `
         className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
       >
         <div
-          className="MuiFormControl-root css-1nrlq1o-MuiFormControl-root"
+          className="MuiFormControl-root css-q8hpuo-MuiFormControl-root"
+          id="loginform"
         >
           <div
-            className="css-1p5q5e5-MuiStack-root"
+            className="css-t070a8-MuiStack-root"
           >
             <div
-              className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1yf420b-MuiPaper-root-MuiAlert-root"
+              className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1muqmc4-MuiPaper-root-MuiAlert-root"
               role="alert"
             >
               <div
@@ -87,14 +88,14 @@ exports[`App has a valid snapshot 1`] = `
               </div>
             </div>
             <div
-              className="css-e53awj-MuiStack-root"
+              className="css-1wbgkc2-MuiStack-root"
             >
               <div
                 className="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-wb57ya-MuiFormControl-root-MuiTextField-root"
                 onKeyDown={[Function]}
               >
                 <label
-                  className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-focused Mui-required css-19v7tfd-MuiFormLabel-root-MuiInputLabel-root"
+                  className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-19v7tfd-MuiFormLabel-root-MuiInputLabel-root"
                   data-shrink={true}
                 >
                   Email Address
@@ -107,7 +108,7 @@ exports[`App has a valid snapshot 1`] = `
                   </span>
                 </label>
                 <div
-                  className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-sizeSmall css-1d5hft2-MuiInputBase-root-MuiOutlinedInput-root"
+                  className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1wkn2r2-MuiInputBase-root-MuiOutlinedInput-root"
                   onClick={[Function]}
                 >
                   <input
@@ -115,6 +116,7 @@ exports[`App has a valid snapshot 1`] = `
                     autoFocus={false}
                     className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall css-1n4twyu-MuiInputBase-input-MuiOutlinedInput-input"
                     disabled={false}
+                    id="emailinput"
                     onAnimationStart={[Function]}
                     onBlur={[Function]}
                     onChange={[Function]}
@@ -142,8 +144,8 @@ exports[`App has a valid snapshot 1`] = `
                 onKeyDown={[Function]}
               >
                 <label
-                  className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1k4rsau-MuiFormLabel-root-MuiInputLabel-root"
-                  data-shrink={false}
+                  className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-19v7tfd-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
                 >
                   Password
                   <span
@@ -155,7 +157,7 @@ exports[`App has a valid snapshot 1`] = `
                   </span>
                 </label>
                 <div
-                  className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1y63yik-MuiInputBase-root-MuiOutlinedInput-root"
+                  className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1q6irb6-MuiInputBase-root-MuiOutlinedInput-root"
                   onClick={[Function]}
                 >
                   <input
@@ -164,6 +166,7 @@ exports[`App has a valid snapshot 1`] = `
                     autoFocus={false}
                     className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedEnd css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input"
                     disabled={false}
+                    id="passwordinput"
                     onAnimationStart={[Function]}
                     onBlur={[Function]}
                     onChange={[Function]}
@@ -212,7 +215,7 @@ exports[`App has a valid snapshot 1`] = `
                     className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
                   >
                     <legend
-                      className="css-173wfxe"
+                      className="css-1z7n62"
                     >
                       <span>
                         Password
@@ -223,66 +226,73 @@ exports[`App has a valid snapshot 1`] = `
                 </div>
               </div>
               <div
-                className="MuiButtonGroup-root MuiButtonGroup-contained css-do7yro-MuiButtonGroup-root"
-                role="group"
+                className="css-181c0ax-MuiStack-root"
               >
-                <button
-                  className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
-                  disabled={false}
-                  onBlur={[Function]}
-                  onClick={[Function]}
-                  onContextMenu={[Function]}
-                  onDragLeave={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyUp={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onTouchEnd={[Function]}
-                  onTouchMove={[Function]}
-                  onTouchStart={[Function]}
-                  tabIndex={0}
-                  type="button"
+                <div
+                  className="MuiButtonGroup-root MuiButtonGroup-contained css-do7yro-MuiButtonGroup-root"
+                  role="group"
                 >
-                  Cancel
-                </button>
-                <button
-                  className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
-                  disabled={true}
-                  onBlur={[Function]}
-                  onClick={[Function]}
-                  onContextMenu={[Function]}
-                  onDragLeave={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyUp={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onTouchEnd={[Function]}
-                  onTouchMove={[Function]}
-                  onTouchStart={[Function]}
-                  tabIndex={-1}
-                  type="button"
-                >
-                  Login
-                </button>
+                  <button
+                    className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
+                    disabled={false}
+                    id="logincancelbutton"
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={0}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
+                    disabled={true}
+                    id="loginbutton"
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={-1}
+                    type="button"
+                  >
+                    Login
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          <p
-            className="MuiFormHelperText-root MuiFormHelperText-sizeMedium MuiFormHelperText-contained css-hnpak8-MuiFormHelperText-root"
-          >
-            <span
-              className="notranslate"
-              dangerouslySetInnerHTML={
-                Object {
-                  "__html": "&#8203;",
+            <p
+              className="MuiFormHelperText-root MuiFormHelperText-sizeMedium MuiFormHelperText-contained css-rlg8wj-MuiFormHelperText-root"
+              id="loginhelper"
+            >
+              <span
+                className="notranslate"
+                dangerouslySetInnerHTML={
+                  Object {
+                    "__html": "&#8203;",
+                  }
                 }
-              }
-            />
-          </p>
+              />
+            </p>
+          </div>
         </div>
       </div>
     </div>
