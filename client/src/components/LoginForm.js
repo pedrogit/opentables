@@ -120,7 +120,10 @@ function LoginForm({ loginState, setLoginState }) {
   return (
     <Collapse in={loginState.open} sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
       <FormControl id="loginform" sx={{width: '100%'}}>
-        <Stack spacing={2} fullWidth={true} padding='5px'>
+        <Stack 
+          spacing={2} 
+          padding='5px'
+        >
           <Alert severity={
               loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
             } 
@@ -138,32 +141,32 @@ function LoginForm({ loginState, setLoginState }) {
 
           <Stack 
             direction={{ xs: 'column', sm: 'row' }} 
-            spacing={2} 
-            fullWidth={true}>
-              <TextField
-                variant="outlined"
-                required
-                size="small"
-                fullWidth
-                label="Email Address"
-                inputRef={emailRef}
-                onChange={() => handleChange()}
-                onKeyDown={(e) => handleKeyDown(e)}
-                error={showInvalidLoginHelper}
-                InputProps={{id: "emailinput"}}
-              />
-              <VisibilityPasswordTextField
-                variant="outlined"
-                size="small"
-                required
-                fullWidth
-                label="Password"
-                autoComplete="off"
-                inputRef={passwordRef}
-                onChange={() => handleChange()}
-                onKeyDown={(e) => handleKeyDown(e)}
-                error={showInvalidLoginHelper}
-              />
+            spacing={2}
+          >
+            <TextField
+              variant="outlined"
+              required
+              size="small"
+              fullWidth
+              label="Email Address"
+              inputRef={emailRef}
+              onChange={() => handleChange()}
+              onKeyDown={(e) => handleKeyDown(e)}
+              error={showInvalidLoginHelper}
+              InputProps={{id: "emailinput"}}
+            />
+            <VisibilityPasswordTextField
+              variant="outlined"
+              size="small"
+              required
+              fullWidth
+              label="Password"
+              autoComplete="off"
+              inputRef={passwordRef}
+              onChange={() => handleChange()}
+              onKeyDown={(e) => handleKeyDown(e)}
+              error={showInvalidLoginHelper}
+            />
             <Stack direction="row" justifyContent="flex-end">
               <ButtonGroup variant="contained" size="small">
                 <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
@@ -223,6 +226,5 @@ function LoginButton({ setLoginState }) {
     }}>{buttonText}</Button>
   );
 }
-
 
 export {LoginForm, LoginButton};
