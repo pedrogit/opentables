@@ -84,4 +84,5 @@ function Item({ template, item, rowNb, setLoginState }) {
   );
 }
 
-export default memo(Item);
+//export default memo(Item);
+export default Item;
