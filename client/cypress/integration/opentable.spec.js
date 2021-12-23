@@ -14,7 +14,13 @@ describe('opentable basic tests', () => {
         // so we must tell it to visit our website with the `cy.visit()` command.
         // Since we want to visit the same URL at the start of all our tests,
         // we include it in our beforeEach function so that it runs before each test
-        cy.visit('http://localhost:3000')
+        cy.get('#loginlogoutbutton')
+          .then(($loginbutton) => {
+            if (!($loginbutton.text().includes('Login'))) {
+              cy.get('#loginlogoutbutton').click();
+            }
+          });
+        cy.get('#loginlogoutbutton').should('contain', 'Login');
     })
   
     it('makes the login form appear and disappear', () => {
@@ -65,8 +71,6 @@ describe('opentable basic tests', () => {
 
         // logout
         cy.get('#loginlogoutbutton').should('contain', 'Logout admin@gmail.com');
-        cy.get('#loginlogoutbutton').click();
-        cy.get('#loginlogoutbutton').should('contain', 'Login');
     })
 
 })
