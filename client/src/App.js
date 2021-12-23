@@ -12,6 +12,7 @@ import Toolbar from "@mui/material/Toolbar";
 import List from "./components/List";
 import {LoginForm, LoginButton} from "./components/LoginForm";
 const Globals = require("../../client/src/common/globals");
+const Utils = require("./common/utils");
 
 const theme = createTheme({
   palette: {
@@ -36,6 +37,7 @@ function App({ viewid }) {
   const [loginState, setLoginState] = React.useState({open: false});
 
   React.useEffect(() => {
+    //console.log('App useEffect()...');
     setLoginState({
       open: false,
       msg: {
@@ -56,6 +58,7 @@ function App({ viewid }) {
     });
   }, [viewid]);
 
+  //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
     <ThemeProvider theme={theme}>
       <Container className="App" disableGutters maxWidth="100%">
@@ -74,23 +77,24 @@ function App({ viewid }) {
             <Stack sx={{backgroundColor: theme.palette.primary.light, padding:'3px'}}>
               <Typography sx={{fontWeight:'bold', color: theme.palette.primary.contrastText}}>List parameters</Typography>
               <List
-                template=''
-                schema={Globals.listOfAllViews[Globals.listSchemaFieldName]}
-                items={[data]}
+                type='View'
+                view={{item_template: ''}}
+                list={Globals.listOfAllViews}
+                items={[Utils.objWithout(data, "_childlist")]}
                 setLoginState={setLoginState}
-                //sx={{padding: '5px', borderRadius: '5px'}}
               />
               <List
-                template=''
-                schema={Globals.listOfAllLists[Globals.listSchemaFieldName]}
-                items={[data._childlist]}
+                type='List'
+                view={{item_template: ''}}
+                list={Globals.listOfAllLists}
+                items={[Utils.objWithout(data._childlist, "items")]}
                 setLoginState={setLoginState}
               />
             </Stack>
-            <List 
-              xsx={{border:'1px solid', borderColor: theme.palette.primary.light}}
-              template={data.item_template}
-              schema={data._childlist.listschema}
+            <List
+              type='Items'
+              view={Utils.objWithout(data, "_childlist")}
+              list={Utils.objWithout(data._childlist, "items")}
               items={data._childlist.items}
               setLoginState={setLoginState}
             />

@@ -9,11 +9,11 @@ import AlertTitle from "@mui/material/AlertTitle";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useTheme, lighten } from "@mui/material/styles";
-import Cookies from 'js-cookie'
-import jwt from 'jsonwebtoken'
 import axios from "axios";
+import Cookies from 'js-cookie'
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
+import getUser from "../clientUtils";
 const Errors = require("../common/errors");
 
 function LoginForm({ loginState, setLoginState }) {
@@ -24,7 +24,7 @@ function LoginForm({ loginState, setLoginState }) {
   const theme = useTheme();
 
   React.useEffect(() => {
-    if (loginState.open) {
+    if (loginState && loginState.open) {
       // dont' make the values disappear when closing
       emailRef.current.value = '';
       passwordRef.current.value = '';
@@ -33,9 +33,11 @@ function LoginForm({ loginState, setLoginState }) {
   }, [loginState]);
 
   const handleClose = () => {
-    setLoginState({...loginState, open: false, tryFirst: false});
-    setloginButtonDisabled(true);
-    setShowInvalidLoginHelper(false);
+    //if (loginState.open) {
+      setLoginState({...loginState, open: false, tryFirst: false});
+      setloginButtonDisabled(true);
+      setShowInvalidLoginHelper(false);      
+    //}
   };
 
   const handleKeyDown = (e) => {
@@ -50,7 +52,7 @@ function LoginForm({ loginState, setLoginState }) {
   }
 
   var doAction = function (addCredentials = false) {
-    if (loginState.action !== undefined) {
+    if (loginState !== undefined && loginState.action !== undefined) {
       // if credentials were entered add an authorization header
       if (addCredentials) {
         loginState.action = {
@@ -107,29 +109,29 @@ function LoginForm({ loginState, setLoginState }) {
   };
 
   // try to perform the action before opening
-  if (loginState.tryFirst !== undefined && loginState.tryFirst === true) {
+  if (loginState !== undefined && loginState.tryFirst !== undefined && loginState.tryFirst === true) {
     doAction();
   }
 // 
   return (
-    <Collapse in={loginState.open} sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+    <Collapse in={loginState && loginState.open} sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
       <FormControl id="loginform" sx={{width: '100%'}}>
         <Stack 
           spacing={2} 
           padding='5px'
         >
           <Alert severity={
-              loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
+              loginState === undefined || loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
             } 
             color="primary"
             sx={{padding: '0px'}}>
             <AlertTitle>{
-              loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
+              loginState === undefined || loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
               (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
             }
             </AlertTitle>
               {
-                loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
+                loginState === undefined || loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
               }
           </Alert>
 
@@ -185,41 +187,47 @@ function LoginForm({ loginState, setLoginState }) {
 
 function LoginButton({ setLoginState }) {
   const [visible, setVisible] = React.useState(true);
-  var user = '';
   var action = 'login';
   var buttonText = 'Login';
-  var authtoken = Cookies.get('authtoken');
-  if (authtoken) {
-     user = jwt.decode(authtoken).email;
+  var user = getUser();
+  if (user) {
      buttonText = 'Logout ' + user;
   }
+
   return (
-    <Button variant="text" color="inherit" onClick={() => {
-      if (user) {
-        Cookies.remove('authtoken');
-        setVisible(!visible);
-      }
-      else {
-        setLoginState({
-          open: (action === 'login'), 
-          msg: {
-            severity: "info",
-            title: "Login",
-            text:  'Please login with valid credentials...'
-          },
-          action: {
-            method: "get",
-            url: "http://localhost:3001/api/opentables/login",
-            callback: (success, data) => {
-              if (success) {
-                setVisible(true);
+    <Button
+      id='loginlogoutbutton'
+      variant="text" 
+      color="inherit" 
+      onClick={() => {
+        if (user) {
+          Cookies.remove('authtoken');
+          setVisible(!visible);
+        }
+        else {
+          setLoginState({
+            open: (action === 'login'), 
+            msg: {
+              severity: "info",
+              title: "Login",
+              text:  'Please login with valid credentials...'
+            },
+            action: {
+              method: "get",
+              url: "http://localhost:3001/api/opentables/login",
+              callback: (success, data) => {
+                if (success) {
+                  setVisible(true);
+                }
               }
-            }
-          },
-          tryFirst: (action === 'logout')
-        });        
-      }
-    }}>{buttonText}</Button>
+            },
+            tryFirst: (action === 'logout')
+          });
+        }
+    }}
+    >
+      {buttonText}
+    </Button>
   );
 }
 

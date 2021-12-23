@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import renderer from 'react-test-renderer';
 
-import LoginForm from './LoginForm';
+import { LoginForm } from './LoginForm';
 
 describe('LoginForm', () => {
   it('renders without crashing', () => {

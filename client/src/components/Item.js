@@ -14,14 +14,14 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({ template, item, rowNb, setLoginState }) {
+function Item({ template, item, rowNb, setLoginState, handleAuth }) {
   const [newItem, setItem] = React.useState(item);
 
   const theme = useTheme();
 
   var defaultSx = { bgcolor: rowNb % 2 ? "#FFF" : "#EEE", padding: 1 };
 
-  var patchHandler = function (val) {
+  var handlePatch = function (val, callback) {
     setLoginState({
       open: false,
       msg: {
@@ -39,6 +39,7 @@ function Item({ template, item, rowNb, setLoginState }) {
         callback: (success, data) => {
           if (success) {
             setItem(data);
+            callback(success, data[Object.keys(val)[0]]);
           }
         }
       },
@@ -48,21 +49,25 @@ function Item({ template, item, rowNb, setLoginState }) {
   };
 
   var setBindings = function (item) {
+    //console.log('Item setBindings()...');
+
     // add property name and rest handlers
     var result = {};
     for (var key in item) {
       if (item.hasOwnProperty(key)) {
         result[key] = {
-          patchHandler: patchHandler,
+          handlePatch: handlePatch,
+          handleAuth: handleAuth,
           prop: key,
           val: item[key] ? item[key] : "",
         };
       }
     }
+    //result.key = result._id.val;
     return result;
   };
 
-  //console.log('Render item...');
+  //console.log('Render Item (' +  item.name + ')...');
 
   return (
     <Box className="item" sx={defaultSx}>
@@ -74,6 +79,7 @@ function Item({ template, item, rowNb, setLoginState }) {
         onError={() => {}}
         renderError={({ error }) => <span>{error}</span>}
         showWarnings={false}
+        disableKeyGeneration={true} // prevent provided jsx to be reconstructed at every render and to keep their states
         allowUnknownElements={false}
         renderUnrecognized={(tagName) => (
           <span style={{ color: theme.palette.primary.main }}>

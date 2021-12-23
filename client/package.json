@@ -29,7 +29,7 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "testall": "cypress run --browser chrome --config video=false & react-scripts test"
+    "testall": "cypress run --browser chrome --config video=false,screenshotOnRunFailure=false & react-scripts test"
   },
   "eslintConfig": {
     "extends": [

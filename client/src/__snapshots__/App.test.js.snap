@@ -16,6 +16,7 @@ exports[`App has a valid snapshot 1`] = `
       <button
         className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-1y942vo-MuiButtonBase-root-MuiButton-root"
         disabled={false}
+        id="loginlogoutbutton"
         onBlur={[Function]}
         onClick={[Function]}
         onContextMenu={[Function]}

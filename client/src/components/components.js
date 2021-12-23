@@ -41,26 +41,29 @@ function Label(props) {
  ********************/
 function Text(props) {
   const propName = props.val ? (props.val.prop ? props.val.prop : "Missing property name") : undefined;
-  const propVal = props.val ? (props.val.val ? props.val.val : "Missing value") : undefined
+  const initPropVal = props.val ? (props.val.val ? props.val.val : "Missing value") : undefined
 
+  const valueRef = React.useRef();
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [elWidth, setElWidth] = React.useState(0);
-  const [editVal, setEditVal] = React.useState(propVal);
-  const [savedVal, setSavedVal] = React.useState(propVal);
+  //const [anchorEl, setAnchorEl] = React.useState(null);
+  //const [elWidth, setElWidth] = React.useState(0);
+  const [editVal, setEditVal] = React.useState(initPropVal);
+  const [propVal, setPropVal] = React.useState(initPropVal);
+
+  const [editing, setEditing] = React.useState(false);
 
   if (props.val && (propName || editVal)) {
 
     var defaultSx = {};
 
-    const handleClick = (e) => {
-      e.preventDefault();
-      setAnchorEl(e.currentTarget);
-      setElWidth(e.currentTarget.offsetWidth);
+    const handleEdit = (e) => {
+      props.val.handleAuth('patch', props.val.prop, (auth) => {
+        setEditing(true);
+      });
     };
 
     const handleClose = () => {
-      setAnchorEl(null);
+      setEditing(false)
     };
 
     const handleChange = (val) => {
@@ -68,9 +71,10 @@ function Text(props) {
     };
 
     const handleSave = () => {
-      if (props.val.patchHandler({ [propName]: editVal })) {
-        setSavedVal(editVal);
-      }
+      props.val.handlePatch({ [propName]: editVal }, (success, val) => {
+        setPropVal(val);
+        setEditing(false);
+      });
     };
 
     const keyPressed = (e) => {
@@ -79,9 +83,6 @@ function Text(props) {
       }
     };
 
-    const open = Boolean(anchorEl);
-    const id = open ? "simple-popover" : undefined;
-
     const inputLabel = 'Edit "' + propName + '"...';
     const getWidth = () => {
       const labelFontWidth = 0.75 * theme.typography.fontSize * 0.4;
@@ -89,7 +90,7 @@ function Text(props) {
       const inputPadding = 28;
       const popoverPadding = 16;
       return Math.max(
-        elWidth + inputPadding + popoverPadding,
+        (valueRef && valueRef.current && valueRef.current.offsetWidth ? valueRef.current.offsetWidth : 0) + inputPadding + popoverPadding,
         labelW + 2 * labelFontWidth + inputPadding + popoverPadding
       );
     };
@@ -100,15 +101,15 @@ function Text(props) {
           <Label {...{ ...props, val: propName }} />
           <Typography
             sx={{ ...defaultSx, ...props.sx }}
-            onDoubleClick={handleClick}
+            onDoubleClick={handleEdit}
+            ref={valueRef}
           >
-            {savedVal}
+            {propVal}
           </Typography>
         </Stack>
         <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
+          open={editing}
+          anchorEl={valueRef.current}
           onClose={handleClose}
           anchorOrigin={{
             vertical: "bottom",

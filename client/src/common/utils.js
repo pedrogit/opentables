@@ -3,6 +3,7 @@ const { assert } = require("chai");
 const jwt = require("jsonwebtoken");
 
 const Globals = require("./globals");
+const Errors = require("../common/errors");
 
 const afterJsonKeyRegEx = "(?=[\\,\\}]|$)";
 const afterJsonValueRegEx = "(?=[\\,\\}\\]]|$)";
@@ -195,4 +196,44 @@ exports.isObjEmpty = function (obj) {
     Object.getPrototypeOf(obj) === Object.prototype
   );
 };
+
+exports.validatePerm = function(user, listOwner, listCPerm, listWPerm, listRPerm, throwerror = true)
+{
+  // admin and listowner have all permissions
+  if (user === process.env.ADMIN_EMAIL || user === listOwner) {
+    return true;
+  }
+
+  if (user !== Globals.unauthUserName && user !== '') {
+    // if listCPerm permission is @all or the user is listed, grant permission
+    if (
+      listCPerm &&
+      (listCPerm === "@all" || listCPerm.split(/\s*,\s*/).includes(user))
+    ) {
+      return true;
+    }
+
+    // if listWPerm permission is @all or the user is listed, grant permission
+    if (
+      listWPerm &&
+      (listWPerm === "@all" || listWPerm.split(/\s*,\s*/).includes(user))
+    ) {
+      return true;
+    }
+  }
+
+  // if listRPerm permission is @all or the user is listed, grant permission
+  if (
+    listRPerm &&
+    (listRPerm === "@all" || listRPerm.split(/\s*,\s*/).includes(user))
+  ) {
+    return true;
+  }
+  if (throwerror) {
+    throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+  }
+  return false;
+}
+
+
 

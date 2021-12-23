@@ -117,50 +117,6 @@ class Controler {
     return items;
   }
 
-  static validatePerm(
-    user,
-    listOwner,
-    listCPerm,
-    listWPerm,
-    listRPerm,
-    throwerror = true
-  ) {
-    // admin and listowner have all permissions
-    if (user === process.env.ADMIN_EMAIL || user === listOwner) {
-      return true;
-    }
-
-    if (user !== Globals.unauthUserName) {
-      // if listCPerm permission is @all or the user is listed, grant permission
-      if (
-        listCPerm &&
-        (listCPerm === "@all" || listCPerm.split(/\s*,\s*/).includes(user))
-      ) {
-        return true;
-      }
-
-      // if listWPerm permission is @all or the user is listed, grant permission
-      if (
-        listWPerm &&
-        (listWPerm === "@all" || listWPerm.split(/\s*,\s*/).includes(user))
-      ) {
-        return true;
-      }
-    }
-
-    // if listRPerm permission is @all or the user is listed, grant permission
-    if (
-      listRPerm &&
-      (listRPerm === "@all" || listRPerm.split(/\s*,\s*/).includes(user))
-    ) {
-      return true;
-    }
-    if (throwerror) {
-      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-    }
-    return false;
-  }
-
   async getParentList(item) {
     var parentList;
     if (!item[Globals.listIdFieldName]) {
@@ -232,7 +188,7 @@ class Controler {
 
     if (Controler.isList(item)) {
       // validate permissions
-      Controler.validatePerm(
+      Utils.validatePerm(
         user,
         item[Globals.ownerFieldName],
         item[Globals.readWritePermFieldName],
@@ -279,7 +235,7 @@ class Controler {
         // if the requested list is the list of list, remove list for which the user deon not have read permissions
         if (itemid === Globals.listofAllListId) {
           item.items = item.items.filter((item) => {
-            return Controler.validatePerm(
+            return Utils.validatePerm(
               user,
               item[Globals.ownerFieldName],
               item[Globals.readWritePermFieldName],
@@ -298,7 +254,7 @@ class Controler {
       var parentList = await this.getParentList(item);
 
       // validate permissions
-      Controler.validatePerm(
+      Utils.validatePerm(
         user,
         parentList[Globals.ownerFieldName],
         parentList[Globals.readWritePermFieldName],
@@ -373,7 +329,7 @@ class Controler {
     var parentList = await this.getParentList(item);
 
     // validate permissions
-    Controler.validatePerm(
+    Utils.validatePerm(
       user,
       parentList[Globals.ownerFieldName],
       parentList[Globals.readWritePermFieldName],
@@ -440,13 +396,13 @@ class Controler {
     // validate permissions
     if (Controler.isList(item)) {
       // list patch permissions are defined at the list level (not the parent level)
-      Controler.validatePerm(
+      Utils.validatePerm(
         user,
         item[Globals.ownerFieldName],
         item[Globals.readWritePermFieldName]
       );
     } else {
-      Controler.validatePerm(
+      Utils.validatePerm(
         user,
         parentList[Globals.ownerFieldName],
         parentList[Globals.readWritePermFieldName],
@@ -550,7 +506,7 @@ class Controler {
         ),
       });
     } else {
-      Controler.validatePerm(
+      Utils.validatePerm(
         user,
         parentList[Globals.ownerFieldName],
         parentList[Globals.readWritePermFieldName],
