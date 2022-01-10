@@ -21,6 +21,8 @@ function LoginForm({ loginState, setLoginState }) {
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
   const [loginButtonDisabled, setloginButtonDisabled] = React.useState(true);
+  const [doSuccessCallback, setDoSuccessCallback] = React.useState(false);
+
   const theme = useTheme();
 
   React.useEffect(() => {
@@ -36,7 +38,7 @@ function LoginForm({ loginState, setLoginState }) {
     //if (loginState.open) {
       setLoginState({...loginState, open: false, tryFirst: false});
       setloginButtonDisabled(true);
-      setShowInvalidLoginHelper(false);      
+      setShowInvalidLoginHelper(false);
     //}
   };
 
@@ -51,7 +53,17 @@ function LoginForm({ loginState, setLoginState }) {
     setloginButtonDisabled(!(emailRef.current.value && passwordRef.current.value));
   }
 
-  var doAction = function (addCredentials = false) {
+  // handle callback only after the login dialog has closed (so the edit popover gets rendred at the right location)
+  const handleSuccessCallback = () => {
+    console.log('doSuccessCallback=' + doSuccessCallback);
+    if (doSuccessCallback) {
+      console.log('doSuccessCallback');
+      loginState.action.callback(true);
+      setDoSuccessCallback(false);
+    }
+  }
+
+  const doAction = (addCredentials = false) => {
     if (loginState !== undefined && loginState.action !== undefined) {
       // if credentials were entered add an authorization header
       if (addCredentials) {
@@ -70,7 +82,12 @@ function LoginForm({ loginState, setLoginState }) {
         .then((res) => {
           if (res.status === 200 || res.statusText.toUpperCase() === "OK") {
             handleClose();
-            loginState.action.callback(true, res.data);
+            if (loginState.open && !res.data) {
+              setDoSuccessCallback(true);
+            }
+            else {
+              loginState.action.callback(true, res.data);
+            }
             return true;
           }
         })
@@ -114,7 +131,11 @@ function LoginForm({ loginState, setLoginState }) {
   }
 // 
   return (
-    <Collapse in={loginState && loginState.open} sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+    <Collapse 
+      in={loginState && loginState.open} 
+      sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}
+      onExited={handleSuccessCallback}
+    >
       <FormControl id="loginform" sx={{width: '100%'}}>
         <Stack 
           spacing={2} 
