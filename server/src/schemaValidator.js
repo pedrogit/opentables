@@ -74,33 +74,47 @@ class SchemaValidator {
       json = jsonstr;
     }
 
-    // 1) validate all required fields are present if strict
+    // 1) validate all required properties are present if strict
     if (strict) {
       const jsonkeys = Object.keys(json);
       //console.log(jsonkeys);
-      var missingField = "";
-      if (
-        !(jsonkeys === null) &&
-        !(jsonkeys.length === 0) &&
-        !this.schema.getRequired().every((field) => {
-          var inc = jsonkeys.includes(field);
-          if (!inc) {
-            missingField = field;
-          }
-          return inc;
+      if (jsonkeys.length === 0){
+        // generate default values for all required properties
+        this.schema.getRequired().map((key) => {
+          json[key] = this.schema.getDefault(key);
         })
-      ) {
-        throw new Error(
-          NodeUtil.format(
-            Errors.ErrMsg.SchemaValidator_MissingProp,
-            missingField
-          )
-        );
+      }
+      else {
+        var missingField = "";
+        if (!this.schema.getRequired().every((key) => {
+            var inc = jsonkeys.includes(key);
+            if (!inc) {
+              missingField = key;
+            }
+            return inc;
+          })
+        ) {
+          throw new Error(
+            NodeUtil.format(
+              Errors.ErrMsg.SchemaValidator_MissingProp,
+              missingField
+            )
+          );
+        }
+
       }
     }
+    else {
+      // set each provided property to it's default
+      Object.keys(json).forEach(key => {
+        if (json[key] === null || json[key] === '') {
+          json[key] = this.schema.getDefault(key);
+        }
+      })
+    }
 
-    // 2) if strict invalidate non schema fields
-    // 3) validate and sanitize each field
+    // 2) if strict invalidate non schema properties
+    // 3) validate and sanitize each property
     await this.traverse(json, null, 0, [
       this.validateField.bind(this),
       null,
@@ -109,31 +123,38 @@ class SchemaValidator {
     return json;
   }
 
-  // validate passed JSON fields
+  // validate passed JSON properties
   async validateField(key, obj, parentKey) {
-    if (!Object.keys(this.schema.schema).includes(key)) {
-      throw new Error(
-        NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidProp, key)
-      );
-    }
-    // if this.schema.schema[key] is an object iterate over each schema property for that field and call the corresponding validator
-    if (typeof this.schema.schema[key] === "object") {
-      for (var property in this.schema.schema[key]) {
-        if (property != "required") {
-          var validatorName = "validate_" + property;
-          obj[key] = await this[validatorName](
-            this.schema.schema[key][property],
-            key,
-            obj[key]
-          ); // pass object by value so the validator can modify it directly
+    // do not validate item ids
+    if (key !== Globals.itemIdFieldName) {
+      if (!Object.keys(this.schema.schema).includes(key)) {
+        throw new Error(
+          NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidProp, key)
+        );
+      }
+      // if this.schema.schema[key] is an object iterate over each schema property for that property and call the corresponding validator
+      if (typeof this.schema.schema[key] === "object") {
+        for (var property in this.schema.schema[key]) {
+            var validatorName = "validate_" + property;
+            obj[key] = await this[validatorName](
+              this.schema.schema[key][property],
+              key,
+              obj[key]
+            ); // pass object by value so the validator can modify it directly
         }
       }
+      // if this.schema.schema[key] is a simple type validate it
+      else {
+        obj[key] = await this.validate_type(
+          this.schema.schema[key],
+          key,
+          obj[key]
+        );
+      }
     }
-    // if this.schema.schema[key] is a simple type validate it
     else {
-      obj[key] = await this.validate_type(
-        this.schema.schema[key],
-        key,
+      obj[key] = await this.validate_type_objectid(
+        Globals.itemIdFieldName,
         obj[key]
       );
     }
@@ -403,6 +424,20 @@ class SchemaValidator {
       );
     }
 
+    return val;
+  }
+
+  validate_required(type, key, val) {
+    if (val === undefined || val === null || val === '') {
+      throw new Error(
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_Required, key)
+      );
+    }
+
+    return val;
+  }
+
+  validate_default(type, key, val) {
     return val;
   }
 }

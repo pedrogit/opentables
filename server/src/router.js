@@ -5,16 +5,10 @@ const asyncHandler = require("express-async-handler");
 
 const Globals = require("../../client/src/common/globals");
 const Utils = require("../../client/src/common/utils");
+const Errors = require("../../client/src/common/errors");
 
 const controler = require("./controler");
 
-var isNewUser = function (item) {
-  return (
-    item.hasOwnProperty(Globals.listIdFieldName) &&
-    item[Globals.listIdFieldName].toString() === Globals.userListId &&
-    item.hasOwnProperty("email")
-  );
-};
 
 const router = express.Router();
 /************************************************************************
@@ -87,15 +81,25 @@ router.get(
 router.post(
   "",
   asyncHandler(async (req, res) => {
+    res.status(404);
+    throw new Errors.NotFound(
+      Errors.ErrMsg.List_Missing
+    );
+  })
+);
+
+router.post(
+  "/:listid",
+  asyncHandler(async (req, res) => {
     // register new users as admin
-    if (isNewUser(req.body)) {
+    if (req.params.listid === Globals.userListId) {
       req.user = process.env.ADMIN_EMAIL;
     }
 
-    const item = await controler.insertMany(req.user, req.body);
+    const item = await controler.insertMany(req.user, req.params.listid, req.body);
 
     // convert email to cookie token when registering
-    if (isNewUser(item)) {
+    if (req.params.listid === Globals.userListId) {
       Utils.setCookieJWT(req, res, { email: item.email });
     }
 

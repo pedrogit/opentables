@@ -106,7 +106,9 @@ app.use("/api/" + Globals.APIKeyword, router);
 
 // Implement a generic error sending middleware
 app.use((err, req, res, next) => {
-  if (!err.statusCode) err.statusCode = 500;
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
 
   if (err.statusCode === 301) {
     return res.status(301).redirect("/not-found");

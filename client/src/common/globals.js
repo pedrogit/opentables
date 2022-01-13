@@ -27,7 +27,6 @@ Globals = {
   ...Globals,
   listOfAllLists: {
     [Globals.itemIdFieldName]: Globals.listofAllListId,
-    [Globals.listIdFieldName]: Globals.voidListId,
     name: "List of all lists",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
@@ -35,26 +34,16 @@ Globals = {
     [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
       "{" +
-      Globals.itemIdFieldName +
-      ": objectid, " +
-      Globals.listIdFieldName +
-      ": {type: objectid, required}, " +
       "name: {type: string, required}, " +
-      Globals.ownerFieldName +
-      ": {type: user, required}, " +
-      Globals.readWritePermFieldName +
-      ":  {type: user_list, required, lower}, " +
-      Globals.itemReadWritePermFieldName +
-      ":  {type: user_list, required, lower}, " +
-      Globals.itemReadPermFieldName +
-      ":  {type: user_list, required, lower}, " +
-      Globals.listSchemaFieldName +
-      ":  {type: schema, lower}" +
+      Globals.ownerFieldName + ": {type: user, required}, " +
+      Globals.readWritePermFieldName + ":  {type: user_list, required, lower}, " +
+      Globals.itemReadWritePermFieldName + ":  {type: user_list, required, lower}, " +
+      Globals.itemReadPermFieldName + ":  {type: user_list, required, lower}, " +
+      Globals.listSchemaFieldName + ":  {type: schema, lower}" +
       "}",
   },
   listOfAllViews: {
     [Globals.itemIdFieldName]: Globals.listofAllViewId,
-    [Globals.listIdFieldName]: Globals.voidListId,
     name: "List of all views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
@@ -62,22 +51,15 @@ Globals = {
     [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
       "{" +
-      Globals.itemIdFieldName +
-      ": objectid, " +
-      Globals.listIdFieldName +
-      ": {type: objectid, required}, " +
       "name: {type: string, required}, " +
-      Globals.ownerFieldName +
-      ": {type: user, required},  " +
-      Globals.readWritePermFieldName +
-      ":  {type: user_list, required, lower},  " +
+      Globals.ownerFieldName + ": {type: user, required},  " +
+      Globals.readWritePermFieldName + ":  {type: user_list, required, lower},  " +
       "item_template: template, " +
       "_childlist: embedded_listid" +
       "}",
   },
   listOfUsers: {
     [Globals.itemIdFieldName]: Globals.userListId,
-    [Globals.listIdFieldName]: Globals.listofAllListId,
     name: "List of all users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
@@ -88,7 +70,6 @@ Globals = {
   },
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
-    [Globals.listIdFieldName]: Globals.listofAllViewId,
     name: "View on the list of users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
@@ -97,7 +78,6 @@ Globals = {
   },
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
-    [Globals.listIdFieldName]: Globals.listofAllViewId,
     name: "View on the list of all views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",

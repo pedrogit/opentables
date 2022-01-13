@@ -61,7 +61,6 @@ function init() {
 
     it("2 - Register the owner user", (done) => {
       newUser = {
-        [Globals.listIdFieldName]: Globals.userListId,
         firstname: "The",
         lastname: "Owner",
         organisation: "Myself",
@@ -70,7 +69,7 @@ function init() {
       };
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.userListId)
         .send(newUser)
         .end((err, response) => {
           newUser = {
@@ -83,7 +82,10 @@ function init() {
           };
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal(newUser);
+          expect(response.body).to.deep.equal({
+            ...newUser,
+            [Globals.listIdFieldName]: Globals.userListId
+          });
           expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
           expect(response).to.have.cookie("authtoken");
           done();
@@ -92,7 +94,6 @@ function init() {
 
     it("3 - Register the other user", (done) => {
       newUser = {
-        [Globals.listIdFieldName]: Globals.userListId,
         firstname: "The",
         lastname: "Other",
         organisation: "Itself",
@@ -101,7 +102,7 @@ function init() {
       };
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.userListId)
         .send(newUser)
         .end((err, response) => {
           newUser = {
@@ -114,7 +115,10 @@ function init() {
           };
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal(newUser);
+          expect(response.body).to.deep.equal({
+            ...newUser,
+            [Globals.listIdFieldName]: Globals.userListId
+          });
           expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
           expect(response).to.have.cookie("authtoken");
           done();
@@ -129,10 +133,8 @@ try {
   csv()
     .fromFile(path.resolve("./server/test/testPermissions.csv"))
     .then(function (permissionTests) {
-      //console.log(permissionTests);
 
       lastList = {
-        [Globals.listIdFieldName]: Globals.listofAllListId,
         name: "Permission tests list",
         [Globals.ownerFieldName]: "owner@gmail.com",
         [Globals.readWritePermFieldName]: "x@auth",
@@ -149,7 +151,7 @@ try {
           it(i + ".1 - Create list as " + permissionTests[i].user, (done) => {
             chai
               .request(server)
-              .post("/api/" + Globals.APIKeyword)
+              .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
               .send(lastList)
               .auth(
                 userEmail(permissionTests[i].user),
@@ -168,6 +170,7 @@ try {
                   expect(response.body).to.deep.equal({
                     ...lastList,
                     [Globals.itemIdFieldName]: lastListID,
+                    [Globals.listIdFieldName]: Globals.listofAllListId
                   });
                 } else {
                   expect(response).to.have.status(403);
@@ -237,7 +240,6 @@ try {
         let j = 3 * i + 4;
         reset();
         let lastList = {
-          [Globals.listIdFieldName]: Globals.listofAllListId,
           name: "Permission tests list",
           [Globals.ownerFieldName]: "owner@gmail.com",
           [Globals.readWritePermFieldName]: "@owner",
@@ -250,7 +252,7 @@ try {
           it("Create a list as " + permissionTests[j].user, (done) => {
             chai
               .request(server)
-              .post("/api/" + Globals.APIKeyword)
+              .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
               .send(lastList)
               .auth(
                 userEmail(permissionTests[j].user),
@@ -262,6 +264,7 @@ try {
                 expect(response.body).to.deep.equal({
                   ...lastList,
                   [Globals.itemIdFieldName]: lastListID,
+                  [Globals.listIdFieldName]: Globals.listofAllListId
                 });
                 done();
               });
@@ -328,12 +331,11 @@ try {
               (done) => {
                 lastItem = {
                   field1: "val1",
-                  [Globals.listIdFieldName]: lastListID,
                 };
 
                 chai
                   .request(server)
-                  .post("/api/" + Globals.APIKeyword)
+                  .post("/api/" + Globals.APIKeyword + "/" + lastListID)
                   .send(lastItem)
                   .auth(
                     userEmail(permissionTests[l].user),
@@ -433,11 +435,10 @@ try {
               (done) => {
                 lastItem = {
                   field1: "val3",
-                  [Globals.listIdFieldName]: lastListID,
                 };
                 chai
                   .request(server)
-                  .post("/api/" + Globals.APIKeyword)
+                  .post("/api/" + Globals.APIKeyword + "/" + lastListID)
                   .send(lastItem)
                   .auth(
                     userEmail(permissionTests[l].user),

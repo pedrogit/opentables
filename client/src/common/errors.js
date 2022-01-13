@@ -33,31 +33,38 @@ class InternalServerError extends Error {
   }
 }
 
+class FatalServerError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 599;
+  }
+}
+
 var ErrMsg = {
   Database_CouldNotConnect: "Could not connect to database...",
   InvalidUser: "User does not exists...",
   CouldNotLogin: "Could not login user...",
-  Forbidden: "User does not have sufficient permission to execute this task...",
+  Forbidden: "User does not have sufficient permission to execute this request...",
   MalformedID: "Malformed ID (%s)...",
+  CouldNotCreate: "Could not create %s...",
+
   Schema_Null: "Schema can not be null...",
   Schema_Malformed: "JSON schema is not well formed...",
   Schema_TooManyLevels: 'Too many levels for schema "%s"...',
   Schema_InvalidValue: "Invalid value (%s) for %s...",
   //'Schema_InvalidSchema': 'Invalid schema (%s). %s...',
   Schema_InvalidSchema: "Invalid schema (%s)...",
-  Schema_InvalidSchemaParameter:
-    'Invalid schema parameter (%s) for field "%s"...',
+  Schema_InvalidSchemaParameter: 'Invalid schema parameter (%s) for property "%s"...',
 
-  SchemaValidator_NotUnique:
-    'JSON object is not valid. Field "%s" should be unique but value (%s) already exists...',
+  SchemaValidator_NotUnique: 'JSON object is not valid. Property "%s" should be unique but value (%s) already exists...',
   SchemaValidator_NoControler: "No controler provided to Schema...",
   SchemaValidator_MissingProp: 'JSON object is not valid. "%s" is missing...',
-  SchemaValidator_InvalidProp:
-    'JSON object is not valid. "%s" is not a valid field for this schema...',
-  SchemaValidator_InvalidType:
-    'JSON object is not valid. Field "%s" value (%s) is not a valid %s...',
+  SchemaValidator_InvalidProp: 'JSON object is not valid. "%s" is not a valid property for this schema...',
+  SchemaValidator_InvalidType: 'JSON object is not valid. Property "%s" value (%s) is not a valid %s...',
   SchemaValidator_Malformed: "JSON object is not valid. %s...",
+  SchemaValidator_Required: "JSON object is not valid. A value is required for the %s property...",
 
+  List_Missing: "List ID is missing from query...",
   List_NotFound: "Could not find list (%s)...",
   Item_NotFound: "Could not find list item (%s)...",
   Item_Invalid: "Invalid item...",

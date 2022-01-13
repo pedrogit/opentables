@@ -5,6 +5,20 @@ const Globals = require("./globals");
 const Errors = require("./errors");
 const Utils = require("./utils");
 
+const validTypes = [
+  "objectid",
+  "embedded_listid",
+  "embedded_itemid_list",
+  "user",
+  "user_list",
+  "string",
+  "encrypted_string",
+  "number",
+  "schema",
+  "email",
+  "template",
+];
+
 class Schema {
   constructor(schema) {
     if (schema == null) {
@@ -47,19 +61,7 @@ class Schema {
       $defs: {
         onelevel: {
           type: "string",
-          enum: [
-            "objectid",
-            "embedded_listid",
-            "embedded_itemid_list",
-            "user",
-            "user_list",
-            "string",
-            "encrypted_string",
-            "number",
-            "schema",
-            "email",
-            "template",
-          ],
+          enum: validTypes,
         },
       },
       patternProperties: {
@@ -75,6 +77,7 @@ class Schema {
                 encrypt: { type: "boolean" },
                 unique: { type: "boolean" },
                 required: { type: "boolean" },
+                default: { type: "string" }
               },
               additionalProperties: false,
             },
@@ -103,6 +106,35 @@ class Schema {
       }
     }
     return required;
+  }
+
+  getType(key) {
+    if (this.schema.hasOwnProperty(key)) {
+      if (validTypes.includes(this.schema[key])) {
+        return this.schema[key];
+      }
+      if (this.schema[key]['type'] !== undefined && 
+          validTypes.includes(this.schema[key]['type'])) {
+       return this.schema[key]['type'];
+      }
+      return 'text'
+    } 
+    return null;
+  }
+
+  getDefault(key) {
+    if (this.schema.hasOwnProperty(key)) {
+      if (this.schema[key]['default'] !== undefined) {
+        return this.schema[key]['default'];
+      }
+
+      var propType = this.getType(key);
+      if (propType === 'string') return 'string';
+      if (propType === 'number') return 0;
+      if (propType === 'email') return "email@gmail.com";
+    }
+
+    return null;
   }
 
   getEmbeddedItems() {
