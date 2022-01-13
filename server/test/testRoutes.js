@@ -541,9 +541,9 @@ describe("testRoutes.js List API", () => {
         });
     });
 
-    it("5.3 - Patch the last list item", (done) => {
+    it("5.3 - Patch the last list item to its default value", (done) => {
       const secondItemPatch = {
-        field2: "field2 value222",
+        field2: "",
       };
 
       chai
@@ -554,7 +554,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           secondItem = {
             ...secondItem,
-            ...secondItemPatch,
+            field2: "string",
           };
           lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
           expect(response).to.have.status(200);
@@ -581,7 +581,47 @@ describe("testRoutes.js List API", () => {
         });
     });
 
-    it("5.5 - Get the list to check if new items were modified", (done) => {
+    it("5.5 - Patch the last list item", (done) => {
+      const secondItemPatch = {
+        field2: "field2 value222",
+      };
+
+      chai
+        .request(server)
+        .patch("/api/" + Globals.APIKeyword + "/" + itemIdToPatch)
+        .send(secondItemPatch)
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          secondItem = {
+            ...secondItem,
+            ...secondItemPatch,
+          };
+          lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
+          expect(response).to.have.status(200);
+          expect(response.body).to.be.a("object");
+          expect(response.body).to.deep.equal({
+            ...secondItem,
+            [Globals.listIdFieldName]: listIdToPatch
+          });
+          done();
+        });
+    });
+
+    it("5.6 - Get the last posted item", (done) => {
+      chai
+        .request(server)
+        .get("/api/" + Globals.APIKeyword + "/" + itemIdToPatch)
+        .end((err, response) => {
+          expect(response).to.have.status(200);
+          expect(response.body).to.deep.equal({
+            ...secondItem,
+            [Globals.listIdFieldName]: listIdToPatch
+          });
+          done();
+        });
+    });
+
+    it("5.7 - Get the list to check if new items were modified", (done) => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/" + listIdToPatch)
