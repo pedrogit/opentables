@@ -34,12 +34,12 @@ Globals = {
     [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
       "{" +
-      "name: {type: string, required}, " +
+      "name: {type: string, required, default: 'List name'}, " +
       Globals.ownerFieldName + ": {type: user, required}, " +
-      Globals.readWritePermFieldName + ":  {type: user_list, required, lower}, " +
-      Globals.itemReadWritePermFieldName + ":  {type: user_list, required, lower}, " +
-      Globals.itemReadPermFieldName + ":  {type: user_list, required, lower}, " +
-      Globals.listSchemaFieldName + ":  {type: schema, lower}" +
+      Globals.readWritePermFieldName + ": {type: user_list, required, lower, default: @owner}, " +
+      Globals.itemReadWritePermFieldName + ": {type: user_list, required, lower, default: @owner}, " +
+      Globals.itemReadPermFieldName + ": {type: user_list, required, lower, default: @all}, " +
+      Globals.listSchemaFieldName + ": {type: schema, default: 'prop1: string'}" +
       "}",
   },
   listOfAllViews: {
@@ -51,9 +51,9 @@ Globals = {
     [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
       "{" +
-      "name: {type: string, required}, " +
-      Globals.ownerFieldName + ": {type: user, required},  " +
-      Globals.readWritePermFieldName + ":  {type: user_list, required, lower},  " +
+      "name: {type: string, required, default: 'View name'}, " +
+      Globals.ownerFieldName + ": {type: user, required}, " +
+      Globals.readWritePermFieldName + ": {type: user_list, required, lower, default: @owner}, " +
       "item_template: template, " +
       "_childlist: embedded_listid" +
       "}",

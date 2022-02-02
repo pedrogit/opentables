@@ -480,8 +480,8 @@ describe("testRoutes.js List API", () => {
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           defaultItem = {
-            "field1" : "string",
-            "field2" : "string",
+            "field1" : "field1",
+            "field2" : "field2",
             [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
           };
           lastItems.push(Utils.objWithout(defaultItem, Globals.listIdFieldName));
@@ -554,7 +554,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           secondItem = {
             ...secondItem,
-            field2: "string",
+            field2: "field2",
           };
           lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
           expect(response).to.have.status(200);

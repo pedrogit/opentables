@@ -122,16 +122,19 @@ class Schema {
     return null;
   }
 
-  getDefault(key) {
+  getDefault(key, user) {
     if (this.schema.hasOwnProperty(key)) {
       if (this.schema[key]['default'] !== undefined) {
         return this.schema[key]['default'];
       }
 
       var propType = this.getType(key);
-      if (propType === 'string') return 'string';
+      
+      if (propType === 'schema') return 'prop1: "string"';
       if (propType === 'number') return 0;
       if (propType === 'email') return "email@gmail.com";
+      if (propType === 'user' || propType === 'user_list') return user;
+      return key;
     }
 
     return null;

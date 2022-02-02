@@ -60,7 +60,7 @@ class SchemaValidator {
   }
 
   // validate a json string against this schema
-  async validateJson(jsonstr, strict = true) {
+  async validateJson(jsonstr, strict = true, user = null) {
     var json;
     if (typeof jsonstr === "string") {
       try {
@@ -81,7 +81,7 @@ class SchemaValidator {
       if (jsonkeys.length === 0){
         // generate default values for all required properties
         this.schema.getRequired().map((key) => {
-          json[key] = this.schema.getDefault(key);
+          json[key] = this.schema.getDefault(key, user);
         })
       }
       else {
@@ -108,7 +108,7 @@ class SchemaValidator {
       // set each provided property to it's default
       Object.keys(json).forEach(key => {
         if (json[key] === null || json[key] === '') {
-          json[key] = this.schema.getDefault(key);
+          json[key] = this.schema.getDefault(key, user);
         }
       })
     }

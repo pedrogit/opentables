@@ -293,7 +293,7 @@ class Controler {
     Validate items against the schema stored in the item with _id = listid
     When strict is false, ignore fields which are not in the schema, otherwise throw an error
   */
-  async validateItems(schemaStr, items, strict, listid = null) {
+  async validateItems(schemaStr, items, strict, listid = null, user = null) {
     var newItems;
 
     // validate provided JSON against the schema
@@ -320,7 +320,7 @@ class Controler {
         );
       } else {
         // validate only one
-        newItems = await schemaValidator.validateJson(items, strict);
+        newItems = await schemaValidator.validateJson(items, strict, user);
         if (strict && listid) {
           newItems[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
         }
@@ -353,7 +353,8 @@ class Controler {
       parentList[Globals.listSchemaFieldName],
       item,
       true,
-      listid
+      listid,
+      user
     );
 
     // create it
@@ -425,7 +426,8 @@ class Controler {
       parentList[Globals.listSchemaFieldName],
       newitem,
       false,
-      item[Globals.listIdFieldName]
+      item[Globals.listIdFieldName],
+      user
     );
     
     // update it
