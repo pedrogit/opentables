@@ -4,12 +4,9 @@ const jwt = require("jsonwebtoken");
 
 const Globals = require("./globals");
 const Errors = require("../common/errors");
-const { str } = require("ajv");
 
 const beforeJsonValueRX = "(?<=:)\\s*";
 const afterJsonValueRX = "(?=[\\,\\}\\]]|$)";
-
-const afterJsonKeyRX = "(?=[\\,\\}]|$)";
 
 const beforeJsonArrayRX = "(?<=(?::\\s{0,10}\\[|\\s{0,10},))\\s*";
 const afterJsonArrayRX = "(?=\\]|,)";
@@ -117,7 +114,7 @@ exports.trimFromEdges = function (
 
 exports.completeTrueValues = function (jsonStr) {
   const nonQuotedOrQuotedKey =
-    '"' + Globals.identifierRegEx + '"' + '|\'' + Globals.identifierRegEx + '\'|' + Globals.identifierRegEx;
+    '"' + Globals.identifierRegEx + '"|\'' + Globals.identifierRegEx + '\'|' + Globals.identifierRegEx;
 
   const beforeKeyWithoutValueRX = "(?<=^|,\\s*|{\\s*)";
   const afterKeyWithoutValueRX = "(?=\\s*(?:,|}|$))";
@@ -216,7 +213,7 @@ exports.doubleQuoteValues = function (jsonStr) {
     }
 
     if (exports.isSurroundedBy(group, '"')) {
-      var matchTrimmed = exports.trimFromEdges(group, '"');
+      let matchTrimmed = exports.trimFromEdges(group, '"');
 
       // unescape escaped single quotes (only those preceded by an ood number of backslashes)
       matchTrimmed = exports.unescapeChar(matchTrimmed, "\"")
@@ -237,7 +234,7 @@ exports.doubleQuoteValues = function (jsonStr) {
     }
     
     if (exports.isSurroundedBy(group, "'")) {
-      var matchTrimmed = exports.trimFromEdges(group, "'");
+      let matchTrimmed = exports.trimFromEdges(group, "'");
 
       // unescape escaped single quotes (only those preceded by an ood number of backslashes)
       matchTrimmed = exports.unescapeChar(matchTrimmed, "'")
