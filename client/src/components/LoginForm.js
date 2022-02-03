@@ -21,7 +21,7 @@ function LoginForm({ loginState, setLoginState }) {
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
   const [loginButtonDisabled, setloginButtonDisabled] = React.useState(true);
-  const [doSuccessCallback, setDoSuccessCallback] = React.useState(false);
+  const [doSuccessCallback, setDoSuccessCallback] = React.useState({doit: false, data: null});
 
   const theme = useTheme();
 
@@ -55,11 +55,11 @@ function LoginForm({ loginState, setLoginState }) {
 
   // handle callback only after the login dialog has closed (so the edit popover gets rendred at the right location)
   const handleSuccessCallback = () => {
-    console.log('doSuccessCallback=' + doSuccessCallback);
-    if (doSuccessCallback) {
+    console.log('doSuccessCallback=' + doSuccessCallback.doit);
+    if (doSuccessCallback.doit) {
       console.log('doSuccessCallback');
-      loginState.action.callback(true);
-      setDoSuccessCallback(false);
+      loginState.action.callback(true, doSuccessCallback.data);
+      setDoSuccessCallback({doit: false, data: null});
     }
   }
 
@@ -80,10 +80,10 @@ function LoginForm({ loginState, setLoginState }) {
       }
       axios({ ...loginState.action, withCredentials: true })
         .then((res) => {
-          if (res.status === 200 || res.statusText.toUpperCase() === "OK") {
+          if (res.status === 200 || res.status === 201 || res.statusText.toUpperCase() === "OK") {
             handleClose();
             if (loginState.open && !res.data) {
-              setDoSuccessCallback(true);
+              setDoSuccessCallback({doit: true, data: res.data});
             }
             else {
               loginState.action.callback(true, res.data);

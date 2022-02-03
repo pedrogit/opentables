@@ -10,6 +10,10 @@ const Globals = require("../common/globals");
 // a list receive a view, list and a list of items
 function List({ type, view, list, items, setLoginState, sx }) {
   var parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
+  if (!(items instanceof Array)) {
+    items = [items];
+  }
+
   var localTemplate = view.item_template;
   if (localTemplate === "") {
     /*localTemplate = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 

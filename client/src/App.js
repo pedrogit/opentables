@@ -8,6 +8,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
+import IconButton from '@mui/material/IconButton';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import List from "./components/List";
 import {LoginForm, LoginButton} from "./components/LoginForm";
@@ -33,7 +35,12 @@ const theme = createTheme({
 });
 
 function App({ viewid }) {
-  const [data, setData] = React.useState(null);
+  //const [data, setData] = React.useState(null);
+  const [viewData, setViewData] = React.useState(null);
+  const [listData, setListData] = React.useState(null);
+  const [itemsData, setItemsData] = React.useState(null); 
+  const [itemsDataUpdated, setItemsDataUpdated] = React.useState(false);
+
   const [loginState, setLoginState] = React.useState({open: false});
 
   React.useEffect(() => {
@@ -50,13 +57,42 @@ function App({ viewid }) {
         url: "http://localhost:3001/api/opentables/" + viewid,
         callback: (success, data) => {
           if (success) {
-            setData(data);
+            //setData(data);
+            setViewData(Utils.objWithout(data, "_childlist"));
+            setListData(Utils.objWithout(data._childlist, "items"));
+            setItemsData(data._childlist.items);
           }
         }
       },
       tryFirst: true
     });
   }, [viewid]);
+
+  const handleAddItem = () => {
+    setLoginState({
+      open: false,
+      msg: {
+        severity: "warning",
+        title: "Permission denied",
+        text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
+      },
+      action: {
+        method: "post",
+        url: "http://localhost:3001/api/opentables/" + listData._id,
+        callback: (success, newitem) => {
+          if (success) {
+            //data._childlist.items.unshift(newitem);
+            //setData(data);
+            var newItemsData = itemsData;
+            newItemsData.unshift(newitem);
+            setItemsData(newItemsData);
+            setItemsDataUpdated(!itemsDataUpdated);
+          }
+        }
+      },
+      tryFirst: true
+    });
+  };
 
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
@@ -65,6 +101,13 @@ function App({ viewid }) {
         <AppBar position="static">
           <Toolbar variant="dense">
             <Box sx={{ flexGrow: 1 }} />
+            <IconButton 
+              aria-label="addItem" 
+              color="inherit"
+              onClick={handleAddItem}
+            >
+              <AddCircleOutlineIcon />
+            </IconButton>
             <LoginButton setLoginState={setLoginState}>Login</LoginButton>
           </Toolbar>
         </AppBar>
@@ -72,7 +115,7 @@ function App({ viewid }) {
           loginState={loginState}
           setLoginState={setLoginState}
         />
-        {data ? (
+        {(viewData && listData && itemsData) ? (
           <Stack>
             <Stack sx={{backgroundColor: theme.palette.primary.light, padding:'3px'}}>
               <Typography sx={{fontWeight:'bold', color: theme.palette.primary.contrastText}}>List parameters</Typography>
@@ -80,23 +123,24 @@ function App({ viewid }) {
                 type='View'
                 view={{item_template: ''}}
                 list={Globals.listOfAllViews}
-                items={[Utils.objWithout(data, "_childlist")]}
+                items={viewData}
                 setLoginState={setLoginState}
               />
               <List
                 type='List'
                 view={{item_template: ''}}
                 list={Globals.listOfAllLists}
-                items={[Utils.objWithout(data._childlist, "items")]}
+                items={listData}
                 setLoginState={setLoginState}
               />
             </Stack>
             <List
               type='Items'
-              view={Utils.objWithout(data, "_childlist")}
-              list={Utils.objWithout(data._childlist, "items")}
-              items={data._childlist.items}
+              view={viewData}
+              list={listData}
+              items={itemsData}
               setLoginState={setLoginState}
+              itemsDataUpdated={itemsDataUpdated}
             />
           </Stack>
         ) : (
