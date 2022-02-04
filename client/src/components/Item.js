@@ -19,7 +19,7 @@ function Item({ template, item, rowNb, setLoginState, handleAuth }) {
 
   const theme = useTheme();
 
-  var defaultSx = { bgcolor: rowNb % 2 ? "#FFF" : "#EEE", padding: 1 };
+  var defaultSx = { bgcolor: rowNb % 2 ? "inherit" : "#EEE", padding: 1 };
 
   var handlePatch = function (val, callback) {
     setLoginState({

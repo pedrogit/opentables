@@ -16,7 +16,7 @@ import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 import getUser from "../clientUtils";
 const Errors = require("../common/errors");
 
-function LoginForm({ loginState, setLoginState }) {
+function LoginForm({ loginState, setLoginState, sx }) {
   const emailRef = React.useRef();
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
@@ -131,13 +131,13 @@ function LoginForm({ loginState, setLoginState }) {
   }
 // 
   return (
-    <Stack className='loginForm'>
+    <Stack className='loginForm' sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
       <Collapse 
         in={loginState && loginState.open} 
-        sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}
+        
         onExited={handleSuccessCallback}
       >
-        <Stack >
+        <Stack sx={{...sx}}>
           <FormControl id="loginform" sx={{width: '100%'}}>
             <Stack 
               spacing={2} 

@@ -1,5 +1,5 @@
 import React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider, lighten } from "@mui/material/styles";
 import { deepOrange, orange } from "@mui/material/colors";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -129,18 +129,16 @@ function App({ viewid }) {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <LoginForm
+        <LoginForm sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
           loginState={loginState}
           setLoginState={setLoginState}
         />
         {(viewData && listData && itemsData) ? (
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'scroll'}}>
-            <Stack>
-              <Collapse 
-                in={configVisible}
-              >
-                <Stack sx={{backgroundColor: theme.palette.primary.light}}>
-                  <Typography sx={{fontWeight:'bold', color: theme.palette.primary.contrastText}}>List parameters</Typography>
+            <Stack sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+              <Collapse in={configVisible}>
+                <Stack sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}>
+                  <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>
                   <List
                     type='View'
                     view={{item_template: ''}}
