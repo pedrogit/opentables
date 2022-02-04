@@ -131,7 +131,7 @@ function LoginForm({ loginState, setLoginState }) {
   }
 // 
   return (
-    <Stack >
+    <Stack className='loginForm'>
       <Collapse 
         in={loginState && loginState.open} 
         sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}
