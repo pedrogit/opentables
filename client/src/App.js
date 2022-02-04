@@ -96,7 +96,8 @@ function App({ viewid }) {
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
     <ThemeProvider theme={theme}>
-      <Container className="App" disableGutters maxWidth="100%">
+      <Container className="App" disableGutters maxWidth="100%" sx={{height: "100%"}}>
+      <Stack sx={{height: "100%"}}>
         <AppBar position="static">
           <Toolbar variant="dense" disableGutters sx={{ml:'5px'}}>
             {(viewData ? (
@@ -133,28 +134,31 @@ function App({ viewid }) {
           setLoginState={setLoginState}
         />
         {(viewData && listData && itemsData) ? (
-          <Stack>
-            <Collapse 
-              in={configVisible}
-            >
-              <Stack sx={{backgroundColor: theme.palette.primary.light, padding:'3px'}}>
-                <Typography sx={{fontWeight:'bold', color: theme.palette.primary.contrastText}}>List parameters</Typography>
-                <List
-                  type='View'
-                  view={{item_template: ''}}
-                  list={Globals.listOfAllViews}
-                  items={viewData}
-                  setLoginState={setLoginState}
-                />
-                <List
-                  type='List'
-                  view={{item_template: ''}}
-                  list={Globals.listOfAllLists}
-                  items={listData}
-                  setLoginState={setLoginState}
-                />
-              </Stack>
-            </Collapse>
+          <Stack className='configAndList' sx={{height: '100%', overflowY: 'scroll'}}>
+            <Stack>
+              <Collapse 
+                in={configVisible}
+              >
+                <Stack sx={{backgroundColor: theme.palette.primary.light}}>
+                  <Typography sx={{fontWeight:'bold', color: theme.palette.primary.contrastText}}>List parameters</Typography>
+                  <List
+                    type='View'
+                    view={{item_template: ''}}
+                    list={Globals.listOfAllViews}
+                    items={viewData}
+                    setLoginState={setLoginState}
+                  />
+                  <List
+                    type='List'
+                    view={{item_template: ''}}
+                    list={Globals.listOfAllLists}
+                    items={listData}
+                    setLoginState={setLoginState}
+                  />
+                </Stack>
+              </Collapse>
+            </Stack>
+
             <List
               type='Items'
               view={viewData}
@@ -169,6 +173,7 @@ function App({ viewid }) {
             <CircularProgress />
           </Container>
         )}
+      </Stack>
       </Container>
     </ThemeProvider>
   );
