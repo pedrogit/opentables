@@ -136,72 +136,74 @@ function LoginForm({ loginState, setLoginState }) {
       sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}
       onExited={handleSuccessCallback}
     >
-      <FormControl id="loginform" sx={{width: '100%'}}>
-        <Stack 
-          spacing={2} 
-          padding='5px'
-        >
-          <Alert severity={
-              loginState === undefined || loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
-            } 
-            color="primary"
-            sx={{padding: '0px'}}>
-            <AlertTitle>{
-              loginState === undefined || loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
-              (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
-            }
-            </AlertTitle>
-              {
-                loginState === undefined || loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
-              }
-          </Alert>
-
+      <Stack >
+        <FormControl id="loginform" sx={{width: '100%'}}>
           <Stack 
-            direction={{ xs: 'column', sm: 'row' }} 
-            spacing={2}
+            spacing={2} 
+            padding='5px'
           >
-            <TextField
-              variant="outlined"
-              required
-              size="small"
-              fullWidth
-              label="Email Address"
-              inputRef={emailRef}
-              onChange={() => handleChange()}
-              onKeyDown={(e) => handleKeyDown(e)}
-              error={showInvalidLoginHelper}
-              InputProps={{id: "emailinput", sx:{backgroundColor: 'white'}}}
-              InputLabelProps={{shrink: true}}
-            />
-            <VisibilityPasswordTextField
-              variant="outlined"
-              size="small"
-              required
-              fullWidth
-              label="Password"
-              autoComplete="off"
-              inputRef={passwordRef}
-              onChange={() => handleChange()}
-              onKeyDown={(e) => handleKeyDown(e)}
-              error={showInvalidLoginHelper}
-              InputLabelProps={{shrink: true}}
-            />
-            <Stack direction="row" justifyContent="flex-end">
-              <ButtonGroup variant="contained" size="small">
-                <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
-                <Button id="loginbutton" onClick={() => doAction(true)} disabled={loginButtonDisabled}>Login</Button>
-              </ButtonGroup>
+            <Alert severity={
+                loginState === undefined || loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
+              } 
+              color="primary"
+              sx={{padding: '0px'}}>
+              <AlertTitle>{
+                loginState === undefined || loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
+                (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
+              }
+              </AlertTitle>
+                {
+                  loginState === undefined || loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
+                }
+            </Alert>
+
+            <Stack 
+              direction={{ xs: 'column', sm: 'row' }} 
+              spacing={2}
+            >
+              <TextField
+                variant="outlined"
+                required
+                size="small"
+                fullWidth
+                label="Email Address"
+                inputRef={emailRef}
+                onChange={() => handleChange()}
+                onKeyDown={(e) => handleKeyDown(e)}
+                error={showInvalidLoginHelper}
+                InputProps={{id: "emailinput", sx:{backgroundColor: 'white'}}}
+                InputLabelProps={{shrink: true}}
+              />
+              <VisibilityPasswordTextField
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                label="Password"
+                autoComplete="off"
+                inputRef={passwordRef}
+                onChange={() => handleChange()}
+                onKeyDown={(e) => handleKeyDown(e)}
+                error={showInvalidLoginHelper}
+                InputLabelProps={{shrink: true}}
+              />
+              <Stack direction="row" justifyContent="flex-end">
+                <ButtonGroup variant="contained" size="small">
+                  <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
+                  <Button id="loginbutton" onClick={() => doAction(true)} disabled={loginButtonDisabled}>Login</Button>
+                </ButtonGroup>
+              </Stack>
             </Stack>
+            <FormHelperText 
+              id="loginhelper" 
+              error={showInvalidLoginHelper} 
+              sx={{mt: '2px', fontSize: '14px', fontStyle: 'italic'}}
+            >
+              {showInvalidLoginHelper ? "Invalid email or password..." : " "}
+            </FormHelperText>
           </Stack>
-          <FormHelperText 
-            id="loginhelper" 
-            error={showInvalidLoginHelper} 
-            sx={{mt: '2px', fontSize: '14px', fontStyle: 'italic'}}
-          >
-            {showInvalidLoginHelper ? "Invalid email or password..." : " "}
-          </FormHelperText>
-        </Stack>
-      </FormControl>
+        </FormControl>
+      </Stack>
     </Collapse>
   );
 }
