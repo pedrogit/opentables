@@ -98,7 +98,18 @@ function App({ viewid }) {
     <ThemeProvider theme={theme}>
       <Container className="App" disableGutters maxWidth="100%">
         <AppBar position="static">
-          <Toolbar variant="dense">
+          <Toolbar variant="dense" disableGutters sx={{ml:'5px'}}>
+            {(viewData ? (
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+              >
+              <Typography sx={{color: 'black', fontStyle: 'italic', mr: '5px'}}>{(viewData.owner + '\'s')}</Typography>
+              <Typography sx={{fontWeight:'bold'}}>{viewData.name}</Typography>
+              </Stack>
+             ) : (
+              <Typography>Loading...</Typography>
+             ))
+             }
             <Box sx={{ flexGrow: 1 }} />
             <LoginButton setLoginState={setLoginState}>Login</LoginButton>
             <IconButton 
