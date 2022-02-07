@@ -1,5 +1,5 @@
 import React from "react";
-import { createTheme, ThemeProvider, lighten } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepOrange, orange } from "@mui/material/colors";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -11,12 +11,15 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
-import Collapse from "@mui/material/Collapse";
 
+// local imports
 import List from "./components/List";
+import ConfigPanel from "./ConfigPanel";
 import {LoginForm, LoginButton} from "./components/LoginForm";
+import getUser from "./clientUtils";
 const Globals = require("../../client/src/common/globals");
 const Utils = require("./common/utils");
+
 
 const theme = createTheme({
   palette: {
@@ -41,12 +44,12 @@ function App({ viewid }) {
   const [listData, setListData] = React.useState(null);
   const [itemsData, setItemsData] = React.useState(null); 
   const [itemsDataUpdated, setItemsDataUpdated] = React.useState(false);
-  const [configVisible, toggleConfig] = React.useState(false); 
+  const [configPanelOpen, toggleConfigPanel] = React.useState(false);
 
   const [loginState, setLoginState] = React.useState({open: false});
 
   React.useEffect(() => {
-    //console.log('App useEffect()...');
+    // initial loading of list data
     setLoginState({
       open: false,
       msg: {
@@ -93,6 +96,54 @@ function App({ viewid }) {
     });
   };
 
+  const handleOpenConfigPanel = () => {
+    var user = getUser();
+    var authView = Utils.validatePerm(
+      user,
+      viewData[Globals.ownerFieldName],
+      viewData[Globals.readWritePermFieldName],
+      null,
+      null,
+      false
+    );
+    var authList = Utils.validatePerm(
+      user,
+      listData[Globals.ownerFieldName],
+      listData[Globals.readWritePermFieldName],
+      null,
+      null,
+      false
+    );
+    if (!(authView || authList)) {
+      // open login dialog
+      setLoginState({
+        open: true, 
+        msg: {
+          severity: "warning",
+          title: "Permission denied",
+          text:
+          'You do not have permissions to configure this list. Please login with valid credentials...',
+  
+        },
+        action: {
+          method: "get",
+          url: "http://localhost:3001/api/opentables/login",
+          callback: (success) => {
+            if (success) {
+              toggleConfigPanel(!configPanelOpen);
+            }
+          }
+        },
+        tryFirst: false
+      });
+
+    }
+    else {
+      toggleConfigPanel(!configPanelOpen);
+    }
+    return authView;
+  }
+
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
     <ThemeProvider theme={theme}>
@@ -114,9 +165,10 @@ function App({ viewid }) {
             <Box sx={{ flexGrow: 1 }} />
             <LoginButton setLoginState={setLoginState}>Login</LoginButton>
             <IconButton 
-              aria-label="addItem" 
+              aria-label="configPanel" 
               color="inherit"
-              onClick={() => toggleConfig(!configVisible)}
+          
+              onClick={handleOpenConfigPanel}
             >
               <SettingsIcon />
             </IconButton>
@@ -135,28 +187,12 @@ function App({ viewid }) {
         />
         {(viewData && listData && itemsData) ? (
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'scroll'}}>
-            <Stack sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
-              <Collapse in={configVisible}>
-                <Stack sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}>
-                  <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>
-                  <List
-                    type='View'
-                    view={{item_template: ''}}
-                    list={Globals.listOfAllViews}
-                    items={viewData}
-                    setLoginState={setLoginState}
-                  />
-                  <List
-                    type='List'
-                    view={{item_template: ''}}
-                    list={Globals.listOfAllLists}
-                    items={listData}
-                    setLoginState={setLoginState}
-                  />
-                </Stack>
-              </Collapse>
-            </Stack>
-
+            <ConfigPanel
+              configPanelOpen={configPanelOpen}
+              viewData={viewData}
+              listData={listData}
+              setLoginState={setLoginState}
+            />
             <List
               type='Items'
               view={viewData}

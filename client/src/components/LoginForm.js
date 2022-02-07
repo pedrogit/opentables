@@ -129,7 +129,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
   if (loginState !== undefined && loginState.tryFirst !== undefined && loginState.tryFirst === true) {
     doAction();
   }
-// 
+
   return (
     <Stack className='loginForm' sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
       <Collapse 
