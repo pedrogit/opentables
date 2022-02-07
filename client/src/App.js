@@ -43,7 +43,6 @@ function App({ viewid }) {
   const [viewData, setViewData] = React.useState(null);
   const [listData, setListData] = React.useState(null);
   const [itemsData, setItemsData] = React.useState(null); 
-  const [itemsDataUpdated, setItemsDataUpdated] = React.useState(false);
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
 
   const [loginState, setLoginState] = React.useState({open: false});
@@ -87,8 +86,7 @@ function App({ viewid }) {
           if (success) {
             var newItemsData = itemsData;
             newItemsData.unshift(newitem);
-            setItemsData(newItemsData);
-            setItemsDataUpdated(!itemsDataUpdated);
+            setItemsData([...newItemsData]);
           }
         }
       },
@@ -199,7 +197,6 @@ function App({ viewid }) {
               list={listData}
               items={itemsData}
               setLoginState={setLoginState}
-              itemsDataUpdated={itemsDataUpdated}
             />
           </Stack>
         ) : (
