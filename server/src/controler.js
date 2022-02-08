@@ -527,7 +527,7 @@ class Controler {
       );
     }
 
-    return this.coll.deleteOne({ [Globals.listIdFieldName]: itemid });
+    return this.coll.deleteOne({ [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) });
   }
 }
 
