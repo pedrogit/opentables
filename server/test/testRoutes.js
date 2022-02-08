@@ -1414,6 +1414,47 @@ describe("testRoutes.js List API", () => {
           done();
         });
     });
+
+    it("12.4 - Delete the view", (done) => {
+      chai
+        .request(server)
+        .delete(
+          "/api/" + Globals.APIKeyword + "/" + newView[Globals.itemIdFieldName]
+        )
+        .send({ item_template: newView.item_template })
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response).to.have.status(200);
+          expect(response.body).to.be.an("object");
+          expect(response.body).to.deep.equal({
+            deletedCount: 1
+          });
+          done();
+        });
+    });
+
+    it("12.5 - Make sure it was deleted", (done) => {
+      chai
+        .request(server)
+        .get(
+          "/api/" + Globals.APIKeyword + "/" + newView[Globals.itemIdFieldName]
+        )
+        .send({ item_template: newView.item_template })
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response).to.have.status(404);
+          expect(response.body).to.be.an("object");
+          expect(response.body).to.deep.equal({
+            err: NodeUtil.format(
+              Errors.ErrMsg.Item_NotFound,
+              newView[Globals.itemIdFieldName]
+            ),
+          });
+
+          done();
+        });
+    });
+
   });
 
   /*describe('13 - Test embedded_itemid and embedded_itemid_lists', () => {
