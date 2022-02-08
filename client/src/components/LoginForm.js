@@ -102,7 +102,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
             ) {
               setShowInvalidLoginHelper(true);
             }
-            if (error.response.data.err === Errors.ErrMsg.Forbidden) {
+            else if (error.response.data.err === Errors.ErrMsg.Forbidden) {
               setLoginState({
                 ...loginState,
                 open: true,
@@ -114,9 +114,19 @@ function LoginForm({ loginState, setLoginState, sx }) {
               });
               //emailRef.current.focus();
             }
+            else {
+              setLoginState({
+                open: false,
+                tryFirst: false
+              });
+            }
           }
           else {
             // show unknown error
+            setLoginState({
+              open: false,
+              tryFirst: false
+            });
           }
 
           return false;
@@ -131,14 +141,14 @@ function LoginForm({ loginState, setLoginState, sx }) {
   }
 
   return (
-    <Stack className='loginForm' sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+    <Stack id='loginForm' sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
       <Collapse 
         in={loginState && loginState.open} 
         
         onExited={handleSuccessCallback}
       >
         <Stack sx={{...sx}}>
-          <FormControl id="loginform" sx={{width: '100%'}}>
+          <FormControl sx={{width: '100%'}}>
             <Stack 
               spacing={2} 
               padding='5px'
@@ -172,7 +182,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
                   onChange={() => handleChange()}
                   onKeyDown={(e) => handleKeyDown(e)}
                   error={showInvalidLoginHelper}
-                  InputProps={{id: "emailinput", sx:{backgroundColor: 'white'}}}
+                  InputProps={{id: "emailInput", sx:{backgroundColor: 'white'}}}
                   InputLabelProps={{shrink: true}}
                 />
                 <VisibilityPasswordTextField
@@ -190,13 +200,13 @@ function LoginForm({ loginState, setLoginState, sx }) {
                 />
                 <Stack direction="row" justifyContent="flex-end">
                   <ButtonGroup variant="contained" size="small">
-                    <Button id="logincancelbutton" onClick={() => handleClose()}>Cancel</Button>
-                    <Button id="loginbutton" onClick={() => doAction(true)} disabled={loginButtonDisabled}>Login</Button>
+                    <Button id="loginCancelButton" onClick={() => handleClose()}>Cancel</Button>
+                    <Button id="loginButton" onClick={() => doAction(true)} disabled={loginButtonDisabled}>Login</Button>
                   </ButtonGroup>
                 </Stack>
               </Stack>
               <FormHelperText 
-                id="loginhelper" 
+                id="loginHelper" 
                 error={showInvalidLoginHelper} 
                 sx={{mt: '2px', fontSize: '14px', fontStyle: 'italic'}}
               >
@@ -221,7 +231,7 @@ function LoginButton({ setLoginState }) {
 
   return (
     <Button
-      id='loginlogoutbutton'
+      id='loginLogoutButton'
       variant="text" 
       color="inherit" 
       onClick={() => {

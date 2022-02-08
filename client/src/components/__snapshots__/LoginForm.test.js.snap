@@ -2,261 +2,269 @@
 
 exports[`LoginForm has a valid snapshot 1`] = `
 <div
-  className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-ypy681-MuiCollapse-root"
-  style={
-    Object {
-      "minHeight": "0px",
-    }
-  }
+  className="loginForm css-2t5fl6-MuiStack-root"
 >
   <div
-    className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+    className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+    style={
+      Object {
+        "minHeight": "0px",
+      }
+    }
   >
     <div
-      className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+      className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
     >
       <div
-        className="MuiFormControl-root css-q8hpuo-MuiFormControl-root"
-        id="loginform"
+        className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
       >
         <div
-          className="css-t070a8-MuiStack-root"
+          className="css-nen11g-MuiStack-root"
         >
           <div
-            className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-hp9f8j-MuiPaper-root-MuiAlert-root"
-            role="alert"
+            className="MuiFormControl-root css-q8hpuo-MuiFormControl-root"
+            id="loginform"
           >
             <div
-              className="MuiAlert-icon css-1ytlwq5-MuiAlert-icon"
-            >
-              <svg
-                aria-hidden={true}
-                className="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1vooibu-MuiSvgIcon-root"
-                data-testid="InfoOutlinedIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z"
-                />
-              </svg>
-            </div>
-            <div
-              className="MuiAlert-message css-acap47-MuiAlert-message"
+              className="css-t070a8-MuiStack-root"
             >
               <div
-                className="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom MuiAlertTitle-root css-yslrua-MuiTypography-root-MuiAlertTitle-root"
+                className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-hp9f8j-MuiPaper-root-MuiAlert-root"
+                role="alert"
               >
-                
-              </div>
-              
-            </div>
-          </div>
-          <div
-            className="css-1wbgkc2-MuiStack-root"
-          >
-            <div
-              className="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-wb57ya-MuiFormControl-root-MuiTextField-root"
-              onKeyDown={[Function]}
-            >
-              <label
-                className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1kty9di-MuiFormLabel-root-MuiInputLabel-root"
-                data-shrink={true}
-              >
-                Email Address
-                <span
-                  aria-hidden={true}
-                  className="MuiInputLabel-asterisk MuiFormLabel-asterisk css-wgai2y-MuiFormLabel-asterisk"
-                >
-                   
-                  *
-                </span>
-              </label>
-              <div
-                className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-28zdli-MuiInputBase-root-MuiOutlinedInput-root"
-                onClick={[Function]}
-              >
-                <input
-                  aria-invalid={false}
-                  autoFocus={false}
-                  className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall css-1n4twyu-MuiInputBase-input-MuiOutlinedInput-input"
-                  disabled={false}
-                  id="emailinput"
-                  onAnimationStart={[Function]}
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onFocus={[Function]}
-                  required={true}
-                  type="text"
-                />
-                <fieldset
-                  aria-hidden={true}
-                  className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-                >
-                  <legend
-                    className="css-1z7n62"
-                  >
-                    <span>
-                      Email Address
-                       *
-                    </span>
-                  </legend>
-                </fieldset>
-              </div>
-            </div>
-            <div
-              className="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-wb57ya-MuiFormControl-root-MuiTextField-root"
-              onKeyDown={[Function]}
-            >
-              <label
-                className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1kty9di-MuiFormLabel-root-MuiInputLabel-root"
-                data-shrink={true}
-              >
-                Password
-                <span
-                  aria-hidden={true}
-                  className="MuiInputLabel-asterisk MuiFormLabel-asterisk css-wgai2y-MuiFormLabel-asterisk"
-                >
-                   
-                  *
-                </span>
-              </label>
-              <div
-                className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-y49cea-MuiInputBase-root-MuiOutlinedInput-root"
-                onClick={[Function]}
-              >
-                <input
-                  aria-invalid={false}
-                  autoComplete="off"
-                  autoFocus={false}
-                  className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedEnd css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input"
-                  disabled={false}
-                  id="passwordinput"
-                  onAnimationStart={[Function]}
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onFocus={[Function]}
-                  required={true}
-                  type="password"
-                />
                 <div
-                  className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeSmall css-1laqsz7-MuiInputAdornment-root"
+                  className="MuiAlert-icon css-1ytlwq5-MuiAlert-icon"
                 >
-                  <button
-                    aria-label="Toggle password visibility"
-                    className="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
-                    disabled={false}
-                    onBlur={[Function]}
-                    onClick={[Function]}
-                    onContextMenu={[Function]}
-                    onDragLeave={[Function]}
-                    onFocus={[Function]}
-                    onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onMouseDown={[Function]}
-                    onMouseLeave={[Function]}
-                    onMouseUp={[Function]}
-                    onTouchEnd={[Function]}
-                    onTouchMove={[Function]}
-                    onTouchStart={[Function]}
-                    tabIndex={0}
-                    type="button"
+                  <svg
+                    aria-hidden={true}
+                    className="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1vooibu-MuiSvgIcon-root"
+                    data-testid="InfoOutlinedIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
                   >
-                    <svg
-                      aria-hidden={true}
-                      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
-                      data-testid="VisibilityOffIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                      />
-                    </svg>
-                  </button>
+                    <path
+                      d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z"
+                    />
+                  </svg>
                 </div>
-                <fieldset
-                  aria-hidden={true}
-                  className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                <div
+                  className="MuiAlert-message css-acap47-MuiAlert-message"
                 >
-                  <legend
-                    className="css-1z7n62"
+                  <div
+                    className="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom MuiAlertTitle-root css-yslrua-MuiTypography-root-MuiAlertTitle-root"
                   >
-                    <span>
-                      Password
-                       *
-                    </span>
-                  </legend>
-                </fieldset>
+                    
+                  </div>
+                  
+                </div>
               </div>
-            </div>
-            <div
-              className="css-181c0ax-MuiStack-root"
-            >
               <div
-                className="MuiButtonGroup-root MuiButtonGroup-contained css-zqcytf-MuiButtonGroup-root"
-                role="group"
+                className="css-1wbgkc2-MuiStack-root"
               >
-                <button
-                  className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
-                  disabled={false}
-                  id="logincancelbutton"
-                  onBlur={[Function]}
-                  onClick={[Function]}
-                  onContextMenu={[Function]}
-                  onDragLeave={[Function]}
-                  onFocus={[Function]}
+                <div
+                  className="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-wb57ya-MuiFormControl-root-MuiTextField-root"
                   onKeyDown={[Function]}
-                  onKeyUp={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onTouchEnd={[Function]}
-                  onTouchMove={[Function]}
-                  onTouchStart={[Function]}
-                  tabIndex={0}
-                  type="button"
                 >
-                  Cancel
-                </button>
-                <button
-                  className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
-                  disabled={true}
-                  id="loginbutton"
-                  onBlur={[Function]}
-                  onClick={[Function]}
-                  onContextMenu={[Function]}
-                  onDragLeave={[Function]}
-                  onFocus={[Function]}
+                  <label
+                    className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1kty9di-MuiFormLabel-root-MuiInputLabel-root"
+                    data-shrink={true}
+                  >
+                    Email Address
+                    <span
+                      aria-hidden={true}
+                      className="MuiInputLabel-asterisk MuiFormLabel-asterisk css-wgai2y-MuiFormLabel-asterisk"
+                    >
+                       
+                      *
+                    </span>
+                  </label>
+                  <div
+                    className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-28zdli-MuiInputBase-root-MuiOutlinedInput-root"
+                    onClick={[Function]}
+                  >
+                    <input
+                      aria-invalid={false}
+                      autoFocus={false}
+                      className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall css-1n4twyu-MuiInputBase-input-MuiOutlinedInput-input"
+                      disabled={false}
+                      id="emailinput"
+                      onAnimationStart={[Function]}
+                      onBlur={[Function]}
+                      onChange={[Function]}
+                      onFocus={[Function]}
+                      required={true}
+                      type="text"
+                    />
+                    <fieldset
+                      aria-hidden={true}
+                      className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                    >
+                      <legend
+                        className="css-1z7n62"
+                      >
+                        <span>
+                          Email Address
+                           *
+                        </span>
+                      </legend>
+                    </fieldset>
+                  </div>
+                </div>
+                <div
+                  className="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-wb57ya-MuiFormControl-root-MuiTextField-root"
                   onKeyDown={[Function]}
-                  onKeyUp={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onTouchEnd={[Function]}
-                  onTouchMove={[Function]}
-                  onTouchStart={[Function]}
-                  tabIndex={-1}
-                  type="button"
                 >
-                  Login
-                </button>
+                  <label
+                    className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1kty9di-MuiFormLabel-root-MuiInputLabel-root"
+                    data-shrink={true}
+                  >
+                    Password
+                    <span
+                      aria-hidden={true}
+                      className="MuiInputLabel-asterisk MuiFormLabel-asterisk css-wgai2y-MuiFormLabel-asterisk"
+                    >
+                       
+                      *
+                    </span>
+                  </label>
+                  <div
+                    className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-y49cea-MuiInputBase-root-MuiOutlinedInput-root"
+                    onClick={[Function]}
+                  >
+                    <input
+                      aria-invalid={false}
+                      autoComplete="off"
+                      autoFocus={false}
+                      className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedEnd css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input"
+                      disabled={false}
+                      id="passwordinput"
+                      onAnimationStart={[Function]}
+                      onBlur={[Function]}
+                      onChange={[Function]}
+                      onFocus={[Function]}
+                      required={true}
+                      type="password"
+                    />
+                    <div
+                      className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeSmall css-1laqsz7-MuiInputAdornment-root"
+                    >
+                      <button
+                        aria-label="Toggle password visibility"
+                        className="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
+                        disabled={false}
+                        onBlur={[Function]}
+                        onClick={[Function]}
+                        onContextMenu={[Function]}
+                        onDragLeave={[Function]}
+                        onFocus={[Function]}
+                        onKeyDown={[Function]}
+                        onKeyUp={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onTouchEnd={[Function]}
+                        onTouchMove={[Function]}
+                        onTouchStart={[Function]}
+                        tabIndex={0}
+                        type="button"
+                      >
+                        <svg
+                          aria-hidden={true}
+                          className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                          data-testid="VisibilityOffIcon"
+                          focusable="false"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <fieldset
+                      aria-hidden={true}
+                      className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                    >
+                      <legend
+                        className="css-1z7n62"
+                      >
+                        <span>
+                          Password
+                           *
+                        </span>
+                      </legend>
+                    </fieldset>
+                  </div>
+                </div>
+                <div
+                  className="css-181c0ax-MuiStack-root"
+                >
+                  <div
+                    className="MuiButtonGroup-root MuiButtonGroup-contained css-zqcytf-MuiButtonGroup-root"
+                    role="group"
+                  >
+                    <button
+                      className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
+                      disabled={false}
+                      id="logincancelbutton"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onContextMenu={[Function]}
+                      onDragLeave={[Function]}
+                      onFocus={[Function]}
+                      onKeyDown={[Function]}
+                      onKeyUp={[Function]}
+                      onMouseDown={[Function]}
+                      onMouseLeave={[Function]}
+                      onMouseUp={[Function]}
+                      onTouchEnd={[Function]}
+                      onTouchMove={[Function]}
+                      onTouchStart={[Function]}
+                      tabIndex={0}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
+                      disabled={true}
+                      id="loginbutton"
+                      onBlur={[Function]}
+                      onClick={[Function]}
+                      onContextMenu={[Function]}
+                      onDragLeave={[Function]}
+                      onFocus={[Function]}
+                      onKeyDown={[Function]}
+                      onKeyUp={[Function]}
+                      onMouseDown={[Function]}
+                      onMouseLeave={[Function]}
+                      onMouseUp={[Function]}
+                      onTouchEnd={[Function]}
+                      onTouchMove={[Function]}
+                      onTouchStart={[Function]}
+                      tabIndex={-1}
+                      type="button"
+                    >
+                      Login
+                    </button>
+                  </div>
+                </div>
               </div>
+              <p
+                className="MuiFormHelperText-root MuiFormHelperText-sizeMedium MuiFormHelperText-contained css-374tsp-MuiFormHelperText-root"
+                id="loginhelper"
+              >
+                <span
+                  className="notranslate"
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": "&#8203;",
+                    }
+                  }
+                />
+              </p>
             </div>
           </div>
-          <p
-            className="MuiFormHelperText-root MuiFormHelperText-sizeMedium MuiFormHelperText-contained css-374tsp-MuiFormHelperText-root"
-            id="loginhelper"
-          >
-            <span
-              className="notranslate"
-              dangerouslySetInnerHTML={
-                Object {
-                  "__html": "&#8203;",
-                }
-              }
-            />
-          </p>
         </div>
       </div>
     </div>

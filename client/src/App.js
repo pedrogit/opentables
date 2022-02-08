@@ -2,24 +2,19 @@ import React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepOrange, orange } from "@mui/material/colors";
 import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from '@mui/material/IconButton';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
+
 
 // local imports
 import List from "./components/List";
-import ConfigPanel from "./ConfigPanel";
-import {LoginForm, LoginButton} from "./components/LoginForm";
+import Header from "./components/Header";
+
+import ConfigPanel from "./components/ConfigPanel";
+import {LoginForm} from "./components/LoginForm";
 import getUser from "./clientUtils";
 const Globals = require("../../client/src/common/globals");
 const Utils = require("./common/utils");
-
 
 const theme = createTheme({
   palette: {
@@ -44,7 +39,6 @@ function App({ viewid }) {
   const [listData, setListData] = React.useState(null);
   const [itemsData, setItemsData] = React.useState(null); 
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
-
   const [loginState, setLoginState] = React.useState({open: false});
 
   React.useEffect(() => {
@@ -92,6 +86,31 @@ function App({ viewid }) {
       },
       tryFirst: true
     });
+  };
+
+  const handleDeleteItem = (itemid, callback) => {
+    setLoginState({
+      open: false,
+      msg: {
+        severity: "warning",
+        title: "Permission denied",
+        text:
+        'You do not have permissions to delete items from this list. Please login with valid credentials...',
+      },
+      action: {
+        method: "delete",
+        url: "http://localhost:3001/api/opentables/" + itemid,
+        callback: (success, data) => {
+          if (success) {
+            var newItemsData = itemsData;
+            newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
+            setItemsData([...newItemsData]);
+          }
+        }
+      },
+      tryFirst: true
+    });
+    return false;
   };
 
   const handleOpenConfigPanel = () => {
@@ -147,49 +166,25 @@ function App({ viewid }) {
     <ThemeProvider theme={theme}>
       <Container className="App" disableGutters maxWidth="100%" sx={{height: "100%"}}>
       <Stack sx={{height: "100%"}}>
-        <AppBar position="static">
-          <Toolbar variant="dense" disableGutters sx={{ml:'5px'}}>
-            {(viewData ? (
-              <Stack 
-                direction={{ xs: 'column', sm: 'row' }} 
-              >
-              <Typography sx={{color: 'black', fontStyle: 'italic', mr: '5px'}}>{(viewData.owner + '\'s')}</Typography>
-              <Typography sx={{fontWeight:'bold'}}>{viewData.name}</Typography>
-              </Stack>
-             ) : (
-              <Typography>Loading...</Typography>
-             ))
-             }
-            <Box sx={{ flexGrow: 1 }} />
-            <LoginButton setLoginState={setLoginState}>Login</LoginButton>
-            <IconButton 
-              aria-label="configPanel" 
-              color="inherit"
-          
-              onClick={handleOpenConfigPanel}
-            >
-              <SettingsIcon />
-            </IconButton>
-            <IconButton 
-              aria-label="addItem" 
-              color="inherit"
-              onClick={handleAddItem}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+        <Header 
+          viewOwner={viewData ? viewData.owner : ''} 
+          viewName={viewData ? viewData.name : ''}
+          setLoginState={setLoginState} 
+          handleOpenConfigPanel={handleOpenConfigPanel} 
+          handleAddItem={handleAddItem}
+        />
         <LoginForm sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
           loginState={loginState}
           setLoginState={setLoginState}
         />
         {(viewData && listData && itemsData) ? (
-          <Stack className='configAndList' sx={{height: '100%', overflowY: 'scroll'}}>
+          <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
             <ConfigPanel
               configPanelOpen={configPanelOpen}
               viewData={viewData}
               listData={listData}
               setLoginState={setLoginState}
+              handleDeleteItem={handleDeleteItem}
             />
             <List
               type='Items'
@@ -197,6 +192,7 @@ function App({ viewid }) {
               list={listData}
               items={itemsData}
               setLoginState={setLoginState}
+              handleDeleteItem={handleDeleteItem}
             />
           </Stack>
         ) : (

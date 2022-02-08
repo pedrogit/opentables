@@ -5,7 +5,9 @@ exports[`List has a valid snapshot 1`] = `
   className="css-nen11g-MuiStack-root"
 >
   <div
-    className="item MuiBox-root css-uz52w6"
+    className="item MuiBox-root css-mjn72o"
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
   />
 </div>
 `;

@@ -4,8 +4,11 @@ import JsxParser from "react-jsx-parser";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
+import IconButton from '@mui/material/IconButton';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 import * as Components from "./components";
+const Globals = require("../common/globals");
 
 // Define all components in the current scope
 // so they can be used directly, without
@@ -14,12 +17,23 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({ template, item, rowNb, setLoginState, handleAuth }) {
+function Item({ template, item, rowNb, setLoginState, handleAuth, handleDeleteItem }) {
   const [newItem, setItem] = React.useState(item);
+  const [showButtons, setShowButtons] = React.useState(false);
 
   const theme = useTheme();
 
-  var defaultSx = { bgcolor: rowNb % 2 ? "inherit" : "#EEE", padding: 1 };
+  var defaultSx = {
+    bgcolor: rowNb % 2 ? "inherit" : "#EEE", 
+    padding: 1,
+    position: 'relative'
+  };
+
+  var buttonSx = {
+    position: 'absolute',
+    top: '1px',
+    right: '1px'
+  }
 
   var handlePatch = function (val, callback) {
     setLoginState({
@@ -34,7 +48,7 @@ function Item({ template, item, rowNb, setLoginState, handleAuth }) {
       },
       action: {
         method: "patch",
-        url: "http://localhost:3001/api/opentables/" + newItem._id,
+        url: "http://localhost:3001/api/opentables/" + newItem[Globals.itemIdFieldName],
         data: val,
         callback: (success, data) => {
           if (success) {
@@ -70,7 +84,12 @@ function Item({ template, item, rowNb, setLoginState, handleAuth }) {
   //console.log('Render Item (' +  item.name + ')...');
 
   return (
-    <Box className="item" sx={defaultSx}>
+    <Box 
+      className="item" 
+      sx={defaultSx}
+      onMouseEnter={() => setShowButtons(true)}
+      onMouseLeave={() => setShowButtons(false)}
+    >
       <JsxParser
         bindings={setBindings(newItem)}
         components={{ ...Components.allComponentsAsJson(), Box, Stack }}
@@ -87,6 +106,17 @@ function Item({ template, item, rowNb, setLoginState, handleAuth }) {
           </span>
         )}
       />
+      {showButtons && 
+        <Stack sx={buttonSx}>
+          <IconButton 
+            aria-label="deleteItem" 
+            color="inherit"
+            onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
+          >
+            <HighlightOffIcon />
+          </IconButton>
+        </Stack>
+      }
     </Box>
   );
 }
