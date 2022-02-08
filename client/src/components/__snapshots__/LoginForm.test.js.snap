@@ -2,7 +2,8 @@
 
 exports[`LoginForm has a valid snapshot 1`] = `
 <div
-  className="loginForm css-2t5fl6-MuiStack-root"
+  className="css-2t5fl6-MuiStack-root"
+  id="loginForm"
 >
   <div
     className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
@@ -23,7 +24,6 @@ exports[`LoginForm has a valid snapshot 1`] = `
         >
           <div
             className="MuiFormControl-root css-q8hpuo-MuiFormControl-root"
-            id="loginform"
           >
             <div
               className="css-t070a8-MuiStack-root"
@@ -87,7 +87,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
                       autoFocus={false}
                       className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall css-1n4twyu-MuiInputBase-input-MuiOutlinedInput-input"
                       disabled={false}
-                      id="emailinput"
+                      id="emailInput"
                       onAnimationStart={[Function]}
                       onBlur={[Function]}
                       onChange={[Function]}
@@ -137,7 +137,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
                       autoFocus={false}
                       className="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedEnd css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input"
                       disabled={false}
-                      id="passwordinput"
+                      id="passwordInput"
                       onAnimationStart={[Function]}
                       onBlur={[Function]}
                       onChange={[Function]}
@@ -206,7 +206,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
                     <button
                       className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
                       disabled={false}
-                      id="logincancelbutton"
+                      id="loginCancelButton"
                       onBlur={[Function]}
                       onClick={[Function]}
                       onContextMenu={[Function]}
@@ -228,7 +228,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
                     <button
                       className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
                       disabled={true}
-                      id="loginbutton"
+                      id="loginButton"
                       onBlur={[Function]}
                       onClick={[Function]}
                       onContextMenu={[Function]}
@@ -252,7 +252,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
               </div>
               <p
                 className="MuiFormHelperText-root MuiFormHelperText-sizeMedium MuiFormHelperText-contained css-374tsp-MuiFormHelperText-root"
-                id="loginhelper"
+                id="loginHelper"
               >
                 <span
                   className="notranslate"
