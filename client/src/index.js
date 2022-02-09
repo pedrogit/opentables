@@ -10,7 +10,8 @@ const widgetDivs = document.querySelectorAll(".opentable");
 widgetDivs.forEach((div) => {
   ReactDOM.render(
     /*<React.StrictMode>*/
-    <App viewid={div.dataset.viewid} />,
-    /*</React.StrictMode>*/ div
+    <App initialViewid={div.dataset.viewid} />
+    /*</React.StrictMode>*/,
+     div
   );
 });
