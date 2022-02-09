@@ -35,11 +35,11 @@ function Header({
     <Toolbar variant="dense" disableGutters sx={{ml:'5px'}}>
     {(viewOwner && viewName ? (
         <Stack direction={{ xs: 'column', sm: 'row' }}>
-        <Typography sx={{color: 'black', fontStyle: 'italic', mr: '5px'}}>{(viewOwner + '\'s')}</Typography>
+        <Typography sx={{color: '#FAA', mr: '5px'}}>{(viewOwner + '\'s list of')}</Typography>
         <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
         </Stack>
         ) : (
-        <Typography>Loading...</Typography>
+        <Typography sx={{color: '#FAA'}}>Loading...</Typography>
         ))
     }
     <Box sx={{ flexGrow: 1 }} />
