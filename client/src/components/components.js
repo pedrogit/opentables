@@ -1,6 +1,7 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
@@ -136,8 +137,31 @@ function Text(props) {
   return (<Typography color = 'red'>&lt;Text value is missing /&gt;</Typography>);
 }
 
-function allComponentsAsJson() {
-  return { Text, Label };
+function Listlink(props) {
+  var extractValues = (props) => {
+    var result = {};
+    for (var key in props) {
+      if (props.hasOwnProperty(key)) {
+        result[key] = props[key] ? (props[key].val ? props[key].val : "Missing value") : undefined;
+        result['setViewId'] = props[key] ? (result.setViewId ? result.setViewId : props[key].setViewId) : result.setViewId;
+      }
+    }
+    return result;
+  }
+
+  var handleClick = () => {
+    window.history.pushState(text, text, "?viewid=" + listid);
+    setViewId(listid);
+  }
+
+  var {text, listid, setViewId} = extractValues(props);
+  return (
+    <Link onClick={handleClick}>{text}</Link>
+  )
 }
 
-export { Text, Label, allComponentsAsJson };
+function allComponentsAsJson() {
+  return { Text, Label, Listlink };
+}
+
+export { Text, Label, Listlink, allComponentsAsJson };

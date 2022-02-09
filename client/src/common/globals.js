@@ -60,7 +60,7 @@ Globals = {
   },
   listOfUsers: {
     [Globals.itemIdFieldName]: Globals.userListId,
-    name: "List of all users",
+    name: "List of users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
     [Globals.itemReadWritePermFieldName]: "@owner",
@@ -70,7 +70,7 @@ Globals = {
   },
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
-    name: "View on the list of users",
+    name: "Users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
     item_template: "",
@@ -78,10 +78,10 @@ Globals = {
   },
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
-    name: "View on the list of all views",
+    name: "Views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.readWritePermFieldName]: "@owner",
-    item_template: "",
+    item_template: "<Listlink text={name} listid={_id}/>",
     _childlist: Globals.listofAllViewId,
   },
 };

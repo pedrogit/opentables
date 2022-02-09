@@ -34,7 +34,9 @@ const theme = createTheme({
   },
 });
 
-function App({ viewid }) {
+function App({ initialViewid }) {
+  const [viewid, setViewId] = React.useState(Utils.getURLParam('viewid') ? Utils.getURLParam('viewid') : initialViewid);
+
   const [viewData, setViewData] = React.useState(null);
   const [listData, setListData] = React.useState(null);
   const [itemsData, setItemsData] = React.useState(null); 
@@ -52,7 +54,7 @@ function App({ viewid }) {
       },
       action: {
         method: "get",
-        url: "http://localhost:3001/api/opentables/" + viewid,
+        url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
         callback: (success, data) => {
           if (success) {
             setViewData(Utils.objWithout(data, "_childlist"));
@@ -193,6 +195,7 @@ function App({ viewid }) {
               items={itemsData}
               setLoginState={setLoginState}
               handleDeleteItem={handleDeleteItem}
+              setViewId={setViewId}
             />
           </Stack>
         ) : (

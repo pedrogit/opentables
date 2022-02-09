@@ -133,7 +133,29 @@ describe("testRoutes.js List API", () => {
         });
     });
 
-    it("2.4 - Get list with a malformed id", (done) => {
+    
+    it("2.4 - Get list with no listid", (done) => {
+      chai
+        .request(server)
+        .get(
+          "/api/" + Globals.APIKeyword // + "/" + Globals.viewOnAllViewViewId
+        )
+        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          var expectedView = {
+            ...Utils.objWithout(Globals.viewOnTheListOfAllViews, '_childlist'),
+            [Globals.listIdFieldName]: '000000000000000000000002',
+            [Globals.itemIdFieldName]: '000000000000000000000004'
+          }
+          expect(response).to.have.status(200);
+          expect(response.body).to.be.an("object");
+          expect(Utils.objWithout(response.body, '_childlist'))
+           .to.deep.equal(expectedView);
+          done();
+        });
+    });
+
+    it("2.5 - Get list with a malformed id", (done) => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/toto")
@@ -147,7 +169,7 @@ describe("testRoutes.js List API", () => {
         });
     });
 
-    it("2.5 - Get list with an invalid id", (done) => {
+    it("2.6 - Get list with an invalid id", (done) => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/6102f9efc3b25831e42fec8b")
@@ -164,7 +186,7 @@ describe("testRoutes.js List API", () => {
         });
     });
 
-    it("2.6 - Get the last list by id", (done) => {
+    it("2.7 - Get the last list by id", (done) => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/" + listIdToPatch)
@@ -1454,6 +1476,7 @@ describe("testRoutes.js List API", () => {
           done();
         });
     });
+
 
   });
 

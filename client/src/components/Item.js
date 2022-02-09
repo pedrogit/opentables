@@ -17,7 +17,15 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({ template, item, rowNb, setLoginState, handleAuth, handleDeleteItem }) {
+function Item({ 
+  template, 
+  item, 
+  rowNb, 
+  setLoginState, 
+  handleAuth, 
+  handleDeleteItem,
+  setViewId
+}) {
   const [newItem, setItem] = React.useState(item);
   const [showButtons, setShowButtons] = React.useState(false);
 
@@ -72,6 +80,7 @@ function Item({ template, item, rowNb, setLoginState, handleAuth, handleDeleteIt
         result[key] = {
           handlePatch: handlePatch,
           handleAuth: handleAuth,
+          setViewId: setViewId,
           prop: key,
           val: item[key] ? item[key] : "",
         };

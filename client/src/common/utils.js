@@ -357,5 +357,10 @@ exports.validatePerm = function(user, listOwner, listCPerm, listWPerm, listRPerm
   return false;
 }
 
+exports.getURLParam = (paramName) => {
+  var url = new URL(window.location.href);
+  return url.searchParams.get(paramName);
+}
+
 
 

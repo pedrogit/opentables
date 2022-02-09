@@ -70,6 +70,13 @@ router.get(
   })
 );
 
+router.get(
+  "/", 
+  (req, res) => {
+    res.redirect("/api/" + Globals.APIKeyword + '/' + Globals.viewOnAllViewViewId);
+  }
+);
+
 /************************************************************************
   POST /api/APIKeyword/
 

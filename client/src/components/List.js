@@ -8,7 +8,16 @@ const Utils = require("../common/utils");
 const Globals = require("../common/globals");
 
 // a list receive a view, list and a list of items
-function List({ type, view, list, items, setLoginState, handleDeleteItem, sx}) {
+function List({ 
+  type, 
+  view, 
+  list, 
+  items, 
+  setLoginState, 
+  handleDeleteItem, 
+  setViewId, 
+  sx
+}) {
   var parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
   if (!(items instanceof Array)) {
     items = [items];
@@ -82,6 +91,7 @@ function List({ type, view, list, items, setLoginState, handleDeleteItem, sx}) {
             setLoginState={setLoginState}
             handleAuth={handleAuth}
             handleDeleteItem={handleDeleteItem}
+            setViewId={setViewId}
           />
         );
       })}
