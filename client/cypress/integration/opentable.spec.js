@@ -126,6 +126,11 @@ describe('opentable basic tests', () => {
       cy.contains('View name').should('contain', 'View name');
       cy.contains('View name').should('not.contain', 'View names');
 
+      // delete the item
+      cy.contains('View name').trigger('mouseover');
+      cy.get('#deleteItemButton').click();
+      cy.contains('View name').should('not.exist');
+
      // make sure the login button is in logout mode and logout
      cy.get('#headerButtons').trigger('mouseover');
      cy.get('#loginLogoutButton').should('contain', 'Logout admin@gmail.com');

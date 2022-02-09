@@ -2,7 +2,8 @@
 
 exports[`Item has a valid snapshot 1`] = `
 <div
-  className="item MuiBox-root css-1lf26fz"
+  className="MuiBox-root css-1lf26fz"
+  id="item_"
   onMouseEnter={[Function]}
   onMouseLeave={[Function]}
 />

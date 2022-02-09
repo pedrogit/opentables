@@ -85,7 +85,7 @@ function Item({ template, item, rowNb, setLoginState, handleAuth, handleDeleteIt
 
   return (
     <Box 
-      className="item" 
+      id={"item_" + (newItem ? newItem[Globals.itemIdFieldName] : '')}
       sx={defaultSx}
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => setShowButtons(false)}
@@ -108,7 +108,8 @@ function Item({ template, item, rowNb, setLoginState, handleAuth, handleDeleteIt
       />
       {showButtons && 
         <Stack sx={buttonSx}>
-          <IconButton 
+          <IconButton
+            id="deleteItemButton"
             aria-label="deleteItem" 
             color="inherit"
             onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
