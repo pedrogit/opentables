@@ -55,9 +55,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
 
   // handle callback only after the login dialog has closed (so the edit popover gets rendred at the right location)
   const handleSuccessCallback = () => {
-    console.log('doSuccessCallback=' + doSuccessCallback.doit);
     if (doSuccessCallback.doit) {
-      console.log('doSuccessCallback');
       loginState.action.callback(true, doSuccessCallback.data);
       setDoSuccessCallback({doit: false, data: null});
     }
