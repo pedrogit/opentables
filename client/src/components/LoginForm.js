@@ -147,9 +147,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
       >
         <Stack sx={{...sx}}>
           <FormControl sx={{width: '100%'}}>
-            <Stack 
-              spacing={2} 
-              padding='5px'
+            <Stack spacing={2} padding='5px'
             >
               <Alert severity={
                   loginState === undefined || loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
