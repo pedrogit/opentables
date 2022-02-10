@@ -5,12 +5,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 
-
 // local imports
 import List from "./components/List";
 import Header from "./components/Header";
 
 import ConfigPanel from "./components/ConfigPanel";
+import ErrorPanel from "./components/ErrorPanel";
 import {LoginForm} from "./components/LoginForm";
 import getUser from "./clientUtils";
 const Globals = require("../../client/src/common/globals");
@@ -42,6 +42,7 @@ function App({ initialViewid }) {
   const [itemsData, setItemsData] = React.useState(null); 
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
+  const [errorMsg, setErrorMsg] = React.useState(null);
 
   React.useEffect(() => {
     // initial loading of list data
@@ -58,8 +59,15 @@ function App({ initialViewid }) {
         callback: (success, data) => {
           if (success) {
             setViewData(Utils.objWithout(data, "_childlist"));
-            setListData(Utils.objWithout(data._childlist, "items"));
-            setItemsData(data._childlist.items);
+            if (data._childlist) {
+              setListData(Utils.objWithout(data._childlist, "items"));
+              setItemsData(data._childlist.items);
+            }
+            else {
+              setListData(null);
+              setItemsData(null);
+              setErrorMsg({text: "No list is associated to this view..."});
+            }
           }
         }
       },
@@ -68,26 +76,31 @@ function App({ initialViewid }) {
   }, [viewid]);
 
   const handleAddItem = () => {
-    setLoginState({
-      open: false,
-      msg: {
-        severity: "warning",
-        title: "Permission denied",
-        text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
-      },
-      action: {
-        method: "post",
-        url: "http://localhost:3001/api/opentables/" + listData._id,
-        callback: (success, newitem) => {
-          if (success) {
-            var newItemsData = itemsData;
-            newItemsData.unshift(newitem);
-            setItemsData([...newItemsData]);
+    if (listData) {
+      setLoginState({
+        open: false,
+        msg: {
+          severity: "warning",
+          title: "Permission denied",
+          text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
+        },
+        action: {
+          method: "post",
+          url: "http://localhost:3001/api/opentables/" + listData[Globals.itemIdFieldName],
+          callback: (success, newitem) => {
+            if (success) {
+              var newItemsData = itemsData;
+              newItemsData.unshift(newitem);
+              setItemsData([...newItemsData]);
+            }
           }
-        }
-      },
-      tryFirst: true
-    });
+        },
+        tryFirst: true
+      });
+    }
+    else {
+      setErrorMsg({text: "No list is associated to this view. You can not add items..."});
+    }
   };
 
   const handleDeleteItem = (itemid, callback) => {
@@ -175,11 +188,12 @@ function App({ initialViewid }) {
           handleOpenConfigPanel={handleOpenConfigPanel} 
           handleAddItem={handleAddItem}
         />
+        <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
         <LoginForm sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
           loginState={loginState}
           setLoginState={setLoginState}
         />
-        {(viewData && listData && itemsData) ? (
+        {(viewData || listData || itemsData) ? (
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
             <ConfigPanel
               configPanelOpen={configPanelOpen}

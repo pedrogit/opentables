@@ -18,24 +18,26 @@ function List({
   setViewId, 
   sx
 }) {
-  var parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
-  if (!(items instanceof Array)) {
-    items = [items];
+  var localTemplate = view.item_template;
+  if (list) {
+    var parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
+    if (localTemplate === "") {
+      /*localTemplate = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
+        '<Text val={' + prop + '} /> '
+      ).join('') + '</Box>';*/
+      localTemplate = parsedSchema
+        .getRequired(true)
+        .map((prop) => {
+          //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
+          return ("<Text val={" + prop + "}/> ")
+        })
+        //.map((prop) => "<Text /> ")
+        .join("");
+    }
   }
 
-  var localTemplate = view.item_template;
-  if (localTemplate === "") {
-    /*localTemplate = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
-      '<Text val={' + prop + '} /> '
-    ).join('') + '</Box>';*/
-    localTemplate = parsedSchema
-      .getRequired(true)
-      .map((prop) => {
-        //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
-        return ("<Text val={" + prop + "}/> ")
-      })
-      //.map((prop) => "<Text /> ")
-      .join("");
+  if (items && !(items instanceof Array)) {
+    items = [items];
   }
 
   var rowNb = 0;
@@ -80,7 +82,7 @@ function List({
   console.log('Render List (' + type + ')...');
   return (
     <Stack sx={sx}>
-      {items.map((item) => {
+      {items && items.map((item) => {
         rowNb = rowNb + 1;
         return (
           <Item

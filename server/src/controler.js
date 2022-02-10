@@ -281,7 +281,9 @@ class Controler {
       await Promise.all(
         schema.getEmbeddedItems().map(async (embItem) => {
           var propName = Object.keys(embItem)[0];
-          item[propName] = await this.findWithItems(user, item[propName]);
+          if (item[propName]){
+            item[propName] = await this.findWithItems(user, item[propName]);
+          }
         })
       );
     }
