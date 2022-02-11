@@ -145,14 +145,17 @@ function App({ initialViewid, appid }) {
       null,
       false
     );
-    var authList = Utils.validatePerm(
-      user,
-      listData[Globals.ownerFieldName],
-      listData[Globals.readWritePermFieldName],
-      null,
-      null,
-      false
-    );
+    var authList = true;
+    if (listData) {
+      authList= Utils.validatePerm(
+        user,
+        listData[Globals.ownerFieldName],
+        listData[Globals.readWritePermFieldName],
+        null,
+        null,
+        false
+      );
+    }
     if (!(authView || authList)) {
       // open login dialog
       setLoginState({
