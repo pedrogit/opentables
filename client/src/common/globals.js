@@ -19,6 +19,7 @@ var Globals = {
   mongoDatabaseName: "listitdata",
   APIKeyword: "opentables",
   unauthUserName: "@unauth",
+  browserHistoryKey: "otviews",
 
   identifierRegEx: "\\$?[a-zA-Z0-9_-]+",
 };

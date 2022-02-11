@@ -13,6 +13,7 @@ import ConfigPanel from "./components/ConfigPanel";
 import ErrorPanel from "./components/ErrorPanel";
 import {LoginForm} from "./components/LoginForm";
 import getUser from "./clientUtils";
+import * as BrowserHistory from "./browserHistory";
 const Globals = require("../../client/src/common/globals");
 const Utils = require("./common/utils");
 
@@ -34,8 +35,8 @@ const theme = createTheme({
   },
 });
 
-function App({ initialViewid }) {
-  const [viewid, setViewId] = React.useState(Utils.getURLParam('viewid') ? Utils.getURLParam('viewid') : initialViewid);
+function App({ initialViewid, appid }) {
+  const [viewid, setViewId] = React.useState(BrowserHistory.getViewIdFromURL(appid) ? BrowserHistory.getViewIdFromURL(appid) : initialViewid);
 
   const [viewData, setViewData] = React.useState(null);
   const [listData, setListData] = React.useState(null);
@@ -43,6 +44,10 @@ function App({ initialViewid }) {
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
+
+  React.useEffect(() => {
+    BrowserHistory.registerApp(appid, setViewId);
+  }, [appid]);
 
   React.useEffect(() => {
     // initial loading of list data
@@ -59,6 +64,8 @@ function App({ initialViewid }) {
         callback: (success, data) => {
           if (success) {
             setViewData(Utils.objWithout(data, "_childlist"));
+            BrowserHistory.pushHistoryState(appid, viewid);
+
             if (data._childlist) {
               setListData(Utils.objWithout(data._childlist, "items"));
               setItemsData(data._childlist.items);
@@ -73,7 +80,7 @@ function App({ initialViewid }) {
       },
       tryFirst: true
     });
-  }, [viewid]);
+  }, [viewid, appid]);
 
   const handleAddItem = () => {
     if (listData) {
@@ -179,7 +186,7 @@ function App({ initialViewid }) {
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
     <ThemeProvider theme={theme}>
-      <Container className="App" disableGutters maxWidth="100%" sx={{height: "100%"}}>
+      <Container id={"otapp_" + appid} disableGutters maxWidth="100%" sx={{height: "100%"}}>
       <Stack sx={{height: "100%"}}>
         <Header 
           viewOwner={viewData ? viewData.owner : ''} 

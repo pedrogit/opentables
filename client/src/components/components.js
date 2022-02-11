@@ -149,14 +149,9 @@ function Listlink(props) {
     return result;
   }
 
-  var handleClick = () => {
-    window.history.pushState(text, text, "?viewid=" + listid);
-    setViewId(listid);
-  }
-
   var {text, listid, setViewId} = extractValues(props);
   return (
-    <Link onClick={handleClick}>{text}</Link>
+    <Link onClick={() => setViewId(listid)}>{text}</Link>
   )
 }
 
