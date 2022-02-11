@@ -7,20 +7,23 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
-
 function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
   const theme = useTheme();
-  var closeTimeOut;
-  
-  if (errorMsg !== null && errorMsg.text && (!errorMsg.open || errorMsg.open === false)) {
-    setTimeout(() => {
-      setErrorMsg({...errorMsg, open: true});
-      if (autoClose) {
-        clearTimeout(closeTimeOut);
-        closeTimeOut = setTimeout(() => setErrorMsg({open: false}), 4000);
-      }
-    }, 300);
-  }
+  var closeTimeOutRef = React.useRef(null);
+  var openTimeOutRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (errorMsg !== null && errorMsg.text && (!errorMsg.open || errorMsg.open === false)) {
+      clearTimeout(openTimeOutRef.current);
+      openTimeOutRef.current = setTimeout(() => {
+        setErrorMsg({...errorMsg, open: true});
+        if (autoClose) {
+          clearTimeout(closeTimeOutRef.current);
+          closeTimeOutRef.current = setTimeout(() => setErrorMsg({open: false}), 4000);
+        }
+      }, 300);
+    }
+  }, [errorMsg, autoClose, setErrorMsg]);
 
   return (
     <Stack sx={{position: 'relative'}}>
