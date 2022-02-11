@@ -7,16 +7,14 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
- var closeTimeOut = null;
-  var openTimeOut = null;
 
 function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
   const theme = useTheme();
+  var closeTimeOut;
   
   if (errorMsg !== null && errorMsg.text && (!errorMsg.open || errorMsg.open === false)) {
-
-    openTimeOut = setTimeout(() => {
-     setErrorMsg({...errorMsg, open: true});
+    setTimeout(() => {
+      setErrorMsg({...errorMsg, open: true});
       if (autoClose) {
         clearTimeout(closeTimeOut);
         closeTimeOut = setTimeout(() => setErrorMsg({open: false}), 4000);
