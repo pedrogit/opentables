@@ -363,13 +363,16 @@ class Controler {
     if (newItems instanceof Array) {
       newItems = await this.coll.insertMany(newItems);
     } else {
-      await this.coll.insertOne(newItems);
+      try {
+        await this.coll.insertOne(newItems);
+      } catch (error) {
+        if (error.code === 11000) {
+          throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.Item_AlreadyExists, item[Globals.itemIdFieldName]));
+        }
+      }
     }
 
-    if (
-      !newItems ||
-      (newItems.acknowledged !== undefined && !newItems.acknowledged)
-    ) {
+    if (!newItems || (newItems.acknowledged !== undefined && !newItems.acknowledged)) {
       throw new Errors.InternalServerError(Errors.ErrMsg.Item_CouldNotCreate);
     }
 

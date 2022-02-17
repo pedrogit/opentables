@@ -66,13 +66,17 @@ var ErrMsg = {
 
   List_Missing: "List ID is missing from query...",
   List_NotFound: "Could not find list (%s)...",
+
   Item_NotFound: "Could not find list item (%s)...",
   Item_Invalid: "Invalid item...",
   Item_CouldNotCreate: "Could not create item...",
   Item_CouldNotUpdate: "Could not update item...",
+  Item_AlreadyExists: "Could not create item. An item with this ID (%s) already exists...",
+
   Filter_Null: "Filter can not be null...",
   Filter_InvalidFilter: "Invalid filter (%s)...",
   Filter_Malformed: "JSON filter is not well formed...",
+
   ComponentParser_Invalid: "Invalid component description (%s)...",
 };
 

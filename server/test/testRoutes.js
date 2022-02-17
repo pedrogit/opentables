@@ -132,7 +132,6 @@ describe("testRoutes.js List API", () => {
           done();
         });
     });
-
     
     it("2.4 - Get list with no listid", (done) => {
       chai
@@ -199,6 +198,27 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.deep.equal({
             ...lastList,
             [Globals.listIdFieldName]: Globals.listofAllListId
+          });
+          done();
+        });
+    });
+
+    it("2.8 - Try to post a new list with an already existing id", (done) => {
+      lastList = {
+        ...lastList,
+        [Globals.listSchemaFieldName]: "{}",
+      };
+      chai
+        .request(server)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .send(lastList)
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response.body).to.deep.equal({
+            err: NodeUtil.format(
+              Errors.ErrMsg.Item_AlreadyExists,
+              listIdToPatch
+            ),
           });
           done();
         });
