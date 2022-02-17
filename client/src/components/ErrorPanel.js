@@ -27,7 +27,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
 
   return (
     <Stack sx={{position: 'relative'}}>
-      <Collapse in={errorMsg && errorMsg.open && errorMsg.open === true} xtimeout={3000}>
+      <Collapse in={errorMsg && errorMsg.open && errorMsg.open === true}>
       <Stack sx={{
         position: 'relative', 
         borderBottomWidth: '5px', 
@@ -40,7 +40,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
             id="closeErrorMsgButton"
             aria-label="closeErrorMsgButton" 
             color="inherit"
-            onClick={() => setErrorMsg({...errorMsg, open: false})}
+            onClick={() => setErrorMsg({open: false})}
           >
             <HighlightOffIcon />
           </IconButton>
@@ -51,7 +51,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
             sx={{padding: '5px'}}
         >
         <AlertTitle>{errorMsg && errorMsg.title ? errorMsg.title : 'Error'}</AlertTitle>
-        {(errorMsg && errorMsg.text) ? errorMsg.text : <span> </span>}
+        {(errorMsg && errorMsg.text && errorMsg.open && errorMsg.open === true) ? errorMsg.text : <span> </span>}
         </Alert>
         </Stack>
       </Collapse>
