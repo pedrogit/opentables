@@ -46,7 +46,7 @@ function App({ initialViewid, appid }) {
   const [errorMsg, setErrorMsg] = React.useState(null);
 
   React.useEffect(() => {
-    BrowserHistory.registerApp(appid, setViewId);
+    BrowserHistory.registerApp(appid, handleChangeViewId);
   }, [appid]);
 
   React.useEffect(() => {
@@ -81,6 +81,11 @@ function App({ initialViewid, appid }) {
       tryFirst: true
     });
   }, [viewid, appid]);
+
+  const handleChangeViewId = (viewid) => {
+    setErrorMsg({...errorMsg, open: false});
+    setViewId(viewid);
+  }
 
   const handleAddItem = () => {
     if (listData) {
@@ -165,7 +170,6 @@ function App({ initialViewid, appid }) {
           title: "Permission denied",
           text:
           'You do not have permissions to configure this list. Please login with valid credentials...',
-  
         },
         action: {
           method: "get",
@@ -219,7 +223,7 @@ function App({ initialViewid, appid }) {
               items={itemsData}
               setLoginState={setLoginState}
               handleDeleteItem={handleDeleteItem}
-              setViewId={setViewId}
+              setViewId={handleChangeViewId}
             />
           </Stack>
         ) : (
