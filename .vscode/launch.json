@@ -25,5 +25,8 @@
             "env": { "CI": "true" },
             "disableOptimisticBPs": true
           }
-    ]
+    ],
+    "skipFiles": [
+        "<node_internals>/**/*.js"
+      ]
 }

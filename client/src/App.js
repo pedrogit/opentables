@@ -45,9 +45,17 @@ function App({ initialViewid, appid }) {
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
 
+  const handleChangeViewId = React.useCallback(
+    (viewid) => {
+      setErrorMsg({...errorMsg, open: false});
+      toggleConfigPanel(false);
+      setViewId(viewid);
+    }, [errorMsg, setErrorMsg, setViewId, toggleConfigPanel]
+  );
+
   React.useEffect(() => {
     BrowserHistory.registerApp(appid, handleChangeViewId);
-  }, [appid]);
+  }, [appid, handleChangeViewId]);
 
   React.useEffect(() => {
     // initial loading of list data
@@ -82,10 +90,6 @@ function App({ initialViewid, appid }) {
     });
   }, [viewid, appid]);
 
-  const handleChangeViewId = (viewid) => {
-    setErrorMsg({...errorMsg, open: false});
-    setViewId(viewid);
-  }
 
   const handleAddItem = () => {
     if (listData) {
@@ -142,24 +146,18 @@ function App({ initialViewid, appid }) {
 
   const handleOpenConfigPanel = () => {
     var user = getUser();
-    var authView = Utils.validatePerm(
-      user,
-      viewData[Globals.ownerFieldName],
-      viewData[Globals.readWritePermFieldName],
-      null,
-      null,
-      false
-    );
+    var authView = Utils.validateRWPerm({
+      user: user,
+      item: viewData,
+      throwError: false
+    });
     var authList = true;
     if (listData) {
-      authList= Utils.validatePerm(
-        user,
-        listData[Globals.ownerFieldName],
-        listData[Globals.readWritePermFieldName],
-        null,
-        null,
-        false
-      );
+      authList = Utils.validateRWPerm({
+        user: user,
+        list: listData,
+        throwError: false
+      });
     }
     if (!(authView || authList)) {
       // open login dialog
@@ -201,6 +199,7 @@ function App({ initialViewid, appid }) {
           setLoginState={setLoginState} 
           handleOpenConfigPanel={handleOpenConfigPanel} 
           handleAddItem={handleAddItem}
+          setViewId={handleChangeViewId}
         />
         <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
         <LoginForm sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}

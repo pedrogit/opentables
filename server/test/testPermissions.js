@@ -64,7 +64,7 @@ function init() {
         firstname: "The",
         lastname: "Owner",
         organisation: "Myself",
-        email: "owner@gmail.com",
+        [Globals.emailFieldName]: "owner@gmail.com",
         password: pw,
       };
       chai
@@ -76,7 +76,7 @@ function init() {
             ...newUser,
             ...{
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-              email: newUser.email.toLowerCase(),
+              [Globals.emailFieldName]: newUser[Globals.emailFieldName].toLowerCase(),
               password: response.body.password,
             },
           };
@@ -97,7 +97,7 @@ function init() {
         firstname: "The",
         lastname: "Other",
         organisation: "Itself",
-        email: "other@gmail.com",
+        [Globals.emailFieldName]: "other@gmail.com",
         password: pw,
       };
       chai
@@ -109,7 +109,7 @@ function init() {
             ...newUser,
             ...{
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-              email: newUser.email.toLowerCase(),
+              [Globals.emailFieldName]: newUser[Globals.emailFieldName].toLowerCase(),
               password: response.body.password,
             },
           };

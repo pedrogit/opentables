@@ -199,7 +199,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.deep.equal({ prop1: "aaaa@x.com" });
   });
 
-  it("1.20 Invalid user_array", async () => {
+  it("1.20 Invalid user_list", async () => {
     var schemaValidator = new SchemaValidator("prop1: user_list");
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "aa, bb"}'),
@@ -207,16 +207,14 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
         Errors.ErrMsg.SchemaValidator_InvalidType,
         "prop1",
         "aa, bb",
-        "user_array"
+        "user_list"
       )
     );
   });
 
-  it("1.21 Valid user_array", async () => {
+  it("1.21 Valid user_list", async () => {
     var schemaValidator = new SchemaValidator("prop1: user_list");
-    var json = await schemaValidator.validateJson(
-      '"prop1": "@All, BB@gmail.com"'
-    );
+    var json = await schemaValidator.validateJson('"prop1": "@All, BB@gmail.com"');
 
     expect(json).to.be.an("object");
     expect(json).to.deep.equal({ prop1: "@all, bb@gmail.com" });

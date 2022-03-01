@@ -7,39 +7,51 @@ var Globals = {
   userListId: "000000000000000000000003",
   viewOnAllViewViewId: "000000000000000000000004",
   viewOnUserListViewId: "000000000000000000000005",
+  signUpViewOnUserListViewId: "000000000000000000000006",
 
   itemIdFieldName: "_id", // do not change
   listIdFieldName: "_listid",
   ownerFieldName: "owner",
   listSchemaFieldName: "listschema",
-  readWritePermFieldName: "readwritep",
-  itemReadWritePermFieldName: "itemreadwritep",
-  itemReadPermFieldName: "itemreadp",
+  emailFieldName: "email",
+
+  readPermFieldName: "r_permissions",
+  readWritePermFieldName: "rw_permissions",
+  itemReadPermFieldName: "item_r_permissions",
+  itemReadWritePermFieldName: "item_rw_permissions",
+
   mongoCollectionName: "items",
   mongoDatabaseName: "listitdata",
+  
   APIKeyword: "opentables",
-  unauthUserName: "@unauth",
   browserHistoryKey: "otviews",
+
+  ownerUserName: "@owner",
+  authUserName: "@auth", // all authenticated users
+  allUserName: "@all", // non authenticated users
 
   identifierRegEx: "\\$?[a-zA-Z0-9_-]+",
 };
 
 Globals = {
   ...Globals,
+  specialUsers: [
+    Globals.ownerUserName, 
+    Globals.authUserName, 
+    Globals.allUserName
+  ],
   listOfAllLists: {
     [Globals.itemIdFieldName]: Globals.listofAllListId,
     name: "List of all lists",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.readWritePermFieldName]: "@owner",
-    [Globals.itemReadWritePermFieldName]: "@all",
-    [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
       "{" +
       "name: {type: string, required, default: 'List name'}, " +
       Globals.ownerFieldName + ": {type: user, required}, " +
-      Globals.readWritePermFieldName + ": {type: user_list, required, lower, default: @owner}, " +
-      Globals.itemReadWritePermFieldName + ": {type: user_list, required, lower, default: @owner}, " +
-      Globals.itemReadPermFieldName + ": {type: user_list, required, lower, default: @all}, " +
+      Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
+      Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
+      Globals.itemReadPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
+      Globals.itemReadWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
       Globals.listSchemaFieldName + ": {type: schema, default: 'prop1: string'}" +
       "}",
   },
@@ -47,14 +59,12 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.listofAllViewId,
     name: "List of all views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.readWritePermFieldName]: "@owner",
-    [Globals.itemReadWritePermFieldName]: "@all",
-    [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
       "{" +
       "name: {type: string, required, default: 'View name'}, " +
       Globals.ownerFieldName + ": {type: user, required}, " +
-      Globals.readWritePermFieldName + ": {type: user_list, required, lower, default: @owner}, " +
+      Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
+      Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
       "item_template: template, " +
       "_childlist: embedded_listid" +
       "}",
@@ -63,25 +73,27 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.userListId,
     name: "List of users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.readWritePermFieldName]: "@owner",
-    [Globals.itemReadWritePermFieldName]: "@owner",
-    [Globals.itemReadPermFieldName]: "@all",
     [Globals.listSchemaFieldName]:
-      "firstname: string, lastname: string, organisation: string, email: {type: email, required, unique, lower}, password: encrypted_string",
+      "firstname: {type: string, required}, secondname: string, organisation: string, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
   },
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
     name: "Users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.readWritePermFieldName]: "@owner",
     item_template: "",
+    _childlist: Globals.userListId,
+  },
+  signUpViewOnTheListOfUsers: {
+    [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
+    name: "Sign Up",
+    [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
+    item_template: "<Text val={firstname} inline/>",
     _childlist: Globals.userListId,
   },
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
     name: "Views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.readWritePermFieldName]: "@owner",
     item_template: "<Listlink text={name} listid={_id}/>",
     _childlist: Globals.listofAllViewId,
   },

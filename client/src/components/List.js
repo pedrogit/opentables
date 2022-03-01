@@ -42,15 +42,13 @@ function List({
 
   var rowNb = 0;
 
-  var handleAuth = function(action = 'patch', propName, callback) {
-    var auth = Utils.validatePerm(
-      getUser(),
-      list[Globals.ownerFieldName],
-      null,
-      list[Globals.itemReadWritePermFieldName],
-      null,
-      false
-    );
+  var handleListAuth = function(action = 'patch', item, propName, callback) {
+    var auth = Utils.validateRWPerm({
+      user: getUser(),
+      list: list,
+      item: item,
+      throwError: false
+    });
     if (!auth) {
       // open login dialog
       setLoginState({
@@ -91,7 +89,7 @@ function List({
             item={item}
             rowNb={rowNb}
             setLoginState={setLoginState}
-            handleAuth={handleAuth}
+            handleListAuth={handleListAuth}
             handleDeleteItem={handleDeleteItem}
             setViewId={setViewId}
           />

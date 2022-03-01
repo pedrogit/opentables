@@ -40,7 +40,7 @@ class Controler {
       var item = await this.insertMany(
         process.env.ADMIN_EMAIL,
         Globals.voidListId,
-        Globals.listOfAllLists
+        {...Globals.listOfAllLists}
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfAllLists['name'])
@@ -53,7 +53,7 @@ class Controler {
       item = await this.insertMany(
         process.env.ADMIN_EMAIL,
         Globals.voidListId,
-        Globals.listOfAllViews
+        {...Globals.listOfAllViews}
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfAllViews['name'])
@@ -66,7 +66,7 @@ class Controler {
       item = await this.insertMany(
         process.env.ADMIN_EMAIL,
         Globals.listofAllViewId,
-        Globals.viewOnTheListOfAllViews
+        {...Globals.viewOnTheListOfAllViews}
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfAllViews['name'])
@@ -79,7 +79,7 @@ class Controler {
       item = await this.insertMany(
         process.env.ADMIN_EMAIL,
         Globals.listofAllListId,
-        Globals.listOfUsers
+        {...Globals.listOfUsers}
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfUsers['name'])
@@ -92,10 +92,23 @@ class Controler {
       item = await this.insertMany(
         process.env.ADMIN_EMAIL,
         Globals.listofAllViewId,
-        Globals.viewOnTheListOfUsers
+        {...Globals.viewOnTheListOfUsers}
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsers['name'])
+      console.log('ERROR: ' + msg);
+      throw new Errors.FatalServerError(msg);
+    }
+
+    console.log("Create the " + Globals.signUpViewOnTheListOfUsers['name'] + "...");
+    try {
+      item = await this.insertMany(
+        process.env.ADMIN_EMAIL,
+        Globals.listofAllViewId,
+        {...Globals.signUpViewOnTheListOfUsers}
+      );
+    } catch (err) {
+      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.signUpViewOnTheListOfUsers['name'])
       console.log('ERROR: ' + msg);
       throw new Errors.FatalServerError(msg);
     }
@@ -183,7 +196,7 @@ class Controler {
     // query
   }*/
 
-  async findWithItems(user, itemid, filter, noitems = false) {
+  async findWithItems(user, itemid, filter, noitems) {
     if (!MongoDB.ObjectId.isValid(itemid)) {
       throw new Errors.BadRequest(
         NodeUtil.format(Errors.ErrMsg.MalformedID, itemid)
@@ -201,14 +214,11 @@ class Controler {
     }
 
     if (Controler.isList(item)) {
-      // validate permissions
-      Utils.validatePerm(
-        user,
-        item[Globals.ownerFieldName],
-        item[Globals.readWritePermFieldName],
-        item[Globals.itemReadWritePermFieldName],
-        item[Globals.itemReadPermFieldName]
-      );
+      Utils.validateRPerm({
+          user: user,
+          list: item
+        }
+      )
 
       if (!noitems) {
         var lookup = {
@@ -246,19 +256,17 @@ class Controler {
         item = await this.coll.aggregate(pipeline).toArray();
         item = item[0];
 
-        // if the requested list is the list of list, remove list for which the user deon not have read permissions
-        if (itemid === Globals.listofAllListId) {
-          item.items = item.items.filter((item) => {
-            return Utils.validatePerm(
-              user,
-              item[Globals.ownerFieldName],
-              item[Globals.readWritePermFieldName],
-              item[Globals.itemReadWritePermFieldName],
-              item[Globals.itemReadPermFieldName],
-              false
-            );
+        // remove items for which the user do not have read permissions
+        item.items = item.items.filter((subItem) => {
+          return Utils.validateRPerm({
+            user: user,
+            list: item,
+            item: subItem,
+            throwError: false
           });
-        }
+        });
+
+        // remove items for which the user do not have read permissions
         if (item.items.length === 0) {
           delete item.items;
         }
@@ -267,14 +275,11 @@ class Controler {
       // find item schema
       var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
-      // validate permissions
-      Utils.validatePerm(
-        user,
-        parentList[Globals.ownerFieldName],
-        parentList[Globals.readWritePermFieldName],
-        parentList[Globals.itemReadWritePermFieldName],
-        parentList[Globals.itemReadPermFieldName]
-      );
+      Utils.validateRPerm({
+        user: user,
+        list: parentList,
+        item: item
+      });
 
       // add embedded items if there are any
       const schema = new Schema(parentList[Globals.listSchemaFieldName]);
@@ -282,7 +287,7 @@ class Controler {
         schema.getEmbeddedItems().map(async (embItem) => {
           var propName = Object.keys(embItem)[0];
           if (item[propName]){
-            item[propName] = await this.findWithItems(user, item[propName]);
+            item[propName] = await this.findWithItems(user, item[propName], filter, noitems);
           }
         })
       );
@@ -335,7 +340,7 @@ class Controler {
 
   async insertMany(user, listid, item) {
     // unauth user have no edit permissions
-    if (user === Globals.unauthUserName) {
+    if (user === Globals.allUserName) {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 
@@ -343,12 +348,10 @@ class Controler {
     var parentList = await this.getParentList(listid);
 
     // validate permissions
-    Utils.validatePerm(
-      user,
-      parentList[Globals.ownerFieldName],
-      parentList[Globals.readWritePermFieldName],
-      parentList[Globals.itemReadWritePermFieldName]
-    );
+    Utils.validateRWPerm({
+      user: user,
+      list: parentList
+    });
 
     // validate item against schema
     var newItems = await this.validateItems(
@@ -386,7 +389,7 @@ class Controler {
 
   async patch(user, itemid, newitem) {
     // unauth user have no edit permissions
-    if (user === Globals.unauthUserName) {
+    if (user === Globals.allUserName) {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 
@@ -409,22 +412,11 @@ class Controler {
     // find item schema
     var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
-    // validate permissions
-    if (Controler.isList(item)) {
-      // list patch permissions are defined at the list level (not the parent level)
-      Utils.validatePerm(
-        user,
-        item[Globals.ownerFieldName],
-        item[Globals.readWritePermFieldName]
-      );
-    } else {
-      Utils.validatePerm(
-        user,
-        parentList[Globals.ownerFieldName],
-        parentList[Globals.readWritePermFieldName],
-        parentList[Globals.itemReadWritePermFieldName]
-      );
-    }
+    Utils.validateRWPerm({
+      user: user,
+      list: parentList,
+      item: item
+    });
 
     // validate item against schema
     newitem = await this.validateItems(
@@ -489,7 +481,7 @@ class Controler {
 
   async delete(user, itemid) {
     // unauth user have no edit permissions
-    if (user === Globals.unauthUserName) {
+    if (user === Globals.allUserName) {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 
@@ -513,24 +505,18 @@ class Controler {
     var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
     // check user permissions
+    Utils.validateDPerm({
+        user: user,
+        list: parentList
+      });
     if (Controler.isList(item)) {
-      if (user !== process.env.ADMIN_EMAIL && user !== item.owner) {
-        throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-      }
       // delete all associated items
       this.coll.deleteMany({
         [Globals.listIdFieldName]: MongoDB.ObjectId(
           item[Globals.itemIdFieldName]
         ),
       });
-    } else {
-      Utils.validatePerm(
-        user,
-        parentList[Globals.ownerFieldName],
-        parentList[Globals.readWritePermFieldName],
-        parentList[Globals.itemReadWritePermFieldName]
-      );
-    }
+    } 
 
     return this.coll.deleteOne({ [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) });
   }

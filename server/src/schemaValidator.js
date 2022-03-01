@@ -238,7 +238,7 @@ class SchemaValidator {
 
   validate_type_user(key, val) {
     val = val.toLowerCase();
-    if (["@all", "@owner"].includes(val)) {
+    if (Globals.specialUsers.includes(val)) {
       return val;
     }
     try {
@@ -271,7 +271,7 @@ class SchemaValidator {
           Errors.ErrMsg.SchemaValidator_InvalidType,
           key,
           val,
-          "user_array"
+          "user_list"
         )
       );
     }

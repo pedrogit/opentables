@@ -54,7 +54,7 @@ router.get(
 
 *************************************************************************/
 router.get(
-  "/:itemid/:noitems?",
+  "/:itemid/?",
   asyncHandler(async (req, res) => {
     // construct the full URL so we can then extract the filter parameter
     const fullURL = new URL(
@@ -64,7 +64,7 @@ router.get(
       req.user,
       req.params.itemid,
       fullURL.searchParams.get("filter"),
-      req.params.noitems === "noitems"
+      fullURL.searchParams.get("noitems")
     );
     res.status(200).send(item);
   })
@@ -107,7 +107,7 @@ router.post(
 
     // convert email to cookie token when registering
     if (req.params.listid === Globals.userListId) {
-      Utils.setCookieJWT(req, res, { email: item.email });
+      Utils.setCookieJWT(req, res, { email: item[Globals.emailFieldName] });
     }
 
     res.status(201).send(item);
@@ -184,7 +184,7 @@ View API
   Edit permission implies read permission (since edit permission automatically allow changing read permission)
   @viewowner = view owner
   @owner keyword = list owner
-  @all = everybody
+  @all = everybody (even not logged in users)
   @itemowner = item owner (when items have a itemowner field)
   GET /api/view               // Get all views the users has permission to view
                               // Status: 200, 401, 403, 404 (no views weres found)

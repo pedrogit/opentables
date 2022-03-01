@@ -215,7 +215,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
   );
 }
 
-function LoginButton({ setLoginState }) {
+function LoginButton({ setViewId, setLoginState }) {
   const [visible, setVisible] = React.useState(true);
   var action = 'login';
   var buttonText = 'Login';
@@ -225,6 +225,7 @@ function LoginButton({ setLoginState }) {
   }
 
   return (
+    <>
     <Button
       id='loginLogoutButton'
       variant="text" 
@@ -258,6 +259,16 @@ function LoginButton({ setLoginState }) {
     >
       {buttonText}
     </Button>
+    { buttonText === 'Login' && 
+      <Button
+        id='signUpButton'
+        variant="text" 
+        color="inherit"
+        onClick={() => {
+          setViewId('000000000000000000000005');
+        }}
+      >Sign&nbsp;Up</Button> }
+    </>
   );
 }
 

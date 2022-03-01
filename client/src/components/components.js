@@ -58,7 +58,7 @@ function Text(props) {
     var defaultSx = {};
 
     const handleEdit = (e) => {
-      props.val.handleAuth('patch', props.val.prop, (auth) => {
+      props.val.handleItemAuth('patch', props.val.prop, (auth) => {
         setEditing(true);
       });
     };

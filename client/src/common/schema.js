@@ -113,7 +113,7 @@ class Schema {
       if (validTypes.includes(this.schema[key])) {
         return this.schema[key];
       }
-      if (this.schema[key]['type'] !== undefined && 
+      if (this.schema[key].hasOwnProperty('type') &&
           validTypes.includes(this.schema[key]['type'])) {
        return this.schema[key]['type'];
       }
@@ -124,7 +124,7 @@ class Schema {
 
   getDefault(key, user) {
     if (this.schema.hasOwnProperty(key)) {
-      if (this.schema[key]['default'] !== undefined) {
+      if (this.schema[key].hasOwnProperty('default')) {
         return this.schema[key]['default'];
       }
 

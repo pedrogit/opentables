@@ -308,7 +308,7 @@ exports.setCookieJWT = function (req, res, payload) {
     algorithm: "HS256",
   });
   res.cookie("authtoken", jwtoken, { httpOnly: false });
-  req.user = payload.email;
+  req.user = payload[Globals.emailFieldName];
 };
 
 exports.isObjEmpty = function (obj) {
@@ -319,39 +319,212 @@ exports.isObjEmpty = function (obj) {
   );
 };
 
-exports.validatePerm = function(user, listOwner, listCPerm, listWPerm, listRPerm, throwerror = true)
-{
-  // admin and listowner have all permissions
-  if (user === process.env.ADMIN_EMAIL || user === listOwner) {
-    return true;
-  }
 
-  if (user !== Globals.unauthUserName && user !== '') {
-    // if listCPerm permission is @all or the user is listed, grant permission
+/*
+Permission model
+
+BASIC - All views, lists and items, can have a r_permission or a rw_permission (or both) set. 
+  r_permission determines who can view (and list) view, list or item properties. 
+  rw_permission determines who can edit view, list or item properties.
+
+  For lists, when r_permission is not set, it defaults to @all.
+  For lists, when rw_permission is not set, it defaults to @owner.
+
+  For views and items, when r_permission (or rw_permission) is not set, it uses the parent 
+  list item_r_permission (or item_rw_permission).
+
+ITEMS - List, and only lists, can have an item_r_permission or an item_rw_permission (or both) set. 
+  item_r_permission determines globally who can view (and list) list item properties. 
+  item_rw_permission determines globally who can edit list item properties.
+
+BOTH SETS - When both list item_r_permission and list item r_permission (or item_rw_permission 
+  and list item rw_permission) are set, list item r_permission (or rw_permission) 
+  takes precedence (see argument below).
+
+ITEM_R UNSET - When item_r_permission (or item_rw_permission) is not set (undefined or null), 
+  childs items r_permission (or rw_permission) are used if they are set.
+
+BOTH UNSET - When both list item_r_permission and list item r_permission (or item_rw_permission 
+  and list item rw_permission) are not set (undefined or null) list r_permission is used.
+
+OTHER RULES
+
+INHERITANCE - rw_permission always grant r_permission
+
+DELETE - rw_permission grants delete permission on an object only when this object does 
+  not have an owner property (case of must list items). When it does, only the owner can 
+  delete the object (case of views and lists).
+
+DEFAULT OWNER - If the item owner property is not set, the list owner is the owner of all 
+  the items.
+
+OWNER DEFAULT PERMISSION - Being the owner of an object (view, list or item) always grants 
+  rw_permission to this object.
+
+PROPERTY LEVEL READ PERMISSION - Schemas can set properties as “read_by_edit_only” so that 
+  they can be only viewed by user having rw_permission
+*/
+exports.validateRWPerm = function(
+  {
+    user,
+    list,
+    item,
+    readWrite = true,
+    throwError = true
+  } = {}
+) {
+  // if user is not defined return false
+  if (user) {
+    // admin has all permissions
+    if (user === process.env.ADMIN_EMAIL) {
+      return true;
+    }
+    // validate owners
+    if ((item && item.hasOwnProperty(Globals.ownerFieldName) && user === item[Globals.ownerFieldName]) || 
+        (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])) {
+        return true;
+    }
+
+    var mergedPerm = [];
+    // if list read permission is not set = default (nothing or @all)
+
+
+    if (list && list.hasOwnProperty(Globals.readWritePermFieldName)) {
+      mergedPerm = list[Globals.readWritePermFieldName].split(/\s*,\s*/);
+    }
+    else {
+      mergedPerm = (readWrite ? [] : [Globals.allUserName]);
+    }
+
+    // if list item permission is not set, set to = []
+    if (list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) {
+      let splittedRW = list[Globals.itemReadWritePermFieldName].split(/\s*,\s*/);
+      
+      if (readWrite) {
+        mergedPerm = mergedPerm.concat(splittedRW);
+      }
+      else {
+        mergedPerm = splittedRW;
+      }
+    }
+
+    // if item permission is not set, set to = []
+    if (item && item.hasOwnProperty(Globals.readWritePermFieldName)) {
+      let splittedRW = item[Globals.readWritePermFieldName].split(/\s*,\s*/);
+      if (readWrite) {
+        mergedPerm = mergedPerm.concat(splittedRW);
+      }
+      else {
+        mergedPerm = splittedRW;
+      }
+    }
+
     if (
-      listCPerm &&
-      (listCPerm === "@all" || listCPerm.split(/\s*,\s*/).includes(user))
+      mergedPerm.includes(Globals.allUserName) ||
+      (mergedPerm.includes(Globals.authUserName) && user !== Globals.allUserName) ||
+      mergedPerm.includes(user)
     ) {
       return true;
     }
+  }
 
-    // if listWPerm permission is @all or the user is listed, grant permission
-    if (
-      listWPerm &&
-      (listWPerm === "@all" || listWPerm.split(/\s*,\s*/).includes(user))
-    ) {
+  if (throwError) {
+    throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+  }
+  return false;
+}
+
+// read permissions
+exports.validateRPerm = function(
+  {
+    user,
+    list, 
+    item,
+    throwError = true
+  } = {}
+) {
+  // if user has RW permission, he also has read permission
+  if (exports.validateRWPerm({
+    user: user,
+    list: list,
+    item: item,
+    throwError: false
+  })) {
+    return true;
+  }
+
+  var newList = {...list};
+  if (list) {
+    if (list.hasOwnProperty(Globals.readPermFieldName)) {
+      newList[Globals.readWritePermFieldName] = list[Globals.readPermFieldName]
+    }
+    else {
+      delete newList[Globals.readWritePermFieldName]
+    }
+    if (list.hasOwnProperty(Globals.itemReadPermFieldName)) {
+      newList[Globals.itemReadWritePermFieldName] = list[Globals.itemReadPermFieldName]
+    }
+    else {
+      delete newList[Globals.itemReadWritePermFieldName]
+    }
+  }
+  var newItem = {...item};
+  if (item) {
+    if (item.hasOwnProperty(Globals.readPermFieldName)) {
+      newItem[Globals.readWritePermFieldName] = item[Globals.readPermFieldName]
+    }
+    else {
+      delete newItem[Globals.readWritePermFieldName]
+    }
+  }
+  // reuse the RW version of the function to check for read permission
+  return exports.validateRWPerm({
+    user: user,
+    list: newList,
+    item: newItem,
+    readWrite: false,
+    throwError: throwError
+  });
+}
+
+// delete permissions
+exports.validateDPerm = function(
+  {
+    user,
+    list, 
+    item,
+     throwError = true
+  } = {}
+) {
+  if (user && user === process.env.ADMIN_EMAIL) {
+    return true;
+  }
+    
+  // if list or item owner are set, user must be owner
+  // if list or item owner are not set, must have RW permission
+  if (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])
+  {
+    return true;
+  }
+  if (item && item.hasOwnProperty(Globals.ownerFieldName)) {
+    if (user === item[Globals.ownerFieldName])
+    {
       return true;
     }
   }
+  else if (((list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) || 
+       (item && item.hasOwnProperty(Globals.readWritePermFieldName))) &&
+      exports.validateRWPerm({
+      user: user,
+      list: list,
+      item: item,
+      throwError: throwError
+    })) {
+      return true;
+  }; 
 
-  // if listRPerm permission is @all or the user is listed, grant permission
-  if (
-    listRPerm &&
-    (listRPerm === "@all" || listRPerm.split(/\s*,\s*/).includes(user))
-  ) {
-    return true;
-  }
-  if (throwerror) {
+
+  if (throwError) {
     throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
   }
   return false;

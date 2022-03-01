@@ -26,6 +26,7 @@ describe("testRoutes.js List API", () => {
   var twoItems;
   var lastItems;
   var listOfAllList = { ...Globals.listOfAllLists };
+  var userList;
 
   describe("1 - Invalid URL and DELETE ALL", () => {
     it("1.1 - Test an invalid URL. It should return a NOT FOUND on invalid URL", (done) => {
@@ -136,9 +137,7 @@ describe("testRoutes.js List API", () => {
     it("2.4 - Get list with no listid", (done) => {
       chai
         .request(server)
-        .get(
-          "/api/" + Globals.APIKeyword // + "/" + Globals.viewOnAllViewViewId
-        )
+        .get("/api/" + Globals.APIKeyword)
         //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           var expectedView = {
@@ -503,7 +502,7 @@ describe("testRoutes.js List API", () => {
     it("4.9 - Get the list again but without the list of items", (done) => {
       chai
         .request(server)
-        .get("/api/" + Globals.APIKeyword + "/" + listIdToPatch + "/noitems")
+        .get("/api/" + Globals.APIKeyword + "/" + listIdToPatch + "/?noitems=true")
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
@@ -1141,10 +1140,10 @@ describe("testRoutes.js List API", () => {
 
     it("10.1 - Register a new user", (done) => {
       newUser = {
-        firstname: "Pedro",
-        lastname: "Root",
-        organisation: "Myself",
-        email: "Pedro@gmail.com",
+        firstname: "User1Firstname",
+        secondname: "User1secondname",
+        organisation: "User 1 Organisation",
+        [Globals.emailFieldName]: "user1@gmail.com",
         password: pw,
       };
       chai
@@ -1156,10 +1155,13 @@ describe("testRoutes.js List API", () => {
             ...newUser,
             ...{
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-              email: newUser.email.toLowerCase(),
+              [Globals.emailFieldName]: newUser[Globals.emailFieldName].toLowerCase(),
               password: response.body.password,
             },
           };
+
+          userList = [newUser];
+
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
           expect(response.body).to.deep.equal({
@@ -1203,10 +1205,10 @@ describe("testRoutes.js List API", () => {
     it("10.3 - Register another user with the same email", (done) => {
       const pw = "mypassword";
       var newUser2 = {
-        firstname: "Pedro2",
-        lastname: "Root2",
-        organisation: "Myself2",
-        email: "Pedro@gmail.com",
+        firstname: "Bad",
+        secondname: "User",
+        organisation: "Bad user Organisation",
+        [Globals.emailFieldName]: newUser[Globals.emailFieldName],
         password: pw,
       };
 
@@ -1226,7 +1228,7 @@ describe("testRoutes.js List API", () => {
             err: NodeUtil.format(
               Errors.ErrMsg.SchemaValidator_NotUnique,
               "email",
-              "pedro@gmail.com"
+              newUser[Globals.emailFieldName]
             ),
           });
           done();
@@ -1250,7 +1252,7 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/login")
-        .auth("x" + newUser.email, pw)
+        .auth("x" + newUser[Globals.emailFieldName], pw)
         .end((err, response) => {
           expect(response).to.have.status(401);
           expect(response.body).to.be.an("object");
@@ -1266,7 +1268,7 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/login")
-        .auth(newUser.email, "x" + pw)
+        .auth(newUser[Globals.emailFieldName], "x" + pw)
         .end((err, response) => {
           expect(response).to.have.status(401);
           expect(response.body).to.be.an("object");
@@ -1282,7 +1284,7 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/login")
-        .auth(newUser.email, pw)
+        .auth(newUser[Globals.emailFieldName], pw)
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
@@ -1308,7 +1310,7 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/" + listIdToPatch)
-        .auth(newUser.email, pw)
+        .auth(newUser[Globals.emailFieldName], pw)
         .end((err, response) => {
           lastList = {
             ...lastList,
@@ -1496,7 +1498,126 @@ describe("testRoutes.js List API", () => {
           done();
         });
     });
+  });
 
+  describe("13 - Test user view", () => {
+    it("13.1 - Get the user list", (done) => {
+      chai
+        .request(server)
+        .get(
+          "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId
+        )
+        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response).to.have.status(200);
+          expect(response.body).to.be.an("object");
+          var expected = {
+            ...Globals.viewOnTheListOfUsers,
+            _childlist: {
+              ...Globals.listOfUsers,
+              [Globals.listIdFieldName]: Globals.listofAllListId,
+              items: userList
+            },
+            [Globals.listIdFieldName]: Globals.listofAllViewId
+          }
+          expect(Utils.objWithout(response.body, '_childlist')).to.deep.equal(Utils.objWithout(expected, '_childlist'));
+          expect(Utils.objWithout(response.body._childlist, 'items')).to.deep.equal(Utils.objWithout(expected._childlist, 'items'));
+          expect(response.body._childlist.items).to.deep.equal(expected._childlist.items);
+          done();
+        });
+    });
+
+    var pw = "user2Password"
+    var user2 = {
+      firstname: "User2Firstname",
+      secondname: "User2secondname",
+      organisation: "User2Organisation",
+      [Globals.emailFieldName]: "User2@gmail.com",
+      password: pw,
+    };
+
+    it("13.2 - Register a new user", (done) => {
+      chai
+        .request(server)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.userListId)
+        .send(user2)
+        .end((err, response) => {
+          user2 = {
+            ...user2,
+            ...{
+              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
+              [Globals.emailFieldName]: user2[Globals.emailFieldName].toLowerCase(),
+              password: response.body.password,
+            },
+          };
+
+          userList.push(user2)
+
+          expect(response).to.have.status(201);
+          expect(response.body).to.be.an("object");
+          expect(response.body).to.deep.equal({
+            ...user2,
+            [Globals.listIdFieldName]: Globals.userListId
+          });
+          expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
+          expect(response).to.have.cookie("authtoken");
+
+          cookies = setCookie.parse(response);
+
+          done();
+        });
+    });
+
+    it("13.2 - Get the user list filtered to a single user", (done) => {
+      chai
+        .request(server)
+        .get(
+          "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId + "?filter=$isexactly_i:[$" + [Globals.emailFieldName] + ",\"" + user2[Globals.emailFieldName] + "\"]"
+        )
+        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response).to.have.status(200);
+          expect(response.body).to.be.an("object");
+
+          var expected = {
+            ...Globals.viewOnTheListOfUsers,
+            _childlist: {
+              ...Globals.listOfUsers,
+              [Globals.listIdFieldName]: Globals.listofAllListId,
+              items: [user2]
+            },
+            [Globals.listIdFieldName]: Globals.listofAllViewId
+          }
+          expect(Utils.objWithout(response.body, '_childlist')).to.deep.equal(Utils.objWithout(expected, '_childlist'));
+          expect(Utils.objWithout(response.body._childlist, 'items')).to.deep.equal(Utils.objWithout(expected._childlist, 'items'));
+          expect(response.body._childlist.items).to.deep.equal(expected._childlist.items);
+          done();
+        });
+    });
+
+    it("13.3 - Get the user list without items", (done) => {
+      chai
+        .request(server)
+        .get(
+          "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId + "/?noitems=true"
+        )
+        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
+        .end((err, response) => {
+          expect(response).to.have.status(200);
+          expect(response.body).to.be.an("object");
+
+          var expected = {
+            ...Globals.viewOnTheListOfUsers,
+            _childlist: {
+              ...Globals.listOfUsers,
+              [Globals.listIdFieldName]: Globals.listofAllListId
+            },
+            [Globals.listIdFieldName]: Globals.listofAllViewId
+          }
+          expect(response.body).to.deep.equal(expected);
+          done();
+        });
+    });
 
   });
 

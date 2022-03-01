@@ -32,7 +32,7 @@ app.use(cookieParser());
 // or as a token in the cookie
 app.use(async (req, res, next) => {
   // default user to unauthenticated user
-  req.user = Globals.unauthUserName;
+  req.user = Globals.allUserName;
 
   // check for credentiel in the authorization header
   if (req.headers.hasOwnProperty("authorization")) {
@@ -59,7 +59,7 @@ app.use(async (req, res, next) => {
           );
         }
       } else {
-        item = await controler.simpleFind(Globals.userListId, { email: email });
+        item = await controler.simpleFind(Globals.userListId, { [Globals.emailFieldName]: email });
 
         if (!item) {
           return next(

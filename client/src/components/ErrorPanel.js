@@ -38,7 +38,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
           <IconButton
             sx = {{position: 'absolute', top: '1px', right: '1px'}}
             id="closeErrorMsgButton"
-            aria-label="closeErrorMsgButton" 
+            aria-label="close error panel" 
             color="inherit"
             onClick={() => setErrorMsg({open: false})}
           >

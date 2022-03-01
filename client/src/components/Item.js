@@ -22,7 +22,7 @@ function Item({
   item, 
   rowNb, 
   setLoginState, 
-  handleAuth, 
+  handleListAuth, 
   handleDeleteItem,
   setViewId
 }) {
@@ -70,6 +70,10 @@ function Item({
     return false;
   };
 
+  var handleItemAuth = function(action = 'patch', propName, callback) {
+    handleListAuth(action = 'patch', item, propName, callback);
+  }
+
   var setBindings = function (item) {
     //console.log('Item setBindings()...');
 
@@ -79,7 +83,7 @@ function Item({
       if (item.hasOwnProperty(key)) {
         result[key] = {
           handlePatch: handlePatch,
-          handleAuth: handleAuth,
+          handleItemAuth: handleItemAuth,
           setViewId: setViewId,
           prop: key,
           val: item[key] ? item[key] : "",
@@ -89,6 +93,8 @@ function Item({
     //result.key = result._id.val;
     return result;
   };
+
+
 
   //console.log('Render Item (' +  item.name + ')...');
 
@@ -119,7 +125,7 @@ function Item({
         <Stack sx={buttonSx}>
           <IconButton
             id="deleteItemButton"
-            aria-label="deleteItem" 
+            aria-label="delete item" 
             color="inherit"
             onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
           >
