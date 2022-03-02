@@ -1,5 +1,5 @@
 import React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider, lighten } from "@mui/material/styles";
 import { deepOrange, orange } from "@mui/material/colors";
 import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
@@ -21,7 +21,7 @@ const theme = createTheme({
   palette: {
     primary: {
       main: deepOrange[900], //#bf360c
-      //light: deepOrange[900], //#bf360c
+      palebg: (theme) => lighten(theme.palette.primary.light, 0.9)
     },
     secondary: {
       main: orange["A200"], //#ffab40

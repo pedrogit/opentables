@@ -5,6 +5,8 @@ import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
+import Input from '@mui/material/Input';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { useTheme } from "@mui/material/styles";
 
 /********************
@@ -15,19 +17,19 @@ function Label(props) {
   var fontSize = props.vertical
     ? theme.typography.caption
     : theme.typography.body1;
+
   var defaultSx = {
     fontSize: fontSize,
     color: theme.palette.primary.main,
     fontWeight: "bold",
     marginRight: 1,
   };
-  var sx = { ...defaultSx, ...props.labelSx, ...props.sx };
 
   if (!props.nolabel) {
     var labelStr = props.label ? props.label : props.val.charAt(0).toUpperCase() + props.val.slice(1)
     var separator = props.vertical ? null : <>&nbsp;:</>;
     return (
-      <Typography sx={sx}>
+      <Typography sx={{ ...defaultSx, ...props.labelSx, ...props.sx }}>
         {labelStr}
         {separator}
       </Typography>
@@ -63,10 +65,6 @@ function Text(props) {
       });
     };
 
-    const handleClose = () => {
-      setEditing(false)
-    };
-
     const handleChange = (val) => {
       setEditVal(val);
     };
@@ -79,8 +77,11 @@ function Text(props) {
     };
 
     const keyPressed = (e) => {
-      if (e.keyCode === 13) {
+      if (e.keyCode === 13) { // enter
         handleSave();
+      }
+      if (e.keyCode === 27) { // escape
+        setEditing(false);
       }
     };
 
@@ -100,18 +101,35 @@ function Text(props) {
       <>
         <Stack direction={props.vertical ? "column" : "row"}>
           <Label {...{ ...props, val: propName }} />
-          <Typography
-            sx={{ ...defaultSx, ...props.sx }}
-            onDoubleClick={handleEdit}
-            ref={valueRef}
-          >
-            {propVal}
-          </Typography>
+          {editing && props.inline ? (
+            <ClickAwayListener onClickAway={() => setEditing(false)}>
+              <Input
+                sx={{ ...defaultSx, ...props.sx, backgroundColor: theme.palette.primary.palebg}}
+                inputProps={{
+                  style: { padding: '0px' }
+                }}
+                
+                fullWidth
+                value={editVal}
+                onChange={(e) => handleChange(e.target.value)}
+                onKeyDown={(e) => keyPressed(e)}
+                autoFocus
+              />
+            </ClickAwayListener>
+          ) : (
+            <Typography
+              sx={{ ...defaultSx, ...props.sx }}
+              onDoubleClick={handleEdit}
+              ref={valueRef}
+            >
+              {propVal}
+            </Typography>
+          )}
         </Stack>
         <Popover
-          open={editing}
+          open={!props.inline && editing}
           anchorEl={valueRef.current}
-          onClose={handleClose}
+          onClose={() => setEditing(false)}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "left",
@@ -119,6 +137,7 @@ function Text(props) {
         >
           <Box sx={{ p: 1, width: getWidth() }}>
             <TextField
+              sx={{backgroundColor: theme.palette.primary.palebg}}
               fullWidth
               id="outlined-basic"
               variant="outlined"
@@ -127,6 +146,7 @@ function Text(props) {
               value={editVal}
               onChange={(e) => handleChange(e.target.value)}
               onKeyDown={(e) => keyPressed(e)}
+              autoFocus
             />
           </Box>
         </Popover>

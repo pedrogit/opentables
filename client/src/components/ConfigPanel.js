@@ -2,7 +2,7 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
-import { useTheme, lighten } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 
 // local imports
 import List from "./List";
@@ -12,7 +12,7 @@ function ConfigPanel({ configPanelOpen, viewData, listData, setLoginState }) {
   const theme = useTheme();
 
   return (
-    <Stack sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+    <Stack sx={{backgroundColor: theme.palette.primary.palebg}}>
       <Collapse in={configPanelOpen}>
         <Stack sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}>
           <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>

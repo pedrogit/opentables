@@ -8,7 +8,7 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
-import { useTheme, lighten } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import Cookies from 'js-cookie'
 
@@ -139,7 +139,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
   }
 
   return (
-    <Stack id='loginForm' sx={{backgroundColor: lighten(theme.palette.primary.light, 0.9)}}>
+    <Stack id='loginForm' sx={{backgroundColor: theme.palette.primary.palebg}}>
       <Collapse 
         in={loginState && loginState.open} 
         
@@ -152,7 +152,7 @@ function LoginForm({ loginState, setLoginState, sx }) {
                   loginState === undefined || loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
                 } 
                 color="primary"
-                sx={{padding: '0px'}}>
+                sx={{padding: 0, backgroundColor: theme.palette.primary.palebg}}>
                 <AlertTitle>{
                   loginState === undefined || loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
                   (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
