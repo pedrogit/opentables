@@ -337,11 +337,6 @@ describe("testRoutes.js List API", () => {
         });
     });
     it("4.2 - Post a list item to an invalid listid", (done) => {
-      firstItem = {
-        field1: "field1val1",
-        field2: "field2val1",
-      };
-
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/60edb91162a87a2c383d5cf2")
@@ -361,10 +356,6 @@ describe("testRoutes.js List API", () => {
     });
 
     it("4.3 - Post a list item having an invalid field", (done) => {
-      firstItem = {
-        ...firstItem,
-      };
-
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/" + listIdToPatch)
@@ -1140,9 +1131,7 @@ describe("testRoutes.js List API", () => {
 
     it("10.1 - Register a new user", (done) => {
       newUser = {
-        firstname: "User1Firstname",
-        secondname: "User1secondname",
-        organisation: "User 1 Organisation",
+        username: "User1Username",
         [Globals.emailFieldName]: "user1@gmail.com",
         password: pw,
       };
@@ -1205,9 +1194,7 @@ describe("testRoutes.js List API", () => {
     it("10.3 - Register another user with the same email", (done) => {
       const pw = "mypassword";
       var newUser2 = {
-        firstname: "Bad",
-        secondname: "User",
-        organisation: "Bad user Organisation",
+        username: "Bad",
         [Globals.emailFieldName]: newUser[Globals.emailFieldName],
         password: pw,
       };
@@ -1227,7 +1214,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.deep.equal({
             err: NodeUtil.format(
               Errors.ErrMsg.SchemaValidator_NotUnique,
-              "email",
+              Globals.emailFieldName,
               newUser[Globals.emailFieldName]
             ),
           });
@@ -1529,9 +1516,7 @@ describe("testRoutes.js List API", () => {
 
     var pw = "user2Password"
     var user2 = {
-      firstname: "User2Firstname",
-      secondname: "User2secondname",
-      organisation: "User2Organisation",
+      username: "User2Username",
       [Globals.emailFieldName]: "User2@gmail.com",
       password: pw,
     };

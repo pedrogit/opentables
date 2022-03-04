@@ -134,6 +134,17 @@ describe("testUtils.js Test Utils functions", () => {
       var result = Utils.completeTrueValues("{a: {'b'}}");
       expect(result).to.equal("{a: {'b': true}}");
     });
+
+    it("10 - Array of strings", () => {
+      var result = Utils.completeTrueValues('{a: [b, c, d]}');
+      expect(result).to.equal('{a: [b, c, d]}');
+    });
+    
+    it("11 - Double quoted list of strings", () => {
+      var result = Utils.completeTrueValues('{a: \"b, c, d\"}');
+      expect(result).to.equal('{a: \"b, c, d\"}');
+    });
+
   });
 
   describe("D - Test unescapeChar()", () => {
@@ -416,7 +427,8 @@ describe("testUtils.js Test Utils functions", () => {
     test80: "Double quotes",
     test81: "Already quoted keys",
     test82: "Key and array",
-    test83: "Already quoted array values"
+    test83: "Already quoted array values",
+    test84: "Quoted list of strings"
   }
 
   var singleQuotesTests = {
@@ -497,8 +509,8 @@ describe("testUtils.js Test Utils functions", () => {
     test80: "pr1: '\"', pr2: '\"\"'                                                      ",
     test81: "\"pr1\": 'aa', \"pr2\": 'bb'                                                ",
     test82: "$contains: [$pr1, aaa]                                                      ",
-    test83: "$contains: [  '$pr1'  ,  \"aaa\"  ,  'bbb'  ,  \"ccc\"  ]"
-
+    test83: "$contains: [  '$pr1'  ,  \"aaa\"  ,  'bbb'  ,  \"ccc\"  ]",
+    test84: "prop1: {type: string, options: \"a, b, c\"}"
   };
 
   var singleQuotesExpectedObj = {
@@ -558,7 +570,8 @@ describe("testUtils.js Test Utils functions", () => {
     test80: {pr1: "\"", pr2: "\"\""},
     test81: {pr1: "aa", pr2: "bb"},
     test82: {$contains: ["$pr1", "aaa"]},
-    test83: {$contains: ["$pr1", "aaa", "bbb", "ccc"]}
+    test83: {$contains: ["$pr1", "aaa", "bbb", "ccc"]},
+    test84: {prop1: {type: "string", options: "a, b, c"}}
   };
 
   var singleQuotesExpectedStr = {
@@ -618,7 +631,8 @@ describe("testUtils.js Test Utils functions", () => {
     test80: "pr1: \"\\\"\", pr2: \"\\\"\\\"\"                                               ",
     test81: "\"pr1\": \"aa\", \"pr2\": \"bb\"                                               ",
     test82: "$contains: [ \"$pr1\", \"aaa\"]                                                ",
-    test83: "$contains: [ \"$pr1\", \"aaa\", \"bbb\", \"ccc\"]                              "
+    test83: "$contains: [ \"$pr1\", \"aaa\", \"bbb\", \"ccc\"]                              ",
+    test84: "prop1: {type: \"string\", options: \"a, b, c\"}                                "
   };
 
   describe("I - Test doubleQuoteValues() with single quoted string", () => {
@@ -743,9 +757,9 @@ describe("testUtils.js Test Utils functions", () => {
       //console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
       if (singleQuotesTestNames.hasOwnProperty(key)) {
         it(key + " - " + singleQuotesTestNames[key], () => {
-          /*if (key === 'test83') {
+          if (key === 'test84') {
             console.log(key);
-          }*/
+          }
           if (key === 'test53' || key === 'test55') {
             /*try {
               Utils.simpleJSONToJSON(singleQuotesTests[key].trim());

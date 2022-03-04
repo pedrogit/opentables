@@ -12,6 +12,7 @@ const validTypes = [
   "user",
   "user_list",
   "string",
+  "boolean",
   "encrypted_string",
   "number",
   "schema",
@@ -77,7 +78,26 @@ class Schema {
                 encrypt: { type: "boolean" },
                 unique: { type: "boolean" },
                 required: { type: "boolean" },
-                default: { type: "string" }
+                options: {
+                  anyOf: [
+                    { type: "string",
+                      minLength: 1
+                    }, 
+                    { type: "array", 
+                      items: {
+                        type: "string",
+                        minLength: 1
+                      },
+                      minLength: 1
+                    }
+                  ]
+                },
+                default: {
+                  anyOf: [
+                    { type: "string" }, 
+                    { type: "boolean" }
+                  ]
+                }
               },
               additionalProperties: false,
             },
@@ -88,7 +108,8 @@ class Schema {
     };
     var ajv = new Ajv({ allErrors: false });
     var validate = ajv.compile(jsonschema);
-    return validate(this.schema);
+    var result = validate(this.schema);
+    return result;
   }
 
   schemaAsJson() {

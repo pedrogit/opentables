@@ -61,9 +61,7 @@ function init() {
 
     it("2 - Register the owner user", (done) => {
       newUser = {
-        firstname: "The",
-        lastname: "Owner",
-        organisation: "Myself",
+        username: "The",
         [Globals.emailFieldName]: "owner@gmail.com",
         password: pw,
       };
@@ -94,9 +92,7 @@ function init() {
 
     it("3 - Register the other user", (done) => {
       newUser = {
-        firstname: "The",
-        lastname: "Other",
-        organisation: "Itself",
+        username: "The",
         [Globals.emailFieldName]: "other@gmail.com",
         password: pw,
       };

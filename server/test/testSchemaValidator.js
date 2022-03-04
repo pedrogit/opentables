@@ -4,6 +4,7 @@ const NodeUtil = require("util");
 
 const SchemaValidator = require("../src/schemavalidator");
 const Errors = require("../../client/src/common/errors");
+const { stringify } = require("ajv");
 
 var expect = chai.expect;
 
@@ -20,7 +21,7 @@ const expectThrowsAsync = async (method, errorMessage) => {
   }
 };
 
-describe("1 testSchemaValidator.js List Item Schema", () => {
+describe("1 testSchemaValidator.js test schema constructor", () => {
   it("1.1 Pass null", () => {
     expect(function () {
       new SchemaValidator();
@@ -39,6 +40,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
+    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", required: true}}}});
   });
 
   it("1.4 Pass JSON schema", () => {
@@ -47,7 +49,89 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     });
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
+    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", required: true}}}});
   });
+
+  it("1.5 Test an invalid level one schema parameter", () => {
+    var schema = "prop1: upper";
+    expect(function () {
+      new SchemaValidator(schema);
+    }).to.throw(
+      NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"' + schema + '"')
+    );
+  });
+
+  it("1.6 Valid string with options as a string list", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"a, b, c\"}");
+    // just make sure the constructor does not throw
+    expect(schemaValidator).to.be.an("object");
+    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", options: "a, b, c"}}}});
+  });
+
+  it("1.7 Valid string with options as a string list", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: [a_a, b_b, c_c]}");
+    // just make sure the constructor does not throw
+    expect(schemaValidator).to.be.an("object");
+    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", options: ["a_a", "b_b", "c_c"]}}}});
+  });
+
+  it("1.8 Empty options", async () => {
+    var schema = "prop1: {type: string, options: \"\"}";
+    expect(function () {
+      new SchemaValidator(schema);
+    }).to.throw(
+      NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"' + schema + '"')
+    );
+  });
+
+  it("1.9 Complex schema", async () => {
+    var schema = "{name: {type: string, required, default: 'List name'}, owner: {type: user, required}, r_permissions: {type: user_list, lower, default: @all}, rw_permissions: {type: user_list, lower, default: @owner}, item_r_permissions: {type: user_list, lower, default: @all}, item_rw_permissions: {type: user_list, lower, default: @owner}, listschema: {type: schema, default: 'prop1: string'}}";
+    var schemaValidator = new SchemaValidator(schema);
+    
+    expect(schemaValidator).to.be.an("object");
+    expect(schemaValidator).to.deep.equal({
+      schema: {
+        schema: {
+          name: {
+            type: "string",
+            required: true,
+            default: "List name",
+          },
+          owner: {
+            type: "user",
+            required: true,
+          },
+          r_permissions: {
+            type: "user_list",
+            lower: true,
+            default: "@all",
+          },
+          rw_permissions: {
+            type: "user_list",
+            lower: true,
+            default: "@owner",
+          },
+          item_r_permissions: {
+            type: "user_list",
+            lower: true,
+            default: "@all",
+          },
+          item_rw_permissions: {
+            type: "user_list",
+            lower: true,
+            default: "@owner",
+          },
+          listschema: {
+            type: "schema",
+            default: "prop1: string",
+          },
+        },
+      },
+    });
+  });
+});
+
+describe("2 testSchemaValidator.js test string against schema", () => {
 
   it("1.5 Validate a simple json string against a one level schema", async () => {
     var schemaValidator = new SchemaValidator("prop1: string");
@@ -57,16 +141,9 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(result).to.have.property("prop1", "toto");
   });
 
-  it("1.6 Test an invalid level one schema parameter", () => {
-    var schema = "prop1: upper";
-    expect(function () {
-      new SchemaValidator(schema);
-    }).to.throw(
-      NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchema, '"' + schema + '"')
-    );
-  });
 
-  it("1.7 Validate a string value against a one level schema of type number", async () => {
+
+  it("2.1 Validate a string value against a one level schema of type number", async () => {
     var schemaValidator = new SchemaValidator("prop1: number");
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "toto"}'),
@@ -79,7 +156,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
   });
 
-  it("1.8 Throw an error for an empty required prop, even if default is provided", async () => {
+  it("2.2 Throw an error for an empty required prop, even if default is provided", async () => {
     var schemaValidator = new SchemaValidator('prop1: {type: string, required, default: "default value"}');
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": ""}'),
@@ -90,7 +167,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
   });
 
-  it("1.9 Generate a required default value", async () => {
+  it("2.3 Generate a required default value", async () => {
     var schemaValidator = new SchemaValidator('prop1: {type: string, required, default: "default value"}');
     var result = await schemaValidator.validateJson('{}');
     // just make sure the constructor does not throw
@@ -99,7 +176,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
   });
 
 
-  it("1.10 Generate a default value for a patched value", async () => {
+  it("2.4 Generate a default value for a patched value", async () => {
     var schemaValidator = new SchemaValidator('prop1: {type: string, default: "default value"}');
     var result = await schemaValidator.validateJson('{"prop1": ""}', false);
     // just make sure the constructor does not throw
@@ -107,7 +184,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(result).to.have.property("prop1", "default value");
   });
 
-  it("1.11 Validate a number against a one level schema of type number", async () => {
+  it("2.5 Validate a number against a one level schema of type number", async () => {
     var schemaValidator = new SchemaValidator("prop1: number");
     var json = await schemaValidator.validateJson('{"prop1": 123}');
 
@@ -115,7 +192,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.have.property("prop1", 123);
   });
 
-  it("1.12 Validate a simple json string against a simple two level schemaa", async () => {
+  it("2.6 Validate a simple json string against a simple two level schemaa", async () => {
     var schemaValidator = new SchemaValidator("prop1: {type: string}");
     var json = await schemaValidator.validateJson('{"prop1": "toto"}');
 
@@ -123,7 +200,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.have.property("prop1", "toto");
   });
 
-  it("1.13 Validate a simple json string against a simple schema", async () => {
+  it("2.7 Validate a simple json string against a simple schema", async () => {
     var schemaValidator = new SchemaValidator(
       "prop1: {type: string, required}"
     );
@@ -133,7 +210,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.have.property("prop1", "toto");
   });
 
-  it("1.14 Validate a missing prop", async () => {
+  it("2.8 Validate a missing prop", async () => {
     var schema = "prop1: {type: string, required}";
     var jsonStr = '{"prop": "toto"}';
     var schemaValidator = new SchemaValidator(schema);
@@ -143,7 +220,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
   });
 
-  it("1.15 Valid type", async () => {
+  it("2.9 Valid type", async () => {
     var schemaValidator = new SchemaValidator(
       "{prop1: {type:string, required}}"
     );
@@ -153,7 +230,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.deep.equal({ prop1: "toto" });
   });
 
-  it("1.16 Invalid type (number instead of string)", async () => {
+  it("2.10 Invalid type (number instead of string)", async () => {
     var schemaValidator = new SchemaValidator(
       "{prop1: {type:string, required}}"
     );
@@ -168,7 +245,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
   });
 
-  it("1.17 Validate upper", async () => {
+  it("2.11 Validate upper", async () => {
     var schemaValidator = new SchemaValidator(
       "{prop1: {type:string, required, upper}}"
     );
@@ -178,7 +255,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.deep.equal({ prop1: "TOTO" });
   });
 
-  it("1.18 Invalid email", async () => {
+  it("2.12 Invalid email", async () => {
     var schemaValidator = new SchemaValidator("{prop1: email}");
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "aaaa"}'),
@@ -191,7 +268,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
   });
 
-  it("1.19 Valid email", async () => {
+  it("2.13 Valid email", async () => {
     var schemaValidator = new SchemaValidator("{prop1: email}");
     var json = await schemaValidator.validateJson('{"prop1": "Aaaa@x.com"}');
 
@@ -199,7 +276,7 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     expect(json).to.deep.equal({ prop1: "aaaa@x.com" });
   });
 
-  it("1.20 Invalid user_list", async () => {
+  it("2.14 Invalid user_list", async () => {
     var schemaValidator = new SchemaValidator("prop1: user_list");
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "aa, bb"}'),
@@ -212,11 +289,101 @@ describe("1 testSchemaValidator.js List Item Schema", () => {
     );
   });
 
-  it("1.21 Valid user_list", async () => {
+  it("2.15 Valid user_list", async () => {
     var schemaValidator = new SchemaValidator("prop1: user_list");
     var json = await schemaValidator.validateJson('"prop1": "@All, BB@gmail.com"');
 
     expect(json).to.be.an("object");
     expect(json).to.deep.equal({ prop1: "@all, bb@gmail.com" });
+  });
+
+  it("2.16 Valid boolean", async () => {
+    var schemaValidator = new SchemaValidator("prop1: boolean");
+    var json = await schemaValidator.validateJson('"prop1": true');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: true });
+  });
+
+  it("2.17 Valid string for option string", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"abc, d, efg\"}");
+    var json = await schemaValidator.validateJson('"prop1": abc');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: "abc" });
+  });
+
+  it("2.17.1 Valid string for option array", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: [abc, d, efg]}");
+    var json = await schemaValidator.validateJson('"prop1": abc');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: "abc" });
+  });
+
+  it("2.18 Valid string for option string", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"a, b, c\"}");
+    var json = await schemaValidator.validateJson('"prop1": b');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: "b" });
+  });
+
+  it("2.18.1 Valid string for option array", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: [a, b, c]}");
+    var json = await schemaValidator.validateJson('"prop1": b');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: "b" });
+  });
+
+
+  it("2.19 Valid string for option string", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"abc, d, efg\"}");
+    var json = await schemaValidator.validateJson('"prop1": efg');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: "efg" });
+  });
+
+  it("2.19.1 Valid string for option array", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: [abc, d, efg]}");
+    var json = await schemaValidator.validateJson('"prop1": efg');
+
+    expect(json).to.be.an("object");
+    expect(json).to.deep.equal({ prop1: "efg" });
+  });
+
+  it("2.20 Invalid string with options", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"a, b, c\"}");
+    expect(schemaValidator).to.be.an("object");
+    await expectThrowsAsync(
+      () => schemaValidator.validateJson('{"prop1": d}'),
+      NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidOptionValue, "d", "prop1", "a, b, c")
+    ); 
+  });
+
+  it("2.21 Space separated options", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"a b\"}");
+    expect(schemaValidator).to.be.an("object");
+
+    var json = await schemaValidator.validateJson('"prop1": b');
+    expect(json).to.deep.equal({ prop1: "b" });
+  });
+
+  it("2.22 Array options including spaces", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: [\"a a\", bb]}");
+    expect(schemaValidator).to.be.an("object");
+
+    var json = await schemaValidator.validateJson('"prop1": "a a"');
+    expect(json).to.deep.equal({ prop1: "a a" });
+  });
+
+  it("2.23 String options including spaces", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"'a a', 'b b', 'c c'\"}");
+    expect(schemaValidator).to.be.an("object");
+
+    var json = await schemaValidator.validateJson('"prop1": "c c"');
+    expect(json).to.deep.equal({ prop1: "c c" });
   });
 });

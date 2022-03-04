@@ -13,7 +13,7 @@ var Globals = {
   listIdFieldName: "_listid",
   ownerFieldName: "owner",
   listSchemaFieldName: "listschema",
-  emailFieldName: "email",
+  emailFieldName: "owner",
 
   readPermFieldName: "r_permissions",
   readWritePermFieldName: "rw_permissions",
@@ -65,6 +65,7 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
+      "add_item_mode: {type: string, options: [default_values, form_values, form_values_only], default: default_values}, " +
       "item_template: template, " +
       "_childlist: embedded_listid" +
       "}",
@@ -74,7 +75,7 @@ Globals = {
     name: "List of users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.listSchemaFieldName]:
-      "firstname: {type: string, required}, secondname: string, organisation: string, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
+      "username: {type: string, required}, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
   },
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
@@ -87,7 +88,8 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
     name: "Sign Up",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    item_template: "<Text val={firstname} inline/>",
+    add_item_mode: "form_values_only", // default_values, form_values, form_values_only, 
+    item_template: "<Text val={username}/><Text val={" + Globals.emailFieldName + "} label=\"Email\"/><Text val={password}/>",
     _childlist: Globals.userListId,
   },
   viewOnTheListOfAllViews: {

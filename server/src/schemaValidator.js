@@ -292,6 +292,20 @@ class SchemaValidator {
     return val;
   }
 
+  validate_type_boolean(key, val) {
+    if (typeof val !== "boolean") {
+      throw new Error(
+        NodeUtil.format(
+          Errors.ErrMsg.SchemaValidator_InvalidType,
+          key,
+          val,
+          "boolean"
+        )
+      );
+    }
+    return val;
+  }
+
   async validate_type_encrypted_string(key, val) {
     if (typeof val !== "string") {
       throw new Error(
@@ -439,6 +453,32 @@ class SchemaValidator {
 
   validate_default(type, key, val) {
     return val;
+  }
+
+  validate_options(options_str, key, val) {
+    var options = options_str;
+    if (typeof options === "string") {
+      const optRX = new RegExp(
+        Utils.RXStr.singleQuotedStr +
+        "|" +
+        Utils.RXStr.doubleQuotedStr +
+        "|" +
+        Utils.RXStr.worldValue, 'g');
+      options = options_str.match(optRX);
+      options = options.map(opt => Utils.trimFromEdges(opt, '"'));
+      options = options.map(opt => Utils.trimFromEdges(opt, "'"));
+    }
+    if (options === null || options.length < 1) {
+      throw new Error(
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidOption, options_str)
+      );
+    }
+    if (options.includes(val)) {
+      return val;
+    }
+    throw new Error(
+      NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidOptionValue, val, key, options_str)
+    );
   }
 }
 

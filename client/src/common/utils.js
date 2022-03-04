@@ -36,6 +36,12 @@ const doubleQuotedStrWithQuoteRX = singleQuotedStrWithQuoteRX.replace(/'/g, "\""
 const singleQuotedStrRX = "'(?:\\\\'|[^'])*'";
 const doubleQuotedStrRX = singleQuotedStrRX.replace(/'/g, "\"");
 
+exports.RXStr = {
+  singleQuotedStr: singleQuotedStrRX,
+  doubleQuotedStr: doubleQuotedStrRX,
+  worldValue: worldValueRX
+}
+
 exports.objKeysInObjKeys = function (obj1, obj2) {
   for (var key of Object.keys(obj1)) {
     if (!key.startsWith("$") && !obj2.hasOwnProperty(key)) {
@@ -118,8 +124,17 @@ exports.completeTrueValues = function (jsonStr) {
 
   const beforeKeyWithoutValueRX = "(?<=^|,\\s*|{\\s*)";
   const afterKeyWithoutValueRX = "(?=\\s*(?:,|}|$))";
+  const beforeQuotedStrValueRX = "(?:\\:\\s*)";
 
   var regex = new RegExp(
+    // quoted string
+    beforeQuotedStrValueRX +
+    "\\\"(?:\\s*(?:" +
+    singleQuotedStrRX +
+    "|" +
+    worldValueRX + ")\\s*,?)+\\\"" +
+    "|" +
+    // array of strings
     "\\[(?:\\s*(?:" +
     singleQuotedStrRX +
     "|" +
@@ -136,6 +151,10 @@ exports.completeTrueValues = function (jsonStr) {
 
   jsonStr = jsonStr.replace(regex, match => {
     if (exports.isSurroundedBy(match, ['[', "]"])) {
+      return match;
+    }
+    const notValue = new RegExp("^\\:\\s*")
+    if (notValue.test(match)) {
       return match;
     }
     return match + ": true"
@@ -170,17 +189,6 @@ exports.unescapeChar = function (str, char) {
 };
 
 exports.doubleQuoteValues = function (jsonStr) {
-  /*const regex = new RegExp(
-      beforeJsonValueRX +
-      "(" +
-      singleQuotedStrWithQuoteRX + 
-      "|" +
-      doubleQuotedStrWithQuoteRX +
-      "|" +
-      worldValueRX + ")\\s*" +
-      afterJsonValueRX, "ig"
-  );*/
-
   const regex = new RegExp(
     "(?:" +
     beforeJsonValueRX +
@@ -308,7 +316,7 @@ exports.setCookieJWT = function (req, res, payload) {
     algorithm: "HS256",
   });
   res.cookie("authtoken", jwtoken, { httpOnly: false });
-  req.user = payload[Globals.emailFieldName];
+  req.user = payload.email;
 };
 
 exports.isObjEmpty = function (obj) {
@@ -379,8 +387,13 @@ exports.validateRWPerm = function(
     if (user === process.env.ADMIN_EMAIL) {
       return true;
     }
+
+    newItem = {...item}
+    if (newItem && !newItem.hasOwnProperty(Globals.ownerFieldName)) {
+      newItem[Globals.ownerFieldName] = list[Globals.ownerFieldName];
+    }
     // validate owners
-    if ((item && item.hasOwnProperty(Globals.ownerFieldName) && user === item[Globals.ownerFieldName]) || 
+    if ((newItem && newItem.hasOwnProperty(Globals.ownerFieldName) && user === newItem[Globals.ownerFieldName]) || 
         (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])) {
         return true;
     }
@@ -409,8 +422,8 @@ exports.validateRWPerm = function(
     }
 
     // if item permission is not set, set to = []
-    if (item && item.hasOwnProperty(Globals.readWritePermFieldName)) {
-      let splittedRW = item[Globals.readWritePermFieldName].split(/\s*,\s*/);
+    if (newItem && newItem.hasOwnProperty(Globals.readWritePermFieldName)) {
+      let splittedRW = newItem[Globals.readWritePermFieldName].split(/\s*,\s*/);
       if (readWrite) {
         mergedPerm = mergedPerm.concat(splittedRW);
       }
