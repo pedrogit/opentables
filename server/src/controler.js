@@ -44,8 +44,8 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfAllLists['name'])
-      console.log('ERROR: ' + msg);
-      throw new Errors.FatalServerError(msg);
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
     }
 
     console.log("Create the " + Globals.listOfAllViews['name'] + "...");
@@ -57,8 +57,8 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfAllViews['name'])
-      console.log('ERROR: ' + msg);
-      throw new Errors.FatalServerError(msg);
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
     }
 
     console.log("Create the " + Globals.viewOnTheListOfAllViews['name'] + "...");
@@ -70,8 +70,8 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfAllViews['name'])
-      console.log('ERROR: ' + msg);
-      throw new Errors.FatalServerError(msg);
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
     }
 
     console.log("Create the " + Globals.listOfUsers['name'] + "...");
@@ -83,8 +83,8 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfUsers['name'])
-      console.log('ERROR: ' + msg);
-      throw new Errors.FatalServerError(msg);
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
     }
 
     console.log("Create the " + Globals.viewOnTheListOfUsers['name'] + "...");
@@ -96,8 +96,8 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsers['name'])
-      console.log('ERROR: ' + msg);
-      throw new Errors.FatalServerError(msg);
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
     }
 
     console.log("Create the " + Globals.signUpViewOnTheListOfUsers['name'] + "...");
@@ -109,8 +109,8 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.signUpViewOnTheListOfUsers['name'])
-      console.log('ERROR: ' + msg);
-      throw new Errors.FatalServerError(msg);
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
     }
   }
 
@@ -471,6 +471,11 @@ class Controler {
           {
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.viewOnAllViewViewId),
+            },
+          }, // sign up view
+          {
+            [Globals.itemIdFieldName]: {
+              $ne: MongoDB.ObjectId(Globals.signUpViewOnUserListViewId),
             },
           },
         ],
