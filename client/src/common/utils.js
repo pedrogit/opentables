@@ -388,10 +388,8 @@ exports.validateRWPerm = function(
       return true;
     }
 
-    newItem = {...item}
-    if (newItem && !newItem.hasOwnProperty(Globals.ownerFieldName)) {
-      newItem[Globals.ownerFieldName] = list[Globals.ownerFieldName];
-    }
+    var newItem = {...item}
+
     // validate owners
     if ((newItem && newItem.hasOwnProperty(Globals.ownerFieldName) && user === newItem[Globals.ownerFieldName]) || 
         (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])) {
@@ -414,7 +412,10 @@ exports.validateRWPerm = function(
       let splittedRW = list[Globals.itemReadWritePermFieldName].split(/\s*,\s*/);
       
       if (readWrite) {
-        mergedPerm = mergedPerm.concat(splittedRW);
+        if (!newItem || 
+            (newItem && (!newItem.hasOwnProperty(Globals.readWritePermFieldName)))) {
+           mergedPerm = mergedPerm.concat(splittedRW);
+        }
       }
       else {
         mergedPerm = splittedRW;
