@@ -12,7 +12,7 @@ import { useTheme } from "@mui/material/styles";
 /********************
  *  Label component
  ********************/
-function Label({val, vertical, label, nolabel, sx}) {
+function Label({val, vertical, nolabel, sx}) {
   const theme = useTheme();
   var fontSize = vertical
     ? theme.typography.caption
@@ -26,11 +26,10 @@ function Label({val, vertical, label, nolabel, sx}) {
   };
 
   if (!nolabel) {
-    var labelStr = label ? label : val.charAt(0).toUpperCase() + val.slice(1)
     var separator = vertical ? null : <>&nbsp;:</>;
     return (
       <Typography sx={{ ...defaultSx, ...sx }}>
-        {labelStr}
+        {val}
         {separator}
       </Typography>
     );
@@ -42,7 +41,16 @@ function Label({val, vertical, label, nolabel, sx}) {
 /********************
  *  Text component
  ********************/
-function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
+function Text({
+  val, 
+  inline = false, 
+  edit = false, 
+  vertical = false, 
+  label, 
+  nolabel = false, 
+  labelSx = {}, 
+  sx
+}) {
   const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
   const initPropVal = val ? (val.val ? val.val : "Missing value") : undefined
 
@@ -52,7 +60,7 @@ function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
   const [editVal, setEditVal] = React.useState(initPropVal);
   const [propVal, setPropVal] = React.useState(initPropVal);
 
-  const [editing, setEditing] = React.useState(false);
+  const [editing, setEditing] = React.useState(edit);
 
   if (val && (propName || editVal)) {
 
@@ -71,7 +79,7 @@ function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
     const handleSave = () => {
       val.handlePatch({ [propName]: editVal }, (success, val) => {
         setPropVal(val);
-        setEditing(false);
+        editingOff();
       });
     };
 
@@ -81,9 +89,15 @@ function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
       }
       if (e.keyCode === 27) { // escape
         setEditVal(propVal);
-        setEditing(false);
+        editingOff()
       }
     };
+
+    const editingOff = () => {
+      if (!edit) {
+        setEditing(false);
+      }
+    }
 
     const inputLabel = 'Edit "' + propName + '"...';
     const getWidth = () => {
@@ -100,9 +114,14 @@ function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
     return (
       <>
         <Stack direction={vertical ? "column" : "row"}>
-          <Label val={propName} vertical={vertical} label={label} nolabel={nolabel} sx={labelSx} />
+          <Label 
+            vertical={vertical} 
+            val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
+            nolabel={nolabel} 
+            sx={labelSx}
+          />
           {editing && inline ? (
-            <ClickAwayListener onClickAway={() => setEditing(false)}>
+            <ClickAwayListener onClickAway={editingOff}>
               <Input
                 sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
                 inputProps={{
@@ -129,7 +148,7 @@ function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
         <Popover
           open={!inline && editing}
           anchorEl={valueRef.current}
-          onClose={() => setEditing(false)}
+          onClose={editingOff}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "left",
