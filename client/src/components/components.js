@@ -80,6 +80,7 @@ function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
         handleSave();
       }
       if (e.keyCode === 27) { // escape
+        setEditVal(propVal);
         setEditing(false);
       }
     };
