@@ -331,46 +331,65 @@ exports.isObjEmpty = function (obj) {
 /*
 Permission model
 
-BASIC - All views, lists and items, can have a r_permission or a rw_permission (or both) set. 
-  r_permission determines who can view (and list) view, list or item properties. 
-  rw_permission determines who can edit view, list or item properties.
+1 - BASIC - All views, lists and items, can have a r_permission or a rw_permission (or both) set. 
+  - r_permission determines who can view (and list) view, list or item properties. 
+  - rw_permission determines who can edit view, list or item properties and delete.
 
-  For lists, when r_permission is not set, it defaults to @all.
-  For lists, when rw_permission is not set, it defaults to @owner.
+    a) For lists, when r_permission is not set, it defaults to @all.
+    b) For lists, when rw_permission is not set, it defaults to @owner.
 
-  For views and items, when r_permission (or rw_permission) is not set, it uses the parent 
-  list item_r_permission (or item_rw_permission).
+    c) For views and items, when r_permission (or rw_permission) is not set, it uses the parent 
+       list item_r_permission (or item_rw_permission).
 
-ITEMS - List, and only lists, can have an item_r_permission or an item_rw_permission (or both) set. 
-  item_r_permission determines globally who can view (and list) list item properties. 
-  item_rw_permission determines globally who can edit list item properties.
+2 - ITEMS - List, and only lists, can have an item_r_permission or an item_rw_permission (or both) set. 
+            
+    - item_r_permission determines globally who can view (and list) list item properties. 
+    - item_rw_permission determines globally who can edit list item properties.
 
-BOTH SETS - When both list item_r_permission and list item r_permission (or item_rw_permission 
-  and list item rw_permission) are set, list item r_permission (or rw_permission) 
-  takes precedence (see argument below).
+    a) BOTH SETS - When both list item_r_permission and list item r_permission (or item_rw_permission 
+                   and list item rw_permission) are set, list item r_permission (or rw_permission) 
+                   takes precedence (see argument below).
 
-ITEM_R UNSET - When item_r_permission (or item_rw_permission) is not set (undefined or null), 
-  childs items r_permission (or rw_permission) are used if they are set.
+    b) ITEM_R UNSET - When item_r_permission (or item_rw_permission) is not set (undefined or null), 
+                      childs items r_permission (or rw_permission) are used if they are set.
 
-BOTH UNSET - When both list item_r_permission and list item r_permission (or item_rw_permission 
-  and list item rw_permission) are not set (undefined or null) list r_permission is used.
+    c) BOTH UNSET - When both list item_r_permission and list item r_permission (or item_rw_permission 
+                    and list item rw_permission) are not set (undefined or null) list r_permission is 
+                    used.
 
-OTHER RULES
+3 - OTHER RULES
 
-INHERITANCE - rw_permission always grant r_permission
+a) PERMISSION INHERITANCE
 
-DELETE - rw_permission grants delete permission on an object only when this object does 
-  not have an owner property (case of must list items). When it does, only the owner can 
-  delete the object (case of views and lists).
+   i) rw_permission and item_rw_permission always grant r_permission and item_r_permission respectively
 
-DEFAULT OWNER - If the item owner property is not set, the list owner is the owner of all 
-  the items.
+  ii) List rw_permission always grants item_rw_permission and item rw_permission (since when you have rw 
+      permission on the list properties, you can always change item_rw_permission and remove item 
+      rw_permission from the schema)
 
-OWNER DEFAULT PERMISSION - Being the owner of an object (view, list or item) always grants 
-  rw_permission to this object.
+ iii) List r_permission does not grant item_r_permission and item r_permission (so that it is possible to 
+      view a list but not be able to read all or some of its items e.g. pool)
 
-PROPERTY LEVEL READ PERMISSION - Schemas can set properties as “read_by_edit_only” so that 
-  they can be only viewed by user having rw_permission
+b) OWNERSHIP RULES
+   i) Being the owner of an object (view, list or item) always grants rw_permission to this object.
+
+  ii) If the item owner property is not set, the list owner is the owner of all the items.
+  
+ iii) Only the owner of a list can change the value of this list owner property (this is to prevent 
+      people having read-write permission to replace, without his agreement, the owner of a list).
+
+  iv) Only list owners and item owners can change the value of an item owner property.
+
+c) DELETE - rw_permission grants delete permission on an object only when this object does not have 
+            an owner property (case of most list items). When it does, only the owner and people having 
+            rw_permission on the parent list can delete the object.
+
+d) PROPERTY LEVEL READ PERMISSION - Schemas can set properties as “read_by_rw_only” so that they can 
+                                    be only viewed by user having rw_permission
+
+e) INACTIVE LIST ITEM PERMISSION - item_r_permission and item_rw_permission permissions set on objects 
+                                   other than lists have no permission effects.
+
 */
 exports.validateRWPerm = function(
   {
@@ -390,28 +409,34 @@ exports.validateRWPerm = function(
 
     var newItem = {...item}
 
-    // validate owners
+    // list owners and item owners (when it is set) have all permissions
     if ((newItem && newItem.hasOwnProperty(Globals.ownerFieldName) && user === newItem[Globals.ownerFieldName]) || 
         (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])) {
         return true;
     }
 
+    // in rw mode (readWrite = true) list rw_p, list item_rw and 
+    // item rw_p are cumulative (merged together). It is like if 
+    // item rw_p inherits list rw_p. This is because when the user 
+    // has list rw permission he also have item rw permission since he 
+    // could always remove the item rw_permission property to get the permission)
     var mergedPerm = [];
-    // if list read permission is not set = default (nothing or @all)
 
-
+    // determine top level (list) permissions
     if (list && list.hasOwnProperty(Globals.readWritePermFieldName)) {
       mergedPerm = list[Globals.readWritePermFieldName].split(/\s*,\s*/);
     }
     else {
+      // in rw mode (readWrite = true), the default for rw is @owner, otherwise it is @all
       mergedPerm = (readWrite ? [] : [Globals.allUserName]);
     }
 
-    // if list item permission is not set, set to = []
+    // handle list item_rw_p permission only if it is set
     if (list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) {
       let splittedRW = list[Globals.itemReadWritePermFieldName].split(/\s*,\s*/);
-      
+      // cumulate only in rw mode
       if (readWrite) {
+        // merge list item_rw_p permission only if item rw _p is not set
         if (!newItem || 
             (newItem && (!newItem.hasOwnProperty(Globals.readWritePermFieldName)))) {
            mergedPerm = mergedPerm.concat(splittedRW);
@@ -422,7 +447,8 @@ exports.validateRWPerm = function(
       }
     }
 
-    // if item permission is not set, set to = []
+    // in both mode (read or readWite) item rw_p always have precedence over list item_rw_p
+    // item_rw_p is more like a global setting that can be overwritten at the item level
     if (newItem && newItem.hasOwnProperty(Globals.readWritePermFieldName)) {
       let splittedRW = newItem[Globals.readWritePermFieldName].split(/\s*,\s*/);
       if (readWrite) {
@@ -433,6 +459,11 @@ exports.validateRWPerm = function(
       }
     }
 
+    // now compare the user with the accumulated set of permissions
+    // grant permission if the cumulative permissions 
+    //   includes @all OR
+    //   includes @auth and the user is not @all OR
+    //   includes the user
     if (
       mergedPerm.includes(Globals.allUserName) ||
       (mergedPerm.includes(Globals.authUserName) && user !== Globals.allUserName) ||
@@ -467,6 +498,9 @@ exports.validateRPerm = function(
     return true;
   }
 
+  // now validate read permission reusing the RW function
+  // copy the list and the item and their permissions if they are set
+  // (delete them otherwise)
   var newList = {...list};
   if (list) {
     if (list.hasOwnProperty(Globals.readPermFieldName)) {
@@ -514,21 +548,27 @@ exports.validateDPerm = function(
     return true;
   }
     
-  // if list or item owner are set, user must be owner
-  // if list or item owner are not set, must have RW permission
+  // if user is list owner, grant delete permission
   if (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])
   {
     return true;
   }
+
+  // if item owner is set, user must be item owner to get delete permission
   if (item && item.hasOwnProperty(Globals.ownerFieldName)) {
     if (user === item[Globals.ownerFieldName])
     {
       return true;
     }
   }
-  else if (((list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) || 
-       (item && item.hasOwnProperty(Globals.readWritePermFieldName))) &&
-      exports.validateRWPerm({
+  // if item owner is not set, one of list item_rw_permission or 
+  // item rw_permission must be set (otherwise it's a list level 
+  // permission request and only the list owner could have permission as tested above)
+  // and they must have rw permission
+  else if (
+    ((list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) || 
+     (item && item.hasOwnProperty(Globals.readWritePermFieldName))) &&
+    exports.validateRWPerm({
       user: user,
       list: list,
       item: item,
@@ -537,6 +577,39 @@ exports.validateDPerm = function(
       return true;
   }; 
 
+  if (throwError) {
+    throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
+  }
+  return false;
+}
+
+// create permissions
+exports.validateCPerm = function(
+  {
+    user,
+    list, 
+    item,
+     throwError = true
+  } = {}
+) {
+  if (user && user === process.env.ADMIN_EMAIL) {
+    return true;
+  }
+
+  // if item_c_permission is set, replace item_rw_permission with it
+  if (exports.validateRWPerm({
+    user: user,
+    list: (
+      list && list.hasOwnProperty(Globals.itemCreatePermFieldName) ? {
+        ...list,
+        [Globals.itemReadWritePermFieldName]: list[Globals.itemCreatePermFieldName]
+      } : list
+    ),
+    item: item,
+    throwError: throwError
+  })) {
+    return true;
+  };
 
   if (throwError) {
     throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);

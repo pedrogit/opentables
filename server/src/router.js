@@ -8,8 +8,6 @@ const Utils = require("../../client/src/common/utils");
 const Errors = require("../../client/src/common/errors");
 
 const controler = require("./controler");
-
-
 const router = express.Router();
 /************************************************************************
   GET /api/APIKeyword/login
@@ -98,11 +96,6 @@ router.post(
 router.post(
   "/:listid",
   asyncHandler(async (req, res) => {
-    // register new users as admin
-    if (req.params.listid === Globals.userListId) {
-      req.user = process.env.ADMIN_EMAIL;
-    }
-
     const item = await controler.insertMany(req.user, req.params.listid, req.body);
 
     // convert email to cookie token when registering

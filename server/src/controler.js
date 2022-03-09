@@ -339,16 +339,11 @@ class Controler {
   }
 
   async insertMany(user, listid, item) {
-    // unauth user have no edit permissions
-    if (user === Globals.allUserName) {
-      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-    }
-
     // find the parent list
     var parentList = await this.getParentList(listid);
 
     // validate permissions
-    Utils.validateRWPerm({
+    Utils.validateCPerm({
       user: user,
       list: parentList
     });
@@ -388,11 +383,6 @@ class Controler {
   }
 
   async patch(user, itemid, newitem) {
-    // unauth user have no edit permissions
-    if (user === Globals.allUserName) {
-      throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
-    }
-
     if (!MongoDB.ObjectId.isValid(itemid)) {
       throw new Errors.BadRequest(
         NodeUtil.format(Errors.ErrMsg.MalformedID, itemid)

@@ -17,6 +17,7 @@ var Globals = {
 
   readPermFieldName: "r_permissions",
   readWritePermFieldName: "rw_permissions",
+  itemCreatePermFieldName: "item_c_permissions",
   itemReadPermFieldName: "item_r_permissions",
   itemReadWritePermFieldName: "item_rw_permissions",
 
@@ -40,6 +41,7 @@ Globals = {
     Globals.authUserName, 
     Globals.allUserName
   ],
+
   listOfAllLists: {
     [Globals.itemIdFieldName]: Globals.listofAllListId,
     name: "List of all lists",
@@ -50,11 +52,13 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
+      Globals.itemCreatePermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.itemReadPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.itemReadWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
       Globals.listSchemaFieldName + ": {type: schema, default: 'prop1: string'}" +
       "}",
   },
+
   listOfAllViews: {
     [Globals.itemIdFieldName]: Globals.listofAllViewId,
     name: "List of all views",
@@ -65,18 +69,21 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      "add_item_mode: {type: string, options: [default_values, form_values, form_values_only], default: default_values}, " +
+      "add_item_mode: {type: string, options: [default, load, load_nolist], default: default}, " +
       "item_template: template, " +
       "_childlist: embedded_listid" +
       "}",
   },
+
   listOfUsers: {
     [Globals.itemIdFieldName]: Globals.userListId,
     name: "List of users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
+    [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
       "username: {type: string, required}, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
   },
+
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
     name: "Users",
@@ -84,14 +91,16 @@ Globals = {
     item_template: "",
     _childlist: Globals.userListId,
   },
+
   signUpViewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
     name: "Sign Up",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    add_item_mode: "form_values_only", // default_values, form_values, form_values_only, 
-    item_template: "<Text val={username}/><Text val={" + Globals.emailFieldName + "} label=\"Email\"/><Text val={password}/>",
+    add_item_mode: "load_nolist", // default, load, load_nolist
+    item_template: "<Text val={username} inline edit/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline edit/><Text val={password}/>",
     _childlist: Globals.userListId,
   },
+
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
     name: "Views",

@@ -35,7 +35,7 @@ function Header({
         buttonsTimeOut = setTimeout(() => setShowButtons(false), 500)
       }}
     >
-    <Toolbar variant="dense" disableGutters sx={{ml:'5px', minHeight: '36px'}}>
+    <Toolbar variant="dense" disableGutters sx={{ml:'5px', minHeight: '38px'}}>
     {(viewOwner && viewName ? (
         <Stack direction={{ xs: 'column', sm: 'row' }}>
         <Typography sx={{color: '#FAA', mr: '5px'}}>{(viewOwner + '\'s list of')}</Typography>

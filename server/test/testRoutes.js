@@ -1481,7 +1481,6 @@ describe("testRoutes.js List API", () => {
               newView[Globals.itemIdFieldName]
             ),
           });
-
           done();
         });
     });

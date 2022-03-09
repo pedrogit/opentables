@@ -12,9 +12,9 @@ import { useTheme } from "@mui/material/styles";
 /********************
  *  Label component
  ********************/
-function Label(props) {
+function Label({val, vertical, label, nolabel, sx}) {
   const theme = useTheme();
-  var fontSize = props.vertical
+  var fontSize = vertical
     ? theme.typography.caption
     : theme.typography.body1;
 
@@ -25,11 +25,11 @@ function Label(props) {
     marginRight: 1,
   };
 
-  if (!props.nolabel) {
-    var labelStr = props.label ? props.label : props.val.charAt(0).toUpperCase() + props.val.slice(1)
-    var separator = props.vertical ? null : <>&nbsp;:</>;
+  if (!nolabel) {
+    var labelStr = label ? label : val.charAt(0).toUpperCase() + val.slice(1)
+    var separator = vertical ? null : <>&nbsp;:</>;
     return (
-      <Typography sx={{ ...defaultSx, ...props.labelSx, ...props.sx }}>
+      <Typography sx={{ ...defaultSx, ...sx }}>
         {labelStr}
         {separator}
       </Typography>
@@ -42,25 +42,24 @@ function Label(props) {
 /********************
  *  Text component
  ********************/
-function Text(props) {
-  const propName = props.val ? (props.val.prop ? props.val.prop : "Missing property name") : undefined;
-  const initPropVal = props.val ? (props.val.val ? props.val.val : "Missing value") : undefined
+function Text({val, inline, open, vertical, label, nolabel, labelSx, sx}) {
+  const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
+  const initPropVal = val ? (val.val ? val.val : "Missing value") : undefined
 
   const valueRef = React.useRef();
   const theme = useTheme();
-  //const [anchorEl, setAnchorEl] = React.useState(null);
-  //const [elWidth, setElWidth] = React.useState(0);
+
   const [editVal, setEditVal] = React.useState(initPropVal);
   const [propVal, setPropVal] = React.useState(initPropVal);
 
   const [editing, setEditing] = React.useState(false);
 
-  if (props.val && (propName || editVal)) {
+  if (val && (propName || editVal)) {
 
     var defaultSx = {};
 
     const handleEdit = (e) => {
-      props.val.handleItemAuth('patch', props.val.prop, (auth) => {
+      val.handleItemAuth('patch', val.prop, (auth) => {
         setEditing(true);
       });
     };
@@ -70,7 +69,7 @@ function Text(props) {
     };
 
     const handleSave = () => {
-      props.val.handlePatch({ [propName]: editVal }, (success, val) => {
+      val.handlePatch({ [propName]: editVal }, (success, val) => {
         setPropVal(val);
         setEditing(false);
       });
@@ -99,12 +98,12 @@ function Text(props) {
 
     return (
       <>
-        <Stack direction={props.vertical ? "column" : "row"}>
-          <Label {...{ ...props, val: propName }} />
-          {editing && props.inline ? (
+        <Stack direction={vertical ? "column" : "row"}>
+          <Label val={propName} vertical={vertical} label={label} nolabel={nolabel} sx={labelSx} />
+          {editing && inline ? (
             <ClickAwayListener onClickAway={() => setEditing(false)}>
               <Input
-                sx={{ ...defaultSx, ...props.sx, backgroundColor: theme.palette.primary.palebg}}
+                sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
                 inputProps={{
                   style: { padding: '0px' }
                 }}
@@ -118,7 +117,7 @@ function Text(props) {
             </ClickAwayListener>
           ) : (
             <Typography
-              sx={{ ...defaultSx, ...props.sx }}
+              sx={{ ...defaultSx, ...sx }}
               onDoubleClick={handleEdit}
               ref={valueRef}
             >
@@ -127,7 +126,7 @@ function Text(props) {
           )}
         </Stack>
         <Popover
-          open={!props.inline && editing}
+          open={!inline && editing}
           anchorEl={valueRef.current}
           onClose={() => setEditing(false)}
           anchorOrigin={{
@@ -153,25 +152,12 @@ function Text(props) {
       </>
     );
   }
-  //return "<Text value is missing />";
   return (<Typography color = 'red'>&lt;Text value is missing /&gt;</Typography>);
 }
 
-function Listlink(props) {
-  var extractValues = (props) => {
-    var result = {};
-    for (var key in props) {
-      if (props.hasOwnProperty(key)) {
-        result[key] = props[key] ? (props[key].val ? props[key].val : "Missing value") : undefined;
-        result['setViewId'] = props[key] ? (result.setViewId ? result.setViewId : props[key].setViewId) : result.setViewId;
-      }
-    }
-    return result;
-  }
-
-  var {text, listid, setViewId} = extractValues(props);
+function Listlink({text, listid}) {
   return (
-    <Link onClick={() => setViewId(listid)}>{text}</Link>
+    <Link onClick={() => (listid.setViewId)(listid.val)}>{text ? (text.val ? text.val : "No text property...") : "No text property..."}</Link>
   )
 }
 
