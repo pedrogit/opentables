@@ -71,12 +71,12 @@ function App({ initialViewid, appid }) {
         url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
         callback: (success, data) => {
           if (success) {
-            setViewData(Utils.objWithout(data, "_childlist"));
+            setViewData(Utils.objWithout(data, Globals.childlistFieldName));
             BrowserHistory.pushHistoryState(appid, viewid);
 
-            if (data._childlist) {
-              setListData(Utils.objWithout(data._childlist, "items"));
-              setItemsData(data._childlist.items);
+            if (data[Globals.childlistFieldName]) {
+              setListData(Utils.objWithout(data[Globals.childlistFieldName], "items"));
+              setItemsData(data[Globals.childlistFieldName].items);
             }
             else {
               setListData(null);
@@ -89,7 +89,6 @@ function App({ initialViewid, appid }) {
       tryFirst: true
     });
   }, [viewid, appid]);
-
 
   const handleAddItem = () => {
     if (listData) {

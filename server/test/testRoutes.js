@@ -141,13 +141,13 @@ describe("testRoutes.js List API", () => {
         //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           var expectedView = {
-            ...Utils.objWithout(Globals.viewOnTheListOfAllViews, '_childlist'),
+            ...Utils.objWithout(Globals.viewOnTheListOfAllViews, Globals.childlistFieldName),
             [Globals.listIdFieldName]: '000000000000000000000002',
             [Globals.itemIdFieldName]: '000000000000000000000004'
           }
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
-          expect(Utils.objWithout(response.body, '_childlist'))
+          expect(Utils.objWithout(response.body, Globals.childlistFieldName))
            .to.deep.equal(expectedView);
           done();
         });
@@ -1379,7 +1379,7 @@ describe("testRoutes.js List API", () => {
         [Globals.ownerFieldName]: "p@gmail.com",
         [Globals.readWritePermFieldName]: "@owner",
         item_template: "",
-        _childlist: listIdToPatch,
+        [Globals.childlistFieldName]: listIdToPatch,
       };
       chai
         .request(server)
@@ -1413,7 +1413,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.an("object");
           expect(response.body).to.deep.equal({
             ...newView,
-            _childlist: {
+            [Globals.childlistFieldName]: {
               ...lastList,
               [Globals.listIdFieldName]: Globals.listofAllListId
             },
@@ -1499,16 +1499,16 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.an("object");
           var expected = {
             ...Globals.viewOnTheListOfUsers,
-            _childlist: {
+            [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
               [Globals.listIdFieldName]: Globals.listofAllListId,
               items: userList
             },
             [Globals.listIdFieldName]: Globals.listofAllViewId
           }
-          expect(Utils.objWithout(response.body, '_childlist')).to.deep.equal(Utils.objWithout(expected, '_childlist'));
-          expect(Utils.objWithout(response.body._childlist, 'items')).to.deep.equal(Utils.objWithout(expected._childlist, 'items'));
-          expect(response.body._childlist.items).to.deep.equal(expected._childlist.items);
+          expect(Utils.objWithout(response.body, Globals.childlistFieldName)).to.deep.equal(Utils.objWithout(expected, Globals.childlistFieldName));
+          expect(Utils.objWithout(response.body[Globals.childlistFieldName], 'items')).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], 'items'));
+          expect(response.body[Globals.childlistFieldName].items).to.deep.equal(expected[Globals.childlistFieldName].items);
           done();
         });
     });
@@ -1565,16 +1565,16 @@ describe("testRoutes.js List API", () => {
 
           var expected = {
             ...Globals.viewOnTheListOfUsers,
-            _childlist: {
+            [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
               [Globals.listIdFieldName]: Globals.listofAllListId,
               items: [user2]
             },
             [Globals.listIdFieldName]: Globals.listofAllViewId
           }
-          expect(Utils.objWithout(response.body, '_childlist')).to.deep.equal(Utils.objWithout(expected, '_childlist'));
-          expect(Utils.objWithout(response.body._childlist, 'items')).to.deep.equal(Utils.objWithout(expected._childlist, 'items'));
-          expect(response.body._childlist.items).to.deep.equal(expected._childlist.items);
+          expect(Utils.objWithout(response.body, Globals.childlistFieldName)).to.deep.equal(Utils.objWithout(expected, Globals.childlistFieldName));
+          expect(Utils.objWithout(response.body[Globals.childlistFieldName], 'items')).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], 'items'));
+          expect(response.body[Globals.childlistFieldName].items).to.deep.equal(expected[Globals.childlistFieldName].items);
           done();
         });
     });
@@ -1592,7 +1592,7 @@ describe("testRoutes.js List API", () => {
 
           var expected = {
             ...Globals.viewOnTheListOfUsers,
-            _childlist: {
+            [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
               [Globals.listIdFieldName]: Globals.listofAllListId
             },
@@ -1721,7 +1721,7 @@ describe("testRoutes.js List API", () => {
         [Globals.ownerFieldName]: 'p@gmail.com',
         [Globals.readWritePermFieldName]: '@owner',
         item_template: '',
-        _childlist: refItemListId
+        [Globals.childlistFieldName]: refItemListId
       };
       chai.request(server)
           .post('/api/' + Globals.APIKeyword)
@@ -1749,7 +1749,7 @@ describe("testRoutes.js List API", () => {
         expect(response.body).to.deep.equal(
           {
             ...embView,
-            _childlist: lastList
+            [Globals.childlistFieldName]: lastList
           });
         done();
       });

@@ -14,6 +14,7 @@ var Globals = {
   ownerFieldName: "owner",
   listSchemaFieldName: "listschema",
   emailFieldName: "owner",
+  childlistFieldName: "_childlist",
 
   readPermFieldName: "r_permissions",
   readWritePermFieldName: "rw_permissions",
@@ -32,6 +33,10 @@ var Globals = {
   allUserName: "@all", // non authenticated users
 
   identifierRegEx: "\\$?[a-zA-Z0-9_-]+",
+
+  addItemModeFieldName: "add_item_mode",
+  addAtLoad: "load",
+  addAtLoadWithoutItems: "load_noitems"
 };
 
 Globals = {
@@ -69,9 +74,9 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      "add_item_mode: {type: string, options: [default, load, load_nolist], default: default}, " +
+      Globals.addItemModeFieldName + ": {type: string, options: [default, " + Globals.addAtLoad + "," + Globals.addAtLoadWithoutItems + "], default: default}, " +
       "item_template: template, " +
-      "_childlist: embedded_listid" +
+      Globals.childlistFieldName + ": embedded_listid" +
       "}",
   },
 
@@ -89,16 +94,16 @@ Globals = {
     name: "Users",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     item_template: "",
-    _childlist: Globals.userListId,
+    [Globals.childlistFieldName]: Globals.userListId,
   },
 
   signUpViewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
     name: "Sign Up",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    add_item_mode: "load_nolist", // default, load, load_nolist
+    [Globals.addItemModeFieldName]: Globals.addAtLoadWithoutItems, // default, load, load_nolist
     item_template: "<Form handlers={handlers}><Text val={username} inline/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline /><Text val={password}/></Form>",
-    _childlist: Globals.userListId,
+    [Globals.childlistFieldName]: Globals.userListId,
   },
 
   viewOnTheListOfAllViews: {
@@ -106,7 +111,7 @@ Globals = {
     name: "Views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     item_template: "<Listlink text={name} listid={_id}/>",
-    _childlist: Globals.listofAllViewId,
+    [Globals.childlistFieldName]: Globals.listofAllViewId,
   },
 };
 
