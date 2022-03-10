@@ -97,7 +97,7 @@ Globals = {
     name: "Sign Up",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     add_item_mode: "load_nolist", // default, load, load_nolist
-    item_template: "<Text val={username} inline edit/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline edit/><Text val={password}/>",
+    item_template: "<Form handlers={handlers}><Text val={username} inline/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline /><Text val={password}/></Form>",
     _childlist: Globals.userListId,
   },
 

@@ -24,6 +24,7 @@ function Item({
   setLoginState, 
   handleListAuth, 
   handleDeleteItem,
+  handlePost,
   setViewId
 }) {
   const [newItem, setItem] = React.useState(item);
@@ -61,7 +62,7 @@ function Item({
         callback: (success, data) => {
           if (success) {
             setItem(data);
-            callback(success, data[Object.keys(val)[0]]);
+            callback(success);
           }
         }
       },
@@ -70,13 +71,16 @@ function Item({
     return false;
   };
 
-  var handleItemAuth = function(action = 'patch', propName, callback) {
-    handleListAuth(action = 'patch', item, propName, callback);
+  var handleItemAuth = function({action = 'patch', propName, callback}) {
+    handleListAuth({
+      action: 'patch', 
+      item: item, 
+      propName: propName, 
+      callback: callback
+    });
   }
 
   var setBindings = function (item) {
-    //console.log('Item setBindings()...');
-
     // add property name and rest handlers
     var result = {};
     for (var key in item) {
@@ -90,14 +94,15 @@ function Item({
         };
       }
     }
-    //result.key = result._id.val;
+    result.handlers = {
+      handlePost: handlePost,
+      handlePatch: handlePatch,
+      handleListAuth: handleListAuth
+    };
     return result;
   };
 
-
-
   //console.log('Render Item (' +  item.name + ')...');
-
   return (
     <Box 
       id={"item_" + (newItem ? newItem[Globals.itemIdFieldName] : '')}

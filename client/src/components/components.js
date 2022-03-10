@@ -1,5 +1,7 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
@@ -43,33 +45,38 @@ function Label({val, vertical, nolabel, sx}) {
  ********************/
 function Text({
   val, 
-  inline = false, 
-  edit = false, 
-  vertical = false, 
+  inline = false,
+  inform = false,
+  edit = false,
+  vertical = false,
   label, 
-  nolabel = false, 
+  nolabel = false,
   labelSx = {}, 
   sx
 }) {
   const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
-  const initPropVal = val ? (val.val ? val.val : "Missing value") : undefined
+  const propVal = val ? (val.val ? val.val : "Missing value") : undefined
 
   const valueRef = React.useRef();
   const theme = useTheme();
 
-  const [editVal, setEditVal] = React.useState(initPropVal);
-  const [propVal, setPropVal] = React.useState(initPropVal);
-
-  const [editing, setEditing] = React.useState(edit);
+  const [editVal, setEditVal] = React.useState(propVal);
+  const [editing, setEditing] = React.useState(false);
 
   if (val && (propName || editVal)) {
 
     var defaultSx = {};
 
     const handleEdit = (e) => {
-      val.handleItemAuth('patch', val.prop, (auth) => {
-        setEditing(true);
-      });
+      if (!inform) {
+        val.handleItemAuth({
+          action: 'patch', 
+          propName: val.prop, 
+          callback: (auth) => {
+            setEditing(true);
+          }
+        });
+      }
     };
 
     const handleChange = (val) => {
@@ -77,15 +84,19 @@ function Text({
     };
 
     const handleSave = () => {
-      val.handlePatch({ [propName]: editVal }, (success, val) => {
-        setPropVal(val);
-        editingOff();
-      });
+      if (!inform) {
+        val.handlePatch({ [propName]: editVal }, (success, val) => {
+          //setPropVal(val);
+          editingOff();
+        });
+      }
     };
 
     const keyPressed = (e) => {
-      if (e.keyCode === 13) { // enter
-        handleSave();
+      if (!inform) {
+        if (e.keyCode === 13) { // enter
+          handleSave();
+        }
       }
       if (e.keyCode === 27) { // escape
         setEditVal(propVal);
@@ -94,7 +105,7 @@ function Text({
     };
 
     const editingOff = () => {
-      if (!edit) {
+      if (!inform) {
         setEditing(false);
       }
     }
@@ -120,14 +131,15 @@ function Text({
             nolabel={nolabel} 
             sx={labelSx}
           />
-          {editing && inline ? (
+          {(edit || editing) && inline ? (
+            <>
             <ClickAwayListener onClickAway={editingOff}>
               <Input
+                name={propName}
                 sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
                 inputProps={{
                   style: { padding: '0px' }
                 }}
-                
                 fullWidth
                 value={editVal}
                 onChange={(e) => handleChange(e.target.value)}
@@ -135,6 +147,7 @@ function Text({
                 autoFocus
               />
             </ClickAwayListener>
+            </>
           ) : (
             <Typography
               sx={{ ...defaultSx, ...sx }}
@@ -146,7 +159,7 @@ function Text({
           )}
         </Stack>
         <Popover
-          open={!inline && editing}
+          open={(edit || editing) && !inline}
           anchorEl={valueRef.current}
           onClose={editingOff}
           anchorOrigin={{
@@ -181,8 +194,75 @@ function Listlink({text, listid}) {
   )
 }
 
-function allComponentsAsJson() {
-  return { Text, Label, Listlink };
+function Form({handlers, children, edit = false}) {
+  const [editing, setEditing] = React.useState(edit);
+  const [childProps, setChildrenProps] = React.useState({inform: true});
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    var newVal = {};
+    for (var i = 0; i < e.target.length - 1; i++) {
+      if (e.target[i].name !== "submitButton") {
+        newVal[e.target[i].name] = e.target[i].defaultValue;
+      }
+    }
+    handlers.handlePatch(newVal, () =>{
+      editingOff(null, newVal);
+    })
+  }
+
+  const handleEdit = (e) => {
+    handlers.handleListAuth({
+      action: 'patch', 
+      callback: (auth) => {
+        setChildrenProps({inform: true, inline: true, edit: true});
+        setEditing(true);
+      }
+    });
+  };
+
+  const childrenWithProp = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, childProps);  
+    }
+    return child;
+  });
+
+  const editingOff = () => {
+    setChildrenProps({inform: true, inline: true, edit: false});
+    setEditing(false);
+  }
+
+  const keyPressed = (e) => {
+    if (e.keyCode === 27) { // escape
+      editingOff()
+    }
+  };
+
+  return (
+    <ClickAwayListener onClickAway={editingOff}>
+      <form 
+        onSubmit={handleSubmit}
+        onDoubleClick={handleEdit}
+        onKeyDown={(e) => keyPressed(e)}
+      >
+        {childrenWithProp}
+        {(edit || editing) ? (
+          <Stack direction="row" justifyContent="flex-end">
+            <ButtonGroup variant="contained" size="small">
+              <Button id="editCancelButton" onClick={editingOff}>Cancel</Button>
+              <Button id="editButton" type="submit">Save</Button>
+            </ButtonGroup>
+          </Stack>
+          ) : null
+        }
+      </form>
+    </ClickAwayListener>
+  )
 }
 
-export { Text, Label, Listlink, allComponentsAsJson };
+function allComponentsAsJson() {
+  return { Text, Label, Listlink, Form };
+}
+
+export { allComponentsAsJson };

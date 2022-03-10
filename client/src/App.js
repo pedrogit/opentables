@@ -205,6 +205,7 @@ function App({ initialViewid, appid }) {
         <LoginForm sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
           loginState={loginState}
           setLoginState={setLoginState}
+          setErrorMsg={setErrorMsg}
         />
         {(viewData || listData || itemsData) ? (
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>

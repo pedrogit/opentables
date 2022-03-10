@@ -15,8 +15,9 @@ import Cookies from 'js-cookie'
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 import getUser from "../clientUtils";
 const Errors = require("../common/errors");
+const Globals = require("../common/globals");
 
-function LoginForm({ loginState, setLoginState, sx }) {
+function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   const emailRef = React.useRef();
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
@@ -94,13 +95,23 @@ function LoginForm({ loginState, setLoginState, sx }) {
               error.response && 
               error.response.data && 
               error.response.data.err) {
+            // handle bad credentials
             if (
               error.response.data.err === Errors.ErrMsg.InvalidUser ||
               error.response.data.err === Errors.ErrMsg.CouldNotLogin
             ) {
               setShowInvalidLoginHelper(true);
             }
-            else if (error.response.data.err === Errors.ErrMsg.Forbidden) {
+            // handle bad request
+            else if (error.response.status === 400) {
+              setLoginState({
+                open: false,
+                tryFirst: false
+              });
+              setErrorMsg({text: error.response.data.err});
+            }
+            // handle forbidden
+            else if (error.response.status === 403) {
               setLoginState({
                 ...loginState,
                 open: true,
@@ -110,8 +121,8 @@ function LoginForm({ loginState, setLoginState, sx }) {
                 },
                 tryFirst: false
               });
-              //emailRef.current.focus();
             }
+            // other errors
             else {
               setLoginState({
                 open: false,
@@ -265,7 +276,7 @@ function LoginButton({ setViewId, setLoginState }) {
         variant="text" 
         color="inherit"
         onClick={() => {
-          setViewId('000000000000000000000005');
+          setViewId(Globals.signUpViewOnUserListViewId);
         }}
       >Sign&nbsp;Up</Button> }
     </>

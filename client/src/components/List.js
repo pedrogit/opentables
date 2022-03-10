@@ -42,13 +42,24 @@ function List({
 
   var rowNb = 0;
 
-  var handleListAuth = function(action = 'patch', item, propName, callback) {
-    var auth = Utils.validateRWPerm({
-      user: getUser(),
-      list: list,
-      item: item,
-      throwError: false
-    });
+  var handleListAuth = function({action = 'patch', item = null, propName = '', callback}) {
+    var auth = false;
+    if (action === "patch") {
+      auth = Utils.validateRWPerm({
+        user: getUser(),
+        list: list,
+        item: item,
+        throwError: false
+      });
+    }
+    else if (action === "post") {
+      auth = Utils.validateCPerm({
+        user: getUser(),
+        list: list,
+        throwError: false
+      });
+    }
+    
     if (!auth) {
       // open login dialog
       setLoginState({
@@ -57,9 +68,9 @@ function List({
           severity: "warning",
           title: "Permission denied",
           text:
-          'You do not have permissions to edit "' +
-          propName +
-          '". Please login with valid credentials...',
+          'You do not have permissions to edit ' + 
+          (propName ? ('"' + propName + '"') : "item") +
+          '. Please login with valid credentials...',
   
         },
         action: {
@@ -77,6 +88,30 @@ function List({
     return auth;
   }
 
+  var handlePost = function (val, callback) {
+    setLoginState({
+      open: false,
+      msg: {
+        severity: "warning",
+        title: "Permission denied",
+        text:
+        'You do not have permissions to add item to this list. Please login with valid credentials...',
+      },
+      action: {
+        method: "post",
+        url: "http://localhost:3001/api/opentables/" + list[Globals.itemIdFieldName],
+        data: val,
+        callback: (success, data) => {
+          if (success) {
+            callback(success, data[Object.keys(val)[0]]);
+          }
+        }
+      },
+      tryFirst: true
+    });
+    return false;
+  };
+
   console.log('Render List (' + type + ')...');
   return (
     <Stack sx={sx}>
@@ -92,6 +127,7 @@ function List({
             handleListAuth={handleListAuth}
             handleDeleteItem={handleDeleteItem}
             setViewId={setViewId}
+            handlePost={handlePost}
           />
         );
       })}
