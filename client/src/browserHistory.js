@@ -39,8 +39,8 @@
       if (!currentState[Globals.browserHistoryKey]) {
         currentState[Globals.browserHistoryKey] = [];
       }
-      if (!currentState[Globals.browserHistoryKey][appid]) {
-        currentState[Globals.browserHistoryKey][appid] = listid;
+      if (!currentState[Globals.browserHistoryKey][appid] || currentState[Globals.browserHistoryKey][appid] != listid) {
+          currentState[Globals.browserHistoryKey][appid] = listid;
       
         var newURL = modifyQueryString(appid, listid);
 
