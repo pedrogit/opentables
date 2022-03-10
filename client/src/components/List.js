@@ -112,7 +112,7 @@ function List({
     return false;
   };
 
-  console.log('Render List (' + type + ')...');
+  //console.log('Render List (' + type + ')...');
   return (
     <Stack sx={sx}>
       {items && items.map((item) => {
