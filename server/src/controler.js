@@ -289,7 +289,7 @@ class Controler {
           if (item[propName]){
             noitems = (propName === Globals.childlistFieldName && 
                        item[Globals.addItemModeFieldName] &&
-                       item[Globals.addItemModeFieldName] === Globals.addAtLoadWithoutItems ? true : noitems)
+                       item[Globals.addItemModeFieldName] === Globals.addAtLoadWithoutItems ? true : noitems);
            item[propName] = await this.findWithItems(user, item[propName], filter, noitems);
           }
         })
