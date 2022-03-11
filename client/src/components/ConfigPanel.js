@@ -8,7 +8,12 @@ import { useTheme } from "@mui/material/styles";
 import List from "./List";
 const Globals = require("../common/globals");
 
-function ConfigPanel({ configPanelOpen, viewData, listData, setLoginState }) {
+function ConfigPanel({
+  configPanelOpen,
+  viewData,
+  listData,
+  setLoginState
+}) {
   const theme = useTheme();
 
   return (
