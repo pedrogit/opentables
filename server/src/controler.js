@@ -287,7 +287,10 @@ class Controler {
         schema.getEmbeddedItems().map(async (embItem) => {
           var propName = Object.keys(embItem)[0];
           if (item[propName]){
-            item[propName] = await this.findWithItems(user, item[propName], filter, noitems);
+            noitems = (propName === Globals.childlistFieldName && 
+                       item[Globals.addItemModeFieldName] &&
+                       item[Globals.addItemModeFieldName] === Globals.addAtLoadWithoutItems ? true : noitems)
+           item[propName] = await this.findWithItems(user, item[propName], filter, noitems);
           }
         })
       );
@@ -502,7 +505,8 @@ class Controler {
     // check user permissions
     Utils.validateDPerm({
         user: user,
-        list: parentList
+        list: parentList,
+        item: item
       });
     if (Controler.isList(item)) {
       // delete all associated items
