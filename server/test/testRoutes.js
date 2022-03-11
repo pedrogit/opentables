@@ -1015,7 +1015,7 @@ describe("testRoutes.js List API", () => {
   });
 
   describe("9 - Test unique parameter", () => {
-    it("9.1 - Patch the listschema so field4 is defined as unique", (done) => {
+    it("9.1 - Patch the listschema with field4 defined as unique", (done) => {
       var listSchemaPatch = {
         [Globals.listSchemaFieldName]:
           '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": "encrypted_string", "field4": {type: "string", unique}}',
@@ -1092,10 +1092,11 @@ describe("testRoutes.js List API", () => {
           ));
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
+          itemIdToPatch = response.body[Globals.itemIdFieldName];
           expect(response.body).to.deep.equal({
             ...dupItem,
             field2: dupItem.field2.toUpperCase(),
-            [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
+            [Globals.itemIdFieldName]: itemIdToPatch,
             [Globals.listIdFieldName]: listIdToPatch
           });
           done();
