@@ -195,7 +195,7 @@ function Listlink({text, listid}) {
 
 function Form({handlers, children, edit = false}) {
   const [editing, setEditing] = React.useState(edit);
-  const [childProps, setChildrenProps] = React.useState({inform: true});
+  const [childProps, setChildrenProps] = React.useState({inform: true, inline: true, edit: edit});
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -228,13 +228,15 @@ function Form({handlers, children, edit = false}) {
   });
 
   const editingOff = () => {
-    setChildrenProps({inform: true, inline: true, edit: false});
-    setEditing(false);
+    if (!edit) {
+      setChildrenProps({inform: true, inline: true, edit: false});
+      setEditing(false);
+    }
   }
 
   const keyPressed = (e) => {
     if (e.keyCode === 27) { // escape
-      editingOff()
+      editingOff();
     }
   };
 
