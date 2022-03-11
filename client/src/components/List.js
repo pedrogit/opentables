@@ -100,6 +100,7 @@ function List({
           <Item
             key={item._id}
             template={localTemplate}
+            listid={list._listid}
             item={item}
             rowNb={rowNb}
             setLoginState={setLoginState}

@@ -85,7 +85,7 @@ function Text({
 
     const handleSave = () => {
       if (!inform) {
-        val.handlePatchProperty({ [propName]: editVal }, (success, val) => {
+        val.handleSaveProperties({ [propName]: editVal }, (success, val) => {
           editingOff();
         });
       }
@@ -205,7 +205,7 @@ function Form({handlers, children, edit = false}) {
         newVal[e.target[i].name] = e.target[i].defaultValue;
       }
     }
-    handlers.handlePatchProperty(newVal, () =>{
+    handlers.handleSaveProperties(newVal, () =>{
       editingOff(null, newVal);
     })
   }

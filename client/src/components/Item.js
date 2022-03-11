@@ -45,7 +45,7 @@ function Item({
     right: '1px'
   }
 
-  var handlePatchProperty = function (val, callback) {
+  var handleSaveProperties = function (val, callback) {
     setLoginState({
       open: false,
       msg: {
@@ -57,8 +57,9 @@ function Item({
         '". Please login with valid credentials...',
       },
       action: {
-        method: "patch",
-        url: "http://localhost:3001/api/opentables/" + newItem[Globals.itemIdFieldName],
+        method: (newItem.hasOwnProperty(Globals.itemIdFieldName) ? "patch" : "post"),
+        url: "http://localhost:3001/api/opentables/" + 
+             (newItem.hasOwnProperty(Globals.itemIdFieldName) ? newItem[Globals.itemIdFieldName] : listid),
         data: val,
         callback: (success, data) => {
           if (success) {
@@ -89,7 +90,7 @@ function Item({
     for (var key in item) {
       if (item.hasOwnProperty(key)) {
         result[key] = {
-          handlePatchProperty: handlePatchProperty,
+          handleSaveProperties: handleSaveProperties,
           handleItemAuth: handleItemAuth,
           setViewId: setViewId,
           prop: key,
@@ -99,7 +100,7 @@ function Item({
     }
     result.handlers = {
       handleAddItem: handleAddItem,
-      handlePatchProperty: handlePatchProperty,
+      handleSaveProperties: handleSaveProperties,
       handleListAuth: handleListAuth
     };
     return result;
