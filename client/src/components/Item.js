@@ -17,13 +17,14 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
-function Item({ 
-  template, 
-  item, 
-  rowNb, 
-  setLoginState, 
+function Item({
+  template,
+  listid,
+  item,
+  rowNb,
+  setLoginState,
   setViewId,
-  handleListAuth, 
+  handleListAuth,
   handleAddItem,
   handleDeleteItem
 }) {
