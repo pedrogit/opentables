@@ -137,7 +137,8 @@ class SchemaValidator {
             obj[key] = await this[validatorName](
               this.schema.schema[key][property],
               key,
-              obj[key]
+              obj[key],
+              (obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null)
             ); // pass object by value so the validator can modify it directly
         }
       }
@@ -422,13 +423,19 @@ class SchemaValidator {
     return hash;
   }
 
-  async validate_unique(type, key, val) {
+  async validate_unique(type, key, val, itemid) {
     // search for an identique value
     if (!this.controler) {
       throw new Error(Errors.ErrMsg.SchemaValidator_NoControler);
     }
-
-    const item = await this.controler.simpleFind(this.listid, { [key]: val });
+    var filter = { [key]: val };
+    if (itemid) {
+      filter = {
+        ...filter,
+        [Globals.itemIdFieldName] : {$ne: itemid}
+      }
+    }
+    const item = await this.controler.simpleFind(this.listid, filter);
 
     if (item) {
       throw new Error(

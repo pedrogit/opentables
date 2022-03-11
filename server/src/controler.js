@@ -414,7 +414,11 @@ class Controler {
     // validate item against schema
     newitem = await this.validateItems(
       parentList[Globals.listSchemaFieldName],
-      newitem,
+      {
+        ...newitem,
+        // include the actual itemid when patching so we can ignore it when validating unicity
+        [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)
+      },
       false,
       item[Globals.listIdFieldName],
       user
