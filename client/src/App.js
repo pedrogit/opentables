@@ -84,6 +84,9 @@ function App({ initialViewid, appid }) {
               setErrorMsg({text: "No list is associated to this view..."});
             }
           }
+          else {
+            setErrorMsg({text: "Connection error..."});
+          }
         }
       },
       tryFirst: true
@@ -211,7 +214,8 @@ function App({ initialViewid, appid }) {
           setViewId={handleChangeViewId}
         />
         <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
-        <LoginForm sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
+        <LoginForm 
+          sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
           loginState={loginState}
           setLoginState={setLoginState}
           setErrorMsg={setErrorMsg}
@@ -225,7 +229,7 @@ function App({ initialViewid, appid }) {
               setLoginState={setLoginState}
             />
             <List
-              type='Items'
+              listType='Items'
               view={viewData}
               list={listData}
               items={itemsData}

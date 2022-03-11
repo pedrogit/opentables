@@ -22,18 +22,18 @@ function ConfigPanel({
         <Stack sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}>
           <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>
           <List
-          type='View'
-          view={{item_template: ''}}
-          list={Globals.listOfAllViews}
-          items={viewData}
-          setLoginState={setLoginState}
+            listType='View'
+            view={{item_template: ''}}
+            list={Globals.listOfAllViews}
+            items={viewData}
+            setLoginState={setLoginState}
           />
           <List
-          type='List'
-          view={{item_template: ''}}
-          list={Globals.listOfAllLists}
-          items={listData}
-          setLoginState={setLoginState}
+            listType='List'
+            view={{item_template: ''}}
+            list={Globals.listOfAllLists}
+            items={listData}
+            setLoginState={setLoginState}
           />
         </Stack>
       </Collapse>

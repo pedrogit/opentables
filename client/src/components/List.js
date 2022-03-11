@@ -9,7 +9,7 @@ const Globals = require("../common/globals");
 
 // a list receive a view, list and a list of items
 function List({ 
-  type,
+  listType,
   view,
   list,
   items,

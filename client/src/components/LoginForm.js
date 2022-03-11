@@ -22,7 +22,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
   const [loginButtonDisabled, setloginButtonDisabled] = React.useState(true);
-  const [doSuccessCallback, setDoSuccessCallback] = React.useState({doit: false, data: null});
+  const [doSuccessCallback, setDoSuccessCallback] = React.useState({callit: false, data: null});
 
   const theme = useTheme();
 
@@ -52,13 +52,13 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
     setloginButtonDisabled(!(emailRef.current.value && passwordRef.current.value));
   }
 
-  // handle callback only after the login dialog has closed (so the edit popover gets rendred at the right location)
+  // handle callback only after the login dialog has closed (so the edit popover gets rendered at the right position)
   const handleSuccessCallback = () => {
-    if (doSuccessCallback.doit) {
+    if (doSuccessCallback.callit) {
       if (loginState.action.callback && typeof loginState.action.callback === 'function') {
         loginState.action.callback(true, doSuccessCallback.data);
       }
-      setDoSuccessCallback({doit: false, data: null});
+      setDoSuccessCallback({callit: false, data: null});
     }
   }
 
@@ -77,12 +77,12 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
           },
         };
       }
-      axios({ ...loginState.action, withCredentials: true })
+      axios({ ...loginState.action, withCredentials: true, timeout: 2000 })
         .then((res) => {
           if (res.status === 200 || res.status === 201 || res.statusText.toUpperCase() === "OK") {
             handleClose();
             if (loginState.open && !res.data) {
-              setDoSuccessCallback({doit: true, data: res.data});
+              setDoSuccessCallback({callit: true, data: null});
             }
             else {
               if (loginState.action.callback && typeof loginState.action.callback === 'function') {
@@ -104,15 +104,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
             ) {
               setShowInvalidLoginHelper(true);
             }
-            // handle bad request
-            else if (error.response.status === 400) {
-              setLoginState({
-                open: false,
-                tryFirst: false
-              });
-              setErrorMsg({text: error.response.data.err});
-            }
-            // handle forbidden
+            // good credential but still forbidden (so stay open)
             else if (error.response.status === 403) {
               setLoginState({
                 ...loginState,
@@ -131,6 +123,9 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
                 tryFirst: false
               });
               setErrorMsg({text: error.response.data.err});
+              if (loginState.action.callback && typeof loginState.action.callback === 'function') {
+                loginState.action.callback(false, error.response.data.err);
+              }
             }
           }
           else {
@@ -139,9 +134,11 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
               open: false,
               tryFirst: false
             });
-            setErrorMsg({text: error.message});
+            //setErrorMsg({text: error.message});
+            if (loginState.action.callback && typeof loginState.action.callback === 'function') {
+              loginState.action.callback(false, error.message);
+            }
           }
-
           return false;
         });
     }
