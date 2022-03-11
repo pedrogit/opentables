@@ -161,6 +161,21 @@ class Schema {
     return null;
   }
 
+  getAllDefault(all = false, user) {
+    var def = {};
+    if (all) {
+      this.getProps().forEach((key) => {
+        def[key] = this.getDefault(key, user);
+      }) 
+    }
+    else {
+      this.getRequired().forEach((key) => {
+        def[key] = this.getDefault(key, user);
+      })      
+    }
+    return def;
+  }
+
   getEmbeddedItems() {
     var embItems = [];
     for (var key in this.schema) {

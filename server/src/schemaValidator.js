@@ -80,9 +80,7 @@ class SchemaValidator {
       //console.log(jsonkeys);
       if (jsonkeys.length === 0){
         // generate default values for all required properties
-        this.schema.getRequired().map((key) => {
-          json[key] = this.schema.getDefault(key, user);
-        })
+        json = this.schema.getAllDefault(user);
       }
       else {
         var missingField = "";
