@@ -201,7 +201,7 @@ function Form({handlers, children, edit = false}) {
     e.preventDefault();
     var newVal = {};
     for (var i = 0; i < e.target.length - 1; i++) {
-      if (e.target[i].name !== "submitButton") {
+      if (e.target[i].type !== "button") {
         newVal[e.target[i].name] = e.target[i].defaultValue;
       }
     }
