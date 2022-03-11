@@ -36,11 +36,9 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   }, [loginState]);
 
   const handleClose = () => {
-    //if (loginState.open) {
       setLoginState({...loginState, open: false, tryFirst: false});
       setloginButtonDisabled(true);
       setShowInvalidLoginHelper(false);
-    //}
   };
 
   const handleKeyDown = (e) => {
@@ -57,7 +55,9 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   // handle callback only after the login dialog has closed (so the edit popover gets rendred at the right location)
   const handleSuccessCallback = () => {
     if (doSuccessCallback.doit) {
-      loginState.action.callback(true, doSuccessCallback.data);
+      if (loginState.action.callback && typeof loginState.action.callback === 'function') {
+        loginState.action.callback(true, doSuccessCallback.data);
+      }
       setDoSuccessCallback({doit: false, data: null});
     }
   }
@@ -85,7 +85,9 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
               setDoSuccessCallback({doit: true, data: res.data});
             }
             else {
-              loginState.action.callback(true, res.data);
+              if (loginState.action.callback && typeof loginState.action.callback === 'function') {
+                loginState.action.callback(true, res.data);
+              }
             }
             return true;
           }
@@ -128,6 +130,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
                 open: false,
                 tryFirst: false
               });
+              setErrorMsg({text: error.response.data.err});
             }
           }
           else {
@@ -136,6 +139,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
               open: false,
               tryFirst: false
             });
+            setErrorMsg({text: error.message});
           }
 
           return false;

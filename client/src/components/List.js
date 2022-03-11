@@ -9,13 +9,15 @@ const Globals = require("../common/globals");
 
 // a list receive a view, list and a list of items
 function List({ 
-  type, 
-  view, 
-  list, 
-  items, 
-  setLoginState, 
-  handleDeleteItem, 
-  setViewId, 
+  type,
+  view,
+  list,
+  items,
+  setItemsData,
+  setLoginState,
+  setViewId,
+  handleAddItem,
+  handleDeleteItem,
   sx
 }) {
   var localTemplate = view.item_template;
@@ -83,36 +85,13 @@ function List({
 
     }
     else {
-      callback(true);
+      if (callback && typeof callback === 'function') {
+        callback(true);
+      }
     }
     return auth;
   }
 
-  var handlePost = function (val, callback) {
-    setLoginState({
-      open: false,
-      msg: {
-        severity: "warning",
-        title: "Permission denied",
-        text:
-        'You do not have permissions to add item to this list. Please login with valid credentials...',
-      },
-      action: {
-        method: "post",
-        url: "http://localhost:3001/api/opentables/" + list[Globals.itemIdFieldName],
-        data: val,
-        callback: (success, data) => {
-          if (success) {
-            callback(success, data[Object.keys(val)[0]]);
-          }
-        }
-      },
-      tryFirst: true
-    });
-    return false;
-  };
-
-  //console.log('Render List (' + type + ')...');
   return (
     <Stack sx={sx}>
       {items && items.map((item) => {
@@ -125,9 +104,9 @@ function List({
             rowNb={rowNb}
             setLoginState={setLoginState}
             handleListAuth={handleListAuth}
+            handleAddItem={handleAddItem}
             handleDeleteItem={handleDeleteItem}
             setViewId={setViewId}
-            handlePost={handlePost}
           />
         );
       })}

@@ -69,7 +69,7 @@ function Header({
             id="addItemButton" 
             aria-label="add item" 
             color="inherit"
-            onClick={handleAddItem}
+            onClick={() => handleAddItem()}
         >
             <AddCircleOutlineIcon fontSize="small"/>
         </IconButton>

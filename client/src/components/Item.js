@@ -22,10 +22,10 @@ function Item({
   item, 
   rowNb, 
   setLoginState, 
+  setViewId,
   handleListAuth, 
-  handleDeleteItem,
-  handlePost,
-  setViewId
+  handleAddItem,
+  handleDeleteItem
 }) {
   const [newItem, setItem] = React.useState(item);
   const [showButtons, setShowButtons] = React.useState(false);
@@ -44,7 +44,7 @@ function Item({
     right: '1px'
   }
 
-  var handlePatch = function (val, callback) {
+  var handlePatchProperty = function (val, callback) {
     setLoginState({
       open: false,
       msg: {
@@ -62,7 +62,9 @@ function Item({
         callback: (success, data) => {
           if (success) {
             setItem(data);
-            callback(success);
+            if (callback && typeof callback === 'function') {
+              callback(success, data);
+            }
           }
         }
       },
@@ -86,7 +88,7 @@ function Item({
     for (var key in item) {
       if (item.hasOwnProperty(key)) {
         result[key] = {
-          handlePatch: handlePatch,
+          handlePatchProperty: handlePatchProperty,
           handleItemAuth: handleItemAuth,
           setViewId: setViewId,
           prop: key,
@@ -95,8 +97,8 @@ function Item({
       }
     }
     result.handlers = {
-      handlePost: handlePost,
-      handlePatch: handlePatch,
+      handleAddItem: handleAddItem,
+      handlePatchProperty: handlePatchProperty,
       handleListAuth: handleListAuth
     };
     return result;

@@ -90,7 +90,7 @@ function App({ initialViewid, appid }) {
     });
   }, [viewid, appid]);
 
-  const handleAddItem = () => {
+  const handleAddItem = (val, callback) => {
     if (listData) {
       setLoginState({
         open: false,
@@ -102,11 +102,15 @@ function App({ initialViewid, appid }) {
         action: {
           method: "post",
           url: "http://localhost:3001/api/opentables/" + listData[Globals.itemIdFieldName],
+          data: val,
           callback: (success, newitem) => {
             if (success) {
               var newItemsData = itemsData;
               newItemsData.unshift(newitem);
               setItemsData([...newItemsData]);
+              if (callback && typeof callback === 'function') {
+                callback(success, newitem);
+              }
             }
           }
         },
@@ -135,6 +139,9 @@ function App({ initialViewid, appid }) {
             var newItemsData = itemsData;
             newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
             setItemsData([...newItemsData]);
+            if (callback && typeof callback === 'function') {
+              callback(success, data);
+            }
           }
         }
       },
@@ -213,16 +220,17 @@ function App({ initialViewid, appid }) {
               viewData={viewData}
               listData={listData}
               setLoginState={setLoginState}
-              handleDeleteItem={handleDeleteItem}
             />
             <List
               type='Items'
               view={viewData}
               list={listData}
               items={itemsData}
+              setItemsData={setItemsData}
               setLoginState={setLoginState}
-              handleDeleteItem={handleDeleteItem}
               setViewId={handleChangeViewId}
+              handleAddItem={handleAddItem}
+              handleDeleteItem={handleDeleteItem}
             />
           </Stack>
         ) : (
