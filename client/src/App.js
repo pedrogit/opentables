@@ -90,7 +90,7 @@ function App({ initialViewid, appid }) {
     });
   }, [viewid, appid]);
 
-  const handleAddItem = (val, callback) => {
+  const handleAddItem = (item, callback) => {
     if (listData) {
       setLoginState({
         open: false,
@@ -102,10 +102,13 @@ function App({ initialViewid, appid }) {
         action: {
           method: "post",
           url: "http://localhost:3001/api/opentables/" + listData[Globals.itemIdFieldName],
-          data: val,
+          data: item,
           callback: (success, newitem) => {
             if (success) {
               var newItemsData = itemsData;
+              if (!newItemsData) {
+                newItemsData = [];
+              }
               newItemsData.unshift(newitem);
               setItemsData([...newItemsData]);
               if (callback && typeof callback === 'function') {
