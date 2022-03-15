@@ -40,10 +40,10 @@ function App({ initialViewid, appid }) {
 
   const [viewData, setViewData] = React.useState(null);
   const [listData, setListData] = React.useState(null);
-  const [itemsData, setItemsData] = React.useState(null); 
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
+  const [addItem, setAddItem] = React.useState(false);
 
   const handleChangeViewId = React.useCallback(
     (viewid) => {
@@ -71,18 +71,15 @@ function App({ initialViewid, appid }) {
         url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
         callback: (success, data) => {
           if (success) {
-            setViewData(Utils.objWithout(data, Globals.childlistFieldName));
-            BrowserHistory.pushHistoryState(appid, viewid);
-
             if (data[Globals.childlistFieldName]) {
-              setListData(Utils.objWithout(data[Globals.childlistFieldName], "items"));
-              setItemsData(data[Globals.childlistFieldName].items);
+              setListData({...data[Globals.childlistFieldName]});
             }
             else {
               setListData(null);
-              setItemsData(null);
               setErrorMsg({text: "No list is associated to this view..."});
             }
+            setViewData({...Utils.objWithout(data, Globals.childlistFieldName)});
+            BrowserHistory.pushHistoryState(appid, viewid);
           }
           else {
             setErrorMsg({text: "Connection error..."});
@@ -92,69 +89,6 @@ function App({ initialViewid, appid }) {
       tryFirst: true
     });
   }, [viewid, appid]);
-
-  const handleAddItem = (item, callback) => {
-    if (listData) {
-      setLoginState({
-        open: false,
-        msg: {
-          severity: "warning",
-          title: "Permission denied",
-          text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
-        },
-        action: {
-          method: "post",
-          url: "http://localhost:3001/api/opentables/" + listData[Globals.itemIdFieldName],
-          data: item,
-          callback: (success, newitem) => {
-            if (success) {
-              var newItemsData = itemsData;
-              if (!newItemsData) {
-                newItemsData = [];
-              }
-              newItemsData.unshift(newitem);
-              setItemsData([...newItemsData]);
-              if (callback && typeof callback === 'function') {
-                callback(success, newitem);
-              }
-            }
-          }
-        },
-        tryFirst: true
-      });
-    }
-    else {
-      setErrorMsg({text: "No list is associated to this view. You can not add items..."});
-    }
-  };
-
-  const handleDeleteItem = (itemid, callback) => {
-    setLoginState({
-      open: false,
-      msg: {
-        severity: "warning",
-        title: "Permission denied",
-        text:
-        'You do not have permissions to delete items from this list. Please login with valid credentials...',
-      },
-      action: {
-        method: "delete",
-        url: "http://localhost:3001/api/opentables/" + itemid,
-        callback: (success, data) => {
-          if (success) {
-            var newItemsData = itemsData;
-            newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
-            setItemsData([...newItemsData]);
-            if (callback && typeof callback === 'function') {
-              callback(success, data);
-            }
-          }
-        }
-      },
-      tryFirst: true
-    });
-    return false;
-  };
 
   const handleOpenConfigPanel = () => {
     var user = getUser();
@@ -210,7 +144,7 @@ function App({ initialViewid, appid }) {
           viewName={viewData ? viewData.name : ''}
           setLoginState={setLoginState} 
           handleOpenConfigPanel={handleOpenConfigPanel} 
-          handleAddItem={handleAddItem}
+          setAddItem={setAddItem}
           setViewId={handleChangeViewId}
         />
         <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
@@ -220,24 +154,25 @@ function App({ initialViewid, appid }) {
           setLoginState={setLoginState}
           setErrorMsg={setErrorMsg}
         />
-        {(viewData || listData || itemsData) ? (
+        {(viewData || listData) ? (
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
             <ConfigPanel
               configPanelOpen={configPanelOpen}
-              viewData={viewData}
-              listData={listData}
+              view={viewData}
+              list={listData}
               setLoginState={setLoginState}
+              setErrorMsg={setErrorMsg}
             />
             <List
               listType='Items'
               view={viewData}
               list={listData}
-              items={itemsData}
-              setItemsData={setItemsData}
+              setListData={setListData}
               setLoginState={setLoginState}
               setViewId={handleChangeViewId}
-              handleAddItem={handleAddItem}
-              handleDeleteItem={handleDeleteItem}
+              setAddItem={setAddItem}
+              addItem={addItem}
+              setErrorMsg={setErrorMsg}
             />
           </Stack>
         ) : (

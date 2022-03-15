@@ -10,9 +10,10 @@ const Globals = require("../common/globals");
 
 function ConfigPanel({
   configPanelOpen,
-  viewData,
-  listData,
-  setLoginState
+  view,
+  list,
+  setLoginState,
+  setErrorMsg
 }) {
   const theme = useTheme();
 
@@ -24,16 +25,22 @@ function ConfigPanel({
           <List
             listType='View'
             view={{item_template: ''}}
-            list={Globals.listOfAllViews}
-            items={viewData}
+            list={{
+              ...Globals.listOfAllViews,
+              items: view ? [view] : []
+            }}
             setLoginState={setLoginState}
+            setErrorMsg={setErrorMsg}
           />
           <List
             listType='List'
             view={{item_template: ''}}
-            list={Globals.listOfAllLists}
-            items={listData}
+            list={{
+              ...Globals.listOfAllLists,
+              items: list ? [list] : []
+            }}
             setLoginState={setLoginState}
+            setErrorMsg={setErrorMsg}
           />
         </Stack>
       </Collapse>

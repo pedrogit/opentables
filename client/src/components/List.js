@@ -8,43 +8,102 @@ const Utils = require("../common/utils");
 const Globals = require("../common/globals");
 
 // a list receive a view, list and a list of items
-function List({ 
+function List({
   listType,
   view,
   list,
-  items,
-  setItemsData,
   setLoginState,
   setViewId,
-  handleAddItem,
-  handleDeleteItem,
+  setListData,
+  setAddItem,
+  addItem,
+  setErrorMsg,
   sx
 }) {
-  var localTemplate = view.item_template;
-  if (list) {
-    var parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
-    if (localTemplate === "") {
-      /*localTemplate = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
-        '<Text val={' + prop + '} /> '
-      ).join('') + '</Box>';*/
-      localTemplate = parsedSchema
-        .getRequired(true)
-        .map((prop) => {
-          //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
-          return ("<Text val={" + prop + "}/> ")
-        })
-        //.map((prop) => "<Text /> ")
-        .join("");
-    }
-  }
+  const handleAddItem = React.useCallback(
+    (item, callback) => {
+      if (list) {
+        setLoginState({
+          open: false,
+          msg: {
+            severity: "warning",
+            title: "Permission denied",
+            text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
+          },
+          action: {
+            method: "post",
+            url: "http://localhost:3001/api/opentables/" + list[Globals.itemIdFieldName],
+            data: item,
+            callback: (success, newitem) => {
+              if (success) {
+                var newItemsData = list.items;
+                if (!newItemsData) {
+                  newItemsData = [];
+                }
+                newItemsData.unshift(newitem);
+                setListData({
+                  ...list,
+                  items: newItemsData
+                });
+              }
+              if (callback && typeof callback === 'function') {
+                callback(success, newitem);
+              }
+            }
+          },
+          tryFirst: true
+        });
+      }
+      else {
+        setErrorMsg({text: "No list is associated to this view. You can not add items..."});
+      }
+    }, [list, setLoginState, setListData, setErrorMsg]
+  );
 
-  if (items && !(items instanceof Array)) {
-    items = [items];
-  }
+  React.useEffect(() => {
+    if (addItem) {
+      setAddItem(false);
+      handleAddItem();
+    }
+  }, [addItem, setAddItem, handleAddItem] );
+
+    var template;
+    var parsedSchema;
+    if (list && view) {
+      // parse the schema and generate a default template if necesssary (should be done in the schema validator)
+      parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
+      template = view.item_template;
+
+      if (template === "") {
+        /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
+          '<Text val={' + prop + '} /> '
+        ).join('') + '</Box>';*/
+        template = parsedSchema
+          .getRequired(true)
+          .map((prop) => {
+            //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
+            return ("<Text val={" + prop + "}/> ")
+          })
+          //.map((prop) => "<Text /> ")
+          .join("");
+      }
+    }
+    else {
+      template = null;
+    }
+
+    var addTemplate;
+    if (view && view[Globals.addItemModeFieldName] && (
+        view[Globals.addItemModeFieldName] === Globals[Globals.addItemModeAtLoadWithItems] || 
+        view[Globals.addItemModeFieldName] === Globals[Globals.addItemModeAtLoadWithoutItems]
+    )) {
+      addTemplate = "<Form handlers={handlers}>" + template + "</Form>"
+      setAddItem(true);
+    }
 
   var rowNb = 0;
 
-  var handleListAuth = function({action = 'patch', item = null, propName = '', callback}) {
+  const handleListAuth = function({action = 'patch', item = null, propName = '', callback}) {
     var auth = false;
     if (action === "patch") {
       auth = Utils.validateRWPerm({
@@ -92,14 +151,64 @@ function List({
     return auth;
   }
 
+  const handleDeleteItem = React.useCallback(
+    (itemid, callback) => {
+      if (list) {
+        setLoginState({
+          open: false,
+          msg: {
+            severity: "warning",
+            title: "Permission denied",
+            text:
+            'You do not have permissions to delete items from this list. Please login with valid credentials...',
+          },
+          action: {
+            method: "delete",
+            url: "http://localhost:3001/api/opentables/" + itemid,
+            callback: (success, data) => {
+              if (success) {
+                var newItemsData = [...list.items];
+                newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
+                setListData({
+                  ...list,
+                  items: newItemsData
+                });
+              }
+              if (callback && typeof callback === 'function') {
+                callback(success, data);
+              }
+            }
+          },
+          tryFirst: true
+        });
+      }
+      else {
+        setErrorMsg({text: "No list is associated to this view. You can not delete items..."});
+      }
+    }, [list, setLoginState, setListData, setErrorMsg]
+  );
+
   return (
     <Stack sx={sx}>
-      {items && items.map((item) => {
+      {addItem && addTemplate && 
+        <Item
+          //key={item._id}
+          template={addTemplate}
+          listid={list._listid}
+          item={parsedSchema.getAllDefault(true, getUser())}
+          rowNb={0}
+          setLoginState={setLoginState}
+          handleListAuth={handleListAuth}
+          handleAddItem={handleAddItem}
+          handleDeleteItem={handleDeleteItem}
+          setViewId={setViewId}
+      />}
+      {template && list && list.items && list.items.map((item) => {
         rowNb = rowNb + 1;
         return (
           <Item
             key={item._id}
-            template={localTemplate}
+            template={template}
             listid={list._listid}
             item={item}
             rowNb={rowNb}

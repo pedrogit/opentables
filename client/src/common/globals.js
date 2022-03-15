@@ -35,8 +35,9 @@ var Globals = {
   identifierRegEx: "\\$?[a-zA-Z0-9_-]+",
 
   addItemModeFieldName: "add_item_mode",
-  addAtLoad: "load",
-  addAtLoadWithoutItems: "load_noitems"
+  addItemModeAsForm: "form",
+  addItemModeAtLoadWithItems: "form_at_load",
+  addItemModeAtLoadWithoutItems: "form_at_load_no_items"
 };
 
 Globals = {
@@ -74,7 +75,7 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.addItemModeFieldName + ": {type: string, options: [default, " + Globals.addAtLoad + "," + Globals.addAtLoadWithoutItems + "], default: default}, " +
+      Globals.addItemModeFieldName + ": {type: string, options: [default, " + Globals.addItemModeAtLoadWithItems + "," + Globals.addItemModeAtLoadWithoutItems + "], default: default}, " +
       "item_template: template, " +
       Globals.childlistFieldName + ": embedded_listid" +
       "}",
@@ -101,8 +102,8 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
     name: "Sign Up",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.addItemModeFieldName]: Globals.addAtLoadWithoutItems, // default, load, load_nolist
-    item_template: "<Form handlers={handlers}><Text val={username} inline/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline /><Text val={password}/></Form>",
+    [Globals.addItemModeFieldName]: Globals.addItemModeAtLoadWithoutItems, // default, load, load_nolist
+    item_template: "<Text val={username} inline/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline /><Text val={password} inline/>",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 

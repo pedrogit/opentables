@@ -17,7 +17,7 @@ function Header({
   viewName, 
   setLoginState, 
   handleOpenConfigPanel, 
-  handleAddItem,
+  setAddItem,
   setViewId
 }) {
   const [showButtons, setShowButtons] = React.useState(false);
@@ -69,7 +69,7 @@ function Header({
             id="addItemButton" 
             aria-label="add item" 
             color="inherit"
-            onClick={() => handleAddItem()}
+            onClick={() => setAddItem(true)}
         >
             <AddCircleOutlineIcon fontSize="small"/>
         </IconButton>
