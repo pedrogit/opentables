@@ -45,7 +45,7 @@ function Item({
     right: '1px'
   }
 
-  var handleSaveProperties = function (val, callback) {
+  var handleSaveProperty = function (val, callback) {
     setLoginState({
       open: false,
       msg: {
@@ -90,7 +90,7 @@ function Item({
     for (var key in item) {
       if (item.hasOwnProperty(key)) {
         result[key] = {
-          handleSaveProperties: handleSaveProperties,
+          handleSaveProperty: handleSaveProperty,
           handleItemAuth: handleItemAuth,
           setViewId: setViewId,
           prop: key,
@@ -100,7 +100,7 @@ function Item({
     }
     result.handlers = {
       handleAddItem: handleAddItem,
-      handleSaveProperties: handleSaveProperties,
+      handleSaveProperty: handleSaveProperty,
       handleListAuth: handleListAuth
     };
     return result;

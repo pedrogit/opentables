@@ -47,7 +47,7 @@ function Text({
   val, 
   inline = false,
   inform = false,
-  edit = false,
+  editmode = false,
   vertical = false,
   label, 
   nolabel = false,
@@ -61,7 +61,7 @@ function Text({
   const theme = useTheme();
 
   const [editVal, setEditVal] = React.useState(propVal);
-  const [editing, setEditing] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(editmode);
 
   if (val && (propName || editVal)) {
 
@@ -73,7 +73,7 @@ function Text({
           action: 'patch', 
           propName: val.prop, 
           callback: (auth) => {
-            setEditing(true);
+            setIsEditing(true);
           }
         });
       }
@@ -85,8 +85,8 @@ function Text({
 
     const handleSave = () => {
       if (!inform) {
-        val.handleSaveProperties({ [propName]: editVal }, (success, val) => {
-          editingOff();
+        val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
+          setIsEditingOff();
         });
       }
     };
@@ -99,13 +99,13 @@ function Text({
       }
       if (e.keyCode === 27) { // escape
         setEditVal(propVal);
-        editingOff()
+        setIsEditingOff()
       }
     };
 
-    const editingOff = () => {
+    const setIsEditingOff = () => {
       if (!inform) {
-        setEditing(false);
+        setIsEditing(false);
       }
     }
 
@@ -130,9 +130,9 @@ function Text({
             nolabel={nolabel} 
             sx={labelSx}
           />
-          {(edit || editing) && inline ? (
+          {(editmode || isEditing) && inline ? (
             <>
-            <ClickAwayListener onClickAway={editingOff}>
+            <ClickAwayListener onClickAway={setIsEditingOff}>
               <Input
                 name={propName}
                 sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
@@ -158,9 +158,9 @@ function Text({
           )}
         </Stack>
         <Popover
-          open={(edit || editing) && !inline}
+          open={(editmode || isEditing) && !inline}
           anchorEl={valueRef.current}
-          onClose={editingOff}
+          onClose={setIsEditingOff}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "left",
@@ -196,6 +196,9 @@ function Listlink({text, listid}) {
 function Form({handlers, children, edit = false}) {
   const [editing, setEditing] = React.useState(edit);
   const [childProps, setChildrenProps] = React.useState({inform: true, inline: true, edit: edit});
+function Form({handlers, children, editmode = false}) {
+  const [isEditing, setIsEditing] = React.useState(editmode);
+  const [childProps, setChildrenProps] = React.useState({inform: true, inline: true, editmode: editmode});
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -206,7 +209,7 @@ function Form({handlers, children, edit = false}) {
       }
     }
     handlers.handleSaveProperties(newVal, () =>{
-      editingOff(null, newVal);
+      //setIsEditingOff();
     })
   }
 
@@ -214,8 +217,8 @@ function Form({handlers, children, edit = false}) {
     handlers.handleListAuth({
       action: 'patch', 
       callback: (auth) => {
-        setChildrenProps({inform: true, inline: true, edit: true});
-        setEditing(true);
+        setChildrenProps({inform: true, inline: true, editmode: true});
+        setIsEditing(true);
       }
     });
   };
@@ -227,31 +230,31 @@ function Form({handlers, children, edit = false}) {
     return child;
   });
 
-  const editingOff = () => {
-    if (!edit) {
-      setChildrenProps({inform: true, inline: true, edit: false});
-      setEditing(false);
+  const setIsEditingOff = () => {
+    if (!editmode) {
+      setChildrenProps({inform: true, inline: true, editmode: false});
+      setIsEditing(false);
     }
   }
 
   const keyPressed = (e) => {
     if (e.keyCode === 27) { // escape
-      editingOff();
+      setIsEditingOff();
     }
   };
 
   return (
-    <ClickAwayListener onClickAway={editingOff}>
+    <ClickAwayListener onClickAway={setIsEditingOff}>
       <form 
         onSubmit={handleSubmit}
         onDoubleClick={handleEdit}
         onKeyDown={(e) => keyPressed(e)}
       >
         {childrenWithProp}
-        {(edit || editing) ? (
+        {(editmode || isEditing) ? (
           <Stack direction="row" justifyContent="flex-end">
             <ButtonGroup variant="contained" size="small">
-              <Button id="editCancelButton" onClick={editingOff}>Cancel</Button>
+              <Button id="editCancelButton" onClick={setIsEditingOff}>Cancel</Button>
               <Button id="editButton" type="submit">Save</Button>
             </ButtonGroup>
           </Stack>

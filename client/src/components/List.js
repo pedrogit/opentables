@@ -7,7 +7,7 @@ const Schema = require("../common/schema");
 const Utils = require("../common/utils");
 const Globals = require("../common/globals");
 
-// a list receive a view, list and a list of items
+// a list receive a view and a list of items
 function List({
   listType,
   view,
