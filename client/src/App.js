@@ -39,7 +39,6 @@ function App({ initialViewid, appid }) {
   const [viewid, setViewId] = React.useState(BrowserHistory.getViewIdFromURL(appid) ? BrowserHistory.getViewIdFromURL(appid) : initialViewid);
 
   const [viewData, setViewData] = React.useState(null);
-  const [listData, setListData] = React.useState(null);
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
@@ -71,14 +70,7 @@ function App({ initialViewid, appid }) {
         url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
         callback: (success, data) => {
           if (success) {
-            if (data[Globals.childlistFieldName]) {
-              setListData({...data[Globals.childlistFieldName]});
-            }
-            else {
-              setListData(null);
-              setErrorMsg({text: "No list is associated to this view..."});
-            }
-            setViewData({...Utils.objWithout(data, Globals.childlistFieldName)});
+            setViewData(data);
             BrowserHistory.pushHistoryState(appid, viewid);
           }
           else {
@@ -98,10 +90,10 @@ function App({ initialViewid, appid }) {
       throwError: false
     });
     var authList = true;
-    if (listData) {
+    if (viewData[Globals.childlistFieldName]) {
       authList = Utils.validateRWPerm({
         user: user,
-        list: listData,
+        list: viewData[Globals.childlistFieldName],
         throwError: false
       });
     }
@@ -154,20 +146,19 @@ function App({ initialViewid, appid }) {
           setLoginState={setLoginState}
           setErrorMsg={setErrorMsg}
         />
-        {(viewData || listData) ? (
+        {(viewData) ? (
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
             <ConfigPanel
               configPanelOpen={configPanelOpen}
               view={viewData}
-              list={listData}
+              setViewData={setViewData}
               setLoginState={setLoginState}
               setErrorMsg={setErrorMsg}
             />
             <List
               listType='Items'
               view={viewData}
-              list={listData}
-              setListData={setListData}
+              setViewData={setViewData}
               setLoginState={setLoginState}
               setViewId={handleChangeViewId}
               setAddItem={setAddItem}

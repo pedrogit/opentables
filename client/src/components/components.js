@@ -11,6 +11,8 @@ import Input from '@mui/material/Input';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { useTheme } from "@mui/material/styles";
 
+const Globals = require("../common/globals");
+
 /********************
  *  Label component
  ********************/
@@ -193,80 +195,94 @@ function Listlink({text, listid}) {
   )
 }
 
-function Form({handlers, children, edit = false}) {
-  const [editing, setEditing] = React.useState(edit);
-  const [childProps, setChildrenProps] = React.useState({inform: true, inline: true, edit: edit});
-function Form({handlers, children, editmode = false}) {
-  const [isEditing, setIsEditing] = React.useState(editmode);
-  const [childProps, setChildrenProps] = React.useState({inform: true, inline: true, editmode: editmode});
+function ItemWrapperForm({handlers, otherProps, children}) {
+  var options = {
+    cancelLabel: "Cancel",
+    cancelAction: () => otherProps.setAddItem(false),
+    okLabel: "Add",
+    addAction: () => otherProps.setAddItem(false)
+  };
+
+  if (otherProps.addItemMode === Globals.addItemModeAtLoadWithoutItems) {
+    options = {
+      ...options,
+      cancelAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
+      addAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
+      addMessage: {
+        text: "Welcome to OpenTable. You have been logged in..."
+      }
+    }
+  }
+
+  const resetForm = () => {
+    alert('Reset form');
+  }
+  
+  if (otherProps.addItemMode === Globals.addItemModeAtLoadWithItems) {
+    options = {
+      cancelLabel: "Reset",
+      cancelAction: resetForm,
+      okLabel: "Add",
+      addAction: resetForm
+    }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    var newVal = {};
+    var newItem = {};
     for (var i = 0; i < e.target.length - 1; i++) {
       if (e.target[i].type !== "button") {
-        newVal[e.target[i].name] = e.target[i].defaultValue;
+        newItem[e.target[i].name] = e.target[i].defaultValue;
       }
     }
-    handlers.handleSaveProperties(newVal, () =>{
-      //setIsEditingOff();
+    handlers.handleAddItem({
+      item: newItem,
+      addToLocalList: otherProps.addItemMode === Globals.addItemModeAtLoadWithoutItems ? false : true,
+      callback: () => {
+        if (options.addMessage) {
+          handlers.setErrorMsg(options.addMessage);
+        }
+        options.addAction();
+      }
     })
   }
 
-  const handleEdit = (e) => {
-    handlers.handleListAuth({
-      action: 'patch', 
-      callback: (auth) => {
-        setChildrenProps({inform: true, inline: true, editmode: true});
-        setIsEditing(true);
-      }
-    });
-  };
-
   const childrenWithProp = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, childProps);  
+      return React.cloneElement(child, {inform: true, inline: true, editmode: true});  
     }
     return child;
   });
 
-  const setIsEditingOff = () => {
-    if (!editmode) {
-      setChildrenProps({inform: true, inline: true, editmode: false});
-      setIsEditing(false);
-    }
-  }
-
   const keyPressed = (e) => {
-    if (e.keyCode === 27) { // escape
-      setIsEditingOff();
+    if (e.keyCode === 27) {
+      options.cancelAction();
     }
   };
 
+  const handleCancel = (e) => {
+
+    options.cancelAction();
+  }
+
   return (
-    <ClickAwayListener onClickAway={setIsEditingOff}>
       <form 
         onSubmit={handleSubmit}
-        onDoubleClick={handleEdit}
         onKeyDown={(e) => keyPressed(e)}
       >
         {childrenWithProp}
-        {(editmode || isEditing) ? (
-          <Stack direction="row" justifyContent="flex-end">
-            <ButtonGroup variant="contained" size="small">
-              <Button id="editCancelButton" onClick={setIsEditingOff}>Cancel</Button>
-              <Button id="editButton" type="submit">Save</Button>
-            </ButtonGroup>
-          </Stack>
-          ) : null
-        }
+        <Stack direction="row" justifyContent="flex-end">
+          <ButtonGroup variant="contained" size="small">
+            <Button id="editCancelButton" onClick={handleCancel}>{options.cancelLabel}</Button>
+            <Button id="editButton" type="submit">{options.okLabel}</Button>
+          </ButtonGroup>
+        </Stack>
       </form>
-    </ClickAwayListener>
   )
 }
 
 function allComponentsAsJson() {
-  return { Text, Label, Listlink, Form };
+  return { Text, Label, Listlink, ItemWrapperForm };
 }
 
 export { allComponentsAsJson };

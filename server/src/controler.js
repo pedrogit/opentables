@@ -31,6 +31,15 @@ class Controler {
     this.reset = true;
   }
 
+  initialViews() {
+    return [Globals.viewOnTheListOfAllViews, 
+            Globals.viewOnTheListOfUsers,
+            Globals.signUpViewOnTheListOfUsers,
+            Globals.viewOnTheListOfUsersAtLoad,
+            Globals.viewOnTheListOfUsersAsForm
+          ]
+  }
+
   async createBaseTables() {
     // clean the database
     await this.deleteAll(process.env.ADMIN_EMAIL, true);
@@ -61,19 +70,6 @@ class Controler {
       process.exit();
     }
 
-    console.log("Create the " + Globals.viewOnTheListOfAllViews['name'] + "...");
-    try {
-      item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
-        Globals.listofAllViewId,
-        {...Globals.viewOnTheListOfAllViews}
-      );
-    } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfAllViews['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
-      process.exit();
-    }
-
     console.log("Create the " + Globals.listOfUsers['name'] + "...");
     try {
       item = await this.insertMany(
@@ -83,6 +79,35 @@ class Controler {
       );
     } catch (err) {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfUsers['name'])
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
+    }
+
+    // create the initial views
+    this.initialViews().forEach(async view => {
+      console.log("Create the " + view['name'] + "...");
+      try {
+        item = await this.insertMany(
+          process.env.ADMIN_EMAIL,
+          Globals.listofAllViewId,
+          {...view}
+        );
+      } catch (err) {
+        var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, view['name'])
+        console.log('ERROR: ' + msg + ' EXITING...');
+        process.exit();
+      }  
+    })
+
+    /*console.log("Create the " + Globals.viewOnTheListOfAllViews['name'] + "...");
+    try {
+      item = await this.insertMany(
+        process.env.ADMIN_EMAIL,
+        Globals.listofAllViewId,
+        {...Globals.viewOnTheListOfAllViews}
+      );
+    } catch (err) {
+      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfAllViews['name'])
       console.log('ERROR: ' + msg + ' EXITING...');
       process.exit();
     }
@@ -100,6 +125,32 @@ class Controler {
       process.exit();
     }
 
+    console.log("Create the " + Globals.viewOnTheListOfUsersAtLoad['name'] + "...");
+    try {
+      item = await this.insertMany(
+        process.env.ADMIN_EMAIL,
+        Globals.listofAllViewId,
+        {...Globals.viewOnTheListOfUsersAtLoad}
+      );
+    } catch (err) {
+      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsersAtLoad['name'])
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
+    }
+
+    console.log("Create the " + Globals.viewOnTheListOfUsersAsForm['name'] + "...");
+    try {
+      item = await this.insertMany(
+        process.env.ADMIN_EMAIL,
+        Globals.listofAllViewId,
+        {...Globals.viewOnTheListOfUsersAsForm}
+      );
+    } catch (err) {
+      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsersAsForm['name'])
+      console.log('ERROR: ' + msg + ' EXITING...');
+      process.exit();
+    }
+
     console.log("Create the " + Globals.signUpViewOnTheListOfUsers['name'] + "...");
     try {
       item = await this.insertMany(
@@ -111,7 +162,7 @@ class Controler {
       var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.signUpViewOnTheListOfUsers['name'])
       console.log('ERROR: ' + msg + ' EXITING...');
       process.exit();
-    }
+    }*/
   }
 
   static isList(item) {
@@ -289,7 +340,7 @@ class Controler {
           if (item[propName]){
             noitems = (propName === Globals.childlistFieldName && 
                        item[Globals.addItemModeFieldName] &&
-                       item[Globals.addItemModeFieldName] === Globals.addAtLoadWithoutItems ? true : noitems);
+                       item[Globals.addItemModeFieldName] === Globals.addItemModeAtLoadWithoutItems ? true : noitems);
            item[propName] = await this.findWithItems(user, item[propName], filter, noitems);
           }
         })
@@ -445,39 +496,48 @@ class Controler {
     if (!all) {
       filter = {
         $and: [
-          {
+          { // list of all lists and list of all views
             [Globals.listIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.voidListId),
             },
-          }, // list of all lists and list of all views
-          {
+          },
+          { // users
             [Globals.listIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
-          }, // users
-          {
+          },
+          { // users list
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
-          }, // users list
-          {
+          },
+          /*{ // users list view
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.viewOnUserListViewId),
             },
-          }, // users list view
-          {
+          },
+          { // view on list of views
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.viewOnAllViewViewId),
             },
-          }, // sign up view
-          {
+          },
+          { // sign up view
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.signUpViewOnUserListViewId),
             },
-          },
+          },*/
         ],
-      }; // view on list of views
+      };
+
+      filter.$and = filter.$and.concat(this.initialViews().map(view => {
+        return {
+          [Globals.itemIdFieldName]: {
+            $ne: MongoDB.ObjectId(view[Globals.itemIdFieldName])
+          }
+        }
+      }))
     }
+
     return this.coll.deleteMany(filter);
   }
 

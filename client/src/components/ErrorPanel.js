@@ -61,7 +61,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
 
 ErrorPanel.defaultProps = {
   autoClose: true,
-  closeButton: false
+  closeButton: true
 }
 
 export default ErrorPanel;

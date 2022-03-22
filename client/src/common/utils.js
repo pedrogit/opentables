@@ -393,84 +393,81 @@ e) INACTIVE LIST ITEM PERMISSION - item_r_permission and item_rw_permission perm
 */
 exports.validateRWPerm = function(
   {
-    user,
+    user = Globals.allUserName,
     list,
     item,
     readWrite = true,
     throwError = true
   } = {}
 ) {
-  // if user is not defined return false
-  if (user) {
-    // admin has all permissions
-    if (user === process.env.ADMIN_EMAIL) {
+  // admin has all permissions
+  if (user === process.env.ADMIN_EMAIL) {
+    return true;
+  }
+
+  var newItem = {...item}
+
+  // list owners and item owners (when it is set) have all permissions
+  if ((newItem && newItem.hasOwnProperty(Globals.ownerFieldName) && user === newItem[Globals.ownerFieldName]) || 
+      (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])) {
       return true;
-    }
+  }
 
-    var newItem = {...item}
+  // in rw mode (readWrite = true) list rw_p, list item_rw and 
+  // item rw_p are cumulative (merged together). It is like if 
+  // item rw_p inherits list rw_p. This is because when the user 
+  // has list rw permission he also have item rw permission since he 
+  // could always remove the item rw_permission property to get the permission)
+  var mergedPerm = [];
 
-    // list owners and item owners (when it is set) have all permissions
-    if ((newItem && newItem.hasOwnProperty(Globals.ownerFieldName) && user === newItem[Globals.ownerFieldName]) || 
-        (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])) {
-        return true;
-    }
+  // determine top level (list) permissions
+  if (list && list.hasOwnProperty(Globals.readWritePermFieldName)) {
+    mergedPerm = list[Globals.readWritePermFieldName].split(/\s*,\s*/);
+  }
+  else {
+    // in rw mode (readWrite = true), the default for rw is @owner, otherwise it is @all
+    mergedPerm = (readWrite ? [] : [Globals.allUserName]);
+  }
 
-    // in rw mode (readWrite = true) list rw_p, list item_rw and 
-    // item rw_p are cumulative (merged together). It is like if 
-    // item rw_p inherits list rw_p. This is because when the user 
-    // has list rw permission he also have item rw permission since he 
-    // could always remove the item rw_permission property to get the permission)
-    var mergedPerm = [];
-
-    // determine top level (list) permissions
-    if (list && list.hasOwnProperty(Globals.readWritePermFieldName)) {
-      mergedPerm = list[Globals.readWritePermFieldName].split(/\s*,\s*/);
+  // handle list item_rw_p permission only if it is set
+  if (list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) {
+    let splittedRW = list[Globals.itemReadWritePermFieldName].split(/\s*,\s*/);
+    // cumulate only in rw mode
+    if (readWrite) {
+      // merge list item_rw_p permission only if item rw _p is not set
+      if (!newItem || 
+          (newItem && (!newItem.hasOwnProperty(Globals.readWritePermFieldName)))) {
+          mergedPerm = mergedPerm.concat(splittedRW);
+      }
     }
     else {
-      // in rw mode (readWrite = true), the default for rw is @owner, otherwise it is @all
-      mergedPerm = (readWrite ? [] : [Globals.allUserName]);
+      mergedPerm = splittedRW;
     }
+  }
 
-    // handle list item_rw_p permission only if it is set
-    if (list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) {
-      let splittedRW = list[Globals.itemReadWritePermFieldName].split(/\s*,\s*/);
-      // cumulate only in rw mode
-      if (readWrite) {
-        // merge list item_rw_p permission only if item rw _p is not set
-        if (!newItem || 
-            (newItem && (!newItem.hasOwnProperty(Globals.readWritePermFieldName)))) {
-           mergedPerm = mergedPerm.concat(splittedRW);
-        }
-      }
-      else {
-        mergedPerm = splittedRW;
-      }
+  // in both mode (read or readWite) item rw_p always have precedence over list item_rw_p
+  // item_rw_p is more like a global setting that can be overwritten at the item level
+  if (newItem && newItem.hasOwnProperty(Globals.readWritePermFieldName)) {
+    let splittedRW = newItem[Globals.readWritePermFieldName].split(/\s*,\s*/);
+    if (readWrite) {
+      mergedPerm = mergedPerm.concat(splittedRW);
     }
+    else {
+      mergedPerm = splittedRW;
+    }
+  }
 
-    // in both mode (read or readWite) item rw_p always have precedence over list item_rw_p
-    // item_rw_p is more like a global setting that can be overwritten at the item level
-    if (newItem && newItem.hasOwnProperty(Globals.readWritePermFieldName)) {
-      let splittedRW = newItem[Globals.readWritePermFieldName].split(/\s*,\s*/);
-      if (readWrite) {
-        mergedPerm = mergedPerm.concat(splittedRW);
-      }
-      else {
-        mergedPerm = splittedRW;
-      }
-    }
-
-    // now compare the user with the accumulated set of permissions
-    // grant permission if the cumulative permissions 
-    //   includes @all OR
-    //   includes @auth and the user is not @all OR
-    //   includes the user
-    if (
-      mergedPerm.includes(Globals.allUserName) ||
-      (mergedPerm.includes(Globals.authUserName) && user !== Globals.allUserName) ||
-      mergedPerm.includes(user)
-    ) {
-      return true;
-    }
+  // now compare the user with the accumulated set of permissions
+  // grant permission if the cumulative permissions 
+  //   includes @all OR
+  //   includes @auth and the user is not @all OR
+  //   includes the user
+  if (
+    mergedPerm.includes(Globals.allUserName) ||
+    (mergedPerm.includes(Globals.authUserName) && user !== Globals.allUserName) ||
+    mergedPerm.includes(user)
+  ) {
+    return true;
   }
 
   if (throwError) {
@@ -482,7 +479,7 @@ exports.validateRWPerm = function(
 // read permissions
 exports.validateRPerm = function(
   {
-    user,
+    user = Globals.allUserName,
     list, 
     item,
     throwError = true
@@ -538,7 +535,7 @@ exports.validateRPerm = function(
 // delete permissions
 exports.validateDPerm = function(
   {
-    user,
+    user = Globals.allUserName,
     list, 
     item,
      throwError = true
@@ -586,13 +583,13 @@ exports.validateDPerm = function(
 // create permissions
 exports.validateCPerm = function(
   {
-    user,
+    user = Globals.allUserName,
     list, 
     item,
      throwError = true
   } = {}
 ) {
-  if (user && user === process.env.ADMIN_EMAIL) {
+  if (user === process.env.ADMIN_EMAIL) {
     return true;
   }
 

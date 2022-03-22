@@ -77,7 +77,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
           },
         };
       }
-      axios({ ...loginState.action, withCredentials: true, timeout: 2000 })
+      axios({ ...loginState.action, withCredentials: true })
         .then((res) => {
           if (res.status === 200 || res.status === 201 || res.statusText.toUpperCase() === "OK") {
             handleClose();
@@ -232,7 +232,7 @@ function LoginButton({ setViewId, setLoginState }) {
   var action = 'login';
   var buttonText = 'Login';
   var user = getUser();
-  if (user) {
+  if (user && user !== Globals.allUserName) {
      buttonText = 'Logout ' + user;
   }
 

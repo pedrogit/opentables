@@ -26,7 +26,9 @@ function Item({
   setViewId,
   handleListAuth,
   handleAddItem,
-  handleDeleteItem
+  handleDeleteItem,
+  setErrorMsg,
+  ...otherProps
 }) {
   const [newItem, setItem] = React.useState(item);
   const [showButtons, setShowButtons] = React.useState(false);
@@ -52,21 +54,21 @@ function Item({
         severity: "warning",
         title: "Permission denied",
         text:
-        'You do not have permissions to edit "' +
+        'You do not have permissions to edit "' + 
         Object.keys(val)[0] +
         '". Please login with valid credentials...',
       },
       action: {
-        method: (newItem.hasOwnProperty(Globals.itemIdFieldName) ? "patch" : "post"),
+        method: "patch",
         url: "http://localhost:3001/api/opentables/" + 
-             (newItem.hasOwnProperty(Globals.itemIdFieldName) ? newItem[Globals.itemIdFieldName] : listid),
+             newItem[Globals.itemIdFieldName],
         data: val,
         callback: (success, data) => {
           if (success) {
             setItem(data);
-            if (callback && typeof callback === 'function') {
-              callback(success, data);
-            }
+          }
+          if (callback && typeof callback === 'function') {
+            callback(success, data);
           }
         }
       },
@@ -101,8 +103,12 @@ function Item({
     result.handlers = {
       handleAddItem: handleAddItem,
       handleSaveProperty: handleSaveProperty,
-      handleListAuth: handleListAuth
+      handleListAuth: handleListAuth,
+      setErrorMsg: setErrorMsg
     };
+    if (otherProps) {
+      result.otherProps = otherProps;
+    }
     return result;
   };
 

@@ -236,7 +236,7 @@ class SchemaValidator {
   }
 
   validate_type_user(key, val) {
-    val = val.toLowerCase();
+    val = val && val.toLowerCase();
     if (Globals.specialUsers.includes(val)) {
       return val;
     }
@@ -407,15 +407,15 @@ class SchemaValidator {
       throw emailError;
     }
 
-    return email.toLowerCase();
+    return email && email.toLowerCase();
   }
 
   validate_upper(type, key, val) {
-    return val.toUpperCase();
+    return val && val.toUpperCase();
   }
 
   validate_lower(type, key, val) {
-    return val.toLowerCase();
+    return val && val.toLowerCase();
   }
 
   async validate_encrypt(type, key, val) {

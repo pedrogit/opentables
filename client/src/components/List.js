@@ -11,18 +11,19 @@ const Globals = require("../common/globals");
 function List({
   listType,
   view,
-  list,
   setLoginState,
   setViewId,
-  setListData,
+  setViewData,
   setAddItem,
   addItem,
   setErrorMsg,
   sx
 }) {
+  var addItemMode = (view && view[Globals.addItemModeFieldName]) || Globals.addItemModeDefault;
+
   const handleAddItem = React.useCallback(
-    (item, callback) => {
-      if (list) {
+    ({item, addToLocalList = true, callback}) => {
+      if (view[Globals.childlistFieldName]) {
         setLoginState({
           open: false,
           msg: {
@@ -32,18 +33,21 @@ function List({
           },
           action: {
             method: "post",
-            url: "http://localhost:3001/api/opentables/" + list[Globals.itemIdFieldName],
+            url: "http://localhost:3001/api/opentables/" + view[Globals.childlistFieldName][Globals.itemIdFieldName],
             data: item,
             callback: (success, newitem) => {
-              if (success) {
-                var newItemsData = list.items;
+              if (success && addToLocalList) {
+                var newItemsData = view[Globals.childlistFieldName].items;
                 if (!newItemsData) {
                   newItemsData = [];
                 }
                 newItemsData.unshift(newitem);
-                setListData({
-                  ...list,
-                  items: newItemsData
+                setViewData({
+                  ...view,
+                  [Globals.childlistFieldName]: {
+                    ...view[Globals.childlistFieldName],
+                    items: newItemsData
+                  }
                 });
               }
               if (callback && typeof callback === 'function') {
@@ -57,103 +61,109 @@ function List({
       else {
         setErrorMsg({text: "No list is associated to this view. You can not add items..."});
       }
-    }, [list, setLoginState, setListData, setErrorMsg]
+    }, [view, setLoginState, setViewData, setErrorMsg]
   );
 
   React.useEffect(() => {
-    if (addItem) {
+    if (addItem && addItemMode === Globals.addItemModeDefault) {
       setAddItem(false);
-      handleAddItem();
+      handleAddItem({});
     }
-  }, [addItem, setAddItem, handleAddItem] );
+  }, [addItem, addItemMode, setAddItem, handleAddItem] );
 
-    var template;
-    var parsedSchema;
-    if (list && view) {
-      // parse the schema and generate a default template if necesssary (should be done in the schema validator)
-      parsedSchema = new Schema(list[Globals.listSchemaFieldName]);
-      template = view.item_template;
+  var template;
+  var parsedSchema;
+  if (view) {
+    // parse the schema and generate a default template if necesssary (should be done in the schema validator)
+    parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
+    template = view.item_template;
 
-      if (template === "") {
-        /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
-          '<Text val={' + prop + '} /> '
-        ).join('') + '</Box>';*/
-        template = parsedSchema
-          .getRequired(true)
-          .map((prop) => {
-            //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
-            return ("<Text val={" + prop + "}/> ")
-          })
-          //.map((prop) => "<Text /> ")
-          .join("");
-      }
+    if (template === "") {
+      /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
+        '<Text val={' + prop + '} /> '
+      ).join('') + '</Box>';*/
+      template = parsedSchema
+        .getRequired(true)
+        .map((prop) => {
+          //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
+          return ("<Text val={" + prop + "}/> ")
+        })
+        //.map((prop) => "<Text /> ")
+        .join("");
     }
-    else {
-      template = null;
-    }
-
-    var addTemplate;
-    if (view && view[Globals.addItemModeFieldName] && (
-        view[Globals.addItemModeFieldName] === Globals[Globals.addItemModeAtLoadWithItems] || 
-        view[Globals.addItemModeFieldName] === Globals[Globals.addItemModeAtLoadWithoutItems]
-    )) {
-      addTemplate = "<Form handlers={handlers}>" + template + "</Form>"
-      setAddItem(true);
-    }
+  }
+  else {
+    template = null;
+  }
 
   var rowNb = 0;
 
-  const handleListAuth = function({action = 'patch', item = null, propName = '', callback}) {
-    var auth = false;
-    if (action === "patch") {
-      auth = Utils.validateRWPerm({
-        user: getUser(),
-        list: list,
-        item: item,
-        throwError: false
-      });
-    }
-    else if (action === "post") {
-      auth = Utils.validateCPerm({
-        user: getUser(),
-        list: list,
-        throwError: false
-      });
-    }
-    
-    if (!auth) {
-      // open login dialog
-      setLoginState({
-        open: true, 
-        msg: {
-          severity: "warning",
-          title: "Permission denied",
-          text:
-          'You do not have permissions to edit ' + 
-          (propName ? ('"' + propName + '"') : "item") +
-          '. Please login with valid credentials...',
-  
-        },
-        action: {
-          method: "get",
-          url: "http://localhost:3001/api/opentables/login",
-          callback: (success) => callback(success)
-        },
-        tryFirst: false
-      });
-
-    }
-    else {
-      if (callback && typeof callback === 'function') {
-        callback(true);
+  const handleListAuth = React.useCallback(
+    ({
+      action = 'patch', 
+      item = null, 
+      propName = '', 
+      callback
+    }) => {
+      var auth = false;
+      if (action === "patch") {
+        auth = Utils.validateRWPerm({
+          user: getUser(),
+          list: view[Globals.childlistFieldName],
+          item: item,
+          throwError: false
+        });
       }
+      else if (action === "post") {
+        auth = Utils.validateCPerm({
+          user: getUser(),
+          list: view[Globals.childlistFieldName],
+          throwError: false
+        });
+      }
+      
+      if (!auth) {
+        // open login dialog
+        setLoginState({
+          open: true, 
+          msg: {
+            severity: "warning",
+            title: "Permission denied",
+            text:
+            'You do not have permissions to edit ' + 
+            (propName ? ('"' + propName + '"') : "item") +
+            '. Please login with valid credentials...',
+    
+          },
+          action: {
+            method: "get",
+            url: "http://localhost:3001/api/opentables/login",
+            callback: (success) => callback(success)
+          },
+          tryFirst: false
+        });
+      }
+      else {
+        if (callback && typeof callback === 'function') {
+          callback(true);
+        }
+      }
+      return auth;
+    }, [view, setLoginState]
+  );
+
+  React.useEffect(() => {
+    if (addItemMode === Globals.addItemModeAtLoadWithItems || 
+        addItemMode === Globals.addItemModeAtLoadWithoutItems) {
+      handleListAuth({
+        action: 'post'
+      });
     }
-    return auth;
-  }
+  }, [view, addItemMode, setAddItem, handleListAuth] );
 
   const handleDeleteItem = React.useCallback(
     (itemid, callback) => {
-      if (list) {
+      if (view[Globals.childlistFieldName]) {
         setLoginState({
           open: false,
           msg: {
@@ -167,11 +177,14 @@ function List({
             url: "http://localhost:3001/api/opentables/" + itemid,
             callback: (success, data) => {
               if (success) {
-                var newItemsData = [...list.items];
+                var newItemsData = [...view[Globals.childlistFieldName].items];
                 newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
-                setListData({
-                  ...list,
-                  items: newItemsData
+                setViewData({
+                  ...view,
+                  [Globals.childlistFieldName]: {
+                    ...view[Globals.childlistFieldName],
+                    items: newItemsData
+                  }
                 });
               }
               if (callback && typeof callback === 'function') {
@@ -185,16 +198,18 @@ function List({
       else {
         setErrorMsg({text: "No list is associated to this view. You can not delete items..."});
       }
-    }, [list, setLoginState, setListData, setErrorMsg]
+    }, [view, setLoginState, setViewData, setErrorMsg]
   );
 
   return (
     <Stack sx={sx}>
-      {addItem && addTemplate && 
+      {((addItem && addItemMode === Globals.addItemModeAsForm) || 
+         addItemMode === Globals.addItemModeAtLoadWithItems || 
+         addItemMode === Globals.addItemModeAtLoadWithoutItems
+         ) &&
         <Item
-          //key={item._id}
-          template={addTemplate}
-          listid={list._listid}
+          template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}
+          listid={view[Globals.childlistFieldName]._id}
           item={parsedSchema.getAllDefault(true, getUser())}
           rowNb={0}
           setLoginState={setLoginState}
@@ -202,14 +217,22 @@ function List({
           handleAddItem={handleAddItem}
           handleDeleteItem={handleDeleteItem}
           setViewId={setViewId}
-      />}
-      {template && list && list.items && list.items.map((item) => {
+          addItemMode={addItemMode}
+          setAddItem={setAddItem}
+          backToMainView={setViewId}
+          setErrorMsg={setErrorMsg}
+        />
+      }
+      {template && 
+       view[Globals.childlistFieldName] && 
+       view[Globals.childlistFieldName].items && 
+       view[Globals.childlistFieldName].items.map((item) => {
         rowNb = rowNb + 1;
         return (
           <Item
             key={item._id}
             template={template}
-            listid={list._listid}
+            listid={view[Globals.childlistFieldName]._id}
             item={item}
             rowNb={rowNb}
             setLoginState={setLoginState}
@@ -217,6 +240,7 @@ function List({
             handleAddItem={handleAddItem}
             handleDeleteItem={handleDeleteItem}
             setViewId={setViewId}
+            setErrorMsg={setErrorMsg}
           />
         );
       })}

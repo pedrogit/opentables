@@ -11,7 +11,7 @@ const Globals = require("../common/globals");
 function ConfigPanel({
   configPanelOpen,
   view,
-  list,
+  //list,
   setLoginState,
   setErrorMsg
 }) {
@@ -24,20 +24,24 @@ function ConfigPanel({
           <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>
           <List
             listType='View'
-            view={{item_template: ''}}
-            list={{
-              ...Globals.listOfAllViews,
-              items: view ? [view] : []
+            view={{
+              item_template: '',
+              [Globals.childlistFieldName]: {
+                ...Globals.listOfAllViews,
+                items: view ? [view] : []
+              }
             }}
             setLoginState={setLoginState}
             setErrorMsg={setErrorMsg}
           />
           <List
             listType='List'
-            view={{item_template: ''}}
-            list={{
-              ...Globals.listOfAllLists,
-              items: list ? [list] : []
+            view={{
+              item_template: '',
+              [Globals.childlistFieldName]: {
+                ...Globals.listOfAllLists,
+                items: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
+              }
             }}
             setLoginState={setLoginState}
             setErrorMsg={setErrorMsg}
