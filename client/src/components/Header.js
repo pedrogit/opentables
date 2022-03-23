@@ -35,17 +35,19 @@ function Header({
         buttonsTimeOut = setTimeout(() => setShowButtons(false), 500)
       }}
     >
-    <Toolbar variant="dense" disableGutters sx={{ml:'5px', minHeight: '38px'}}>
+    <Toolbar variant="dense" disableGutters sx={{ml:'5px', minHeight: '52px'}}>
     {(viewOwner && viewName ? (
-        <Stack direction={{ xs: 'column', sm: 'row' }}>
-        <Typography sx={{color: '#FAA', mr: '5px'}}>{(viewOwner + '\'s list of')}</Typography>
-        <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
+        <Stack direction='column'>
+          <Stack direction='row'>
+            <Typography sx={{color: '#222', fontSize: "0.8em", fontStyle: "italic"}}>{viewOwner}</Typography><Typography sx={{color: '#FAA', fontSize: "0.8em", fontStyle: "italic"}}>'s list of</Typography>
+          </Stack>
+          <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
         </Stack>
-        ) : (
+      ) : (
         <Typography sx={{color: '#FAA'}}>Loading...</Typography>
-        ))
+      ))
     }
-    <Box sx={{ flexGrow: 1 }} />
+    <Box sx={{ flexGrow: 1 }}/>
     {showButtons && 
         <Stack direction='row'>
         <LoginButton setViewId={setViewId} setLoginState={setLoginState} />
@@ -75,6 +77,7 @@ function Header({
         </IconButton>
         </Stack>
     }
+
     </Toolbar>
     </AppBar>
   )
