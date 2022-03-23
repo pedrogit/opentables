@@ -56,7 +56,7 @@ describe("testRoutes.js List API", () => {
   describe("2 - POST and GET on list", () => {
     it("2.1 - Post a new list having an invalid field", (done) => {
       lastList = {
-        name: "First test list",
+        [Globals.nameFieldName]: "First test list",
         ["x" + Globals.ownerFieldName]: "p@gmail.com",
         [Globals.readWritePermFieldName]: "@owner",
         [Globals.itemReadWritePermFieldName]: "@owner",
@@ -1320,7 +1320,7 @@ describe("testRoutes.js List API", () => {
     it("11.1 - Add an extra list", (done) => {
       newList = {
         ...lastList,
-        name: "Extra list",
+        [Globals.nameFieldName]: "Extra list",
         [Globals.listSchemaFieldName]: "{}",
       };
       delete newList.items;
@@ -1376,10 +1376,10 @@ describe("testRoutes.js List API", () => {
 
     it("12.1 - Create a new view", (done) => {
       newView = {
-        name: "First view",
+        [Globals.nameFieldName]: "First view",
         [Globals.ownerFieldName]: "p@gmail.com",
         [Globals.readWritePermFieldName]: "@owner",
-        item_template: "",
+        [Globals.itemTemplateFieldName]: "",
         [Globals.childlistFieldName]: listIdToPatch,
       };
       chai
@@ -1427,14 +1427,14 @@ describe("testRoutes.js List API", () => {
     it("12.3 - Patch the view with a new item_template", (done) => {
       newView = {
         ...newView,
-        item_template: "[[field1]]",
+        [Globals.itemTemplateFieldName]: "[[field1]]",
       };
       chai
         .request(server)
         .patch(
           "/api/" + Globals.APIKeyword + "/" + newView[Globals.itemIdFieldName]
         )
-        .send({ item_template: newView.item_template })
+        .send({[Globals.itemTemplateFieldName]: newView[Globals.itemTemplateFieldName]})
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
@@ -1453,7 +1453,7 @@ describe("testRoutes.js List API", () => {
         .delete(
           "/api/" + Globals.APIKeyword + "/" + newView[Globals.itemIdFieldName]
         )
-        .send({ item_template: newView.item_template })
+        .send({[Globals.itemTemplateFieldName]: newView[Globals.itemTemplateFieldName] })
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
@@ -1471,7 +1471,7 @@ describe("testRoutes.js List API", () => {
         .get(
           "/api/" + Globals.APIKeyword + "/" + newView[Globals.itemIdFieldName]
         )
-        .send({ item_template: newView.item_template })
+        .send({[Globals.itemTemplateFieldName]: newView[Globals.itemTemplateFieldName] })
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(404);
@@ -1616,7 +1616,7 @@ describe("testRoutes.js List API", () => {
     it('13.1 - Add a list of referenced items', (done) => {
       refItemList = {
         [Globals.listIdFieldName]: Globals.listofAllListId,
-        name: 'List of referenced items',
+        [Globals.nameFieldName]: 'List of referenced items',
         [Globals.ownerFieldName]: 'pedro@gmail.com', 
         [Globals.readWritePermFieldName]: '@owner',
         [Globals.itemReadWritePermFieldName]: '@owner',
@@ -1643,7 +1643,7 @@ describe("testRoutes.js List API", () => {
     it('13.2 - Post one item to this list', (done) => {
       item = {
         [Globals.listIdFieldName]: refItemListId, 
-        name: 'Item 1',
+        [Globals.nameFieldName]: 'Item 1',
         ref_item: '',
         ref_items: []
       };
@@ -1668,7 +1668,7 @@ describe("testRoutes.js List API", () => {
     it('13.3 - Post a second item referencing the first', (done) => {
       item = {
         [Globals.listIdFieldName]: refItemListId, 
-        name: 'Item 2',
+        [Globals.nameFieldName]: 'Item 2',
         ref_item: firstItemId,
         ref_items: [firstItemId]
       };
@@ -1693,7 +1693,7 @@ describe("testRoutes.js List API", () => {
     it('13.4 - Post a third item referencing the two first ones', (done) => {
       item = {
         [Globals.listIdFieldName]: refItemListId, 
-        name: 'Item 3',
+        [Globals.nameFieldName]: 'Item 3',
         ref_item: secondItemId,
         ref_items: [firstItemId, secondItemId]
       };
@@ -1718,10 +1718,10 @@ describe("testRoutes.js List API", () => {
     it('13.4 - Create a view on the list', (done) => {
       embView = {
         [Globals.listIdFieldName]: Globals.listofAllViewId,
-        name: 'View on embedded items',
+        [Globals.nameFieldName]: 'View on embedded items',
         [Globals.ownerFieldName]: 'p@gmail.com',
         [Globals.readWritePermFieldName]: '@owner',
-        item_template: '',
+        [Globals.itemTemplateFieldName]: '',
         [Globals.childlistFieldName]: refItemListId
       };
       chai.request(server)

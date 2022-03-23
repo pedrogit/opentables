@@ -25,7 +25,7 @@ function ConfigPanel({
           <List
             listType='View'
             view={{
-              item_template: '',
+              [Globals.itemTemplateFieldName]: '',
               [Globals.childlistFieldName]: {
                 ...Globals.listOfAllViews,
                 items: view ? [view] : []
@@ -37,7 +37,7 @@ function ConfigPanel({
           <List
             listType='List'
             view={{
-              item_template: '',
+              [Globals.itemTemplateFieldName]: '',
               [Globals.childlistFieldName]: {
                 ...Globals.listOfAllLists,
                 items: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []

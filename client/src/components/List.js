@@ -76,7 +76,7 @@ function List({
   if (view) {
     // parse the schema and generate a default template if necesssary (should be done in the schema validator)
     parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
-    template = view.item_template;
+    template = view[Globals.itemTemplateFieldName];
 
     if (template === "") {
       /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 

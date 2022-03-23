@@ -12,7 +12,7 @@ describe('List', () => {
     ReactDOM.render(
       <List 
         type='Item' 
-        view={{item_template: ''}} 
+        view={{[Globals.itemTemplateFieldName]: ''}} 
         list={{[Globals.listSchemaFieldName]: {prop1: 'string'}}} 
         items={[{[Globals.itemIdFieldName]: 1, prop1: 'toto'}]}
       />, div);
@@ -22,7 +22,7 @@ describe('List', () => {
     const component = renderer.create(
       <List 
         type='Item' 
-        view={{item_template: ''}} 
+        view={{[Globals.itemTemplateFieldName]: ''}} 
         list={{[Globals.listSchemaFieldName]: {prop1: 'string'}}} 
         items={[{[Globals.itemIdFieldName]: 1, prop1: 'toto'}]}
       />

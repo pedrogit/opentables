@@ -131,7 +131,7 @@ try {
     .then(function (permissionTests) {
 
       lastList = {
-        name: "Permission tests list",
+        [Globals.nameFieldName]: "Permission tests list",
         [Globals.ownerFieldName]: "owner@gmail.com",
         [Globals.readWritePermFieldName]: "x@auth",
         [Globals.itemReadWritePermFieldName]: "x@auth",
@@ -236,7 +236,7 @@ try {
         let j = 3 * i + 4;
         reset();
         let lastList = {
-          name: "Permission tests list",
+          [Globals.nameFieldName]: "Permission tests list",
           [Globals.ownerFieldName]: "owner@gmail.com",
           [Globals.readWritePermFieldName]: "@owner",
           [Globals.itemReadWritePermFieldName]: "@owner",
