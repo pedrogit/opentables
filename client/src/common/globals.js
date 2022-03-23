@@ -95,7 +95,7 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
     name: "Views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    item_template: "<Listlink text={name} listid={_id}/>",
+    item_template: "<Listlink text={name} listid={" + Globals.itemIdFieldName + "}/>",
     [Globals.childlistFieldName]: Globals.listofAllViewId,
   },
   

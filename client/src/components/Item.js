@@ -21,6 +21,7 @@ function Item({
   template,
   listid,
   item,
+  defItem,
   rowNb,
   setLoginState,
   setViewId,
@@ -97,6 +98,7 @@ function Item({
           setViewId: setViewId,
           prop: key,
           val: item[key] ? item[key] : "",
+          def: defItem && defItem[key] ? defItem[key] : key
         };
       }
     }

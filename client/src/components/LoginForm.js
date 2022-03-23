@@ -134,7 +134,6 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
               open: false,
               tryFirst: false
             });
-            //setErrorMsg({text: error.message});
             if (loginState.action.callback && typeof loginState.action.callback === 'function') {
               loginState.action.callback(false, error.message);
             }

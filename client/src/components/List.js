@@ -209,8 +209,9 @@ function List({
          ) &&
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}
-          listid={view[Globals.childlistFieldName]._id}
+          listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
           item={parsedSchema.getAllDefault(true, getUser())}
+          defItem={parsedSchema.getAllDefault(true, getUser())}
           rowNb={0}
           setLoginState={setLoginState}
           handleListAuth={handleListAuth}
@@ -221,6 +222,9 @@ function List({
           setAddItem={setAddItem}
           backToMainView={setViewId}
           setErrorMsg={setErrorMsg}
+          addLabel={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Register" : null)}
+          addMessage={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Welcome to OpenTable. You have been logged in..." : null)}
+          addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Congratulation!" : null)}
         />
       }
       {template && 
@@ -230,9 +234,9 @@ function List({
         rowNb = rowNb + 1;
         return (
           <Item
-            key={item._id}
+            key={item[Globals.itemIdFieldName]}
             template={template}
-            listid={view[Globals.childlistFieldName]._id}
+            listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
             item={item}
             rowNb={rowNb}
             setLoginState={setLoginState}

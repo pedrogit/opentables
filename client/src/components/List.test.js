@@ -14,7 +14,7 @@ describe('List', () => {
         type='Item' 
         view={{item_template: ''}} 
         list={{[Globals.listSchemaFieldName]: {prop1: 'string'}}} 
-        items={[{_id: 1, prop1: 'toto'}]}
+        items={[{[Globals.itemIdFieldName]: 1, prop1: 'toto'}]}
       />, div);
   });
 
@@ -24,7 +24,7 @@ describe('List', () => {
         type='Item' 
         view={{item_template: ''}} 
         list={{[Globals.listSchemaFieldName]: {prop1: 'string'}}} 
-        items={[{_id: 1, prop1: 'toto'}]}
+        items={[{[Globals.itemIdFieldName]: 1, prop1: 'toto'}]}
       />
     );
     let tree = component.toJSON();

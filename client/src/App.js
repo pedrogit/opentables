@@ -46,7 +46,10 @@ function App({ initialViewid, appid }) {
 
   const handleChangeViewId = React.useCallback(
     (viewid) => {
-      setErrorMsg({...errorMsg, open: false});
+      // this was to fix the issue when the text disappear before the panel closes
+      //setErrorMsg({...errorMsg, open: false});
+      setErrorMsg({open: false});
+
       toggleConfigPanel(false);
       setViewId(viewid);
     }, [errorMsg, setErrorMsg, setViewId, toggleConfigPanel]

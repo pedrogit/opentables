@@ -9,6 +9,7 @@ import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
 import Input from '@mui/material/Input';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+
 import { useTheme } from "@mui/material/styles";
 
 const Globals = require("../common/globals");
@@ -50,6 +51,8 @@ function Text({
   inline = false,
   inform = false,
   editmode = false,
+  reset = false,
+  disableReset,
   vertical = false,
   label, 
   nolabel = false,
@@ -57,7 +60,8 @@ function Text({
   sx
 }) {
   const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
-  const propVal = val ? (val.val ? val.val : "Missing value") : undefined
+  const propVal = val ? (val.val ? val.val : "Missing value") : undefined;
+  const defVal = val ? (val.def ? val.def : "Missing default value") : undefined;
 
   const valueRef = React.useRef();
   const theme = useTheme();
@@ -65,9 +69,17 @@ function Text({
   const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
+  React.useEffect(() => {
+    if (reset) {
+      setEditVal(defVal);
+      disableReset();
+    }
+  }, [reset, defVal, setEditVal, disableReset] );
+
   if (val && (propName || editVal)) {
 
     var defaultSx = {};
+
 
     const handleEdit = (e) => {
       if (!inform) {
@@ -196,10 +208,12 @@ function Listlink({text, listid}) {
 }
 
 function ItemWrapperForm({handlers, otherProps, children}) {
+  const [childProps, setChildProps] = React.useState({inform: true, inline: true, editmode: true});
+
   var options = {
     cancelLabel: "Cancel",
     cancelAction: () => otherProps.setAddItem(false),
-    okLabel: "Add",
+    addLabel: "Add",
     addAction: () => otherProps.setAddItem(false)
   };
 
@@ -207,23 +221,36 @@ function ItemWrapperForm({handlers, otherProps, children}) {
     options = {
       ...options,
       cancelAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
+      addLabel: otherProps.addLabel ? otherProps.addLabel : "Save",
       addAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
       addMessage: {
-        text: "Welcome to OpenTable. You have been logged in..."
+        severity:"success",
+        title: "Success!",
+        text: "Your new item was added..."
       }
+    }
+    if (otherProps && otherProps.addMessage) {
+      options.addMessage.text = otherProps.addMessage;
+    }
+    if (otherProps && otherProps.addMessageTitle) {
+      options.addMessage.title = otherProps.addMessageTitle;
     }
   }
 
+  const disableReset = () => {
+    setChildProps({inform: true, inline: true, editmode: true})
+  }
+
   const resetForm = () => {
-    alert('Reset form');
+    setChildProps({inform: true, inline: true, editmode: true, reset: true, disableReset: disableReset});
   }
   
   if (otherProps.addItemMode === Globals.addItemModeAtLoadWithItems) {
     options = {
       cancelLabel: "Reset",
-      cancelAction: resetForm,
-      okLabel: "Add",
-      addAction: resetForm
+      cancelAction: () => resetForm(),
+      addLabel: "Add",
+      addAction: () => resetForm()
     }
   }
 
@@ -238,18 +265,20 @@ function ItemWrapperForm({handlers, otherProps, children}) {
     handlers.handleAddItem({
       item: newItem,
       addToLocalList: otherProps.addItemMode === Globals.addItemModeAtLoadWithoutItems ? false : true,
-      callback: () => {
-        if (options.addMessage) {
-          handlers.setErrorMsg(options.addMessage);
+      callback: (success) => {
+        if (success) {
+          if (options.addMessage) {
+            handlers.setErrorMsg({text: options.addMessage});
+          }
+          options.addAction();
         }
-        options.addAction();
       }
     })
   }
 
   const childrenWithProp = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, {inform: true, inline: true, editmode: true});  
+      return React.cloneElement(child, childProps);  
     }
     return child;
   });
@@ -260,24 +289,19 @@ function ItemWrapperForm({handlers, otherProps, children}) {
     }
   };
 
-  const handleCancel = (e) => {
-
-    options.cancelAction();
-  }
-
   return (
-      <form 
-        onSubmit={handleSubmit}
-        onKeyDown={(e) => keyPressed(e)}
-      >
-        {childrenWithProp}
-        <Stack direction="row" justifyContent="flex-end">
-          <ButtonGroup variant="contained" size="small">
-            <Button id="editCancelButton" onClick={handleCancel}>{options.cancelLabel}</Button>
-            <Button id="editButton" type="submit">{options.okLabel}</Button>
-          </ButtonGroup>
-        </Stack>
-      </form>
+    <form
+      onSubmit={handleSubmit}
+      onKeyDown={keyPressed}
+    >
+      {childrenWithProp}
+      <Stack direction="row" justifyContent="flex-end">
+        <ButtonGroup variant="contained" size="small">
+          <Button id="editCancelButton" onClick={() => options.cancelAction()}>{options.cancelLabel}</Button>
+          <Button id="editButton" type="submit">{options.addLabel}</Button>
+        </ButtonGroup>
+      </Stack>
+    </form>
   )
 }
 

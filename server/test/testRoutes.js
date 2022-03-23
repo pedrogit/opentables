@@ -1355,7 +1355,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           //listOfAllList.items.push(Globals.listOfUsers);
           listOfAllList.items.unshift(Globals.listOfUsers);
-          listOfAllList.items[0]._id = listOfAllList.items[0]._id.toString();
+          listOfAllList.items[0][Globals.itemIdFieldName] = listOfAllList.items[0][Globals.itemIdFieldName].toString();
           listOfAllList.items.forEach(function (v) {
             delete v[Globals.listIdFieldName];
           });
