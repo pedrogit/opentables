@@ -164,7 +164,8 @@ function Text({
                 value={editVal}
                 onChange={(e) => handleChange(e.target.value)}
                 onKeyDown={(e) => keyPressed(e)}
-                autoFocus
+                InputLabelProps={{shrink: true}}
+                autoFocus={inform ? false : true}
               />
             </ClickAwayListener>
             </>
