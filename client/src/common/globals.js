@@ -90,7 +90,7 @@ Globals = {
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
-      "username: {type: string, required}, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
+      "username: {type: string, required, unique}, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
   },
 
   viewOnTheListOfAllViews: {
