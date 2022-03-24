@@ -317,8 +317,8 @@ function ItemWrapperForm({handlers, otherProps, children}) {
         text: "Your new item was added..."
       }
     }
-    if (otherProps && otherProps.addMessage) {
-      options.addMessage.text = otherProps.addMessage;
+    if (otherProps && otherProps.addMessageText) {
+      options.addMessage.text = otherProps.addMessageText;
     }
     if (otherProps && otherProps.addMessageTitle) {
       options.addMessage.title = otherProps.addMessageTitle;
