@@ -52,7 +52,7 @@ function App({ initialViewid, appid }) {
 
       toggleConfigPanel(false);
       setViewId(viewid);
-    }, [errorMsg, setErrorMsg, setViewId, toggleConfigPanel]
+    }, [setErrorMsg, setViewId, toggleConfigPanel]
   );
 
   React.useEffect(() => {
