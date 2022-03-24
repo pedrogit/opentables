@@ -39,8 +39,8 @@ var Globals = {
   addItemModeFieldName: "add_item_mode",
   addItemModeDefault: "default_values",
   addItemModeAsForm: "form",
-  addItemModeAtLoadWithItems: "form_at_load",
-  addItemModeAtLoadWithoutItems: "form_at_load_no_items"
+  addWithPersistentFormAndItems: "persistent_form",
+  addWithPersistentFormNoItems: "persistent_form_no_items"
 };
 
 Globals = {
@@ -78,7 +78,7 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.addItemModeFieldName + ": {type: string, options: [" + Globals.addItemModeDefault + ", " + Globals.addItemModeAsForm + ", " + Globals.addItemModeAtLoadWithItems + "," + Globals.addItemModeAtLoadWithoutItems + "], default: " + Globals.addItemModeDefault + "}, " +
+      Globals.addItemModeFieldName + ": {type: string, options: [" + Globals.addItemModeDefault + ", " + Globals.addItemModeAsForm + ", " + Globals.addWithPersistentFormAndItems + "," + Globals.addWithPersistentFormNoItems + "], default: " + Globals.addItemModeDefault + "}, " +
       Globals.itemTemplateFieldName + ": template, " +
       Globals.childlistFieldName + ": embedded_listid" +
       "}",
@@ -104,7 +104,7 @@ Globals = {
   
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
-    [Globals.nameFieldName]: "Users (add default)",
+    [Globals.nameFieldName]: "Users (add with default values)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.itemTemplateFieldName]: "",
     [Globals.childlistFieldName]: Globals.userListId,
@@ -112,25 +112,25 @@ Globals = {
 
   signUpViewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
-    [Globals.nameFieldName]: "Sign Up (add at load without items)",
+    [Globals.nameFieldName]: "Sign Up (persistent form without items)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.addItemModeFieldName]: Globals.addItemModeAtLoadWithoutItems,
+    [Globals.addItemModeFieldName]: Globals.addWithPersistentFormNoItems,
     [Globals.itemTemplateFieldName]: "<Text val={username}/><Text val={" + Globals.emailFieldName + "} label=\"Email\"/><Password val={password}/>",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 
   viewOnTheListOfUsersAtLoad: {
     [Globals.itemIdFieldName]: (Globals.voidListId + (Globals.signUpViewOnUserListViewId *1 + 1)).slice(-24),
-    [Globals.nameFieldName]: "Users (add at load)",
+    [Globals.nameFieldName]: "Users (persistent form with items)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.addItemModeFieldName]: Globals.addItemModeAtLoadWithItems,
+    [Globals.addItemModeFieldName]: Globals.addWithPersistentFormAndItems,
     [Globals.itemTemplateFieldName]: "",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 
   viewOnTheListOfUsersAsForm: {
     [Globals.itemIdFieldName]: (Globals.voidListId + (Globals.signUpViewOnUserListViewId *1 + 2)).slice(-24),
-    [Globals.nameFieldName]: "Users (add as form)",
+    [Globals.nameFieldName]: "Users (add with form)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.addItemModeFieldName]: Globals.addItemModeAsForm,
     [Globals.itemTemplateFieldName]: "",

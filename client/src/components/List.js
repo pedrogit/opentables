@@ -153,8 +153,8 @@ function List({
   );
 
   React.useEffect(() => {
-    if (addItemMode === Globals.addItemModeAtLoadWithItems || 
-        addItemMode === Globals.addItemModeAtLoadWithoutItems) {
+    if (addItemMode === Globals.addWithPersistentFormAndItems || 
+        addItemMode === Globals.addWithPersistentFormNoItems) {
       handleListAuth({
         action: 'post'
       });
@@ -204,8 +204,8 @@ function List({
   return (
     <Stack sx={sx}>
       {((addItem && addItemMode === Globals.addItemModeAsForm) || 
-         addItemMode === Globals.addItemModeAtLoadWithItems || 
-         addItemMode === Globals.addItemModeAtLoadWithoutItems
+         addItemMode === Globals.addWithPersistentFormAndItems || 
+         addItemMode === Globals.addWithPersistentFormNoItems
          ) &&
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}

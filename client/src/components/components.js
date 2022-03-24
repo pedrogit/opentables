@@ -307,7 +307,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
     addAction: () => otherProps.setAddItem(false)
   };
 
-  if (otherProps.addItemMode === Globals.addItemModeAtLoadWithoutItems) {
+  if (otherProps.addItemMode === Globals.addWithPersistentFormNoItems) {
     options = {
       ...options,
       cancelAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
@@ -338,7 +338,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       disableReset: disableReset});
   }
   
-  if (otherProps.addItemMode === Globals.addItemModeAtLoadWithItems) {
+  if (otherProps.addItemMode === Globals.addWithPersistentFormAndItems) {
     options = {
       cancelLabel: "Reset",
       cancelAction: () => resetForm(),
@@ -363,7 +363,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       }
       handlers.handleAddItem({
         item: newItem,
-        addToLocalList: otherProps.addItemMode === Globals.addItemModeAtLoadWithoutItems ? false : true,
+        addToLocalList: otherProps.addItemMode === Globals.addWithPersistentFormNoItems ? false : true,
         callback: (success) => {
           if (success) {
             if (options.addMessage) {
