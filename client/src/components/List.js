@@ -225,7 +225,7 @@ function List({
           addLabel={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Register" : null)}
           addMessageText={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Welcome to OpenTable. You have been logged in..." : null)}
           addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Congratulation!" : null)}
-          recaptcha={true}
+          recaptcha={getUser() === Globals.allUserName}
         />
       }
       {template && 
