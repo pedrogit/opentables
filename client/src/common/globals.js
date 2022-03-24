@@ -90,14 +90,15 @@ Globals = {
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
-      "username: {type: string, required, unique}, " + Globals.emailFieldName + ": {type: email, required, unique, lower}, password: encrypted_string",
+      "username: {type: string, required, unique}, " + 
+      Globals.emailFieldName + ": {type: email, required, unique, lower}, password: {type: encrypted_string, required}",
   },
 
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
     [Globals.nameFieldName]: "Views",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.itemTemplateFieldName]: "<Listlink text={name} listid={" + Globals.itemIdFieldName + "}/>",
+    [Globals.itemTemplateFieldName]: "<Viewlink text={name} viewid={" + Globals.itemIdFieldName + "}/>",
     [Globals.childlistFieldName]: Globals.listofAllViewId,
   },
   
@@ -114,7 +115,7 @@ Globals = {
     [Globals.nameFieldName]: "Sign Up (add at load without items)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.addItemModeFieldName]: Globals.addItemModeAtLoadWithoutItems,
-    [Globals.itemTemplateFieldName]: "<Text val={username}/><Text val={" + Globals.emailFieldName + "} label=\"Email\"/><PasswordWithConfirmation val={password}/>",
+    [Globals.itemTemplateFieldName]: "<Text val={username}/><Text val={" + Globals.emailFieldName + "} label=\"Email\"/><Password val={password}/>",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 

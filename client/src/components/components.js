@@ -209,13 +209,26 @@ function Text({
   return (<Typography color = 'red'>&lt;Text value is missing /&gt;</Typography>);
 }
 
-function Listlink({text, listid}) {
+/*************************
+ *  Viewlink component
+ *************************/
+function Viewlink({
+  text,  //text to display under the link
+  viewid //viewid of the view to display
+}) {
   return (
-    <Link onClick={() => (listid.setViewId)(listid.val)}>{text ? (text.val ? text.val : "No text property...") : "No text property..."}</Link>
+    <Link onClick={() => (viewid.setViewId)(viewid.val)}>
+      {text ? (text.val ? text.val : "Text property missing...") : "Text property missing..."}
+    </Link>
   )
 }
 
-function PasswordWithConfirmation({
+/*************************
+ *  Password component
+ *  
+ *  Always in edit mode
+ *************************/
+function Password({
   val,
   inline = false,
   pretty = false,
@@ -373,7 +386,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
 }
 
 function allComponentsAsJson() {
-  return { Text, Label, Listlink, PasswordWithConfirmation, ItemWrapperForm };
+  return { Text, Label, Viewlink, Password, ItemWrapperForm };
 }
 
 export { allComponentsAsJson };
