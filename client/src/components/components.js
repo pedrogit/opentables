@@ -81,8 +81,8 @@ function Text({
   if (val && (propName || editVal)) {
 
     var defaultSx = {
-      marginTop: pretty ? "8px" : "inherit",
-      marginBottom: pretty ? "8px" : "inherit"
+      marginTop: inline && pretty && (editmode || isEditing) ? "8px" : "inherit",
+      marginBottom: inline && pretty && (editmode || isEditing) ? "8px" : "inherit"
     };
 
     const handleEdit = (e) => {
@@ -142,7 +142,7 @@ function Text({
     return (
       <>
         <Stack direction={vertical ? "column" : "row"}>
-          {!pretty && <Label 
+          {(!(inline && pretty) || !(editmode || isEditing)) && <Label 
             vertical={vertical} 
             val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
             nolabel={nolabel} 
@@ -234,8 +234,8 @@ function PasswordWithConfirmation({
   const theme = useTheme();
 
   var defaultSx = {
-    marginTop: pretty ? "8px" : "inherit",
-    marginBottom: pretty ? "8px" : "inherit"
+    marginTop: inline && pretty ? "8px" : "inherit",
+    marginBottom: inline && pretty ? "8px" : "inherit"
   };
 
   const handleChange = (val) => {
