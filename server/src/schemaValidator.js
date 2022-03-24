@@ -99,7 +99,6 @@ class SchemaValidator {
             )
           );
         }
-
       }
     }
     else {

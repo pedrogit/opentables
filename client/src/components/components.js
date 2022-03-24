@@ -356,8 +356,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
             e.target[i].type !== "fieldset" && 
             e.target[i].name && 
             e.target[i].name !== "g-recaptcha-response" &&
-            e.target[i].defaultValue &&
-            e.target[i].defaultValue !== "") {
+            e.target[i].defaultValue) {
           newItem[e.target[i].name] = e.target[i].defaultValue;
         }
       }
