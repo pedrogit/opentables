@@ -114,7 +114,7 @@ Globals = {
     [Globals.nameFieldName]: "Sign Up (add at load without items)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.addItemModeFieldName]: Globals.addItemModeAtLoadWithoutItems,
-    [Globals.itemTemplateFieldName]: "<Text val={username} inline/><Text val={" + Globals.emailFieldName + "} label=\"Email\" inline /><Text val={password} inline/>",
+    [Globals.itemTemplateFieldName]: "<Text val={username}/><Text val={" + Globals.emailFieldName + "} label=\"Email\"/><PasswordWithConfirmation val={password}/>",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 
