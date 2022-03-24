@@ -6,13 +6,15 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 function VisibilityPasswordTextField({ ...rest }) {
   const [isVisible, toggleVisible] = React.useState(false);
 
+  var defaultSx = {backgroundColor: 'white', paddingRight: "0px"};
+
   return (
     <TextField
       {...rest}
       type={isVisible ? "text" : "password"}
       InputProps={{
         id: "passwordInput",
-        sx: {backgroundColor: 'white'},
+        sx: {...defaultSx, ...rest.sx, marginTop: "0px", marginBottom: "0px"},
         endAdornment: (
           <InputAdornment position="end">
             <IconButton

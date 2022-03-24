@@ -9,8 +9,9 @@ import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
 import Input from '@mui/material/Input';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-
 import { useTheme } from "@mui/material/styles";
+
+import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 
 const Globals = require("../common/globals");
 
@@ -50,6 +51,7 @@ function Text({
   val, 
   inline = false,
   inform = false,
+  pretty = false,
   editmode = false,
   reset = false,
   disableReset,
@@ -78,8 +80,10 @@ function Text({
 
   if (val && (propName || editVal)) {
 
-    var defaultSx = {};
-
+    var defaultSx = {
+      marginTop: pretty ? "8px" : "inherit",
+      marginBottom: pretty ? "8px" : "inherit"
+    };
 
     const handleEdit = (e) => {
       if (!inform) {
@@ -138,21 +142,24 @@ function Text({
     return (
       <>
         <Stack direction={vertical ? "column" : "row"}>
-          <Label 
+          {!pretty && <Label 
             vertical={vertical} 
             val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
             nolabel={nolabel} 
             sx={labelSx}
-          />
+          />}
           {(editmode || isEditing) && inline ? (
             <>
             <ClickAwayListener onClickAway={setIsEditingOff}>
-              <Input
+              <TextField
                 name={propName}
+                variant={pretty ? "outlined" : "filled"}
                 sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
-                inputProps={{
-                  style: { padding: '0px' }
+                inputProps={pretty? {} : {
+                  style: {padding: '0px'}
                 }}
+                size="small"
+                label={pretty ? (label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)) : null}
                 fullWidth
                 value={editVal}
                 onChange={(e) => handleChange(e.target.value)}
@@ -207,8 +214,67 @@ function Listlink({text, listid}) {
   )
 }
 
+function PasswordWithConfirmation({
+  val,
+  inline = false,
+  pretty = false,
+  vertical = false,
+  reset = false,
+  disableReset,
+  label, 
+  nolabel = false,
+  labelSx = {}, 
+  sx
+}) {
+  const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
+  const propVal = val ? (val.val ? val.val : "Missing value") : undefined;
+  //const defVal = val ? (val.def ? val.def : "Missing default value") : undefined;
+
+  const [editVal, setEditVal] = React.useState(propVal);
+  const theme = useTheme();
+
+  var defaultSx = {
+    marginTop: pretty ? "8px" : "inherit",
+    marginBottom: pretty ? "8px" : "inherit"
+  };
+
+  const handleChange = (val) => {
+    setEditVal(val);
+  };
+
+  return (
+    <>
+      <Stack direction={vertical ? "column" : "row"}>
+        {!pretty && <Label 
+            vertical={vertical} 
+            val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
+            nolabel={nolabel} 
+            sx={labelSx}
+          />
+        }
+        
+        <VisibilityPasswordTextField
+          name={propName}
+          value={editVal}
+          sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
+          inputProps={pretty? {} : {
+            style: {padding: "0px"}
+          }}
+          variant={inline && !pretty ? "filled" : "outlined"}
+          size="small"
+          fullWidth
+          label={inline && !pretty ? null : (label ? label : propName.charAt(0).toUpperCase() + propName.slice(1))}
+          autoComplete="off"
+          onChange={(e) => handleChange(e.target.value)}
+          InputLabelProps={{shrink: true}}
+        />
+      </Stack>
+    </>
+  )
+}
+
 function ItemWrapperForm({handlers, otherProps, children}) {
-  const [childProps, setChildProps] = React.useState({inform: true, inline: true, editmode: true});
+  const [childProps, setChildProps] = React.useState({inform: true, inline: true, pretty: true, editmode: true});
 
   var options = {
     cancelLabel: "Cancel",
@@ -238,11 +304,11 @@ function ItemWrapperForm({handlers, otherProps, children}) {
   }
 
   const disableReset = () => {
-    setChildProps({inform: true, inline: true, editmode: true})
+    setChildProps({inform: true, inline: true, pretty: true, editmode: true})
   }
 
   const resetForm = () => {
-    setChildProps({inform: true, inline: true, editmode: true, reset: true, disableReset: disableReset});
+    setChildProps({inform: true, inline: true, pretty: true, editmode: true, reset: true, disableReset: disableReset});
   }
   
   if (otherProps.addItemMode === Globals.addItemModeAtLoadWithItems) {
@@ -268,7 +334,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       callback: (success) => {
         if (success) {
           if (options.addMessage) {
-            handlers.setErrorMsg({text: options.addMessage});
+            handlers.setErrorMsg(options.addMessage);
           }
           options.addAction();
         }
@@ -306,7 +372,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
 }
 
 function allComponentsAsJson() {
-  return { Text, Label, Listlink, ItemWrapperForm };
+  return { Text, Label, Listlink, PasswordWithConfirmation, ItemWrapperForm };
 }
 
 export { allComponentsAsJson };
