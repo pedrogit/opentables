@@ -28,7 +28,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
 
   React.useEffect(() => {
     if (loginState && loginState.open) {
-      // dont' make the values disappear when closing
+      // don't make the values disappear when closing
       emailRef.current.value = '';
       passwordRef.current.value = '';
       emailRef.current.focus();
@@ -242,7 +242,7 @@ function LoginButton({ setViewId, setLoginState }) {
       variant="text" 
       color="inherit" 
       onClick={() => {
-        if (user) {
+        if (user && user !== Globals.allUserName) {
           Cookies.remove('authtoken');
           setVisible(!visible);
         }
