@@ -53,6 +53,7 @@ function Text({
   inform = false,
   pretty = false,
   editmode = false,
+  noeditdefault = false,
   reset = false,
   disableReset,
   vertical = false,
@@ -68,7 +69,7 @@ function Text({
   const valueRef = React.useRef();
   const theme = useTheme();
 
-  const [editVal, setEditVal] = React.useState(propVal);
+  const [editVal, setEditVal] = React.useState(noeditdefault && propVal === defVal ? "" : propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
   React.useEffect(() => {
@@ -242,9 +243,9 @@ function Password({
 }) {
   const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
   const propVal = val ? (val.val ? val.val : "Missing value") : undefined;
-  //const defVal = val ? (val.def ? val.def : "Missing default value") : undefined;
+  const defVal = val ? (val.def ? val.def : "Missing default value") : undefined;
 
-  const [editVal, setEditVal] = React.useState(propVal);
+  const [editVal, setEditVal] = React.useState(propVal === defVal ? "" : propVal);
   const theme = useTheme();
 
   var defaultSx = {
@@ -288,7 +289,14 @@ function Password({
 }
 
 function ItemWrapperForm({handlers, otherProps, children}) {
-  const [childProps, setChildProps] = React.useState({inform: true, inline: true, pretty: true, editmode: true});
+  const defChildProps = {
+    inform: true, 
+    inline: true, 
+    pretty: true, 
+    editmode: true,
+    noeditdefault: true
+  }
+  const [childProps, setChildProps] = React.useState(defChildProps);
 
   var options = {
     cancelLabel: "Cancel",
@@ -318,11 +326,14 @@ function ItemWrapperForm({handlers, otherProps, children}) {
   }
 
   const disableReset = () => {
-    setChildProps({inform: true, inline: true, pretty: true, editmode: true})
+    setChildProps(defChildProps)
   }
 
   const resetForm = () => {
-    setChildProps({inform: true, inline: true, pretty: true, editmode: true, reset: true, disableReset: disableReset});
+    setChildProps({
+      ...defChildProps, 
+      reset: true, 
+      disableReset: disableReset});
   }
   
   if (otherProps.addItemMode === Globals.addItemModeAtLoadWithItems) {
