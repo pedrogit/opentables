@@ -75,10 +75,10 @@ function Text({
 
   React.useEffect(() => {
     if (reset) {
-      setEditVal(defVal);
+      setEditVal(noeditdefault ? "" : defVal);
       disableReset();
     }
-  }, [reset, defVal, setEditVal, disableReset] );
+  }, [reset, noeditdefault, defVal, setEditVal, disableReset] );
 
   if (val && (propName || editVal)) {
 
