@@ -14,6 +14,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 
 const Globals = require("../common/globals");
+const Errors = require("../common/errors");
 
 /********************
  *  Label component
@@ -297,7 +298,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
     noeditdefault: true
   }
   const [childProps, setChildProps] = React.useState(defChildProps);
-  const [notARobot, setNotARobot] = React.useState(false);
+  const [recaptchaResponse, setRecaptchaResponse] = React.useState('');
 
   var options = {
     cancelLabel: "Cancel",
@@ -348,15 +349,17 @@ function ItemWrapperForm({handlers, otherProps, children}) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!otherProps.recaptcha || (otherProps.recaptcha && notARobot)) {
+    if (!otherProps.recaptcha || (otherProps.recaptcha && recaptchaResponse)) {
       var newItem = {};
       for (var i = 0; i < e.target.length - 1; i++) {
         if (e.target[i].type !== "button" && 
             e.target[i].type !== "fieldset" && 
             e.target[i].name !== undefined && 
-            e.target[i].name !== "g-recaptcha-response" &&
             e.target[i].defaultValue !== undefined) {
           newItem[e.target[i].name] = e.target[i].defaultValue;
+        }
+        if (e.target[i].name === Globals.gRecaptchaResponse) {
+          newItem[Globals.gRecaptchaResponse] = recaptchaResponse;
         }
       }
       handlers.handleAddItem({
@@ -373,7 +376,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       })
     }
     else {
-      handlers.setErrorMsg({text: "You must prove that you are not a robot..."});
+      handlers.setErrorMsg({text: Errors.ErrMsg.Recaptcha_Failed});
     }
    }
 
@@ -399,8 +402,8 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       {otherProps.recaptcha &&
         <ReCAPTCHA
           sitekey="6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V"
-          onChange={() => setNotARobot(true)}
-          onExpired={() => setNotARobot(false)}
+          onChange={(value) => setRecaptchaResponse(value)}
+          onExpired={() => recaptchaResponse('')}
         />
       }
       <Stack direction="row" justifyContent="flex-end">

@@ -1,5 +1,6 @@
 const MongoDB = require("mongodb");
 const NodeUtil = require("util");
+const axios = require("axios");
 require("dotenv").config();
 
 const Errors = require("../../client/src/common/errors");
@@ -98,6 +99,26 @@ class Controler {
         process.exit();
       }  
     })
+  }
+
+  static async validateRecaptcha(item) {
+    var humanKey = item[Globals.gRecaptchaResponse];
+    delete item[Globals.gRecaptchaResponse];
+    if (humanKey) {
+      var isHuman;
+      try {
+        isHuman = await axios.post(
+          "https://www.google.com/recaptcha/api/siteverify?secret=" +
+          process.env.RECAPTCHA_SERVER_KEY + "&response=" + humanKey
+        );
+      }
+      catch (err){
+        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
+      }
+      if (isHuman === null || !isHuman.data || isHuman.data.success !== true) {
+        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
+      }
+    }
   }
 
   static isList(item) {
@@ -360,6 +381,9 @@ class Controler {
   }
 
   async insertMany(user, listid, item) {
+    // validate the recaptcha if necessary
+    await Controler.validateRecaptcha(item);
+
     // find the parent list
     var parentList = await this.getParentList(listid);
 

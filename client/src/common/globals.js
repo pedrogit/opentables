@@ -42,7 +42,8 @@ var Globals = {
   addWithPersistentFormAndItems: "persistent_form",
   addWithPersistentFormNoItems: "persistent_form_no_items",
 
-  noDefault: "nodefault"
+  noDefault: "nodefault",
+  gRecaptchaResponse: "g-recaptcha-response"
 };
 
 Globals = {

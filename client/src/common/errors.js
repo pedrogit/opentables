@@ -78,6 +78,8 @@ var ErrMsg = {
   Filter_InvalidFilter: "Invalid filter (%s)...",
   Filter_Malformed: "JSON filter is not well formed...",
 
+  Recaptcha_Failed: "You failed to prove that you are not a robot...",
+
   ComponentParser_Invalid: "Invalid component description (%s)...",
 };
 
