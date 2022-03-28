@@ -125,10 +125,7 @@ describe("testRoutes.js List API", () => {
           };
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           listIdToPatch = response.body[Globals.itemIdFieldName];
           done();
         });
@@ -138,11 +135,9 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword)
-        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           var expectedView = {
             ...Utils.objWithout(Globals.viewOnTheListOfAllViews, Globals.childlistFieldName),
-            [Globals.listIdFieldName]: '000000000000000000000002',
             [Globals.itemIdFieldName]: '000000000000000000000004'
           }
           expect(response).to.have.status(200);
@@ -194,10 +189,7 @@ describe("testRoutes.js List API", () => {
           };
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -303,10 +295,7 @@ describe("testRoutes.js List API", () => {
           delete lastList.items;
 
           expect(response).to.have.status(200);
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -404,13 +393,12 @@ describe("testRoutes.js List API", () => {
             ...firstItem,
             [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
           };
-          lastItems = [Utils.objWithout(firstItem, Globals.listIdFieldName)];
+          delete firstItem[Globals.listIdFieldName];
+          lastItems = [firstItem];
+
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...firstItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(firstItem);
           done();
         });
     });
@@ -432,13 +420,11 @@ describe("testRoutes.js List API", () => {
             ...secondItem,
             [Globals.itemIdFieldName]: itemIdToPatch,
           };
-          lastItems.push(Utils.objWithout(secondItem, Globals.listIdFieldName));
+          delete secondItem[Globals.listIdFieldName];
+          lastItems.push(secondItem);
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -483,8 +469,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            items: lastItems,
-            [Globals.listIdFieldName]: Globals.listofAllListId
+            items: lastItems
           });
           done();
         });
@@ -497,10 +482,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -519,10 +501,7 @@ describe("testRoutes.js List API", () => {
           lastItems.push(Utils.objWithout(defaultItem, Globals.listIdFieldName));
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...defaultItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(defaultItem);
           done();
         });
     });
@@ -591,10 +570,7 @@ describe("testRoutes.js List API", () => {
           lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -605,10 +581,7 @@ describe("testRoutes.js List API", () => {
         .get("/api/" + Globals.APIKeyword + "/" + itemIdToPatch)
         .end((err, response) => {
           expect(response).to.have.status(200);
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -631,10 +604,7 @@ describe("testRoutes.js List API", () => {
           lastItems[1] = Utils.objWithout(secondItem, Globals.listIdFieldName);
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -645,10 +615,7 @@ describe("testRoutes.js List API", () => {
         .get("/api/" + Globals.APIKeyword + "/" + itemIdToPatch)
         .end((err, response) => {
           expect(response).to.have.status(200);
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -662,8 +629,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            items: lastItems,
-            [Globals.listIdFieldName]: Globals.listofAllListId
+            items: lastItems
           });
           done();
         });
@@ -688,10 +654,7 @@ describe("testRoutes.js List API", () => {
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -719,10 +682,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -745,10 +705,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -765,17 +722,10 @@ describe("testRoutes.js List API", () => {
         .send(secondItemPatch)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
-          secondItem = {
-            ...secondItem,
-            ...{ field3: response.body.field3 },
-          };
+          // encrypted string values are hidden so they are not sent back to the client
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
-          expect(bcrypt.compareSync(pw, response.body.field3)).to.be.true;
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -785,7 +735,6 @@ describe("testRoutes.js List API", () => {
     it("7.1 - Patch listschema with an invalid type for field4", (done) => {
       var invalidSchema =
         '{"field1": {"type": "string", required, lower}, "field2": {"type": "string", required, upper}, "field3": "encrypted_string", "field4": "toto"}';
-      //var invalidSchema = "{\"field1\": {\"type\": \"string\", required, lower}, \"field2\": {\"type\": \"string\", required, upper}, \"field3\": \"encrypted_string\", \"field4\": \"toto\"}";
       chai
         .request(server)
         .patch("/api/" + Globals.APIKeyword + "/" + listIdToPatch)
@@ -820,10 +769,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -863,7 +809,6 @@ describe("testRoutes.js List API", () => {
           secondItem = {
             ...secondItem,
             ...{
-              field3: response.body.field3,
               field4: "field4 value4",
             },
           };
@@ -871,12 +816,7 @@ describe("testRoutes.js List API", () => {
 
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...secondItem,
-            [Globals.listIdFieldName]: listIdToPatch
-          });
-          expect(bcrypt.compareSync("new password", response.body.field3)).to.be
-            .true;
+          expect(response.body).to.deep.equal(secondItem);
           done();
         });
     });
@@ -898,8 +838,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) },
-            [Globals.listIdFieldName]: Globals.listofAllListId
+            ...{ items: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -920,8 +859,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) },
-            [Globals.listIdFieldName]: Globals.listofAllListId
+            ...{ items: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -940,10 +878,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -963,8 +898,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) },
-            [Globals.listIdFieldName]: Globals.listofAllListId
+            ...{ items: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -985,8 +919,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) },
-            [Globals.listIdFieldName]: Globals.listofAllListId
+            ...{ items: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -1005,10 +938,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -1037,10 +967,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           done();
         });
     });
@@ -1082,22 +1009,26 @@ describe("testRoutes.js List API", () => {
         .send(dupItem)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
-          lastItems.push(Utils.objWithout(
+          /*lastItems.push(Utils.objWithout(
             {
               ...dupItem,
               field2: dupItem.field2.toUpperCase(),
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
             },
             Globals.listIdFieldName
-          ));
+          ));*/
+          lastItems.push({
+            ...dupItem,
+            field2: dupItem.field2.toUpperCase(),
+            [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
+          });
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
           itemIdToPatch = response.body[Globals.itemIdFieldName];
           expect(response.body).to.deep.equal({
             ...dupItem,
             field2: dupItem.field2.toUpperCase(),
-            [Globals.itemIdFieldName]: itemIdToPatch,
-            [Globals.listIdFieldName]: listIdToPatch
+            [Globals.itemIdFieldName]: itemIdToPatch
           });
           done();
         });
@@ -1134,19 +1065,20 @@ describe("testRoutes.js List API", () => {
       newUser = {
         username: "User1Username",
         [Globals.emailFieldName]: "user1@gmail.com",
-        password: pw,
       };
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/" + Globals.userListId)
-        .send(newUser)
+        .send({
+          ...newUser,
+          password: pw
+        })
         .end((err, response) => {
           newUser = {
             ...newUser,
             ...{
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-              [Globals.emailFieldName]: newUser[Globals.emailFieldName].toLowerCase(),
-              password: response.body.password,
+              [Globals.emailFieldName]: newUser[Globals.emailFieldName].toLowerCase()
             },
           };
 
@@ -1154,11 +1086,7 @@ describe("testRoutes.js List API", () => {
 
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...newUser,
-            [Globals.listIdFieldName]: Globals.userListId
-          });
-          expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
+          expect(response.body).to.deep.equal(newUser);
           expect(response).to.have.cookie("authtoken");
 
           cookies = setCookie.parse(response);
@@ -1183,10 +1111,7 @@ describe("testRoutes.js List API", () => {
           };
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           expect(response).to.have.cookie("authtoken");
           done();
         });
@@ -1306,10 +1231,7 @@ describe("testRoutes.js List API", () => {
           };
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal({
-            ...lastList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(lastList);
           expect(response).to.have.cookie("authtoken");
           done();
         });
@@ -1338,10 +1260,7 @@ describe("testRoutes.js List API", () => {
           };
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...newList,
-            [Globals.listIdFieldName]: Globals.listofAllListId
-          });
+          expect(response.body).to.deep.equal(newList);
           listOfAllList.items.push(newList);
           done();
         });
@@ -1351,9 +1270,7 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
-        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
-          //listOfAllList.items.push(Globals.listOfUsers);
           listOfAllList.items.unshift(Globals.listOfUsers);
           listOfAllList.items[0][Globals.itemIdFieldName] = listOfAllList.items[0][Globals.itemIdFieldName].toString();
           listOfAllList.items.forEach(function (v) {
@@ -1362,10 +1279,7 @@ describe("testRoutes.js List API", () => {
 
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...listOfAllList,
-            [Globals.listIdFieldName]: Globals.voidListId
-          });
+          expect(response.body).to.deep.equal(listOfAllList);
           done();
         });
     });
@@ -1394,10 +1308,7 @@ describe("testRoutes.js List API", () => {
           };
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...newView,
-            [Globals.listIdFieldName]: Globals.listofAllViewId
-          });
+          expect(response.body).to.deep.equal(newView);
           done();
         });
     });
@@ -1408,17 +1319,12 @@ describe("testRoutes.js List API", () => {
         .get(
           "/api/" + Globals.APIKeyword + "/" + newView[Globals.itemIdFieldName]
         )
-        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
           expect(response.body).to.deep.equal({
             ...newView,
-            [Globals.childlistFieldName]: {
-              ...lastList,
-              [Globals.listIdFieldName]: Globals.listofAllListId
-            },
-            [Globals.listIdFieldName]: Globals.listofAllViewId,
+            [Globals.childlistFieldName]: lastList
           });
           done();
         });
@@ -1439,10 +1345,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...newView,
-            [Globals.listIdFieldName]: Globals.listofAllViewId
-          });
+          expect(response.body).to.deep.equal(newView);
           done();
         });
     });
@@ -1494,7 +1397,6 @@ describe("testRoutes.js List API", () => {
         .get(
           "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId
         )
-        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
@@ -1502,10 +1404,8 @@ describe("testRoutes.js List API", () => {
             ...Globals.viewOnTheListOfUsers,
             [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
-              [Globals.listIdFieldName]: Globals.listofAllListId,
               items: userList
-            },
-            [Globals.listIdFieldName]: Globals.listofAllViewId
+            }
           }
           expect(Utils.objWithout(response.body, Globals.childlistFieldName)).to.deep.equal(Utils.objWithout(expected, Globals.childlistFieldName));
           expect(Utils.objWithout(response.body[Globals.childlistFieldName], 'items')).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], 'items'));
@@ -1517,22 +1417,23 @@ describe("testRoutes.js List API", () => {
     var pw = "user2Password"
     var user2 = {
       username: "User2Username",
-      [Globals.emailFieldName]: "User2@gmail.com",
-      password: pw,
+      [Globals.emailFieldName]: "User2@gmail.com"
     };
 
     it("13.2 - Register a new user", (done) => {
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/" + Globals.userListId)
-        .send(user2)
+        .send({
+          ...user2,
+          password: pw
+        })
         .end((err, response) => {
           user2 = {
             ...user2,
             ...{
               [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-              [Globals.emailFieldName]: user2[Globals.emailFieldName].toLowerCase(),
-              password: response.body.password,
+              [Globals.emailFieldName]: user2[Globals.emailFieldName].toLowerCase()
             },
           };
 
@@ -1540,11 +1441,7 @@ describe("testRoutes.js List API", () => {
 
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
-          expect(response.body).to.deep.equal({
-            ...user2,
-            [Globals.listIdFieldName]: Globals.userListId
-          });
-          expect(bcrypt.compareSync(pw, response.body.password)).to.be.true;
+          expect(response.body).to.deep.equal(user2);
           expect(response).to.have.cookie("authtoken");
 
           cookies = setCookie.parse(response);
@@ -1559,7 +1456,6 @@ describe("testRoutes.js List API", () => {
         .get(
           "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId + "?filter=$isexactly_i:[$" + [Globals.emailFieldName] + ",\"" + user2[Globals.emailFieldName] + "\"]"
         )
-        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
@@ -1568,10 +1464,8 @@ describe("testRoutes.js List API", () => {
             ...Globals.viewOnTheListOfUsers,
             [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
-              [Globals.listIdFieldName]: Globals.listofAllListId,
               items: [user2]
-            },
-            [Globals.listIdFieldName]: Globals.listofAllViewId
+            }
           }
           expect(Utils.objWithout(response.body, Globals.childlistFieldName)).to.deep.equal(Utils.objWithout(expected, Globals.childlistFieldName));
           expect(Utils.objWithout(response.body[Globals.childlistFieldName], 'items')).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], 'items'));
@@ -1586,18 +1480,13 @@ describe("testRoutes.js List API", () => {
         .get(
           "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId + "/?noitems=true"
         )
-        //.auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.an("object");
 
           var expected = {
             ...Globals.viewOnTheListOfUsers,
-            [Globals.childlistFieldName]: {
-              ...Globals.listOfUsers,
-              [Globals.listIdFieldName]: Globals.listofAllListId
-            },
-            [Globals.listIdFieldName]: Globals.listofAllViewId
+            [Globals.childlistFieldName]: Globals.listOfUsers
           }
           expect(response.body).to.deep.equal(expected);
           done();

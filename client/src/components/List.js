@@ -83,7 +83,7 @@ function List({
         '<Text val={' + prop + '} /> '
       ).join('') + '</Box>';*/
       template = parsedSchema
-        .getRequired(true)
+        .getRequired(true, true)
         .map((prop) => {
           //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
           return ("<Text val={" + prop + "} inline pretty/> ")
@@ -210,8 +210,8 @@ function List({
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}
           listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
-          item={parsedSchema.getAllDefault(true, getUser())}
-          defItem={parsedSchema.getAllDefault(true, getUser())}
+          item={parsedSchema.getAllDefault({onlyRequired: true, user: getUser()})}
+          defItem={parsedSchema.getAllDefault({onlyRequired: true, user: getUser()})}
           rowNb={0}
           setLoginState={setLoginState}
           handleListAuth={handleListAuth}

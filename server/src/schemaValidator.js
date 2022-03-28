@@ -8,7 +8,7 @@ const Utils = require("../../client/src/common/utils");
 const Schema = require("../../client/src/common/schema");
 
 class SchemaValidator {
-  constructor(schema, controler = null, listid = null) {
+  constructor(schema, controler = null, listid = null, post = false) {
     if (schema == null) {
       throw new Error(Errors.ErrMsg.Schema_Null);
     }
@@ -33,13 +33,16 @@ class SchemaValidator {
     if (controler !== null) {
       this.controler = controler;
     }
+
+    if (post !== null) {
+      this.post = post;
+    }
   }
 
   // traverse a json object calling provided callbacks according to the right level
   async traverse(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {
       //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
-
       if (
         !(callbacks[level] === null) &&
         typeof callbacks[level] === "function"
@@ -49,8 +52,8 @@ class SchemaValidator {
 
       if (
         obj[key] !== null &&
-        typeof obj[key] == "object" &&
-        obj[key].constructor.name != "ObjectId"
+        typeof obj[key] === "object" &&
+        obj[key].constructor.name !== "ObjectId"
       ) {
         //going one step down in the object tree!!
         await this.traverse(obj[key], key, ++level, callbacks);
@@ -80,11 +83,15 @@ class SchemaValidator {
       //console.log(jsonkeys);
       if (jsonkeys.length === 0){
         // generate default values for all required properties
-        json = this.schema.getAllDefault(user);
+        json = this.schema.getAllDefault({
+          onlyRequired: true,
+          throwIfNoDefault: true,
+          user: user
+        });
       }
       else {
         var missingField = "";
-        if (!this.schema.getRequired().every((key) => {
+        if (!this.schema.getRequired(false, false, true).every((key) => {
             var inc = jsonkeys.includes(key);
             if (!inc) {
               missingField = key;
@@ -139,6 +146,10 @@ class SchemaValidator {
               obj[key],
               (obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null)
             ); // pass object by value so the validator can modify it directly
+            if (this.post && obj[key] === undefined) {
+              delete obj[key];
+              break;
+            }
         }
       }
       // if this.schema.schema[key] is a simple type validate it
@@ -182,6 +193,10 @@ class SchemaValidator {
   }
 
   validate_type_embedded_listid(key, val) {
+    // if in post mode, do not validate, just return val
+    if (this.post) {
+      return val;
+    }
     if (!MongoDB.ObjectId.isValid(val)) {
       throw new Error(
         NodeUtil.format(
@@ -196,7 +211,8 @@ class SchemaValidator {
   }
 
   validate_type_embedded_itemid(key, val) {
-    if (val === "") {
+    // if in post mode, do not validate, just return val
+    if (this.post || val === "") {
       return val;
     }
     if (!MongoDB.ObjectId.isValid(val)) {
@@ -213,6 +229,11 @@ class SchemaValidator {
   }
 
   validate_type_embedded_itemid_list(key, val) {
+    // if in post mode, do not validate, just return val
+    if (this.post) {
+      return val;
+    }
+    
     var valArr = val;
     try {
       if (!(valArr instanceof Array)) {
@@ -305,6 +326,10 @@ class SchemaValidator {
   }
 
   async validate_type_encrypted_string(key, val) {
+    // encrypted strings are hidden by default
+    if (this.post) {
+      return undefined;
+    }
     if (typeof val !== "string") {
       throw new Error(
         NodeUtil.format(
@@ -315,8 +340,11 @@ class SchemaValidator {
         )
       );
     }
-    var encryptedStr = await this.validate_encrypt(null, key, val);
-    return encryptedStr;
+    if (val !== "") {
+      var encryptedStr = await this.validate_encrypt(null, key, val);
+      return encryptedStr;      
+    }
+    return val;
   }
 
   validate_type_number(key, val) {
@@ -418,6 +446,10 @@ class SchemaValidator {
   }
 
   async validate_encrypt(type, key, val) {
+    // encrypted strings are hidden by default
+    if (this.post) {
+      return undefined;
+    }
     var hash = await bcrypt.hash(val, 10);
     return hash;
   }
@@ -456,6 +488,17 @@ class SchemaValidator {
   }
 
   validate_default(type, key, val) {
+    return val;
+  }
+
+  validate_nodefault(type, key, val) {
+    return val;
+  }
+
+  validate_hidden(type, key, val) {
+    if (this.post) {
+      return undefined;
+    }
     return val;
   }
 

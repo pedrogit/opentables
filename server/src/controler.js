@@ -98,71 +98,6 @@ class Controler {
         process.exit();
       }  
     })
-
-    /*console.log("Create the " + Globals.viewOnTheListOfAllViews['name'] + "...");
-    try {
-      item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
-        Globals.listofAllViewId,
-        {...Globals.viewOnTheListOfAllViews}
-      );
-    } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfAllViews['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
-      process.exit();
-    }
-
-    console.log("Create the " + Globals.viewOnTheListOfUsers['name'] + "...");
-    try {
-      item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
-        Globals.listofAllViewId,
-        {...Globals.viewOnTheListOfUsers}
-      );
-    } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsers['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
-      process.exit();
-    }
-
-    console.log("Create the " + Globals.viewOnTheListOfUsersAtLoad['name'] + "...");
-    try {
-      item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
-        Globals.listofAllViewId,
-        {...Globals.viewOnTheListOfUsersAtLoad}
-      );
-    } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsersAtLoad['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
-      process.exit();
-    }
-
-    console.log("Create the " + Globals.viewOnTheListOfUsersAsForm['name'] + "...");
-    try {
-      item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
-        Globals.listofAllViewId,
-        {...Globals.viewOnTheListOfUsersAsForm}
-      );
-    } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.viewOnTheListOfUsersAsForm['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
-      process.exit();
-    }
-
-    console.log("Create the " + Globals.signUpViewOnTheListOfUsers['name'] + "...");
-    try {
-      item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
-        Globals.listofAllViewId,
-        {...Globals.signUpViewOnTheListOfUsers}
-      );
-    } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.signUpViewOnTheListOfUsers['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
-      process.exit();
-    }*/
   }
 
   static isList(item) {
@@ -205,13 +140,11 @@ class Controler {
       );
     }
     
-    if (listid === Globals.voidListId) {
+    if (listid.toString() === Globals.voidListId) {
       parentList = Globals.listOfAllLists;
     } else {
       parentList = await this.coll.findOne({
-        [Globals.itemIdFieldName]: MongoDB.ObjectId(
-          listid
-        ),
+        [Globals.itemIdFieldName]: MongoDB.ObjectId(listid),
       });
     }
     if (!parentList) {
@@ -304,6 +237,14 @@ class Controler {
           { $lookup: lookup },
           { $unset: "items." + Globals.listIdFieldName },
         ];
+
+        // remove hidden properties
+        const schema = new Schema(item[Globals.listSchemaFieldName]);
+
+        schema.getHidden().map(async (hidden) => {
+          pipeline.push({ $unset: "items." + hidden })
+        });
+
         item = await this.coll.aggregate(pipeline).toArray();
         item = item[0];
 
@@ -317,11 +258,26 @@ class Controler {
           });
         });
 
-        // remove items for which the user do not have read permissions
+        // delete the items property if there are none
         if (item.items.length === 0) {
           delete item.items;
         }
       }
+
+      var parentList = await this.getParentList(item[Globals.listIdFieldName]);
+
+      var items = item.items;
+      // post validate the item against schema (mostly to remove hidden properties)
+      delete item[Globals.listIdFieldName];
+      item = await this.validateItems(
+        parentList[Globals.listSchemaFieldName],
+        Utils.objWithout(item, "items"),
+        false,
+        parentList[Globals.itemIdFieldName],
+        user,
+        true
+      );
+      item.items = items;
     } else {
       // find item schema
       var parentList = await this.getParentList(item[Globals.listIdFieldName]);
@@ -345,8 +301,18 @@ class Controler {
           }
         })
       );
-    }
 
+      // post validate the item against schema (mostly to remove hidden properties)
+      delete item[Globals.listIdFieldName];
+      item = await this.validateItems(
+        parentList[Globals.listSchemaFieldName],
+        item,
+        false,
+        parentList[Globals.itemIdFieldName],
+        user,
+        true
+      );
+    }
     return item;
   }
 
@@ -354,7 +320,7 @@ class Controler {
     Validate items against the schema stored in the item with _id = listid
     When strict is false, ignore fields which are not in the schema, otherwise throw an error
   */
-  async validateItems(schemaStr, items, strict, listid = null, user = null) {
+  async validateItems(schemaStr, items, strict, listid = null, user = null, post = false) {
     var newItems;
 
     // validate provided JSON against the schema
@@ -363,7 +329,8 @@ class Controler {
       const schemaValidator = new SchemaValidator(
         schema,
         this,
-        listid
+        listid,
+        post
       );
 
       // validate many or one
@@ -432,6 +399,19 @@ class Controler {
     if (newItems.acknowledged !== undefined) {
       delete newItems.acknowledged;
     }
+    else {
+      // post validate the item against schema (mostly to remove hidden properties)
+      delete newItems[Globals.listIdFieldName];
+
+      newItems = await this.validateItems(
+        parentList[Globals.listSchemaFieldName],
+        newItems,
+        false,
+        listid,
+        user,
+        true
+      );
+    }
 
     return newItems;
   }
@@ -484,7 +464,19 @@ class Controler {
     if (!item.ok) {
       throw new Errors.InternalServerError(Errors.ErrMsg.Item_CouldNotUpdate);
     }
-    return item.value;
+
+    // post validate the item against schema (mostly to remove hidden properties)
+    delete item.value[Globals.listIdFieldName];
+    item = await this.validateItems(
+      parentList[Globals.listSchemaFieldName],
+      item.value,
+      false,
+      item.value[Globals.listIdFieldName],
+      user,
+      true
+    );
+      
+    return item;
   }
 
   deleteAll(user, all = false) {
@@ -510,22 +502,7 @@ class Controler {
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
-          },
-          /*{ // users list view
-            [Globals.itemIdFieldName]: {
-              $ne: MongoDB.ObjectId(Globals.viewOnUserListViewId),
-            },
-          },
-          { // view on list of views
-            [Globals.itemIdFieldName]: {
-              $ne: MongoDB.ObjectId(Globals.viewOnAllViewViewId),
-            },
-          },
-          { // sign up view
-            [Globals.itemIdFieldName]: {
-              $ne: MongoDB.ObjectId(Globals.signUpViewOnUserListViewId),
-            },
-          },*/
+          }
         ],
       };
 

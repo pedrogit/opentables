@@ -40,7 +40,20 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
     );
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
-    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", required: true}}}});
+    expect(schemaValidator).to.deep.equal({
+      post: false, 
+      schema: {
+        required: ["prop1"], 
+        hidden: [], 
+        noDefault: [], 
+        schema: {
+          prop1: {
+            type: "string", 
+            required: true
+          }
+        }
+      }
+    });
   });
 
   it("1.4 Pass JSON schema", () => {
@@ -49,7 +62,20 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
     });
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
-    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", required: true}}}});
+    expect(schemaValidator).to.deep.equal({
+      post: false, 
+      schema: {
+        required: ["prop1"], 
+        hidden: [], 
+        noDefault: [], 
+        schema: {
+          prop1: {
+            type: "string", 
+            required: true
+          }
+        }
+      }
+    });
   });
 
   it("1.5 Test an invalid level one schema parameter", () => {
@@ -65,14 +91,40 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
     var schemaValidator = new SchemaValidator("prop1: {type: string, options: \"a, b, c\"}");
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
-    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", options: "a, b, c"}}}});
+    expect(schemaValidator).to.deep.equal({
+      post: false, 
+      schema: {
+        required: [], 
+        hidden: [], 
+        noDefault: [], 
+        schema: {
+          prop1: {
+            type: "string", 
+            options: "a, b, c"
+          }
+        }
+      }
+    });
   });
 
   it("1.7 Valid string with options as a string list", async () => {
     var schemaValidator = new SchemaValidator("prop1: {type: string, options: [a_a, b_b, c_c]}");
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
-    expect(schemaValidator).to.deep.equal({schema: {schema: {prop1: {type: "string", options: ["a_a", "b_b", "c_c"]}}}});
+    expect(schemaValidator).to.deep.equal({
+      post: false, 
+      schema: {
+        required: [], 
+        hidden: [], 
+        noDefault: [],
+        schema: {
+          prop1: {
+            type: "string", 
+            options: ["a_a", "b_b", "c_c"]
+          }
+        }
+      }
+    });
   });
 
   it("1.8 Empty options", async () => {
@@ -90,7 +142,11 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
     
     expect(schemaValidator).to.be.an("object");
     expect(schemaValidator).to.deep.equal({
+      post: false, 
       schema: {
+        required: ["name", "owner"], 
+        hidden: [], 
+        noDefault: [],
         schema: {
           name: {
             type: "string",

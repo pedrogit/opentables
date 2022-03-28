@@ -7,7 +7,6 @@ import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
-import Input from '@mui/material/Input';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { useTheme } from "@mui/material/styles";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -63,9 +62,9 @@ function Text({
   labelSx = {}, 
   sx
 }) {
-  const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
-  const propVal = val ? (val.val ? val.val : "Missing value") : undefined;
-  const defVal = val ? (val.def ? val.def : "Missing default value") : undefined;
+  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
+  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
+  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
 
   const valueRef = React.useRef();
   const theme = useTheme();
@@ -242,9 +241,9 @@ function Password({
   labelSx = {}, 
   sx
 }) {
-  const propName = val ? (val.prop ? val.prop : "Missing property name") : undefined;
-  const propVal = val ? (val.val ? val.val : "Missing value") : undefined;
-  const defVal = val ? (val.def ? val.def : "Missing default value") : undefined;
+  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
+  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
+  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
 
   const [editVal, setEditVal] = React.useState(propVal === defVal ? "" : propVal);
   const theme = useTheme();
@@ -354,9 +353,9 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       for (var i = 0; i < e.target.length - 1; i++) {
         if (e.target[i].type !== "button" && 
             e.target[i].type !== "fieldset" && 
-            e.target[i].name && 
+            e.target[i].name !== undefined && 
             e.target[i].name !== "g-recaptcha-response" &&
-            e.target[i].defaultValue) {
+            e.target[i].defaultValue !== undefined) {
           newItem[e.target[i].name] = e.target[i].defaultValue;
         }
       }

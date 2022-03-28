@@ -17,6 +17,7 @@ var Globals = {
   emailFieldName: "owner",
   itemTemplateFieldName: "item_template",
   childlistFieldName: "_childlist",
+  addItemModeFieldName: "add_item_mode",
 
   readPermFieldName: "r_permissions",
   readWritePermFieldName: "rw_permissions",
@@ -36,11 +37,12 @@ var Globals = {
 
   identifierRegEx: "\\$?[a-zA-Z0-9_-]+",
 
-  addItemModeFieldName: "add_item_mode",
   addItemModeDefault: "default_values",
   addItemModeAsForm: "form",
   addWithPersistentFormAndItems: "persistent_form",
-  addWithPersistentFormNoItems: "persistent_form_no_items"
+  addWithPersistentFormNoItems: "persistent_form_no_items",
+
+  noDefault: "nodefault"
 };
 
 Globals = {
@@ -57,7 +59,7 @@ Globals = {
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.listSchemaFieldName]:
       "{" +
-      Globals.nameFieldName + ": {type: string, required, default: 'List name'}, " +
+      Globals.nameFieldName + ": {type: string, required, default: 'List Name'}, " +
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
@@ -74,11 +76,15 @@ Globals = {
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.listSchemaFieldName]:
       "{" +
-      Globals.nameFieldName + ": {type: string, required, default: 'View name'}, " +
+      Globals.nameFieldName + ": {type: string, required, default: 'View Name'}, " +
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.addItemModeFieldName + ": {type: string, options: [" + Globals.addItemModeDefault + ", " + Globals.addItemModeAsForm + ", " + Globals.addWithPersistentFormAndItems + "," + Globals.addWithPersistentFormNoItems + "], default: " + Globals.addItemModeDefault + "}, " +
+      Globals.addItemModeFieldName + ": {type: string, options: [" + Globals.addItemModeDefault + ", " + 
+                                                                     Globals.addItemModeAsForm + ", " + 
+                                                                     Globals.addWithPersistentFormAndItems + "," + 
+                                                                     Globals.addWithPersistentFormNoItems + 
+                                                                "], default: " + Globals.addItemModeDefault + "}, " +
       Globals.itemTemplateFieldName + ": template, " +
       Globals.childlistFieldName + ": embedded_listid" +
       "}",
@@ -90,8 +96,9 @@ Globals = {
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
-      "username: {type: string, required, unique}, " + 
-      Globals.emailFieldName + ": {type: email, required, unique, lower}, password: {type: encrypted_string, required}",
+      "username: {type: string, required, unique, " + Globals.noDefault + "}, " + 
+      Globals.emailFieldName + ": {type: email, required, unique, lower, " + Globals.noDefault + "}, " + 
+      "password: {type: encrypted_string, required, " + Globals.noDefault + "}",
   },
 
   viewOnTheListOfAllViews: {

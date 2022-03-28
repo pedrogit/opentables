@@ -55,6 +55,25 @@ class Schema {
         )
       );
     }
+
+    this.hidden = [];
+    this.noDefault = [];
+    this.required = [];
+    for (var key in this.schema) {
+      if ((this.schema[key]["hidden"] && this.schema[key]["hidden"] === true) || 
+          this.schema[key] === "encrypted_string" ||
+          this.schema[key]["type"] === "encrypted_string") {
+            this.hidden.push(key);
+      }
+      if (this.schema[key][Globals.noDefault] && 
+          this.schema[key][Globals.noDefault] === true) {
+        this.noDefault.push(key);
+      }
+      if (this.schema[key]["required"] &&
+          this.schema[key]["required"] === true) {
+        this.required.push(key);
+      }
+    }
   }
 
   validate() {
@@ -78,6 +97,8 @@ class Schema {
                 encrypt: { type: "boolean" },
                 unique: { type: "boolean" },
                 required: { type: "boolean" },
+                hidden: { type: "boolean" },
+                [Globals.noDefault]: { type: "boolean" },
                 options: {
                   anyOf: [
                     { type: "string",
@@ -116,17 +137,19 @@ class Schema {
     return this.schema;
   }
 
-  getRequired(removeHidden = false) {
-    var required = [];
-    for (var key in this.schema) {
-      if (
-        !(removeHidden && key.charAt(0) === "_") &&
-        this.schema[key]["required"]
-      ) {
-        required.push(key);
-      }
-    }
-    return required;
+  getRequired(
+    removeReserved = false,
+    removeHidden = false
+) {
+
+    return this.required.filter(prop => {
+      return !(removeReserved && prop.charAt(0) === "_") &&
+             !(removeHidden && this.hidden.includes(prop));
+    })
+  }
+
+  getHidden() {
+    return this.hidden;
   }
 
   getType(key) {
@@ -145,12 +168,16 @@ class Schema {
 
   getDefault(key, user) {
     if (this.schema.hasOwnProperty(key)) {
+      if (this.schema[key].hasOwnProperty('nodefault')) {
+        return '';
+      }
       if (this.schema[key].hasOwnProperty('default')) {
         return this.schema[key]['default'];
       }
 
       var propType = this.getType(key);
       
+      if (propType === 'template') return '';
       if (propType === 'schema') return 'prop1: "string"';
       if (propType === 'number') return 0;
       if (propType === 'email') return "email@gmail.com";
@@ -161,18 +188,20 @@ class Schema {
     return null;
   }
 
-  getAllDefault(all = false, user) {
+  getAllDefault({
+    onlyRequired = false,
+    throwIfNoDefault = false, 
+    user
+  }
+  ) {
     var def = {};
-    if (all) {
-      this.getProps().forEach((key) => {
-        def[key] = this.getDefault(key, user);
-      }) 
+    if (throwIfNoDefault && this.noDefault.length !== 0) {
+      throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_NoDefault, this.noDefault.join(', ')));
     }
-    else {
-      this.getRequired().forEach((key) => {
-        def[key] = this.getDefault(key, user);
-      })      
-    }
+
+    (onlyRequired ? this.getRequired() : this.getProps()).forEach((key) => {
+      def[key] = this.getDefault(key, user);
+    })
     return def;
   }
 
@@ -201,86 +230,6 @@ class Schema {
   getProps() {
     return Object.keys(this.schema);
   }
-
-  /* // traverse a json object calling provided callbacks according to the right level
-  traverseSync(obj, parentKey = null, level = 0, callbacks = null) {
-    for (var key in obj) {
-      //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
-      
-      if (level === 3) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema));
-      }
-      else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
-        callbacks[level](key, obj, parentKey);
-      }
-
-      if (obj[key] !== null && typeof(obj[key]) == "object") {
-          //going one step down in the object tree!!
-            this.traverseSync(obj[key], key, ++level, callbacks);
-          level--;
-      };
-    };
-  };
-
-  // validate that this schema is valid
-  validate() {
-    this.traverseSync(this.schema, null, 0, [this.validateSchemaFirstLevelProperties.bind(this), 
-                                         this.validateSchemaSecondLevelProperties.bind(this), 
-                                         null]);
-    return true;
-  };
-
-  // validate this.schema first level properties
-  validateSchemaFirstLevelProperties(key, obj, parentKey) {
-    var validTypes = ['objectid', 
-                      'embedded_listid', 
-                      'embedded_itemid', 
-                      'embedded_itemid_list',
-                      'user',
-                      'user_list',
-                      'string',
-                      'encrypted_string',
-                      'number',
-                      'schema',
-                      'email'];
-    if (obj[key] !== null && typeof(obj[key]) !== "object") {
-      if (!validTypes.includes(obj[key])) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidSchemaParameter, obj[key], key));
-      }
-    }
-  }
-
-  // validate this.schema second level properties
-  validateSchemaSecondLevelProperties(key, obj, parentKey) {
-    var validKeywords = ['type', 'upper', 'lower', 'encrypt', 'unique', 'required'];
-    if (key === 'required') {
-      this.requiredProps.push(parentKey);
-    }
-    else if (!validKeywords.includes(key)) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_InvalidValue, key, parentKey));
-    }
-  }
-
-  // traverse a json object calling provided callbacks according to the right level
-  async traverse(obj, parentKey = null, level = 0, callbacks = null) {
-    for (var key in obj) {
-      //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
-      
-      if (level === 3) {
-        throw new Error(NodeUtil.format(Errors.ErrMsg.Schema_TooManyLevels, this.schema));
-      }
-      else if (!(callbacks[level] === null) && typeof callbacks[level] === 'function') {
-        await callbacks[level](key, obj, parentKey);
-      }
-
-      if (obj[key] !== null && typeof(obj[key]) === "object" && obj[key].constructor.name !== 'ObjectId') {
-          //going one step down in the object tree!!
-          await this.traverse(obj[key], key, ++level, callbacks);
-          level--;
-      };
-    };
-  };
-*/
 }
 
 module.exports = Schema;
