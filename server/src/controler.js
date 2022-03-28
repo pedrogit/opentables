@@ -256,6 +256,7 @@ class Controler {
         var pipeline = [
           { $match: { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) } },
           { $lookup: lookup },
+          // remove the listid property since it is the same as the list itemid
           { $unset: "items." + Globals.listIdFieldName },
         ];
 
@@ -289,7 +290,6 @@ class Controler {
 
       var items = item.items;
       // post validate the item against schema (mostly to remove hidden properties)
-      delete item[Globals.listIdFieldName];
       item = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
         Utils.objWithout(item, "items"),
@@ -324,7 +324,6 @@ class Controler {
       );
 
       // post validate the item against schema (mostly to remove hidden properties)
-      delete item[Globals.listIdFieldName];
       item = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
         item,
@@ -339,7 +338,8 @@ class Controler {
 
   /*
     Validate items against the schema stored in the item with _id = listid
-    When strict is false, ignore fields which are not in the schema, otherwise throw an error
+    When strict is false, ignore fields which are not in the schema, 
+    otherwise throw an error.
   */
   async validateItems(schemaStr, items, strict, listid = null, user = null, post = false) {
     var newItems;
@@ -358,17 +358,19 @@ class Controler {
       if (items instanceof Array) {
         // validate many
         newItems = await Promise.all(
-          items.map(async (thisitem) => {
-            var newItem = await schemaValidator.validateJson(thisitem, strict);
+          items.map(async (thisItem) => {
+            delete thisItem[Globals.listIdFieldName];
+            var newItem = await schemaValidator.validateJson(thisItem, strict);
             // add listid to the item
             if (strict && listid) {
-              thisitem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
+              thisItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
             }
             return newItem;
           })
         );
       } else {
         // validate only one
+        delete items[Globals.listIdFieldName];
         newItems = await schemaValidator.validateJson(items, strict, user);
         if (strict && listid) {
           newItems[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
@@ -425,8 +427,6 @@ class Controler {
     }
     else {
       // post validate the item against schema (mostly to remove hidden properties)
-      delete newItems[Globals.listIdFieldName];
-
       newItems = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
         newItems,
@@ -490,7 +490,6 @@ class Controler {
     }
 
     // post validate the item against schema (mostly to remove hidden properties)
-    delete item.value[Globals.listIdFieldName];
     item = await this.validateItems(
       parentList[Globals.listSchemaFieldName],
       item.value,
