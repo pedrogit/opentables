@@ -229,7 +229,6 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
 
 function LoginButton({ setViewId, setLoginState }) {
   const [visible, setVisible] = React.useState(true);
-  var action = 'login';
   var buttonText = 'Login';
   var user = getUser();
   if (user && user !== Globals.allUserName) {
@@ -249,7 +248,7 @@ function LoginButton({ setViewId, setLoginState }) {
         }
         else {
           setLoginState({
-            open: (action === 'login'), 
+            open: true, 
             msg: {
               severity: "info",
               title: "Login",
@@ -264,7 +263,7 @@ function LoginButton({ setViewId, setLoginState }) {
                 }
               }
             },
-            tryFirst: (action === 'logout')
+            tryFirst: false
           });
         }
     }}
