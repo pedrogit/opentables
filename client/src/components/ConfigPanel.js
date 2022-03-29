@@ -11,7 +11,6 @@ const Globals = require("../common/globals");
 function ConfigPanel({
   configPanelOpen,
   view,
-  //list,
   setLoginState,
   setErrorMsg
 }) {

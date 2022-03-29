@@ -50,12 +50,15 @@ function Header({
     <Box sx={{ flexGrow: 1 }}/>
     {showButtons && 
         <Stack direction='row'>
-        <LoginButton setViewId={setViewId} setLoginState={setLoginState} />
+        <LoginButton 
+          setViewId={setViewId} 
+          setLoginState={setLoginState}
+        />
         <IconButton
-            id="homeButton" 
-            aria-label="home" 
-            color="inherit"
-            onClick={() => setViewId(Globals.viewOnAllViewViewId)}
+          id="homeButton" 
+          aria-label="home" 
+          color="inherit"
+          onClick={() => setViewId(Globals.viewOnAllViewViewId)}
         >
           <HomeIcon fontSize="small"/>
         </IconButton>
