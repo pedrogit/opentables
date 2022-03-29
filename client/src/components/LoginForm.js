@@ -104,7 +104,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
             ) {
               setShowInvalidLoginHelper(true);
             }
-            // good credential but still forbidden (so stay open)
+            // good credential but still forbidden (leave login form open)
             else if (error.response.status === 403) {
               setLoginState({
                 ...loginState,
@@ -116,7 +116,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
                 tryFirst: false
               });
             }
-            // other errors
+            // other server errors
             else {
               setLoginState({
                 open: false,
@@ -128,12 +128,13 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
               }
             }
           }
+          // connection errors
           else {
-            // show unknown error
             setLoginState({
               open: false,
               tryFirst: false
             });
+            setErrorMsg({text: error.message});
             if (loginState.action.callback && typeof loginState.action.callback === 'function') {
               loginState.action.callback(false, error.message);
             }

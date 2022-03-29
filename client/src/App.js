@@ -76,9 +76,6 @@ function App({ initialViewid, appid }) {
             setViewData(data);
             BrowserHistory.pushHistoryState(appid, viewid);
           }
-          else {
-            setErrorMsg({text: "Connection error..."});
-          }
         }
       },
       tryFirst: true
