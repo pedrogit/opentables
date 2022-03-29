@@ -122,7 +122,12 @@ function List({
         });
       }
       
-      if (!auth) {
+      if (auth) {
+        if (callback && typeof callback === 'function') {
+          callback(true);
+        }
+      }
+      else {
         // open login dialog
         setLoginState({
           open: true, 
@@ -132,8 +137,7 @@ function List({
             text:
             'You do not have permissions to edit ' + 
             (propName ? ('"' + propName + '"') : "item") +
-            '. Please login with valid credentials...',
-    
+            '. Please login with valid credentials...'
           },
           action: {
             method: "get",
@@ -142,11 +146,6 @@ function List({
           },
           tryFirst: false
         });
-      }
-      else {
-        if (callback && typeof callback === 'function') {
-          callback(true);
-        }
       }
       return auth;
     }, [view, setLoginState]
