@@ -179,6 +179,61 @@ class Controler {
     return parentList;
   }
 
+  /*
+    Validate items against the schema stored in the item with _id = listid
+    When strict is false, ignore fields which are not in the schema, 
+    otherwise throw an error.
+  */
+  async validateItems(
+    schemaStr, 
+    items,
+    user,
+    listid,
+    {
+      strict = false,
+      post = false
+    }
+  ) {
+    var newItems;
+
+    // validate provided JSON against the schema
+    try {
+      const schema = new Schema(schemaStr);
+      const schemaValidator = new SchemaValidator(
+        schema,
+        this,
+        listid,
+        post
+      );
+
+      // validate many or one
+      if (items instanceof Array) {
+        // validate many
+        newItems = await Promise.all(
+          items.map(async (thisItem) => {
+            delete thisItem[Globals.listIdFieldName];
+            var newItem = await schemaValidator.validateJson(thisItem, strict);
+            // add listid to the item
+            if (strict && listid) {
+              thisItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
+            }
+            return newItem;
+          })
+        );
+      } else {
+        // validate only one
+        delete items[Globals.listIdFieldName];
+        newItems = await schemaValidator.validateJson(items, strict, user);
+        if (strict && listid) {
+          newItems[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
+        }
+      }
+    } catch (err) {
+      throw new Errors.BadRequest(err.message);
+    }
+    return newItems;
+  }
+
   /*makePipeline() {
 
   }
@@ -293,10 +348,11 @@ class Controler {
       item = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
         Utils.objWithout(item, "items"),
-        false,
-        parentList[Globals.itemIdFieldName],
         user,
-        true
+        parentList[Globals.itemIdFieldName],
+        {
+          post: true
+        }
       );
       item.items = items;
     } else {
@@ -327,59 +383,15 @@ class Controler {
       item = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
         item,
-        false,
-        parentList[Globals.itemIdFieldName],
         user,
-        true
+        parentList[Globals.itemIdFieldName],
+        {
+          strict: false,
+          post: true
+        }
       );
     }
     return item;
-  }
-
-  /*
-    Validate items against the schema stored in the item with _id = listid
-    When strict is false, ignore fields which are not in the schema, 
-    otherwise throw an error.
-  */
-  async validateItems(schemaStr, items, strict, listid = null, user = null, post = false) {
-    var newItems;
-
-    // validate provided JSON against the schema
-    try {
-      const schema = new Schema(schemaStr);
-      const schemaValidator = new SchemaValidator(
-        schema,
-        this,
-        listid,
-        post
-      );
-
-      // validate many or one
-      if (items instanceof Array) {
-        // validate many
-        newItems = await Promise.all(
-          items.map(async (thisItem) => {
-            delete thisItem[Globals.listIdFieldName];
-            var newItem = await schemaValidator.validateJson(thisItem, strict);
-            // add listid to the item
-            if (strict && listid) {
-              thisItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
-            }
-            return newItem;
-          })
-        );
-      } else {
-        // validate only one
-        delete items[Globals.listIdFieldName];
-        newItems = await schemaValidator.validateJson(items, strict, user);
-        if (strict && listid) {
-          newItems[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
-        }
-      }
-    } catch (err) {
-      throw new Errors.BadRequest(err.message);
-    }
-    return newItems;
   }
 
   async insertMany(user, listid, item) {
@@ -401,9 +413,11 @@ class Controler {
     var newItems = await this.validateItems(
       parentList[Globals.listSchemaFieldName],
       item,
-      true,
+      user,
       listid,
-      user
+      {
+        strict: true,
+      }
     );
 
     // create it
@@ -432,10 +446,12 @@ class Controler {
       newItems = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
         newItems,
-        false,
-        listid,
         user,
-        true
+        listid,
+        {
+          strict: false,
+          post: true
+        }
       );
     }
 
@@ -476,9 +492,11 @@ class Controler {
         // include the actual itemid when patching so we can ignore it when validating unicity
         [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)
       },
-      false,
+      user,
       item[Globals.listIdFieldName],
-      user
+      {
+        strict: false,
+      }
     );
     
     // update it
@@ -495,10 +513,12 @@ class Controler {
     item = await this.validateItems(
       parentList[Globals.listSchemaFieldName],
       item.value,
-      false,
-      item.value[Globals.listIdFieldName],
       user,
-      true
+      item.value[Globals.listIdFieldName],
+      {
+        strict: false,
+        post: true
+      }
     );
       
     return item;
