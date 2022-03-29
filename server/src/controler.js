@@ -383,8 +383,10 @@ class Controler {
   }
 
   async insertMany(user, listid, item) {
-    // validate the recaptcha if necessary
-    await Controler.validateRecaptcha(item);
+    // validate recaptcha when user = @all
+    if (user === Globals.allUserName) {
+      await Controler.validateRecaptcha(item);
+    }
 
     // find the parent list
     var parentList = await this.getParentList(listid);
