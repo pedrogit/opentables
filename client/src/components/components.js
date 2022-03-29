@@ -399,19 +399,29 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       onKeyDown={keyPressed}
     >
       {childrenWithProp}
-      {otherProps.recaptcha &&
-        <ReCAPTCHA
-          sitekey="6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V"
-          onChange={(value) => setRecaptchaResponse(value)}
-          onExpired={() => recaptchaResponse('')}
-        />
-      }
-      <Stack direction="row" justifyContent="flex-end">
-        <ButtonGroup variant="contained" size="small">
-          <Button id="editCancelButton" onClick={() => options.cancelAction()}>{options.cancelLabel}</Button>
-          <Button id="editButton" type="submit">{options.addLabel}</Button>
-        </ButtonGroup>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        justifyContent="space-between"
+      >
+        {otherProps.recaptcha &&
+          <ReCAPTCHA
+            sitekey="6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V"
+            onChange={(value) => setRecaptchaResponse(value)}
+            onExpired={() => recaptchaResponse('')}
+          />
+        }
+        <Stack 
+          direction="row" 
+          justifyContent="flex-end"
+          alignItems="flex-end"
+        >
+          <ButtonGroup variant="contained" size="small">
+            <Button id="editCancelButton" onClick={() => options.cancelAction()}>{options.cancelLabel}</Button>
+            <Button id="editButton" type="submit">{options.addLabel}</Button>
+          </ButtonGroup>
+        </Stack>
       </Stack>
+
     </form>
   )
 }
