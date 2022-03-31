@@ -8,6 +8,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Tooltip from '@mui/material/Tooltip';
 
 import {LoginButton} from "./LoginForm";
 const Globals = require("../common/globals");
@@ -21,11 +24,16 @@ function Header({
   setViewId
 }) {
   const [showButtons, setShowButtons] = React.useState(false);
+  const headerRef = React.useRef();
+  const theme = useTheme();
+  const small = useMediaQuery((xtheme) => xtheme.breakpoints.down('sm'));
+
   var buttonsTimeOut = null;
 
   return (
     <AppBar
       id="headerButtons"
+      ref={headerRef}
       position="static" 
       onMouseEnter={() => {
         clearTimeout(buttonsTimeOut);
@@ -48,38 +56,45 @@ function Header({
       ))
     }
     <Box sx={{ flexGrow: 1 }}/>
-    {showButtons && 
+      {showButtons && 
         <Stack direction='row'>
-        <LoginButton 
-          setViewId={setViewId} 
-          setLoginState={setLoginState}
-        />
-        <IconButton
-          id="homeButton" 
-          aria-label="home" 
-          color="inherit"
-          onClick={() => setViewId(Globals.viewOnAllViewViewId)}
-        >
-          <HomeIcon fontSize="small"/>
-        </IconButton>
-        <IconButton
-            id="configPanelOpenButton" 
-            aria-label="config panel" 
-            color="inherit"
-            onClick={handleOpenConfigPanel}
-        >
-            <SettingsIcon fontSize="small"/>
-        </IconButton>
-        <IconButton
-            id="addItemButton" 
-            aria-label="add item" 
-            color="inherit"
-            onClick={() => setAddItem(true)}
-        >
-            <AddCircleOutlineIcon fontSize="small"/>
-        </IconButton>
+          <LoginButton 
+            setViewId={setViewId} 
+            setLoginState={setLoginState}
+            buttons={small}
+          />
+          <Tooltip title="Home">
+            <IconButton
+              id="homeButton" 
+              aria-label="home" 
+              color="inherit"
+              onClick={() => setViewId(Globals.viewOnAllViewViewId)}
+            >
+              <HomeIcon fontSize="small"/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="List Settings">
+            <IconButton
+                id="configPanelOpenButton" 
+                aria-label="config panel" 
+                color="inherit"
+                onClick={handleOpenConfigPanel}
+            >
+                <SettingsIcon fontSize="small"/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Add Item">
+            <IconButton
+                id="addItemButton" 
+                aria-label="add item" 
+                color="inherit"
+                onClick={() => setAddItem(true)}
+            >
+                <AddCircleOutlineIcon fontSize="small"/>
+            </IconButton>
+          </Tooltip>
         </Stack>
-    }
+      }
 
     </Toolbar>
     </AppBar>

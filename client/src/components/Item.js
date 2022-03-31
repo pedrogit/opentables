@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import Tooltip from '@mui/material/Tooltip';
 
 import * as Components from "./components";
 const Globals = require("../common/globals");
@@ -140,19 +141,20 @@ function Item({
       />
       {showButtons && 
         <Stack sx={buttonSx}>
-          <IconButton
-            id="deleteItemButton"
-            aria-label="delete item" 
-            color="inherit"
-            onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
-          >
-            <HighlightOffIcon />
-          </IconButton>
+          <Tooltip title="Delete Item">
+            <IconButton
+              id="deleteItemButton"
+              aria-label="delete item" 
+              color="inherit"
+              onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
+            >
+              <HighlightOffIcon />
+            </IconButton>
+          </Tooltip>
         </Stack>
       }
     </Box>
   );
 }
 
-//export default memo(Item);
 export default Item;

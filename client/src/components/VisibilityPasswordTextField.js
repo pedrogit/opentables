@@ -2,6 +2,7 @@ import React from "react";
 import { TextField, InputAdornment, IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import Tooltip from '@mui/material/Tooltip';
 
 function VisibilityPasswordTextField({ ...rest }) {
   const [isVisible, toggleVisible] = React.useState(false);
@@ -17,17 +18,19 @@ function VisibilityPasswordTextField({ ...rest }) {
         sx: {...defaultSx, ...rest.sx, marginTop: "0px", marginBottom: "0px"},
         endAdornment: (
           <InputAdornment position="end">
-            <IconButton
-              aria-label="Toggle password visibility"
-              onClick={() => {
-                toggleVisible(!isVisible);
-              }}
-              onMouseDown={(event) => {
-                event.preventDefault();
-              }}
-            >
-              {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-            </IconButton>
+            <Tooltip title="View Password">
+              <IconButton
+                aria-label="Toggle password visibility"
+                onClick={() => {
+                  toggleVisible(!isVisible);
+                }}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                }}
+              >
+                {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+              </IconButton>
+            </Tooltip>
           </InputAdornment>
         ),
       }}

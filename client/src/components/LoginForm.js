@@ -10,7 +10,12 @@ import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import IconButton from '@mui/material/IconButton';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import Tooltip from '@mui/material/Tooltip';
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 import getUser from "../clientUtils";
@@ -227,58 +232,99 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   );
 }
 
-function LoginButton({ setViewId, setLoginState }) {
+function LoginButton({ setViewId, setLoginState, buttons }) {
   const [visible, setVisible] = React.useState(true);
-  var buttonText = 'Login';
+  var loginButtonText = 'Login';
   var user = getUser();
   if (user && user !== Globals.allUserName) {
-     buttonText = 'Logout ' + user;
+     loginButtonText = 'Logout ' + user;
   }
 
-  return (
-    <>
+  const handleLoginLogout = () => {
+    if (user && user !== Globals.allUserName) {
+      Cookies.remove('authtoken');
+      setVisible(!visible);
+    }
+    else {
+      setLoginState({
+        open: true, 
+        msg: {
+          severity: "info",
+          title: "Login",
+          text:  'Please login with valid credentials...'
+        },
+        action: {
+          method: "get",
+          url: "http://localhost:3001/api/opentables/login",
+          callback: (success, data) => {
+            if (success) {
+              setVisible(true);
+            }
+          }
+        },
+        tryFirst: false
+      });
+    }
+  }
+
+  var loginButton = (
     <Button
-      id='loginLogoutButton'
+      id='LogoutIcon'
       variant="text" 
       color="inherit" 
-      onClick={() => {
-        if (user && user !== Globals.allUserName) {
-          Cookies.remove('authtoken');
-          setVisible(!visible);
-        }
-        else {
-          setLoginState({
-            open: true, 
-            msg: {
-              severity: "info",
-              title: "Login",
-              text:  'Please login with valid credentials...'
-            },
-            action: {
-              method: "get",
-              url: "http://localhost:3001/api/opentables/login",
-              callback: (success, data) => {
-                if (success) {
-                  setVisible(true);
-                }
-              }
-            },
-            tryFirst: false
-          });
-        }
-    }}
+      onClick={handleLoginLogout}
     >
-      {buttonText}
+      {loginButtonText}
     </Button>
-    { buttonText === 'Login' && 
+  )
+
+  var signUpButton = (
       <Button
         id='signUpButton'
         variant="text" 
         color="inherit"
-        onClick={() => {
-          setViewId(Globals.signUpViewOnUserListViewId);
-        }}
-      >Sign&nbsp;Up</Button> }
+        onClick={() => {setViewId(Globals.signUpViewOnUserListViewId);}}
+      >Sign&nbsp;Up</Button>
+  )
+
+  if (buttons) {
+    loginButton = (
+      <IconButton
+        id="loginButton" 
+        aria-label="home" 
+        color="inherit"
+        onClick={handleLoginLogout}
+      >
+        {loginButtonText === 'Login' ? (
+          <Tooltip title="Login">
+            <LoginIcon fontSize="small"/>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Logout">
+            <LogoutIcon fontSize="small"/>
+          </Tooltip>
+        )}
+      </IconButton>
+    )
+
+    signUpButton = (
+      <Tooltip title="Sign Up">
+        <IconButton
+          id="signUpButton" 
+          aria-label="home" 
+          color="inherit"
+          onClick={() => {setViewId(Globals.signUpViewOnUserListViewId);}}
+        >
+        <HowToRegIcon fontSize="small"/>
+      </IconButton>
+    </Tooltip>
+    )
+  }
+
+  return (
+    <>
+      {loginButton}
+      {loginButtonText === 'Login' && signUpButton}
     </>
   );
 }
