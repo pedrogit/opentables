@@ -1,5 +1,4 @@
 import React from "react";
-//import React, {memo} from "react";
 import JsxParser from "react-jsx-parser";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
