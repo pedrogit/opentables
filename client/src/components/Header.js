@@ -49,12 +49,12 @@ function Header({
             {viewOwner &&
                 <><Typography 
                   sx={{
-                    color: '#222', 
+                    color: '#FAA', 
                     fontSize: "0.8em", 
                     fontStyle: "italic"
                   }}>{viewOwner}</Typography><Typography 
                     sx={{
-                      color: '#FAA', 
+                      color: '#222', 
                       fontSize: "0.8em", 
                       fontStyle: "italic", 
                       whiteSpace: "nowrap"}}>'s list of</Typography></>
