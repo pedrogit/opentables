@@ -238,7 +238,6 @@ function LoginButton({
   handleReload,
   buttons
 }) {
-  const [visible, setVisible] = React.useState(true);
   const theme = useTheme();
 
   var loginButtonText = 'Login';
@@ -250,7 +249,6 @@ function LoginButton({
   const handleLoginLogout = () => {
     if (user && user !== Globals.allUserName) {
       Cookies.remove('authtoken');
-      setVisible(!visible);
       handleReload();
     }
     else {
@@ -266,7 +264,6 @@ function LoginButton({
           url: "http://localhost:3001/api/opentables/login",
           callback: (success, data) => {
             if (success) {
-              setVisible(true);
               handleReload();
             }
           }
