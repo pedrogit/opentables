@@ -35,78 +35,75 @@ function Header({
       ref={headerRef}
       position="static" 
     >
-      <Toolbar 
-        variant="dense" 
-        disableGutters 
+      <Stack 
+        direction='column'
         sx={{
-          minHeight: '52px',
-          flexDirection: "row",
-          alignItems: "flex-start"
+          minHeight: '58px'
         }}
       >
-        {(viewOwner && viewName ? (
-          <Stack direction='column' sx={{p:'5px'}}>
-            <Stack direction='row'>
-              <Typography 
-                sx={{
-                  color: '#222', 
-                  fontSize: "0.8em", 
-                  fontStyle: "italic"
-                }}>{viewOwner}</Typography><Typography 
+        <Stack 
+          direction='row' 
+          justifyContent="space-between" 
+        >
+          <Stack direction='row' sx={{p:'5px'}}>
+            {viewOwner &&
+                <><Typography 
                   sx={{
-                    color: '#FAA', 
+                    color: '#222', 
                     fontSize: "0.8em", 
-                    fontStyle: "italic", 
-                    whiteSpace: "nowrap"}}>'s list of</Typography>
-            </Stack>
-            <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
+                    fontStyle: "italic"
+                  }}>{viewOwner}</Typography><Typography 
+                    sx={{
+                      color: '#FAA', 
+                      fontSize: "0.8em", 
+                      fontStyle: "italic", 
+                      whiteSpace: "nowrap"}}>'s list of</Typography></>
+            }
           </Stack>
-        ) : (
-          <Typography sx={{p:'5px', color: '#FAA'}}>Loading...</Typography>
-        ))}
-        <Box sx={{ flexGrow: 1 }}/>
-        <Stack direction='row'>
-          <LoginButton 
-            setViewId={setViewId} 
-            setLoginState={setLoginState}
-            buttons={small}
-          />
-          <Tooltip title="Home">
-            <IconButton
-              id="homeButton" 
-              aria-label="home" 
-              color="inherit"
-              sx={{p: theme.openTable.buttonPadding}}
-              onClick={() => setViewId(Globals.viewOnAllViewViewId)}
-            >
-              <HomeIcon fontSize="small"/>
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="List Settings">
-            <IconButton
-                id="configPanelOpenButton" 
-                aria-label="config panel" 
+          <Stack direction='row'>
+            <LoginButton 
+              setViewId={setViewId} 
+              setLoginState={setLoginState}
+              buttons={small}
+            />
+            <Tooltip title="Home">
+              <IconButton
+                id="homeButton" 
+                aria-label="home" 
                 color="inherit"
                 sx={{p: theme.openTable.buttonPadding}}
-                onClick={handleOpenConfigPanel}
-            >
-              <SettingsIcon fontSize="small"/>
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Add Item">
-            <IconButton
-                id="addItemButton" 
-                aria-label="add item" 
-                color="inherit"
-                onClick={() => setAddItem(true)}
-                sx={{p: theme.openTable.buttonPadding}}
-                disableFocusRipple={true}
-            >
-              <AddCircleOutlineIcon fontSize="small"/>
-            </IconButton>
-          </Tooltip>
+                onClick={() => setViewId(Globals.viewOnAllViewViewId)}
+              >
+                <HomeIcon fontSize="small"/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="List Settings">
+              <IconButton
+                  id="configPanelOpenButton" 
+                  aria-label="config panel" 
+                  color="inherit"
+                  sx={{p: theme.openTable.buttonPadding}}
+                  onClick={handleOpenConfigPanel}
+              >
+                <SettingsIcon fontSize="small"/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Add Item">
+              <IconButton
+                  id="addItemButton" 
+                  aria-label="add item" 
+                  color="inherit"
+                  onClick={() => setAddItem(true)}
+                  sx={{p: theme.openTable.buttonPadding}}
+                  disableFocusRipple={true}
+              >
+                <AddCircleOutlineIcon fontSize="small"/>
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Stack>
-      </Toolbar>
+          <Typography sx={{fontWeight:'bold', pl:'5px', pb:'5px'}}>{viewName ? viewName : "Loading..."}</Typography>
+      </Stack>
     </AppBar>
   )
 }

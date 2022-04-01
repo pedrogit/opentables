@@ -274,7 +274,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
       id='LogoutIcon'
       variant="text" 
       color="inherit" 
-      sx={{p: theme.openTable.buttonPadding}}
+      sx={{p: theme.openTable.buttonPadding, lineHeight: "normal"}}
       onClick={handleLoginLogout}
     >
       {loginButtonText}
@@ -286,7 +286,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
         id='signUpButton'
         variant="text" 
         color="inherit"
-        sx={{p: theme.openTable.buttonPadding}}
+        sx={{p: theme.openTable.buttonPadding, lineHeight: "normal"}}
         onClick={() => {setViewId(Globals.signUpViewOnUserListViewId);}}
       >Sign&nbsp;Up</Button>
   )
