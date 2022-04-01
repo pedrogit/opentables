@@ -1,7 +1,5 @@
 import React from "react";
 import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Box from "@mui/material/Box";
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -26,8 +24,6 @@ function Header({
   const headerRef = React.useRef();
   const theme = useTheme();
   const small = useMediaQuery((thm) => thm.breakpoints.down('sm'));
-
-  var buttonsTimeOut = null;
 
   return (
     <AppBar
