@@ -172,6 +172,7 @@ function App({ initialViewid, appid }) {
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
             <ConfigPanel
               configPanelOpen={configPanelOpen}
+              toggleConfigPanel={toggleConfigPanel}
               view={viewData}
               setViewData={setViewData}
               setLoginState={setLoginState}

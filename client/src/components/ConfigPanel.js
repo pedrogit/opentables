@@ -3,6 +3,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import { useTheme } from "@mui/material/styles";
+import IconButton from '@mui/material/IconButton';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 // local imports
 import List from "./List";
@@ -10,6 +12,7 @@ const Globals = require("../common/globals");
 
 function ConfigPanel({
   configPanelOpen,
+  toggleConfigPanel,
   view,
   setViewData,
   setLoginState,
@@ -30,7 +33,26 @@ function ConfigPanel({
   return (
     <Stack sx={{backgroundColor: theme.palette.primary.palebg}}>
       <Collapse in={configPanelOpen}>
-        <Stack sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}>
+        <Stack sx={{
+          position: 'relative', 
+          borderBottomWidth: '5px', 
+          borderBottomStyle: 'solid', 
+          borderBottomColor: theme.palette.primary.main
+        }}>
+          <IconButton
+            sx = {{
+              position: 'absolute', 
+              top: '1px', 
+              right: '1px',
+              p: theme.openTable.buttonPadding
+            }}
+            id="closeErrorMsgButton"
+            aria-label="close error panel" 
+            color="inherit"
+            onClick={() => toggleConfigPanel(false)}
+          >
+            <HighlightOffIcon />
+          </IconButton>
           <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>
           <List
             listType='View'
