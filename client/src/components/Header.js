@@ -43,17 +43,17 @@ function Header({
           direction='row' 
           justifyContent="space-between" 
         >
-          <Stack direction='row' sx={{p:'5px'}}>
+          <Stack direction='row' sx={{pl:'5px', pt:'5px'}}>
             {viewOwner &&
                 <><Typography 
                   sx={{
                     color: '#FAA', 
-                    fontSize: "0.8em", 
+                    fontSize: "0.85em", 
                     fontStyle: "italic"
                   }}>{viewOwner}</Typography><Typography 
                     sx={{
                       color: '#222', 
-                      fontSize: "0.8em", 
+                      fontSize: "0.85em", 
                       fontStyle: "italic", 
                       whiteSpace: "nowrap"}}>'s list of</Typography></>
             }
