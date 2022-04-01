@@ -47,10 +47,17 @@ function App({ initialViewid, appid }) {
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
 
-  const handleReload = React.useCallback(
+  const closeAll = React.useCallback(
     () => {
       setErrorMsg({open: false});
       toggleConfigPanel(false);
+    }, [setErrorMsg, toggleConfigPanel]
+  );
+
+  const handleReload = React.useCallback(
+    () => {
+      closeAll();
+      // make the list of items to flash to nothing before reloading
       setViewData({
         ...Utils.objWithout(viewData, Globals.childlistFieldName),
         [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], "items")
@@ -63,8 +70,7 @@ function App({ initialViewid, appid }) {
 
   const handleChangeViewId = React.useCallback(
     (viewid) => {
-      setErrorMsg({open: false});
-      toggleConfigPanel(false);
+      closeAll();
       setViewId(viewid);
     }, [setErrorMsg, setViewId, toggleConfigPanel]
   );

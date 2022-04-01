@@ -232,7 +232,12 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   );
 }
 
-function LoginButton({ setViewId, setLoginState, buttons }) {
+function LoginButton({ 
+  setViewId,
+  setLoginState,
+  handleReload,
+  buttons
+}) {
   const [visible, setVisible] = React.useState(true);
   const theme = useTheme();
 
@@ -246,6 +251,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
     if (user && user !== Globals.allUserName) {
       Cookies.remove('authtoken');
       setVisible(!visible);
+      handleReload();
     }
     else {
       setLoginState({
@@ -261,6 +267,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
           callback: (success, data) => {
             if (success) {
               setVisible(true);
+              handleReload();
             }
           }
         },

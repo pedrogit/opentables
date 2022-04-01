@@ -25,7 +25,7 @@ function Header({
 }) {
   const headerRef = React.useRef();
   const theme = useTheme();
-  const small = useMediaQuery((thm) => thm.breakpoints.down('sm'));
+  const isSmall = useMediaQuery((thm) => thm.breakpoints.down('sm'));
 
   return (
     <AppBar
@@ -62,7 +62,8 @@ function Header({
             <LoginButton 
               setViewId={setViewId} 
               setLoginState={setLoginState}
-              buttons={small}
+              handleReload={handleReload}
+              buttons={isSmall}
             />
             <Tooltip title="Home">
               <IconButton
