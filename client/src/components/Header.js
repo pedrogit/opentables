@@ -4,6 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
+import ReplayIcon from '@mui/icons-material/Replay';
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
@@ -19,7 +20,8 @@ function Header({
   setLoginState, 
   handleOpenConfigPanel, 
   setAddItem,
-  setViewId
+  setViewId,
+  handleReload
 }) {
   const headerRef = React.useRef();
   const theme = useTheme();
@@ -82,6 +84,18 @@ function Header({
                   onClick={handleOpenConfigPanel}
               >
                 <SettingsIcon fontSize="small"/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Reload List">
+              <IconButton
+                  id="reloadListButton" 
+                  aria-label="reload list" 
+                  color="inherit"
+                  onClick={() => handleReload()}
+                  sx={{p: theme.openTable.buttonPadding}}
+                  disableFocusRipple={true}
+              >
+                <ReplayIcon fontSize="small"/>
               </IconButton>
             </Tooltip>
             <Tooltip title="Add Item">

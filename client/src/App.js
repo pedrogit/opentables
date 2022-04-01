@@ -40,19 +40,30 @@ const theme = createTheme({
 
 function App({ initialViewid, appid }) {
   const [viewid, setViewId] = React.useState(BrowserHistory.getViewIdFromURL(appid) ? BrowserHistory.getViewIdFromURL(appid) : initialViewid);
-
+  const [viewid2, setViewId2] = React.useState(null);
   const [viewData, setViewData] = React.useState(null);
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
 
+  const handleReload = React.useCallback(
+    () => {
+      setErrorMsg({open: false});
+      toggleConfigPanel(false);
+      setViewData({
+        ...Utils.objWithout(viewData, Globals.childlistFieldName),
+        [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], "items")
+      });
+      var oldViewid = viewid;
+      setViewId(null);
+      setViewId2(oldViewid);
+    }, [viewid, viewData, setViewData, toggleConfigPanel, setErrorMsg]
+  );
+
   const handleChangeViewId = React.useCallback(
     (viewid) => {
-      // this was to fix the issue when the text disappear before the panel closes
-      //setErrorMsg({...errorMsg, open: false});
       setErrorMsg({open: false});
-
       toggleConfigPanel(false);
       setViewId(viewid);
     }, [setErrorMsg, setViewId, toggleConfigPanel]
@@ -64,26 +75,32 @@ function App({ initialViewid, appid }) {
 
   React.useEffect(() => {
     // initial loading of list data
-    setLoginState({
-      open: false,
-      msg: {
-        severity: "warning",
-        title: "Permission denied",
-        text: 'You do not have permissions to view this list. Please login with valid credentials...'
-      },
-      action: {
-        method: "get",
-        url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
-        callback: (success, data) => {
-          if (success) {
-            setViewData(data);
-            BrowserHistory.pushHistoryState(appid, viewid);
+    if (viewid2) {
+      setViewId(viewid2);
+      setViewId2(null);
+    }
+    if (viewid) {
+      setLoginState({
+        open: false,
+        msg: {
+          severity: "warning",
+          title: "Permission denied",
+          text: 'You do not have permissions to view this list. Please login with valid credentials...'
+        },
+        action: {
+          method: "get",
+          url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
+          callback: (success, data) => {
+            if (success) {
+              setViewData(data);
+              BrowserHistory.pushHistoryState(appid, viewid);
+            }
           }
-        }
-      },
-      tryFirst: true
-    });
-  }, [viewid, appid]);
+        },
+        tryFirst: true
+      });
+    }
+  }, [viewid, viewid2, appid]);
 
   const handleOpenConfigPanel = () => {
     var user = getUser();
@@ -141,6 +158,7 @@ function App({ initialViewid, appid }) {
           handleOpenConfigPanel={handleOpenConfigPanel} 
           setAddItem={setAddItem}
           setViewId={handleChangeViewId}
+          handleReload={handleReload}
         />
         <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
         <LoginForm 
