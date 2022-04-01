@@ -17,6 +17,7 @@ function List({
   setAddItem,
   addItem,
   setErrorMsg,
+  enableDeleteButton = true,
   sx
 }) {
   var addItemMode = (view && view[Globals.addItemModeFieldName]) || Globals.addItemModeDefault;
@@ -243,6 +244,7 @@ function List({
           addMessageText={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Welcome to OpenTable. You have been logged in..." : null)}
           addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Congratulation!" : null)}
           recaptcha={getUser() === Globals.allUserName}
+          enableDeleteButton={false}
         />
       }
       {template && 
@@ -264,6 +266,7 @@ function List({
             handleEditItem={handleEditItem}
             setViewId={setViewId}
             setErrorMsg={setErrorMsg}
+            enableDeleteButton={enableDeleteButton}
           />
         );
       })}

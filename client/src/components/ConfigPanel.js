@@ -44,6 +44,7 @@ function ConfigPanel({
             setLoginState={setLoginState}
             setViewData={handleEditView}
             setErrorMsg={setErrorMsg}
+            enableDeleteButton={false}
           />
           <List
             listType='List'
@@ -56,6 +57,7 @@ function ConfigPanel({
             }}
             setLoginState={setLoginState}
             setErrorMsg={setErrorMsg}
+            enableDeleteButton={false}
           />
         </Stack>
       </Collapse>

@@ -31,6 +31,7 @@ function Item({
   handleDeleteItem,
   handleEditItem,
   setErrorMsg,
+  enableDeleteButton,
   ...otherProps
 }) {
   const [showButtons, setShowButtons] = React.useState(false);
@@ -141,17 +142,19 @@ function Item({
       />
       {showButtons && 
         <Stack sx={buttonSx}>
-          <Tooltip title="Delete Item">
-            <IconButton
-              id="deleteItemButton"
-              aria-label="delete item" 
-              color="inherit"
-              sx={{p: theme.openTable.buttonPadding}}
-              onClick={() => handleDeleteItem(item[Globals.itemIdFieldName])}
-            >
-              <HighlightOffIcon />
-            </IconButton>
-          </Tooltip>
+          {enableDeleteButton &&
+            <Tooltip title="Delete Item">
+              <IconButton
+                id="deleteItemButton"
+                aria-label="delete item" 
+                color="inherit"
+                sx={{p: theme.openTable.buttonPadding}}
+                onClick={() => handleDeleteItem(item[Globals.itemIdFieldName])}
+              >
+                <HighlightOffIcon />
+              </IconButton>
+            </Tooltip>
+          }
         </Stack>
       }
     </Box>
