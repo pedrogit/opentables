@@ -86,7 +86,7 @@ function List({
         .getRequired(true, true)
         .map((prop) => {
           //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
-          return ("<Text val={" + prop + "} inline pretty/> ")
+          return ("<Text val={" + prop + "} inline /> ")
         })
         //.map((prop) => "<Text /> ")
         .join("");
