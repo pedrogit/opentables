@@ -47,33 +47,28 @@ function App({ initialViewid, appid }) {
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
 
-  const closeAll = React.useCallback(
-    () => {
+  const closeAll = () => {
+      setAddItem(false);
       setErrorMsg({open: false});
       toggleConfigPanel(false);
-    }, [setErrorMsg, toggleConfigPanel]
-  );
+      if (viewData) {
+        // make the list of items to flash to nothing before reloading
+        setViewData({
+          ...Utils.objWithout(viewData, Globals.childlistFieldName),
+          [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], "items")
+        });
+      }
+    };
 
-  const handleReload = React.useCallback(
-    () => {
+  const handleReload = () => {
+    handleChangeViewId(viewid);
+  };
+
+  const handleChangeViewId = (newViewid) => {
       closeAll();
-      // make the list of items to flash to nothing before reloading
-      setViewData({
-        ...Utils.objWithout(viewData, Globals.childlistFieldName),
-        [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], "items")
-      });
-      var oldViewid = viewid;
       setViewId(null);
-      setViewId2(oldViewid);
-    }, [viewid, viewData, setViewData, toggleConfigPanel, setErrorMsg]
-  );
-
-  const handleChangeViewId = React.useCallback(
-    (viewid) => {
-      closeAll();
-      setViewId(viewid);
-    }, [setErrorMsg, setViewId, toggleConfigPanel]
-  );
+      setViewId2(newViewid);
+  };
 
   React.useEffect(() => {
     BrowserHistory.registerApp(appid, handleChangeViewId);
