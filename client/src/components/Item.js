@@ -29,10 +29,10 @@ function Item({
   handleListAuth,
   handleAddItem,
   handleDeleteItem,
+  handleEditItem,
   setErrorMsg,
   ...otherProps
 }) {
-  const [newItem, setItem] = React.useState(item);
   const [showButtons, setShowButtons] = React.useState(false);
 
   const theme = useTheme();
@@ -63,11 +63,11 @@ function Item({
       action: {
         method: "patch",
         url: "http://localhost:3001/api/opentables/" + 
-             newItem[Globals.itemIdFieldName],
+             item[Globals.itemIdFieldName],
         data: val,
         callback: (success, data) => {
           if (success) {
-            setItem(data);
+            handleEditItem(data);
           }
           if (callback && typeof callback === 'function') {
             callback(success, data);
@@ -118,13 +118,13 @@ function Item({
   //console.log('Render Item (' +  item.name + ')...');
   return (
     <Box 
-      id={"item_" + (newItem ? newItem[Globals.itemIdFieldName] : '')}
+      id={"item_" + (item ? item[Globals.itemIdFieldName] : '')}
       sx={defaultSx}
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => setShowButtons(false)}
     >
       <JsxParser
-        bindings={setBindings(newItem)}
+        bindings={setBindings(item)}
         components={{ ...Components.allComponentsAsJson(), Box, Stack }}
         jsx={template}
         renderInWrapper={false}
@@ -147,7 +147,7 @@ function Item({
               aria-label="delete item" 
               color="inherit"
               sx={{p: theme.openTable.buttonPadding}}
-              onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
+              onClick={() => handleDeleteItem(item[Globals.itemIdFieldName])}
             >
               <HighlightOffIcon />
             </IconButton>

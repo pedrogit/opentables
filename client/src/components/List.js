@@ -200,6 +200,24 @@ function List({
     }, [view, setLoginState, setViewData, setErrorMsg]
   );
 
+  const handleEditItem = React.useCallback(
+    (editedItem, callback) => {
+      var newItemsData = [...view[Globals.childlistFieldName].items];
+
+      var idx = newItemsData.findIndex(
+        item => item[Globals.itemIdFieldName] === editedItem[Globals.itemIdFieldName]
+      )
+      newItemsData[idx] = editedItem;
+      setViewData({
+        ...view,
+        [Globals.childlistFieldName]: {
+          ...view[Globals.childlistFieldName],
+          items: newItemsData
+        }
+      });
+    }, [view, setViewData]
+  );
+
   return (
     <Stack sx={sx}>
       {((addItem && addItemMode === Globals.addItemModeAsForm) || 
@@ -243,6 +261,7 @@ function List({
             handleListAuth={handleListAuth}
             handleAddItem={handleAddItem}
             handleDeleteItem={handleDeleteItem}
+            handleEditItem={handleEditItem}
             setViewId={setViewId}
             setErrorMsg={setErrorMsg}
           />

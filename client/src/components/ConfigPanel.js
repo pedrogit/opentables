@@ -11,10 +11,21 @@ const Globals = require("../common/globals");
 function ConfigPanel({
   configPanelOpen,
   view,
+  setViewData,
   setLoginState,
   setErrorMsg
 }) {
   const theme = useTheme();
+
+  const handleEditView = React.useCallback(
+    (editedView, callback) => {
+      var child = {...view[Globals.childlistFieldName]};
+      setViewData({
+        ...editedView[Globals.childlistFieldName].items[0],
+        [Globals.childlistFieldName]: child
+      });
+    }, [view, setViewData]
+  );
 
   return (
     <Stack sx={{backgroundColor: theme.palette.primary.palebg}}>
@@ -31,6 +42,7 @@ function ConfigPanel({
               }
             }}
             setLoginState={setLoginState}
+            setViewData={handleEditView}
             setErrorMsg={setErrorMsg}
           />
           <List
