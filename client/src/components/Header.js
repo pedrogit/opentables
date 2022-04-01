@@ -47,7 +47,17 @@ function Header({
         {(viewOwner && viewName ? (
           <Stack direction='column' sx={{p:'5px'}}>
             <Stack direction='row'>
-              <Typography sx={{color: '#222', fontSize: "0.8em", fontStyle: "italic"}}>{viewOwner}</Typography><Typography sx={{color: '#FAA', fontSize: "0.8em", fontStyle: "italic"}}>'s list of</Typography>
+              <Typography 
+                sx={{
+                  color: '#222', 
+                  fontSize: "0.8em", 
+                  fontStyle: "italic"
+                }}>{viewOwner}</Typography><Typography 
+                  sx={{
+                    color: '#FAA', 
+                    fontSize: "0.8em", 
+                    fontStyle: "italic", 
+                    whiteSpace: "nowrap"}}>'s list of</Typography>
             </Stack>
             <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
           </Stack>
