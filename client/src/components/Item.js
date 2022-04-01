@@ -146,6 +146,7 @@ function Item({
               id="deleteItemButton"
               aria-label="delete item" 
               color="inherit"
+              sx={{p: theme.openTable.buttonPadding}}
               onClick={() => handleDeleteItem(newItem[Globals.itemIdFieldName])}
             >
               <HighlightOffIcon />

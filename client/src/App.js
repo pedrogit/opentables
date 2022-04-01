@@ -33,6 +33,9 @@ const theme = createTheme({
       main: orange["A200"], //#ffab40
     },
   },
+  openTable: {
+    buttonPadding: "4px"
+  }
 });
 
 function App({ initialViewid, appid }) {

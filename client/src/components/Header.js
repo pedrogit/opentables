@@ -23,10 +23,9 @@ function Header({
   setAddItem,
   setViewId
 }) {
-  const [showButtons, setShowButtons] = React.useState(false);
   const headerRef = React.useRef();
   const theme = useTheme();
-  const small = useMediaQuery((xtheme) => xtheme.breakpoints.down('sm'));
+  const small = useMediaQuery((thm) => thm.breakpoints.down('sm'));
 
   var buttonsTimeOut = null;
 
@@ -35,28 +34,27 @@ function Header({
       id="headerButtons"
       ref={headerRef}
       position="static" 
-      onMouseEnter={() => {
-        clearTimeout(buttonsTimeOut);
-        setShowButtons(true);
-      }}
-      onMouseLeave={() => {
-        buttonsTimeOut = setTimeout(() => setShowButtons(false), 500)
-      }}
     >
-    <Toolbar variant="dense" disableGutters sx={{ml:'5px', minHeight: '52px'}}>
-    {(viewOwner && viewName ? (
-        <Stack direction='column'>
-          <Stack direction='row'>
-            <Typography sx={{color: '#222', fontSize: "0.8em", fontStyle: "italic"}}>{viewOwner}</Typography><Typography sx={{color: '#FAA', fontSize: "0.8em", fontStyle: "italic"}}>'s list of</Typography>
+      <Toolbar 
+        variant="dense" 
+        disableGutters 
+        sx={{
+          minHeight: '52px',
+          flexDirection: "row",
+          alignItems: "flex-start"
+        }}
+      >
+        {(viewOwner && viewName ? (
+          <Stack direction='column' sx={{p:'5px'}}>
+            <Stack direction='row'>
+              <Typography sx={{color: '#222', fontSize: "0.8em", fontStyle: "italic"}}>{viewOwner}</Typography><Typography sx={{color: '#FAA', fontSize: "0.8em", fontStyle: "italic"}}>'s list of</Typography>
+            </Stack>
+            <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
           </Stack>
-          <Typography sx={{fontWeight:'bold'}}>{viewName}</Typography>
-        </Stack>
-      ) : (
-        <Typography sx={{color: '#FAA'}}>Loading...</Typography>
-      ))
-    }
-    <Box sx={{ flexGrow: 1 }}/>
-      {showButtons && 
+        ) : (
+          <Typography sx={{p:'5px', color: '#FAA'}}>Loading...</Typography>
+        ))}
+        <Box sx={{ flexGrow: 1 }}/>
         <Stack direction='row'>
           <LoginButton 
             setViewId={setViewId} 
@@ -68,6 +66,7 @@ function Header({
               id="homeButton" 
               aria-label="home" 
               color="inherit"
+              sx={{p: theme.openTable.buttonPadding}}
               onClick={() => setViewId(Globals.viewOnAllViewViewId)}
             >
               <HomeIcon fontSize="small"/>
@@ -78,9 +77,10 @@ function Header({
                 id="configPanelOpenButton" 
                 aria-label="config panel" 
                 color="inherit"
+                sx={{p: theme.openTable.buttonPadding}}
                 onClick={handleOpenConfigPanel}
             >
-                <SettingsIcon fontSize="small"/>
+              <SettingsIcon fontSize="small"/>
             </IconButton>
           </Tooltip>
           <Tooltip title="Add Item">
@@ -89,14 +89,14 @@ function Header({
                 aria-label="add item" 
                 color="inherit"
                 onClick={() => setAddItem(true)}
+                sx={{p: theme.openTable.buttonPadding}}
+                disableFocusRipple={true}
             >
-                <AddCircleOutlineIcon fontSize="small"/>
+              <AddCircleOutlineIcon fontSize="small"/>
             </IconButton>
           </Tooltip>
         </Stack>
-      }
-
-    </Toolbar>
+      </Toolbar>
     </AppBar>
   )
 }

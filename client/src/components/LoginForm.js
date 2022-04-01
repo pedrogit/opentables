@@ -234,6 +234,8 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
 
 function LoginButton({ setViewId, setLoginState, buttons }) {
   const [visible, setVisible] = React.useState(true);
+  const theme = useTheme();
+
   var loginButtonText = 'Login';
   var user = getUser();
   if (user && user !== Globals.allUserName) {
@@ -272,6 +274,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
       id='LogoutIcon'
       variant="text" 
       color="inherit" 
+      sx={{p: theme.openTable.buttonPadding}}
       onClick={handleLoginLogout}
     >
       {loginButtonText}
@@ -283,6 +286,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
         id='signUpButton'
         variant="text" 
         color="inherit"
+        sx={{p: theme.openTable.buttonPadding}}
         onClick={() => {setViewId(Globals.signUpViewOnUserListViewId);}}
       >Sign&nbsp;Up</Button>
   )
@@ -293,6 +297,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
         id="loginButton" 
         aria-label="home" 
         color="inherit"
+        sx={{p: theme.openTable.buttonPadding}}
         onClick={handleLoginLogout}
       >
         {loginButtonText === 'Login' ? (
@@ -313,6 +318,7 @@ function LoginButton({ setViewId, setLoginState, buttons }) {
           id="signUpButton" 
           aria-label="home" 
           color="inherit"
+          sx={{p: theme.openTable.buttonPadding}}
           onClick={() => {setViewId(Globals.signUpViewOnUserListViewId);}}
         >
         <HowToRegIcon fontSize="small"/>

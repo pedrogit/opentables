@@ -36,7 +36,12 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
       }}>
         {closeButton &&
           <IconButton
-            sx = {{position: 'absolute', top: '1px', right: '1px'}}
+            sx = {{
+              position: 'absolute', 
+              top: '1px', 
+              right: '1px',
+              p: theme.openTable.buttonPadding
+            }}
             id="closeErrorMsgButton"
             aria-label="close error panel" 
             color="inherit"
