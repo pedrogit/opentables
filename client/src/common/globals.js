@@ -17,6 +17,7 @@ var Globals = {
   emailFieldName: "owner",
   itemTemplateFieldName: "item_template",
   childlistFieldName: "_childlist",
+  itemsFieldName: "_items",
   addItemModeFieldName: "add_item_mode",
 
   readPermFieldName: "r_permissions",

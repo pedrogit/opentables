@@ -38,7 +38,7 @@ function List({
             data: item,
             callback: (success, newitem) => {
               if (success && addToLocalList) {
-                var newItemsData = view[Globals.childlistFieldName].items;
+                var newItemsData = view[Globals.childlistFieldName][Globals.itemsFieldName];
                 if (!newItemsData) {
                   newItemsData = [];
                 }
@@ -47,7 +47,7 @@ function List({
                   ...view,
                   [Globals.childlistFieldName]: {
                     ...view[Globals.childlistFieldName],
-                    items: newItemsData
+                    [Globals.itemsFieldName]: newItemsData
                   }
                 });
               }
@@ -79,10 +79,7 @@ function List({
     parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
     template = view[Globals.itemTemplateFieldName];
 
-    if (template === "") {
-      /*template = '<Box sx={{borderRadius:5, border:1, padding:2}}>' + parsedSchema.getRequired().map(prop => 
-        '<Text val={' + prop + '} /> '
-      ).join('') + '</Box>';*/
+    /*if (template === "") {
       template = parsedSchema
         .getRequired(true, true)
         .map((prop) => {
@@ -91,7 +88,7 @@ function List({
         })
         //.map((prop) => "<Text /> ")
         .join("");
-    }
+    }*/
   }
   else {
     template = null;
@@ -177,13 +174,13 @@ function List({
             url: "http://localhost:3001/api/opentables/" + itemid,
             callback: (success, data) => {
               if (success) {
-                var newItemsData = [...view[Globals.childlistFieldName].items];
+                var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
                 newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
                 setViewData({
                   ...view,
                   [Globals.childlistFieldName]: {
                     ...view[Globals.childlistFieldName],
-                    items: newItemsData
+                    [Globals.itemsFieldName]: newItemsData
                   }
                 });
               }
@@ -203,7 +200,7 @@ function List({
 
   const handleEditItem = React.useCallback(
     (editedItem, callback) => {
-      var newItemsData = [...view[Globals.childlistFieldName].items];
+      var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
 
       var idx = newItemsData.findIndex(
         item => item[Globals.itemIdFieldName] === editedItem[Globals.itemIdFieldName]
@@ -213,7 +210,7 @@ function List({
         ...view,
         [Globals.childlistFieldName]: {
           ...view[Globals.childlistFieldName],
-          items: newItemsData
+          [Globals.itemsFieldName]: newItemsData
         }
       });
     }, [view, setViewData]
@@ -247,10 +244,10 @@ function List({
           enableDeleteButton={false}
         />
       }
-      {template && 
+      {(view && 
        view[Globals.childlistFieldName] && 
-       view[Globals.childlistFieldName].items && 
-       view[Globals.childlistFieldName].items.map((item) => {
+       view[Globals.childlistFieldName][Globals.itemsFieldName]) && 
+       view[Globals.childlistFieldName][Globals.itemsFieldName].map((item) => {
         rowNb = rowNb + 1;
         return (
           <Item

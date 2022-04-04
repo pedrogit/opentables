@@ -285,7 +285,7 @@ class Controler {
           from: Globals.mongoCollectionName,
           localField: Globals.itemIdFieldName,
           foreignField: Globals.listIdFieldName,
-          as: "items",
+          as: Globals.itemsFieldName,
         };
 
         if (filter) {
@@ -312,21 +312,21 @@ class Controler {
           { $match: { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) } },
           { $lookup: lookup },
           // remove the listid property since it is the same as the list itemid
-          { $unset: "items." + Globals.listIdFieldName },
+          { $unset: Globals.itemsFieldName + "." + Globals.listIdFieldName },
         ];
 
         // remove hidden properties
         const schema = new Schema(item[Globals.listSchemaFieldName]);
 
         schema.getHidden().map(async (hidden) => {
-          pipeline.push({ $unset: "items." + hidden })
+          pipeline.push({ $unset: [Globals.itemsFieldName] + "." + hidden })
         });
 
         item = await this.coll.aggregate(pipeline).toArray();
         item = item[0];
 
         // remove items for which the user do not have read permissions
-        item.items = item.items.filter((subItem) => {
+        item[Globals.itemsFieldName] = item[Globals.itemsFieldName].filter((subItem) => {
           return Utils.validateRPerm({
             user: user,
             list: item,
@@ -336,25 +336,25 @@ class Controler {
         });
 
         // delete the items property if there are none
-        if (item.items.length === 0) {
-          delete item.items;
+        if (item[Globals.itemsFieldName].length === 0) {
+          delete item[Globals.itemsFieldName];
         }
       }
 
       var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
-      var items = item.items;
+      var items = item[Globals.itemsFieldName];
       // post validate the item against schema (mostly to remove hidden properties)
       item = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
-        Utils.objWithout(item, "items"),
+        Utils.objWithout(item, Globals.itemsFieldName),
         user,
         parentList[Globals.itemIdFieldName],
         {
           post: true
         }
       );
-      item.items = items;
+      item[Globals.itemsFieldName] = items;
     } else {
       // find item schema
       var parentList = await this.getParentList(item[Globals.listIdFieldName]);

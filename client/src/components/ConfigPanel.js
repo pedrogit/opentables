@@ -24,7 +24,7 @@ function ConfigPanel({
     (editedView, callback) => {
       var child = {...view[Globals.childlistFieldName]};
       setViewData({
-        ...editedView[Globals.childlistFieldName].items[0],
+        ...editedView[Globals.childlistFieldName][Globals.itemsFieldName][0],
         [Globals.childlistFieldName]: child
       });
     }, [view, setViewData]
@@ -60,7 +60,7 @@ function ConfigPanel({
               [Globals.itemTemplateFieldName]: '',
               [Globals.childlistFieldName]: {
                 ...Globals.listOfAllViews,
-                items: view ? [view] : []
+                [Globals.itemsFieldName]: view ? [view] : []
               }
             }}
             setLoginState={setLoginState}
@@ -74,7 +74,7 @@ function ConfigPanel({
               [Globals.itemTemplateFieldName]: '',
               [Globals.childlistFieldName]: {
                 ...Globals.listOfAllLists,
-                items: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
+                [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
               }
             }}
             setLoginState={setLoginState}

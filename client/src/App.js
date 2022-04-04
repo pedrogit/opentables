@@ -62,7 +62,7 @@ function App({ initialViewid, appid }) {
         // make the list of items to flash to nothing before reloading
         setViewData({
           ...Utils.objWithout(viewData, Globals.childlistFieldName),
-          [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], "items")
+          [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], Globals.itemsFieldName)
         });
       }
       setViewId(null);
@@ -146,7 +146,7 @@ function App({ initialViewid, appid }) {
         toggleConfigPanel(!configPanelOpen);
       }
       return authView;
-    }, [viewid, viewid2, appid]
+    }, [setLoginState, viewData, configPanelOpen, toggleConfigPanel]
   );
 
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');

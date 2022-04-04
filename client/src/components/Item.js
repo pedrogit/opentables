@@ -115,6 +115,16 @@ function Item({
     return result;
   };
 
+  if (!template) {
+    template = '';
+    for (var key in item) {
+      if (item.hasOwnProperty(key) && 
+          key.charAt(0) !== "_") {
+        template = template + "<Text val={" + key + "} inline /> "
+      }
+    }
+  }
+
   //console.log('Render Item (' +  item.name + ')...');
   return (
     <Box 

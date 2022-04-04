@@ -292,7 +292,7 @@ describe("testRoutes.js List API", () => {
             ...lastList,
             ...listPatch,
           };
-          delete lastList.items;
+          delete lastList[Globals.itemsFieldName];
 
           expect(response).to.have.status(200);
           expect(response.body).to.deep.equal(lastList);
@@ -469,7 +469,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            items: lastItems
+            [Globals.itemsFieldName]: lastItems
           });
           done();
         });
@@ -629,7 +629,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            items: lastItems
+            [Globals.itemsFieldName]: lastItems
           });
           done();
         });
@@ -838,7 +838,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) }
+            ...{ [Globals.itemsFieldName]: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -859,7 +859,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) }
+            ...{ [Globals.itemsFieldName]: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -898,7 +898,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) }
+            ...{ [Globals.itemsFieldName]: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -919,7 +919,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             ...lastList,
-            ...{ items: lastItems.slice(0, 1) }
+            ...{ [Globals.itemsFieldName]: lastItems.slice(0, 1) }
           });
           done();
         });
@@ -956,8 +956,8 @@ describe("testRoutes.js List API", () => {
       };
 
       // add the list to the list of lists for further test
-      listOfAllList["items"] = [];
-      listOfAllList["items"].push(lastList);
+      listOfAllList[Globals.itemsFieldName] = [];
+      listOfAllList[Globals.itemsFieldName].push(lastList);
 
       chai
         .request(server)
@@ -1009,14 +1009,6 @@ describe("testRoutes.js List API", () => {
         .send(dupItem)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
-          /*lastItems.push(Utils.objWithout(
-            {
-              ...dupItem,
-              field2: dupItem.field2.toUpperCase(),
-              [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-            },
-            Globals.listIdFieldName
-          ));*/
           lastItems.push({
             ...dupItem,
             field2: dupItem.field2.toUpperCase(),
@@ -1107,7 +1099,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           lastList = {
             ...lastList,
-            ...{ items: lastItems },
+            ...{ [Globals.itemsFieldName]: lastItems },
           };
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
@@ -1227,7 +1219,7 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           lastList = {
             ...lastList,
-            items: lastItems,
+            [Globals.itemsFieldName]: lastItems,
           };
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
@@ -1245,7 +1237,7 @@ describe("testRoutes.js List API", () => {
         [Globals.nameFieldName]: "Extra list",
         [Globals.listSchemaFieldName]: "{}",
       };
-      delete newList.items;
+      delete newList[Globals.itemsFieldName];
       delete newList[Globals.itemIdFieldName];
       delete newList[Globals.listIdFieldName];
       chai
@@ -1261,7 +1253,7 @@ describe("testRoutes.js List API", () => {
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
           expect(response.body).to.deep.equal(newList);
-          listOfAllList.items.push(newList);
+          listOfAllList[Globals.itemsFieldName].push(newList);
           done();
         });
     });
@@ -1271,9 +1263,9 @@ describe("testRoutes.js List API", () => {
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
         .end((err, response) => {
-          listOfAllList.items.unshift(Globals.listOfUsers);
-          listOfAllList.items[0][Globals.itemIdFieldName] = listOfAllList.items[0][Globals.itemIdFieldName].toString();
-          listOfAllList.items.forEach(function (v) {
+          listOfAllList[Globals.itemsFieldName].unshift(Globals.listOfUsers);
+          listOfAllList[Globals.itemsFieldName][0][Globals.itemIdFieldName] = listOfAllList[Globals.itemsFieldName][0][Globals.itemIdFieldName].toString();
+          listOfAllList[Globals.itemsFieldName].forEach(function (v) {
             delete v[Globals.listIdFieldName];
           });
 
@@ -1404,12 +1396,12 @@ describe("testRoutes.js List API", () => {
             ...Globals.viewOnTheListOfUsers,
             [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
-              items: userList
+              [Globals.itemsFieldName]: userList
             }
           }
           expect(Utils.objWithout(response.body, Globals.childlistFieldName)).to.deep.equal(Utils.objWithout(expected, Globals.childlistFieldName));
-          expect(Utils.objWithout(response.body[Globals.childlistFieldName], 'items')).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], 'items'));
-          expect(response.body[Globals.childlistFieldName].items).to.deep.equal(expected[Globals.childlistFieldName].items);
+          expect(Utils.objWithout(response.body[Globals.childlistFieldName], Globals.itemsFieldName)).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], Globals.itemsFieldName));
+          expect(response.body[Globals.childlistFieldName][Globals.itemsFieldName]).to.deep.equal(expected[Globals.childlistFieldName][Globals.itemsFieldName]);
           done();
         });
     });
@@ -1464,12 +1456,12 @@ describe("testRoutes.js List API", () => {
             ...Globals.viewOnTheListOfUsers,
             [Globals.childlistFieldName]: {
               ...Globals.listOfUsers,
-              items: [user2]
+              [Globals.itemsFieldName]: [user2]
             }
           }
           expect(Utils.objWithout(response.body, Globals.childlistFieldName)).to.deep.equal(Utils.objWithout(expected, Globals.childlistFieldName));
-          expect(Utils.objWithout(response.body[Globals.childlistFieldName], 'items')).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], 'items'));
-          expect(response.body[Globals.childlistFieldName].items).to.deep.equal(expected[Globals.childlistFieldName].items);
+          expect(Utils.objWithout(response.body[Globals.childlistFieldName], Globals.itemsFieldName)).to.deep.equal(Utils.objWithout(expected[Globals.childlistFieldName], Globals.itemsFieldName));
+          expect(response.body[Globals.childlistFieldName][Globals.itemsFieldName]).to.deep.equal(expected[Globals.childlistFieldName][Globals.itemsFieldName]);
           done();
         });
     });
