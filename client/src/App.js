@@ -47,7 +47,14 @@ function App({ initialViewid, appid }) {
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
 
-  const closeAll = () => {
+  // handleReload is necessary because the viewid is not 
+  // available where handleReload is called
+  const handleReload = () => {
+    handleChangeViewId(viewid);
+  };
+
+  const handleChangeViewId = React.useCallback(
+    (newViewid) => {
       setAddItem(false);
       setErrorMsg({open: false});
       toggleConfigPanel(false);
@@ -58,17 +65,10 @@ function App({ initialViewid, appid }) {
           [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], "items")
         });
       }
-    };
-
-  const handleReload = () => {
-    handleChangeViewId(viewid);
-  };
-
-  const handleChangeViewId = (newViewid) => {
-      closeAll();
       setViewId(null);
       setViewId2(newViewid);
-  };
+    }, [viewData, setAddItem, setErrorMsg, toggleConfigPanel, setViewData, setViewId, setViewId2]
+  );
 
   React.useEffect(() => {
     BrowserHistory.registerApp(appid, handleChangeViewId);
@@ -80,7 +80,7 @@ function App({ initialViewid, appid }) {
       setViewId(viewid2);
       setViewId2(null);
     }
-    if (viewid) {
+    else {
       setLoginState({
         open: false,
         msg: {
@@ -103,49 +103,51 @@ function App({ initialViewid, appid }) {
     }
   }, [viewid, viewid2, appid]);
 
-  const handleOpenConfigPanel = () => {
-    var user = getUser();
-    var authView = Utils.validateRWPerm({
-      user: user,
-      item: viewData,
-      throwError: false
-    });
-    var authList = true;
-    if (viewData[Globals.childlistFieldName]) {
-      authList = Utils.validateRWPerm({
+  const handleOpenConfigPanel = React.useCallback(
+    () => {
+      var user = getUser();
+      var authView = Utils.validateRWPerm({
         user: user,
-        list: viewData[Globals.childlistFieldName],
+        item: viewData,
         throwError: false
       });
-    }
-    if (!(authView || authList)) {
-      // open login dialog
-      setLoginState({
-        open: true, 
-        msg: {
-          severity: "warning",
-          title: "Permission denied",
-          text:
-          'You do not have permissions to configure this list. Please login with valid credentials...',
-        },
-        action: {
-          method: "get",
-          url: "http://localhost:3001/api/opentables/login",
-          callback: (success) => {
-            if (success) {
-              toggleConfigPanel(!configPanelOpen);
+      var authList = true;
+      if (viewData[Globals.childlistFieldName]) {
+        authList = Utils.validateRWPerm({
+          user: user,
+          list: viewData[Globals.childlistFieldName],
+          throwError: false
+        });
+      }
+      if (!(authView || authList)) {
+        // open login dialog
+        setLoginState({
+          open: true, 
+          msg: {
+            severity: "warning",
+            title: "Permission denied",
+            text:
+            'You do not have permissions to configure this list. Please login with valid credentials...',
+          },
+          action: {
+            method: "get",
+            url: "http://localhost:3001/api/opentables/login",
+            callback: (success) => {
+              if (success) {
+                toggleConfigPanel(!configPanelOpen);
+              }
             }
-          }
-        },
-        tryFirst: false
-      });
+          },
+          tryFirst: false
+        });
 
-    }
-    else {
-      toggleConfigPanel(!configPanelOpen);
-    }
-    return authView;
-  }
+      }
+      else {
+        toggleConfigPanel(!configPanelOpen);
+      }
+      return authView;
+    }, [viewid, viewid2, appid]
+  );
 
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
