@@ -171,15 +171,16 @@ function App({ initialViewid, appid }) {
           setErrorMsg={setErrorMsg}
         />
         {(viewData) ? (
+          <>
+          <ConfigPanel
+            configPanelOpen={configPanelOpen}
+            toggleConfigPanel={toggleConfigPanel}
+            view={viewData}
+            setViewData={setViewData}
+            setLoginState={setLoginState}
+            setErrorMsg={setErrorMsg}
+          />
           <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
-            <ConfigPanel
-              configPanelOpen={configPanelOpen}
-              toggleConfigPanel={toggleConfigPanel}
-              view={viewData}
-              setViewData={setViewData}
-              setLoginState={setLoginState}
-              setErrorMsg={setErrorMsg}
-            />
             <List
               listType='Items'
               view={viewData}
@@ -191,6 +192,7 @@ function App({ initialViewid, appid }) {
               setErrorMsg={setErrorMsg}
             />
           </Stack>
+          </>
         ) : (
           <Container className="progress" sx={{display: 'flex', justifyContent: 'center'}}>
             <CircularProgress />
