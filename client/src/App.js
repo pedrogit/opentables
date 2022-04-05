@@ -4,6 +4,7 @@ import { deepOrange, orange } from "@mui/material/colors";
 import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
 // local imports
 import List from "./components/List";
@@ -180,7 +181,7 @@ function App({ initialViewid, appid }) {
             setLoginState={setLoginState}
             setErrorMsg={setErrorMsg}
           />
-          <Stack className='configAndList' sx={{height: '100%', overflowY: 'auto'}}>
+          <Box sx={{height: '100%', overflowY: 'auto'}}>
             <List
               listType='Items'
               view={viewData}
@@ -191,7 +192,7 @@ function App({ initialViewid, appid }) {
               addItem={addItem}
               setErrorMsg={setErrorMsg}
             />
-          </Stack>
+          </Box>
           </>
         ) : (
           <Container className="progress" sx={{display: 'flex', justifyContent: 'center'}}>
