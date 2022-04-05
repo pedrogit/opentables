@@ -53,7 +53,7 @@ function ConfigPanel({
           >
             <HighlightOffIcon />
           </IconButton>
-          <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>List Parameters</Typography>
+          <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>{Globals.listProperties}</Typography>
           <List
             listType='View'
             view={{

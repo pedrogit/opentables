@@ -76,7 +76,7 @@ function Header({
                 <HomeIcon fontSize="small"/>
               </IconButton>
             </Tooltip>
-            <Tooltip title="List Settings">
+            <Tooltip title={Globals.listProperties}>
               <IconButton
                   id="configPanelOpenButton" 
                   aria-label="config panel" 

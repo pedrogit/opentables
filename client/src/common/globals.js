@@ -44,7 +44,9 @@ var Globals = {
   addWithPersistentFormNoItems: "persistent_form_no_items",
 
   noDefault: "nodefault",
-  gRecaptchaResponse: "g-recaptcha-response"
+  gRecaptchaResponse: "g-recaptcha-response",
+
+  listProperties: "List Properties"
 };
 
 Globals = {
@@ -115,7 +117,6 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
     [Globals.nameFieldName]: "Users (add with default values)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
-    [Globals.itemTemplateFieldName]: "",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 
