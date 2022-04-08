@@ -56,22 +56,46 @@ class Schema {
       );
     }
 
-    this.hidden = [];
-    this.noDefault = [];
-    this.required = [];
+    this.hidden = [];    // properties having the schema hidden property set
+    this.reserved = [];  // properties starting with "_"
+    this.noDefault = []; // properties having the nodefault schema property set
+    this.required = [];  // properties having the required schema property set
+    this.embedded = [];  // properties defining an embedded item
+
     for (var key in this.schema) {
+      // find hidden properties
       if ((this.schema[key]["hidden"] && this.schema[key]["hidden"] === true) || 
           this.schema[key] === "encrypted_string" ||
           this.schema[key]["type"] === "encrypted_string") {
             this.hidden.push(key);
       }
+
+      // find nodefault properties
       if (this.schema[key][Globals.noDefault] && 
           this.schema[key][Globals.noDefault] === true) {
         this.noDefault.push(key);
       }
+
+      // find required properties
       if (this.schema[key]["required"] &&
           this.schema[key]["required"] === true) {
         this.required.push(key);
+      }
+
+      // find reserved properties
+      if (key.charAt(0) === "_") {
+        this.reserved.push(key);
+      }
+
+      // find embedded properties
+      if (
+        this.schema[key] === "embedded_itemid" ||
+        this.schema[key] === "embedded_listid" ||
+        this.schema[key] === "embedded_itemid_list" ||
+        this.schema[key].type === "embedded_itemid" ||
+        this.schema[key].type === "embedded_itemid_list"        
+      ) {
+        this.embedded.push(key);
       }
     }
   }
@@ -137,21 +161,6 @@ class Schema {
     return this.schema;
   }
 
-  getRequired(
-    removeReserved = false,
-    removeHidden = false
-) {
-
-    return this.required.filter(prop => {
-      return !(removeReserved && prop.charAt(0) === "_") &&
-             !(removeHidden && this.hidden.includes(prop));
-    })
-  }
-
-  getHidden() {
-    return this.hidden;
-  }
-
   getType(key) {
     if (this.schema.hasOwnProperty(key)) {
       if (validTypes.includes(this.schema[key])) {
@@ -166,7 +175,7 @@ class Schema {
     return null;
   }
 
-  getDefault(key, user) {
+  getDefault(key, user, listSchemaStr) {
     if (this.schema.hasOwnProperty(key)) {
       if (this.schema[key].hasOwnProperty('nodefault')) {
         return '';
@@ -177,7 +186,17 @@ class Schema {
 
       var propType = this.getType(key);
       
-      if (propType === 'template') return '';
+      if (propType === 'template')
+      {
+        if (listSchemaStr) {
+          var listSchema = new Schema(listSchemaStr);
+          return this.getDefaultTemplate(listSchema);
+        }
+        else {
+          return '';
+        }
+      }
+
       if (propType === 'schema') return 'prop1: "string"';
       if (propType === 'number') return 0;
       if (propType === 'email') return "email@gmail.com";
@@ -188,47 +207,152 @@ class Schema {
     return null;
   }
 
-  getAllDefault({
-    onlyRequired = false,
-    throwIfNoDefault = false, 
-    user
+  static deleteEmptyProps(item) {
+    var props = Object.keys(item)
+    props.forEach(p => {
+      if (item[p] === "") {
+        delete item[p];
+      }
+    });
+    return item;
   }
-  ) {
+
+  static getEmptyProps(item) {
+    var props = Object.keys(item)
+    return props.filter(p => item[p] === null || item[p] === "");
+  }
+
+  getDefaultTemplate(listSchema) {
+    return (listSchema ? listSchema : this).getProps({hidden: false, reserved: false})
+            .map((prop) => {
+              return ("<Text val={" + prop + "} inline /> ")
+            })
+            .join("");
+  }
+
+  getAllDefaults({
+    required = true,
+    hidden = true,
+    reserved = true,
+    others = true,
+    throwIfNoDefault = false, 
+    user,
+    listSchema
+  }) {
     var def = {};
     if (throwIfNoDefault && this.noDefault.length !== 0) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_NoDefault, this.noDefault.join(', ')));
     }
 
-    (onlyRequired ? this.getRequired() : this.getProps()).forEach((key) => {
-      def[key] = this.getDefault(key, user);
+    this.getProps({
+      required: required,
+      hidden: hidden,
+      reserved: reserved,
+      others: others
+    }).forEach((key) => {
+      def[key] = this.getDefault(key, user, listSchema);
     })
     return def;
   }
 
-  getEmbeddedItems() {
-    var embItems = [];
-    for (var key in this.schema) {
-      if (
-        this.schema[key] === "embedded_itemid" ||
-        this.schema[key] === "embedded_listid" ||
-        this.schema[key] === "embedded_itemid_list"
-      ) {
-        var item = {};
-        item.type = this.schema[key];
-        embItems.push({ [key]: item });
-      } else if (
-        this.schema[key].type === "embedded_itemid" ||
-        this.schema[key].type === "embedded_itemid_list"
-      ) {
-        embItems.push({ [key]: this.schema[key] });
-      }
-    }
-
-    return embItems;
+  getEmbedded() {
+    return this.embedded;
   }
 
-  getProps() {
-    return Object.keys(this.schema);
+  getProps(
+    {
+      required = true,
+      hidden = true,
+      reserved = true,
+      others = true,
+    }
+  ) {
+    return this.filterProps(Object.keys(this.schema), {
+      required: required,
+      hidden: hidden,
+      reserved: reserved,
+      others: others
+    })
+  }
+
+  filterProps(
+    props,
+    {
+      required = true,
+      hidden = true,
+      reserved = true,
+      others = true,
+    }
+  ) {
+    var allProps = Object.keys(this.schema);
+    if (others) {
+      if (!required) {
+        allProps = allProps.filter(p => !(this.required.includes(p)));
+      }
+      if (!hidden) {
+        allProps = allProps.filter(p => !(this.hidden.includes(p)));
+      }
+      if (!reserved) {
+        allProps = allProps.filter(p => !(this.reserved.includes(p)));
+      }
+    }
+    else {
+      allProps = [];
+      if (required) {
+        allProps = this.required;
+      }
+      if (hidden) {
+        allProps = allProps.concat(this.hidden);
+      }
+      if (reserved) {
+        allProps = allProps.concat(this.reserved);
+      }
+    }
+    return allProps.filter(p => props.includes(p));;
+  }
+
+  isRequired(prop) {
+    return this.required.includes(prop);
+  }
+
+  getRequired() {
+    return this.required
+  }
+
+  getOptional() {
+    return this.getProps({
+      required: false
+    });
+  }
+
+  getHidden() {
+    return this.hidden;
+  }
+
+  getNotHidden() {
+    return this.getProps({
+      hidden: false
+    });
+  }
+
+  getReserved() {
+    return this.hidden;
+  }
+
+  getNotReserved() {
+    return this.getProps({
+      reserved: false
+    });
+  }
+
+  getUnsetProps(
+    item,
+    {
+      hidden = false,
+      reserved = false
+    } = {}
+  ) {
+    return this.getProps({hidden: hidden, reserved: reserved}).filter(key => item[key] === undefined);
   }
 }
 

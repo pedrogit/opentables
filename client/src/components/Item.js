@@ -6,6 +6,9 @@ import { useTheme } from "@mui/material/styles";
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Tooltip from '@mui/material/Tooltip';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import * as Components from "./components";
 const Globals = require("../common/globals");
@@ -17,10 +20,74 @@ for (let name in Components) {
   global[name] = Components[name];
 }
 
+function ItemMoreMenu({
+  unsetProps,
+  handleSetUnsetProperty
+}) {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const theme = useTheme();
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <Tooltip title="More Options">
+        <IconButton
+          id="moreItemButton"
+          aria-label="more item" 
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          color="inherit"
+          sx={{p: theme.openTable.buttonPadding}}
+        >
+          <ExpandMoreIcon />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem dense>{unsetProps && unsetProps.length > 0 ? "Set Unset Property" : "No Unset Property in the Template"}</MenuItem>
+        {unsetProps && unsetProps.map(prop => 
+          <MenuItem
+            sx={{ml: "10px"}}
+            dense
+            onClick={() => handleSetUnsetProperty(prop)}>
+              {prop}
+          </MenuItem>
+        )}
+      </Menu>
+    </>
+  );
+}
+
 function Item({
   template,
   listid,
   item,
+  unsetProps,
   defItem,
   rowNb,
   setLoginState,
@@ -37,19 +104,19 @@ function Item({
 
   const theme = useTheme();
 
-  var defaultSx = {
+  const defaultSx = {
     bgcolor: rowNb % 2 ? "inherit" : "#EEE", 
     padding: 1,
     position: 'relative'
   };
 
-  var buttonSx = {
+  const buttonSx = {
     position: 'absolute',
     top: '1px',
-    right: '1px'
+    right: '2px'
   }
 
-  var handleSaveProperty = function (val, callback) {
+  const handleSaveProperty = (val, callback) => {
     setLoginState({
       open: false,
       msg: {
@@ -79,7 +146,13 @@ function Item({
     return false;
   };
 
-  var handleItemAuth = function({action = 'patch', propName, callback}) {
+  const handleSetUnsetProperty = (prop) => {
+    handleSaveProperty({
+      [prop]: defItem[prop]
+    })
+  }
+
+  const handleItemAuth = ({action = 'patch', propName, callback}) => {
     handleListAuth({
       action: 'patch', 
       item: item, 
@@ -88,7 +161,7 @@ function Item({
     });
   }
 
-  var setBindings = function (item) {
+  const setBindings = (item) => {
     // add property name and rest handlers
     var result = {};
     for (var key in item) {
@@ -115,17 +188,6 @@ function Item({
     return result;
   };
 
-  if (!template) {
-    template = '';
-    for (var key in item) {
-      if (item.hasOwnProperty(key) && 
-          key.charAt(0) !== "_") {
-        template = template + "<Text val={" + key + "} inline /> "
-      }
-    }
-  }
-
-  //console.log('Render Item (' +  item.name + ')...');
   return (
     <Box 
       id={"item_" + (item ? item[Globals.itemIdFieldName] : '')}
@@ -150,7 +212,7 @@ function Item({
         )}
       />
       {showButtons && 
-        <Stack sx={buttonSx}>
+        <Stack sx={buttonSx} direction="row">
           {enableDeleteButton &&
             <Tooltip title="Delete Item">
               <IconButton
@@ -164,6 +226,10 @@ function Item({
               </IconButton>
             </Tooltip>
           }
+          <ItemMoreMenu 
+            unsetProps={unsetProps}
+            handleSetUnsetProperty={handleSetUnsetProperty}
+          />
         </Stack>
       }
     </Box>

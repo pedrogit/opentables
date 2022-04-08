@@ -134,7 +134,6 @@ Globals = {
     [Globals.nameFieldName]: "Users (persistent form with items)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.addItemModeFieldName]: Globals.addWithPersistentFormAndItems,
-    [Globals.itemTemplateFieldName]: "",
     [Globals.childlistFieldName]: Globals.userListId,
   },
 
@@ -143,7 +142,6 @@ Globals = {
     [Globals.nameFieldName]: "Users (add with form)",
     [Globals.ownerFieldName]: process.env.ADMIN_EMAIL,
     [Globals.addItemModeFieldName]: Globals.addItemModeAsForm,
-    [Globals.itemTemplateFieldName]: "",
     [Globals.childlistFieldName]: Globals.userListId,
   }
 };

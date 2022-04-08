@@ -4,6 +4,7 @@ import Stack from "@mui/material/Stack";
 
 import getUser from "../clientUtils";
 const Schema = require("../common/schema");
+
 const Utils = require("../common/utils");
 const Globals = require("../common/globals");
 
@@ -11,6 +12,7 @@ const Globals = require("../common/globals");
 function List({
   listType,
   view,
+  listSchemaStr,
   setLoginState,
   setViewId,
   setViewData,
@@ -74,24 +76,11 @@ function List({
 
   var template;
   var parsedSchema;
+
   if (view) {
     // parse the schema and generate a default template if necesssary (should be done in the schema validator)
     parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
-    template = view[Globals.itemTemplateFieldName];
-
-    /*if (template === "") {
-      template = parsedSchema
-        .getRequired(true, true)
-        .map((prop) => {
-          //return ("<Text key={key + '_" + prop + "'} val={" + prop + "}/> ")
-          return ("<Text val={" + prop + "} inline /> ")
-        })
-        //.map((prop) => "<Text /> ")
-        .join("");
-    }*/
-  }
-  else {
-    template = null;
+    template = view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate();
   }
 
   var rowNb = 0;
@@ -225,8 +214,8 @@ function List({
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}
           listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
-          item={parsedSchema.getAllDefault({onlyRequired: true, user: getUser()})}
-          defItem={parsedSchema.getAllDefault({onlyRequired: true, user: getUser()})}
+          item={parsedSchema.getAllDefaults({hidden: false, reserved: false, others: false, user: getUser()})}
+          defItem={parsedSchema.getAllDefaults({user: getUser()})}
           rowNb={0}
           setLoginState={setLoginState}
           handleListAuth={handleListAuth}
@@ -255,6 +244,8 @@ function List({
             template={template}
             listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
             item={item}
+            defItem={parsedSchema.getAllDefaults({user: getUser(), listSchema: listSchemaStr})}
+            unsetProps={parsedSchema.getUnsetProps(item)}
             rowNb={rowNb}
             setLoginState={setLoginState}
             handleListAuth={handleListAuth}

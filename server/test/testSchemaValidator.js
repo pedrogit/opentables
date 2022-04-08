@@ -45,6 +45,8 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
       schema: {
         required: ["prop1"], 
         hidden: [], 
+        embedded: [], 
+        reserved: [], 
         noDefault: [], 
         schema: {
           prop1: {
@@ -67,6 +69,8 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
       schema: {
         required: ["prop1"], 
         hidden: [], 
+        embedded: [], 
+        reserved: [], 
         noDefault: [], 
         schema: {
           prop1: {
@@ -96,6 +100,8 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
       schema: {
         required: [], 
         hidden: [], 
+        embedded: [], 
+        reserved: [], 
         noDefault: [], 
         schema: {
           prop1: {
@@ -116,6 +122,8 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
       schema: {
         required: [], 
         hidden: [], 
+        embedded: [], 
+        reserved: [], 
         noDefault: [],
         schema: {
           prop1: {
@@ -146,6 +154,8 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
       schema: {
         required: ["name", "owner"], 
         hidden: [], 
+        embedded: [], 
+        reserved: [], 
         noDefault: [],
         schema: {
           name: {
@@ -214,13 +224,10 @@ describe("2 testSchemaValidator.js test string against schema", () => {
 
   it("2.2 Throw an error for an empty required prop, even if default is provided", async () => {
     var schemaValidator = new SchemaValidator('prop1: {type: string, required, default: "default value"}');
-    await expectThrowsAsync(
-      () => schemaValidator.validateJson('{"prop1": ""}'),
-      NodeUtil.format(
-        Errors.ErrMsg.SchemaValidator_Required,
-        "prop1"
-      )
-    );
+    var result = await schemaValidator.validateJson('{"prop1": ""}');
+    // just make sure the constructor does not throw
+    expect(result).to.be.an("object");
+    expect(result).to.have.property("prop1", "default value");
   });
 
   it("2.3 Generate a required default value", async () => {
@@ -231,13 +238,12 @@ describe("2 testSchemaValidator.js test string against schema", () => {
     expect(result).to.have.property("prop1", "default value");
   });
 
-
-  it("2.4 Generate a default value for a patched value", async () => {
+  it("2.4 Make sure a default value is not generated for an optional value", async () => {
     var schemaValidator = new SchemaValidator('prop1: {type: string, default: "default value"}');
     var result = await schemaValidator.validateJson('{"prop1": ""}', false);
     // just make sure the constructor does not throw
     expect(result).to.be.an("object");
-    expect(result).to.have.property("prop1", "default value");
+    expect(result).to.have.property("prop1", "");
   });
 
   it("2.5 Validate a number against a one level schema of type number", async () => {

@@ -1285,7 +1285,6 @@ describe("testRoutes.js List API", () => {
         [Globals.nameFieldName]: "First view",
         [Globals.ownerFieldName]: "p@gmail.com",
         [Globals.readWritePermFieldName]: "@owner",
-        [Globals.itemTemplateFieldName]: "",
         [Globals.childlistFieldName]: listIdToPatch,
       };
       chai

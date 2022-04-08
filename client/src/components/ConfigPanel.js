@@ -21,11 +21,24 @@ function ConfigPanel({
   const theme = useTheme();
 
   const handleEditView = React.useCallback(
-    (editedView, callback) => {
+    (editedView) => {
       var child = {...view[Globals.childlistFieldName]};
       setViewData({
         ...editedView[Globals.childlistFieldName][Globals.itemsFieldName][0],
         [Globals.childlistFieldName]: child
+      });
+    }, [view, setViewData]
+  );
+
+  const handleEditList = React.useCallback(
+    (editedList) => {
+      var items = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
+      setViewData({
+        ...view,
+        [Globals.childlistFieldName]: {
+          ...editedList[Globals.childlistFieldName][Globals.itemsFieldName][0],
+          [Globals.itemsFieldName]: items
+        }
       });
     }, [view, setViewData]
   );
@@ -57,12 +70,12 @@ function ConfigPanel({
           <List
             listType='View'
             view={{
-              [Globals.itemTemplateFieldName]: '',
               [Globals.childlistFieldName]: {
                 ...Globals.listOfAllViews,
                 [Globals.itemsFieldName]: view ? [view] : []
               }
             }}
+            listSchemaStr={view[Globals.childlistFieldName][Globals.listSchemaFieldName]}
             setLoginState={setLoginState}
             setViewData={handleEditView}
             setErrorMsg={setErrorMsg}
@@ -71,13 +84,13 @@ function ConfigPanel({
           <List
             listType='List'
             view={{
-              [Globals.itemTemplateFieldName]: '',
               [Globals.childlistFieldName]: {
                 ...Globals.listOfAllLists,
                 [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
               }
             }}
             setLoginState={setLoginState}
+            setViewData={handleEditList}
             setErrorMsg={setErrorMsg}
             enableDeleteButton={false}
           />

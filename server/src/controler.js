@@ -215,7 +215,7 @@ class Controler {
             var newItem = await schemaValidator.validateJson(thisItem, strict);
             // add listid to the item
             if (strict && listid) {
-              thisItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
+              newItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
             }
             return newItem;
           })
@@ -368,13 +368,12 @@ class Controler {
       // add embedded items if there are any
       const schema = new Schema(parentList[Globals.listSchemaFieldName]);
       await Promise.all(
-        schema.getEmbeddedItems().map(async (embItem) => {
-          var propName = Object.keys(embItem)[0];
-          if (item[propName]){
-            noitems = (propName === Globals.childlistFieldName && 
+        schema.getEmbedded().map(async (embedded) => {
+          if (item[embedded]){
+            noitems = (embedded === Globals.childlistFieldName && 
                        item[Globals.addItemModeFieldName] &&
                        item[Globals.addItemModeFieldName] === Globals.addWithPersistentFormNoItems ? true : noitems);
-           item[propName] = await this.findWithItems(user, item[propName], filter, noitems);
+           item[embedded] = await this.findWithItems(user, item[embedded], filter, noitems);
           }
         })
       );
@@ -500,9 +499,14 @@ class Controler {
     );
     
     // update it
+    var unsetProps = Schema.getEmptyProps(newitem);
+    var pipeline = { $set: newitem };
+    if (unsetProps.length > 0) {
+      pipeline = [pipeline, { $unset: unsetProps }];
+    }
     item = await this.coll.findOneAndUpdate(
       { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) },
-      { $set: newitem },
+      pipeline,
       { returnDocument: "after" }
     );
     if (!item.ok) {

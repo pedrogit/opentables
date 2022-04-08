@@ -70,7 +70,7 @@ function Text({
   const valueRef = React.useRef();
   const theme = useTheme();
 
-  const [editVal, setEditVal] = React.useState(noeditdefault && propVal === defVal ? "" : propVal);
+  const [editVal, setEditVal] = React.useState(noeditdefault ? "" : propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
   React.useEffect(() => {
@@ -93,6 +93,9 @@ function Text({
           action: 'patch', 
           propName: val.prop, 
           callback: (auth) => {
+            if (!editVal) {
+              setEditVal(propVal);
+            }
             setIsEditing(true);
           }
         });
@@ -106,6 +109,7 @@ function Text({
     const handleSave = () => {
       if (!inform) {
         val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
+          setEditVal(val[propName]);
           setIsEditingOff();
         });
       }
@@ -126,6 +130,9 @@ function Text({
     const setIsEditingOff = () => {
       if (!inform) {
         setIsEditing(false);
+        if (!editVal) {
+          setEditVal(propVal);
+        }
       }
     }
 
@@ -208,7 +215,7 @@ function Text({
       </>
     );
   }
-  return (<Typography color = 'red'>&lt;Text value is missing /&gt;</Typography>);
+  return null;
 }
 
 /*************************
@@ -355,7 +362,9 @@ function ItemWrapperForm({handlers, otherProps, children}) {
         if (e.target[i].type !== "button" && 
             e.target[i].type !== "fieldset" && 
             e.target[i].name !== undefined && 
-            e.target[i].defaultValue !== undefined) {
+            e.target[i].defaultValue !== undefined &&
+            e.target[i].defaultValue !== null &&
+            e.target[i].defaultValue !== "") {
           newItem[e.target[i].name] = e.target[i].defaultValue;
         }
         if (e.target[i].name === Globals.gRecaptchaResponse) {
