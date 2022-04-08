@@ -5,7 +5,11 @@ const Globals = require("./common/globals");
 const getUser = function() {
   var authtoken = Cookies.get('authtoken');
   if (authtoken) {
-    return jwt.decode(authtoken).email;
+    var user = jwt.decode(authtoken).email;
+    if (user !== null && user !=='') {
+      return user;
+    }
+    Cookies.remove('authtoken');
   }
   return Globals.allUserName;
 }
