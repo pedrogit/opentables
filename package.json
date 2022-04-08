@@ -4,6 +4,7 @@
   "description": "Restful server of configurable and formattable tables",
   "main": "server/index.js",
   "scripts": {
+    "test-template": "nodemon --inspect --exec \"mocha client/src/common/test/testTemplateParser.js --timeout 0\"",
     "test-schema": "nodemon --inspect --exec \"mocha server/test/testSchemaValidator.js --timeout 0\"",
     "test-utils": "nodemon --inspect --exec \"mocha client/src/common/test/testUtils.js --timeout 0\"",
     "test-permissions": "nodemon --inspect --exec \"mocha client/src/common/test/testPermissions.js --timeout 0\"",
