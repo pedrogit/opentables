@@ -95,7 +95,7 @@ class Schema {
         this.schema[key] === "embedded_listid" ||
         this.schema[key] === "embedded_itemid_list" ||
         this.schema[key].type === "embedded_itemid" ||
-        this.schema[key].type === "embedded_itemid_list"        
+        this.schema[key].type === "embedded_itemid_list"
       ) {
         this.embedded.push(key);
       }
@@ -109,7 +109,14 @@ class Schema {
       this.required.push(lastKey);
     }
     if (count > 1 && this.required.length === 0) {
-      throw new Error(Errors.ErrMsg.Schema_InvalidSchemaOneRequired);
+      throw new Error(
+                    NodeUtil.format(
+                      Errors.ErrMsg.Schema_InvalidSchemaOneRequired,
+                        typeof schema === "object"
+                          ? JSON.stringify(schema)
+                          : '"' + schema + '"'
+                    )
+                  );
     }
   }
 
