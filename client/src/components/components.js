@@ -112,10 +112,12 @@ function Text({
     };
 
     const handleSave = () => {
-      if (!inform) {
+      if (!inform && editVal !== propVal) {
         val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
-          setEditVal(val[propName]);
-          setIsEditingOff();
+          if (success) {
+            setIsEditingOff();
+            setEditVal(val[propName]);
+          }
         });
       }
     };
