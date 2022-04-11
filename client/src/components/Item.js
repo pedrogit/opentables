@@ -69,7 +69,7 @@ function ItemMoreMenu({
           horizontal: 'right',
         }}
       >
-        <MenuItem dense>{unsetProps && unsetProps.length > 0 ? "Set Unset Property" : "No Unset Property in the Template"}</MenuItem>
+        <MenuItem dense>{unsetProps && unsetProps.length > 0 ? "Add Unset Property" : "No Unset Property to Add"}</MenuItem>
         {unsetProps && unsetProps.map(prop => 
           <MenuItem
             sx={{ml: "10px"}}
