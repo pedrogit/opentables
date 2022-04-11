@@ -101,26 +101,6 @@ class Controler {
     })
   }
 
-  static async validateRecaptcha(item) {
-    var humanKey = item[Globals.gRecaptchaResponse];
-    delete item[Globals.gRecaptchaResponse];
-    if (humanKey) {
-      var isHuman;
-      try {
-        isHuman = await axios.post(
-          "https://www.google.com/recaptcha/api/siteverify?secret=" +
-          process.env.RECAPTCHA_SERVER_KEY + "&response=" + humanKey
-        );
-      }
-      catch (err){
-        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
-      }
-      if (isHuman === null || !isHuman.data || isHuman.data.success !== true) {
-        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
-      }
-    }
-  }
-
   static isList(item) {
     return (
       item[Globals.listIdFieldName] &&
@@ -179,6 +159,30 @@ class Controler {
     return parentList;
   }
 
+  static async validateRecaptcha(humanKey) {
+    //var humanKey = item[Globals.gRecaptchaResponse];
+    //delete item[Globals.gRecaptchaResponse];
+    if (humanKey) {
+      var isHuman;
+      try {
+        isHuman = await axios.post(
+          "https://www.google.com/recaptcha/api/siteverify?secret=" +
+          process.env.RECAPTCHA_SERVER_KEY + "&response=" + humanKey
+        );
+      }
+      catch (err){
+        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
+      }
+      /*if (isHuman === null || !isHuman.data || isHuman.data.success !== true) {
+        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
+      }*/
+      if (isHuman && isHuman.data && isHuman.data.success) {
+        return
+      }
+    }
+    throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
+  }
+
   /*
     Validate items against the schema stored in the item with _id = listid
     When strict is false, ignore fields which are not in the schema, 
@@ -195,6 +199,13 @@ class Controler {
     }
   ) {
     var newItems;
+    var gRecaptchaResponse;
+
+    // remember recaptcha
+    if (strict && !post && user === Globals.allUserName) {
+      gRecaptchaResponse = items[Globals.gRecaptchaResponse];
+      delete items[Globals.gRecaptchaResponse];
+    }
 
     // validate provided JSON against the schema
     try {
@@ -230,6 +241,11 @@ class Controler {
       }
     } catch (err) {
       throw new Errors.BadRequest(err.message);
+    }
+
+    // validate recaptcha when user = @all
+    if (strict && !post && user === Globals.allUserName) {
+      await Controler.validateRecaptcha(gRecaptchaResponse);
     }
     return newItems;
   }
@@ -394,11 +410,6 @@ class Controler {
   }
 
   async insertMany(user, listid, item) {
-    // validate recaptcha when user = @all
-    if (user === Globals.allUserName) {
-      await Controler.validateRecaptcha(item);
-    }
-
     // find the parent list
     var parentList = await this.getParentList(listid);
 

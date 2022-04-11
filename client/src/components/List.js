@@ -76,13 +76,11 @@ function List({
     }
   }, [addItem, addItemMode, setAddItem, handleAddItem] );
 
-  var template;
   var parsedSchema;
 
   if (view) {
-    // parse the schema and generate a default template if necesssary
+    // parse the schema
     parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
-    template = view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate();
   }
 
   var rowNb = 0;
@@ -214,7 +212,7 @@ function List({
          addItemMode === Globals.addWithPersistentFormNoItems
          ) &&
         <Item
-          template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}
+          template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + (view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate({hidden: true})) + "</ItemWrapperForm>"}
           listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
           item={parsedSchema.getRequiredDefaults({user: getUser()})}
           defItem={parsedSchema.getAllDefaults({user: getUser()})}
@@ -243,7 +241,7 @@ function List({
         return (
           <Item
             key={item[Globals.itemIdFieldName]}
-            template={template}
+            template={view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate()}
             listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
             item={item}
             defItem={parsedSchema.getAllDefaults({user: getUser(), listSchema: listSchemaStr})}

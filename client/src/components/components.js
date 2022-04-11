@@ -318,7 +318,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
   }
   const [childProps, setChildProps] = React.useState(defChildProps);
   const [recaptchaResponse, setRecaptchaResponse] = React.useState('');
-
+  const recaptchaRef = React.useRef();
   var options = {
     cancelLabel: "Cancel",
     cancelAction: () => otherProps.setAddItem(false),
@@ -350,11 +350,20 @@ function ItemWrapperForm({handlers, otherProps, children}) {
     setChildProps(defChildProps)
   }
 
+  const resetRecaptcha = () => {
+    if (recaptchaRef && recaptchaRef.current) {
+      setRecaptchaResponse('');
+      recaptchaRef.current.reset();
+    }
+  }
+
   const resetForm = () => {
+    resetRecaptcha();
     setChildProps({
       ...defChildProps, 
       reset: true, 
-      disableReset: disableReset});
+      disableReset: disableReset
+    });
   }
   
   if (otherProps.addItemMode === Globals.addWithPersistentFormAndItems) {
@@ -393,6 +402,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
             }
             options.addAction();
           }
+          //resetRecaptcha();
         }
       })
     }
@@ -422,13 +432,14 @@ function ItemWrapperForm({handlers, otherProps, children}) {
       {childrenWithProp}
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        justifyContent="space-between"
+        justifyContent={otherProps.recaptcha ? "space-between" : "flex-end"}
       >
         {otherProps.recaptcha &&
           <ReCAPTCHA
+            ref={recaptchaRef}
             sitekey="6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V"
             onChange={(value) => setRecaptchaResponse(value)}
-            onExpired={() => recaptchaResponse('')}
+            onExpired={() => setRecaptchaResponse('')}
           />
         }
         <Stack 

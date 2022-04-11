@@ -189,8 +189,7 @@ class Schema {
       if (propType === 'template')
       {
         if (listSchemaStr) {
-          var listSchema = new Schema(listSchemaStr);
-          return this.getDefaultTemplate(listSchema);
+          return this.getDefaultTemplate({listSchema: (new Schema(listSchemaStr))});
         }
         else {
           return '';
@@ -222,19 +221,26 @@ class Schema {
     return props.filter(p => item[p] === null || item[p] === "");
   }
 
-  getDefaultTemplate(listSchema) {
-    return (listSchema ? listSchema : this).getProps({hidden: false, reserved: false})
-            .map((prop) => {
-              return ("<Text val={" + prop + "} inline /> ")
-            })
-            .join("");
+  getDefaultTemplate({
+    hidden = false, 
+    reserved = false,
+    listSchema = null
+  } = {}) {
+    return (listSchema ? listSchema : this).getProps({
+      hidden: hidden, 
+      reserved: reserved
+    })
+    .map((prop) => {
+      return ("<Text val={" + prop + "} inline /> ")
+    })
+    .join("");
   }
 
   getRequiredDefaults({
     throwIfNoDefault = false, 
     user,
     listSchema
-  }) {
+  } = {}) {
     return this.getAllDefaults({
       hidden: false,
       reserved: false,
@@ -253,7 +259,7 @@ class Schema {
     throwIfNoDefault = false, 
     user,
     listSchema
-  }) {
+  } = {}) {
     var def = {};
     if (throwIfNoDefault && this.noDefault.length !== 0) {
       throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_NoDefault, this.noDefault.join(', ')));
@@ -274,14 +280,12 @@ class Schema {
     return this.embedded;
   }
 
-  getProps(
-    {
+  getProps({
       required = true,
       hidden = true,
       reserved = true,
       others = true,
-    }
-  ) {
+  } = {}) {
     return this.filterProps(Object.keys(this.schema), {
       required: required,
       hidden: hidden,
@@ -297,7 +301,7 @@ class Schema {
       hidden = true,
       reserved = true,
       others = true,
-    }
+    } = {}
   ) {
     var allProps = Object.keys(this.schema);
     if (others) {
