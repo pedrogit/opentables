@@ -54,6 +54,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
             severity={errorMsg && errorMsg.severity ? errorMsg.severity : 'error'} 
             color="primary"
             sx={{padding: '5px'}}
+            onClick={() => closeButton && clearTimeout(closeTimeOutRef.current)}
         >
         <AlertTitle>{errorMsg && errorMsg.title ? errorMsg.title : 'Error'}</AlertTitle>
         {(errorMsg && errorMsg.text && errorMsg.open && errorMsg.open === true) ? errorMsg.text : <span> </span>}
