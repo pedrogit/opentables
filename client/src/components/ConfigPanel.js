@@ -66,14 +66,16 @@ function ConfigPanel({
 
   const handleEditList = React.useCallback(
     (editedList) => {
-      var items = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
-      setViewData({
+      var newViewData = {
         ...view,
         [Globals.childlistFieldName]: {
           ...editedList[Globals.childlistFieldName][Globals.itemsFieldName][0],
-          [Globals.itemsFieldName]: items
         }
-      });
+      }
+      if (view[Globals.childlistFieldName][Globals.itemsFieldName]) {
+        newViewData[Globals.childlistFieldName][Globals.itemsFieldName] = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
+      }
+      setViewData(newViewData);
     }, [view, setViewData]
   );
 
