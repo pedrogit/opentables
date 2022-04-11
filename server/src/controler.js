@@ -434,6 +434,12 @@ class Controler {
     if (newItems instanceof Array) {
       newItems = await this.coll.insertMany(newItems);
     } else {
+      // if the new item is a view, add a corresponding list
+      if (listid === Globals.listofAllViewId && !newItems[Globals.childlistFieldName]) {
+        var newList = await this.insertMany(user, Globals.listofAllListId, {});
+        newItems[Globals.childlistFieldName] = newList[Globals.itemIdFieldName];
+      }
+
       try {
         await this.coll.insertOne(newItems);
       } catch (error) {

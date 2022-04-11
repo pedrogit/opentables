@@ -107,22 +107,12 @@ describe("testRoutes.js List API", () => {
     });
 
     it("2.3 - Post a new, valid empty list", (done) => {
-      lastList = {
-        ...lastList,
-        [Globals.listSchemaFieldName]: "{}",
-      };
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
-        .send(lastList)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
-          lastList = {
-            ...lastList,
-            [Globals.itemReadPermFieldName]:
-              lastList[Globals.itemReadPermFieldName].toLowerCase(),
-            [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName]
-          };
+          lastList = response.body;
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
           expect(response.body).to.deep.equal(lastList);
@@ -195,10 +185,6 @@ describe("testRoutes.js List API", () => {
     });
 
     it("2.8 - Try to post a new list with an already existing id", (done) => {
-      lastList = {
-        ...lastList,
-        [Globals.listSchemaFieldName]: "{}",
-      };
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
@@ -269,7 +255,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.deep.equal({
             err: NodeUtil.format(
               Errors.ErrMsg.SchemaValidator_InvalidProp,
-              "xlistschema"
+              "x" + Globals.listSchemaFieldName
             ),
           });
           done();
@@ -1065,6 +1051,7 @@ describe("testRoutes.js List API", () => {
           ...newUser,
           password: pw
         })
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           newUser = {
             ...newUser,
@@ -1232,24 +1219,12 @@ describe("testRoutes.js List API", () => {
 
   describe("11 - Test get all lists", () => {
     it("11.1 - Add an extra list", (done) => {
-      newList = {
-        ...lastList,
-        [Globals.nameFieldName]: "Extra list",
-        [Globals.listSchemaFieldName]: "{}",
-      };
-      delete newList[Globals.itemsFieldName];
-      delete newList[Globals.itemIdFieldName];
-      delete newList[Globals.listIdFieldName];
       chai
         .request(server)
         .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
-        .send(newList)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
-          newList = {
-            ...newList,
-            [Globals.itemIdFieldName]: response.body[Globals.itemIdFieldName],
-          };
+          newList = response.body;
           expect(response).to.have.status(201);
           expect(response.body).to.be.an("object");
           expect(response.body).to.deep.equal(newList);
@@ -1419,6 +1394,7 @@ describe("testRoutes.js List API", () => {
           ...user2,
           password: pw
         })
+        .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           user2 = {
             ...user2,

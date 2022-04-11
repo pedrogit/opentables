@@ -13,7 +13,7 @@ var Globals = {
   listIdFieldName: "_listid",
   ownerFieldName: "owner",
   nameFieldName: "name",
-  listSchemaFieldName: "listschema",
+  listSchemaFieldName: "schema",
   emailFieldName: "owner",
   itemTemplateFieldName: "item_template",
   childlistFieldName: "_childlist",
@@ -71,7 +71,7 @@ Globals = {
       Globals.itemCreatePermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.itemReadPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.itemReadWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.listSchemaFieldName + ": {type: schema, default: 'prop1: string'}" +
+      Globals.listSchemaFieldName + ": {type: schema, required, default: 'prop1: string'}" +
       "}",
   },
 

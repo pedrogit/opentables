@@ -62,6 +62,8 @@ class Schema {
     this.required = [];  // properties having the required schema property set
     this.embedded = [];  // properties defining an embedded item
 
+    var count = 0;
+    var lastKey;
     for (var key in this.schema) {
       // find hidden properties
       if ((this.schema[key]["hidden"] && this.schema[key]["hidden"] === true) || 
@@ -97,6 +99,17 @@ class Schema {
       ) {
         this.embedded.push(key);
       }
+      count++;
+      lastKey = key;
+    }
+    if (count === 1 && this.required.length === 0) {
+      if (typeof this.schema[key] === "object") {
+        this.schema[key]["required"] = true;
+      }
+      this.required.push(lastKey);
+    }
+    if (count > 1 && this.required.length === 0) {
+      throw new Error(Errors.ErrMsg.Schema_InvalidSchemaOneRequired);
     }
   }
 

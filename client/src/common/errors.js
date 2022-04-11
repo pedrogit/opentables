@@ -54,6 +54,7 @@ var ErrMsg = {
   Schema_InvalidValue: "Invalid value (%s) for %s...",
   Schema_InvalidSchema: "Invalid schema (%s)...",
   Schema_InvalidSchemaParameter: 'Invalid schema parameter (%s) for property "%s"...',
+  Schema_InvalidSchemaOneRequired: "Invalid schema (%s). At least one property must be required...",
 
   SchemaValidator_NotUnique: 'Item is not valid. Property "%s" should be unique but value (%s) already exists...',
   SchemaValidator_NoControler: "No controler provided to Schema...",

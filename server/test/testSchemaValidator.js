@@ -5,6 +5,7 @@ const NodeUtil = require("util");
 const SchemaValidator = require("../src/schemavalidator");
 const Errors = require("../../client/src/common/errors");
 const { stringify } = require("ajv");
+const Globals = require("../../client/src/common/globals");
 
 var expect = chai.expect;
 
@@ -98,7 +99,7 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
     expect(schemaValidator).to.deep.equal({
       post: false, 
       schema: {
-        required: [], 
+        required: ["prop1"], 
         hidden: [], 
         embedded: [], 
         reserved: [], 
@@ -106,6 +107,7 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
         schema: {
           prop1: {
             type: "string", 
+            required: true,
             options: "a, b, c"
           }
         }
@@ -114,13 +116,13 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
   });
 
   it("1.7 Valid string with options as a string list", async () => {
-    var schemaValidator = new SchemaValidator("prop1: {type: string, options: [a_a, b_b, c_c]}");
+    var schemaValidator = new SchemaValidator("prop1: {type: string, required, options: [a_a, b_b, c_c]}");
     // just make sure the constructor does not throw
     expect(schemaValidator).to.be.an("object");
     expect(schemaValidator).to.deep.equal({
       post: false, 
       schema: {
-        required: [], 
+        required: ["prop1"], 
         hidden: [], 
         embedded: [], 
         reserved: [], 
@@ -128,6 +130,7 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
         schema: {
           prop1: {
             type: "string", 
+            required: true,
             options: ["a_a", "b_b", "c_c"]
           }
         }
@@ -145,7 +148,7 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
   });
 
   it("1.9 Complex schema", async () => {
-    var schema = "{name: {type: string, required, default: 'List name'}, owner: {type: user, required}, r_permissions: {type: user_list, lower, default: @all}, rw_permissions: {type: user_list, lower, default: @owner}, item_r_permissions: {type: user_list, lower, default: @all}, item_rw_permissions: {type: user_list, lower, default: @owner}, listschema: {type: schema, default: 'prop1: string'}}";
+    var schema = "{name: {type: string, required, default: 'List name'}, owner: {type: user, required}, r_permissions: {type: user_list, lower, default: @all}, rw_permissions: {type: user_list, lower, default: @owner}, item_r_permissions: {type: user_list, lower, default: @all}, item_rw_permissions: {type: user_list, lower, default: @owner}, " + Globals.listSchemaFieldName + ": {type: schema, default: 'prop1: string'}}";
     var schemaValidator = new SchemaValidator(schema);
     
     expect(schemaValidator).to.be.an("object");
@@ -158,36 +161,36 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
         reserved: [], 
         noDefault: [],
         schema: {
-          name: {
+          [Globals.nameFieldName]: {
             type: "string",
             required: true,
             default: "List name",
           },
-          owner: {
+          [Globals.ownerFieldName]: {
             type: "user",
             required: true,
           },
-          r_permissions: {
+          [Globals.readPermFieldName]: {
             type: "user_list",
             lower: true,
             default: "@all",
           },
-          rw_permissions: {
+          [Globals.readWritePermFieldName]: {
             type: "user_list",
             lower: true,
             default: "@owner",
           },
-          item_r_permissions: {
+          [Globals.itemReadPermFieldName]: {
             type: "user_list",
             lower: true,
             default: "@all",
           },
-          item_rw_permissions: {
+          [Globals.itemReadWritePermFieldName]: {
             type: "user_list",
             lower: true,
             default: "@owner",
           },
-          listschema: {
+          [Globals.listSchemaFieldName]: {
             type: "schema",
             default: "prop1: string",
           },
@@ -199,7 +202,7 @@ describe("1 testSchemaValidator.js test schema constructor", () => {
 
 describe("2 testSchemaValidator.js test string against schema", () => {
 
-  it("1.5 Validate a simple json string against a one level schema", async () => {
+  it("2.5 Validate a simple json string against a one level schema", async () => {
     var schemaValidator = new SchemaValidator("prop1: string");
     var result = await schemaValidator.validateJson('{"prop1": "toto"}');
     // just make sure the constructor does not throw
@@ -239,11 +242,11 @@ describe("2 testSchemaValidator.js test string against schema", () => {
   });
 
   it("2.4 Make sure a default value is not generated for an optional value", async () => {
-    var schemaValidator = new SchemaValidator('prop1: {type: string, default: "default value"}');
-    var result = await schemaValidator.validateJson('{"prop1": ""}', false);
+    var schemaValidator = new SchemaValidator('prop1: {type: string, required}, prop2: {type: string, default: "default value"}');
+    var result = await schemaValidator.validateJson('{"prop2": ""}', false);
     // just make sure the constructor does not throw
     expect(result).to.be.an("object");
-    expect(result).to.have.property("prop1", "");
+    expect(result).to.have.property("prop2", "");
   });
 
   it("2.5 Validate a number against a one level schema of type number", async () => {
