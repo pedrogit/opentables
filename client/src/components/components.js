@@ -19,7 +19,12 @@ const Errors = require("../common/errors");
 /********************
  *  Label component
  ********************/
-function Label({val, vertical, nolabel, sx}) {
+function Label({
+  val, // label text
+  vertical = false, // label is over the component (vertical=true), or  on the left size of it (vertical=false)
+  nolabel = false, // do not dispay the label
+  sx // label sx
+}) {
   const theme = useTheme();
   var fontSize = vertical
     ? theme.typography.caption
@@ -50,18 +55,18 @@ function Label({val, vertical, nolabel, sx}) {
  ********************/
 function Text({
   val, 
-  inline = false,
-  inform = false,
-  pretty = false,
-  editmode = false,
-  noeditdefault = false,
-  reset = false,
-  disableReset,
-  vertical = false,
-  label, 
-  nolabel = false,
-  labelSx = {}, 
-  sx
+  inline = false, // edit mode is inline 
+  inform = false, // component is part of a form
+  pretty = false, // make inline inputs pretty
+  editmode = false, // switch between read and edit mode
+  noeditdefault = false, // set to empty when resetting
+  reset = false, // reset or not
+  disableReset, // function to reset the reset mode
+  vertical = false, // vertical lavels (horizontal otherwise)
+  label, // label
+  nolabel = false, // do not display label
+  labelSx = {}, // label sx
+  sx  // component sx
 }) {
   const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
   const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
@@ -222,11 +227,11 @@ function Text({
  *  Viewlink component
  *************************/
 function Viewlink({
-  text,  //text to display under the link
-  viewid //viewid of the view to display
+  text,  // text to display under the link
+  viewid // viewid of the view to display
 }) {
   return (
-    <Link onClick={() => (viewid.setViewId)(viewid.val)}>
+    <Link onClick={viewid && viewid.setViewId ? (() => (viewid.setViewId)(viewid.val)) : null}>
       {text ? (text.val ? text.val : "Text property missing...") : "Text property missing..."}
     </Link>
   )
@@ -239,15 +244,15 @@ function Viewlink({
  *************************/
 function Password({
   val,
-  inline = false,
-  pretty = false,
-  vertical = false,
-  reset = false,
-  disableReset,
-  label, 
-  nolabel = false,
-  labelSx = {}, 
-  sx
+  inline = true, // inline or popop (for now always inline)
+  pretty = false, // make inline inputs pretty
+  vertical = false, // label placement
+  reset = false, // reset or not
+  disableReset, // function to reset the reset mode
+  label, // label to display
+  nolabel = false, // do not display any label
+  labelSx = {}, // label sx
+  sx // input sx
 }) {
   const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
   const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
@@ -296,6 +301,13 @@ function Password({
   )
 }
 
+/*************************
+ *  Add Item Wrapper Form
+ *  
+ *  Add cancel (or add or reset) and Add (or Register) buttons 
+ *  around the item template and set the template component
+ *  properties to necessary values (inform, inline, pretty)
+ *************************/
 function ItemWrapperForm({handlers, otherProps, children}) {
   const defChildProps = {
     inform: true, 
