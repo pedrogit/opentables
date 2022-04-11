@@ -230,6 +230,21 @@ class Schema {
             .join("");
   }
 
+  getRequiredDefaults({
+    throwIfNoDefault = false, 
+    user,
+    listSchema
+  }) {
+    return this.getAllDefaults({
+      hidden: false,
+      reserved: false,
+      others: false,
+      throwIfNoDefault: throwIfNoDefault, 
+      user: user,
+      listSchema: listSchema
+    })
+  }
+
   getAllDefaults({
     required = true,
     hidden = true,

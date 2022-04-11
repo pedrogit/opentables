@@ -22,6 +22,7 @@ function List({
   enableDeleteButton = true,
   sx
 }) {
+  // set a default value for addItemMode
   var addItemMode = (view && view[Globals.addItemModeFieldName]) || Globals.addItemModeDefault;
 
   const handleAddItem = React.useCallback(
@@ -68,6 +69,7 @@ function List({
   );
 
   React.useEffect(() => {
+    // add a new default item when requested
     if (addItem && addItemMode === Globals.addItemModeDefault) {
       setAddItem(false);
       handleAddItem({});
@@ -78,7 +80,7 @@ function List({
   var parsedSchema;
 
   if (view) {
-    // parse the schema and generate a default template if necesssary (should be done in the schema validator)
+    // parse the schema and generate a default template if necesssary
     parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
     template = view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate();
   }
@@ -214,7 +216,7 @@ function List({
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + template + "</ItemWrapperForm>"}
           listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
-          item={parsedSchema.getAllDefaults({hidden: false, reserved: false, others: false, user: getUser()})}
+          item={parsedSchema.getRequiredDefaults({user: getUser()})}
           defItem={parsedSchema.getAllDefaults({user: getUser()})}
           rowNb={0}
           setLoginState={setLoginState}

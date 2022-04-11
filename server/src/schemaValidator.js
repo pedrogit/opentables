@@ -82,10 +82,7 @@ class SchemaValidator {
     if (jsonkeys.length === 0) {
       if (strict) {
         // generate default values for all required properties
-        json = this.schema.getAllDefaults({
-          hidden: false,
-          reserved: false,
-          others: false,
+        json = this.schema.getRequiredDefaults({
           throwIfNoDefault: true,
           user: user
         });
