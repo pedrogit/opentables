@@ -1,14 +1,43 @@
 import React from "react";
+import Box from '@mui/material/Box';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import { useTheme } from "@mui/material/styles";
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import PropTypes from 'prop-types';
 
 // local imports
 import List from "./List";
 const Globals = require("../common/globals");
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <>
+          {children}
+        </>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
 
 function ConfigPanel({
   configPanelOpen,
@@ -18,7 +47,12 @@ function ConfigPanel({
   setLoginState,
   setErrorMsg
 }) {
+  const [value, setValue] = React.useState(0);
   const theme = useTheme();
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const handleEditView = React.useCallback(
     (editedView) => {
@@ -57,7 +91,8 @@ function ConfigPanel({
               position: 'absolute', 
               top: '1px', 
               right: '1px',
-              p: theme.openTable.buttonPadding
+              p: theme.openTable.buttonPadding,
+              zIndex: '100'
             }}
             id="closeErrorMsgButton"
             aria-label="close error panel" 
@@ -66,34 +101,46 @@ function ConfigPanel({
           >
             <HighlightOffIcon />
           </IconButton>
-          <Typography sx={{fontWeight:'bold', color: theme.palette.primary.main, padding: '8px'}}>{Globals.listProperties}</Typography>
-          <List
-            listType='View'
-            view={{
-              [Globals.childlistFieldName]: {
-                ...Globals.listOfAllViews,
-                [Globals.itemsFieldName]: view ? [view] : []
-              }
-            }}
-            listSchemaStr={view[Globals.childlistFieldName][Globals.listSchemaFieldName]}
-            setLoginState={setLoginState}
-            setViewData={handleEditView}
-            setErrorMsg={setErrorMsg}
-            enableDeleteButton={false}
-          />
-          <List
-            listType='List'
-            view={{
-              [Globals.childlistFieldName]: {
-                ...Globals.listOfAllLists,
-                [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
-              }
-            }}
-            setLoginState={setLoginState}
-            setViewData={handleEditList}
-            setErrorMsg={setErrorMsg}
-            enableDeleteButton={false}
-          />
+
+          <Box sx={{ width: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                <Tab label={Globals.viewProperties}/>
+                <Tab label={Globals.listProperties} />
+              </Tabs>
+            </Box>
+            <TabPanel value={value} index={0}>
+              <List
+                listType='View'
+                view={{
+                  [Globals.childlistFieldName]: {
+                    ...Globals.listOfAllViews,
+                    [Globals.itemsFieldName]: view ? [view] : []
+                  }
+                }}
+                listSchemaStr={view[Globals.childlistFieldName][Globals.listSchemaFieldName]}
+                setLoginState={setLoginState}
+                setViewData={handleEditView}
+                setErrorMsg={setErrorMsg}
+                enableDeleteButton={false}
+              />
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+              <List
+                listType='List'
+                view={{
+                  [Globals.childlistFieldName]: {
+                    ...Globals.listOfAllLists,
+                    [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
+                  }
+                }}
+                setLoginState={setLoginState}
+                setViewData={handleEditList}
+                setErrorMsg={setErrorMsg}
+                enableDeleteButton={false}
+              />
+            </TabPanel>
+          </Box>
         </Stack>
       </Collapse>
     </Stack>

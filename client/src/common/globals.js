@@ -46,7 +46,8 @@ var Globals = {
   noDefault: "nodefault",
   gRecaptchaResponse: "g-recaptcha-response",
 
-  listProperties: "List Properties"
+  viewProperties: "View Properties",
+  listProperties: "List Properties",
 };
 
 Globals = {
