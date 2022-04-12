@@ -20,6 +20,7 @@ function List({
   addItem,
   setErrorMsg,
   enableDeleteButton = true,
+  handleReload,
   sx
 }) {
   // set a default value for addItemMode
@@ -188,21 +189,28 @@ function List({
   );
 
   const handleEditItem = React.useCallback(
-    (editedItem, callback) => {
-      var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
+    (editedItem, editedProperty) => {
+      // if the edited property is part of the view or the list, 
+      // reload the list because it generally have an effect on the whole list
+      if (listType === 'View' && editedProperty.includes(Globals.addItemModeFieldName)) {
+        handleReload(false);
+      }
+      else {
+        var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
 
-      var idx = newItemsData.findIndex(
-        item => item[Globals.itemIdFieldName] === editedItem[Globals.itemIdFieldName]
-      )
-      newItemsData[idx] = editedItem;
-      setViewData({
-        ...view,
-        [Globals.childlistFieldName]: {
-          ...view[Globals.childlistFieldName],
-          [Globals.itemsFieldName]: newItemsData
-        }
-      });
-    }, [view, setViewData]
+        var idx = newItemsData.findIndex(
+          item => item[Globals.itemIdFieldName] === editedItem[Globals.itemIdFieldName]
+        )
+        newItemsData[idx] = editedItem;
+        setViewData({
+          ...view,
+          [Globals.childlistFieldName]: {
+            ...view[Globals.childlistFieldName],
+            [Globals.itemsFieldName]: newItemsData
+          }
+        });
+      }
+    }, [listType, view, setViewData, handleReload]
   );
 
   return (

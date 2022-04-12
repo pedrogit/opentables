@@ -41,24 +41,26 @@ const theme = createTheme({
 
 function App({ initialViewid, appid }) {
   const [viewid, setViewId] = React.useState(BrowserHistory.getViewIdFromURL(appid) ? BrowserHistory.getViewIdFromURL(appid) : initialViewid);
-  const [viewid2, setViewId2] = React.useState(null);
   const [viewData, setViewData] = React.useState(null);
   const [configPanelOpen, toggleConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
+  const [reload, setReload] = React.useState(false);
 
   // handleReload is necessary because the viewid is not 
   // available where handleReload is called
-  const handleReload = () => {
-    handleChangeViewId(viewid);
+  const handleReload = (toggleCfgPanel) => {
+    handleChangeViewId(viewid, toggleCfgPanel);
   };
 
   const handleChangeViewId = React.useCallback(
-    (newViewid) => {
+    (newViewid, toggleCfgPanel) => {
       setAddItem(false);
       setErrorMsg({open: false});
-      toggleConfigPanel(false);
+      if (toggleCfgPanel === undefined) {
+        toggleConfigPanel(false);
+      }
       if (viewData) {
         // make the list of items to flash to nothing before reloading
         setViewData({
@@ -66,9 +68,9 @@ function App({ initialViewid, appid }) {
           [Globals.childlistFieldName]: Utils.objWithout(viewData[Globals.childlistFieldName], Globals.itemsFieldName)
         });
       }
-      setViewId(null);
-      setViewId2(newViewid);
-    }, [viewData, setAddItem, setErrorMsg, toggleConfigPanel, setViewData, setViewId, setViewId2]
+      setViewId(newViewid);
+      setReload(!reload);
+    }, [viewData, setAddItem, setErrorMsg, toggleConfigPanel, setViewData, setViewId, reload]
   );
 
   React.useEffect(() => {
@@ -77,11 +79,6 @@ function App({ initialViewid, appid }) {
 
   React.useEffect(() => {
     // initial loading of list data
-    if (viewid2) {
-      setViewId(viewid2);
-      setViewId2(null);
-    }
-    else {
       setLoginState({
         open: false,
         msg: {
@@ -101,8 +98,7 @@ function App({ initialViewid, appid }) {
         },
         tryFirst: true
       });
-    }
-  }, [viewid, viewid2, appid]);
+  }, [reload, viewid, appid]);
 
   const handleOpenConfigPanel = React.useCallback(
     () => {
@@ -159,7 +155,7 @@ function App({ initialViewid, appid }) {
           viewOwner={viewData ? viewData.owner : ''} 
           viewName={viewData ? viewData.name : ''}
           setLoginState={setLoginState} 
-          handleOpenConfigPanel={handleOpenConfigPanel} 
+          handleOpenConfigPanel={handleOpenConfigPanel}
           setAddItem={setAddItem}
           setViewId={handleChangeViewId}
           handleReload={handleReload}
@@ -180,6 +176,7 @@ function App({ initialViewid, appid }) {
             setViewData={setViewData}
             setLoginState={setLoginState}
             setErrorMsg={setErrorMsg}
+            handleReload={handleReload}
           />
           <Box sx={{height: '100%', overflowY: 'auto'}}>
             <List

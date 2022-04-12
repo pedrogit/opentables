@@ -7,6 +7,8 @@ import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
+import MUISelect from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { useTheme } from "@mui/material/styles";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -225,6 +227,132 @@ function Text({
   return null;
 }
 
+/********************
+ *  Select component
+ ********************/
+ function Select({
+  val,
+  options,
+  inform = false, // component is part of a form
+  pretty = false, // make inline inputs pretty
+  editmode = false, // init in edit mode
+  reset = false, // reset or not
+  disableReset, // function to reset the reset mode
+  vertical = false, // vertical lavels (horizontal otherwise)
+  label, // label
+  nolabel = false, // do not display label
+  labelSx = {}, // label sx
+  sx  // component sx
+}) {
+  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
+  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
+  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
+
+  const valueRef = React.useRef();
+  const theme = useTheme();
+
+  const [editVal, setEditVal] = React.useState(propVal);
+  const [isEditing, setIsEditing] = React.useState(editmode);
+
+  React.useEffect(() => {
+    if (reset) {
+      setEditVal(defVal);
+      disableReset();
+    }
+  }, [reset, defVal, setEditVal, disableReset] );
+
+  if (val && (propName || editVal)) {
+
+    var defaultSx = {
+      marginTop: inform && pretty && (editmode || isEditing) ? "8px" : "inherit",
+      marginBottom: inform && pretty && (editmode || isEditing) ? "8px" : "inherit"
+    };
+
+    const handleEdit = (e) => {
+      if (!inform) {
+        val.handleItemAuth({
+          action: 'patch', 
+          propName: val.prop, 
+          callback: (auth) => {
+            if (!editVal) {
+              setEditVal(propVal);
+            }
+            setIsEditing(true);
+          }
+        });
+      }
+    };
+
+    const handleChange = (newVal) => {
+      if (!inform && newVal !== propVal) {
+        val.handleSaveProperty({ [propName]: newVal }, (success, data) => {
+          if (success) {
+            setIsEditingOff();
+            setEditVal(data[propName]);
+          }
+        });
+      }
+    };
+
+    const keyPressed = (e) => {
+      if (e.keyCode === 27) { // escape
+        setEditVal(propVal);
+        setIsEditingOff()
+      }
+    };
+
+    const setIsEditingOff = () => {
+      if (!inform) {
+        setIsEditing(false);
+        if (!editVal) {
+          setEditVal(propVal);
+        }
+      }
+    }
+
+    return (
+      <Stack direction={vertical ? "column" : "row"}>
+        {(!(inform && pretty) || !(editmode || isEditing)) && <Label 
+          vertical={vertical} 
+          val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
+          nolabel={nolabel} 
+          sx={labelSx}
+        />}
+        {(editmode || isEditing) ? (
+          <>
+            <MUISelect
+              name={propName}
+              open={editmode || isEditing}
+              variant={"standard"}
+              sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
+
+              SelectDisplayProps={{style: {padding:'0px 20px 0px 0px '}}}
+              size="small"
+              autoWidth={true}
+              value={editVal}
+              onChange={(e) => {handleChange(e.target.value)}}
+              onKeyDown={(e) => keyPressed(e)}
+              onClose={setIsEditingOff}
+            >
+              <MenuItem value=""><em>Reset</em></MenuItem>
+              {options && options.map(opt => <MenuItem value={opt}>{opt}</MenuItem>)}
+            </MUISelect>
+          </>
+        ) : (
+          <Typography
+            sx={{ ...defaultSx, ...sx }}
+            onDoubleClick={handleEdit}
+            ref={valueRef}
+          >
+            {propVal}
+          </Typography>
+        )}
+      </Stack>
+    );
+  }
+  return null;
+}
+
 /*************************
  *  Viewlink component
  *************************/
@@ -310,7 +438,11 @@ function Password({
  *  around the item template and set the template component
  *  properties to necessary values (inform, inline, pretty)
  *************************/
-function ItemWrapperForm({handlers, otherProps, children}) {
+function ItemWrapperForm({
+  handlers, 
+  otherProps, 
+  children
+}) {
   const defChildProps = {
     inform: true, 
     inline: true, 
@@ -461,7 +593,7 @@ function ItemWrapperForm({handlers, otherProps, children}) {
 }
 
 function allComponentsAsJson() {
-  return { Text, Label, Viewlink, Password, ItemWrapperForm };
+  return { Text, Select, Label, Viewlink, Password, ItemWrapperForm };
 }
 
 export { allComponentsAsJson };

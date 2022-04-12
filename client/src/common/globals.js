@@ -85,11 +85,11 @@ Globals = {
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.addItemModeFieldName + ": {type: string, options: [" + Globals.addItemModeDefault + ", " + 
-                                                                     Globals.addItemModeAsForm + ", " + 
-                                                                     Globals.addWithPersistentFormAndItems + "," + 
+      Globals.addItemModeFieldName + ": {type: string, options: ['" + Globals.addItemModeDefault + "', '" + 
+                                                                     Globals.addItemModeAsForm + "', '" + 
+                                                                     Globals.addWithPersistentFormAndItems + "', '" + 
                                                                      Globals.addWithPersistentFormNoItems + 
-                                                                "], default: " + Globals.addItemModeDefault + "}, " +
+                                                                "'], default: " + Globals.addItemModeDefault + "}, " +
       Globals.itemTemplateFieldName + ": template, " +
       Globals.childlistFieldName + ": embedded_listid" +
       "}",

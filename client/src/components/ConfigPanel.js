@@ -45,7 +45,8 @@ function ConfigPanel({
   view,
   setViewData,
   setLoginState,
-  setErrorMsg
+  setErrorMsg,
+  handleReload
 }) {
   const [value, setValue] = React.useState(0);
   const theme = useTheme();
@@ -125,6 +126,7 @@ function ConfigPanel({
                 setViewData={handleEditView}
                 setErrorMsg={setErrorMsg}
                 enableDeleteButton={false}
+                handleReload={handleReload}
               />
             </TabPanel>
             <TabPanel value={value} index={1}>
@@ -140,6 +142,7 @@ function ConfigPanel({
                 setViewData={handleEditList}
                 setErrorMsg={setErrorMsg}
                 enableDeleteButton={false}
+                handleReload={handleReload}
               />
             </TabPanel>
           </Box>

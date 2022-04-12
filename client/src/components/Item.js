@@ -123,18 +123,18 @@ function Item({
         severity: "warning",
         title: "Permission denied",
         text:
-        'You do not have permissions to edit "' + 
+        'You do not have permissions to edit "' +
         Object.keys(val)[0] +
         '". Please login with valid credentials...',
       },
       action: {
         method: "patch",
-        url: "http://localhost:3001/api/opentables/" + 
+        url: "http://localhost:3001/api/opentables/" +
              item[Globals.itemIdFieldName],
         data: val,
         callback: (success, data) => {
           if (success) {
-            handleEditItem(data);
+            handleEditItem(data, Object.keys(val));
           }
           if (callback && typeof callback === 'function') {
             callback(success, data);
@@ -165,7 +165,7 @@ function Item({
     // add property name and rest handlers
     var result = {};
     for (var key in item) {
-      if (item.hasOwnProperty(key)) {
+      if (item.hasOwnProperty(key) && key !== Globals.childlistFieldName) {
         result[key] = {
           handleSaveProperty: handleSaveProperty,
           handleItemAuth: handleItemAuth,

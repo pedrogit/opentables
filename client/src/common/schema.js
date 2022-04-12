@@ -246,11 +246,15 @@ class Schema {
     reserved = false,
     listSchema = null
   } = {}) {
-    return (listSchema ? listSchema : this).getProps({
+    var schema = listSchema ? listSchema : this;
+    return schema.getProps({
       hidden: hidden, 
       reserved: reserved
     })
     .map((prop) => {
+      if (schema.hasProperty(prop, "options")) {
+        return ("<Select val={" + prop + "} options={['" + schema.getProperty(prop, "options").join("', '") + "']} inline /> ")
+      }
       return ("<Text val={" + prop + "} inline /> ")
     })
     .join("");
@@ -392,6 +396,16 @@ class Schema {
     } = {}
   ) {
     return this.getProps({hidden: hidden, reserved: reserved}).filter(key => item[key] === undefined);
+  }
+
+  hasProperty(key, property) {
+    return this.schema.hasOwnProperty(key) && 
+           this.schema[key].hasOwnProperty(property);
+  }
+
+  getProperty(key, property) {
+    return this.schema.hasOwnProperty(key) && 
+           this.schema[key][property];
   }
 }
 
