@@ -109,8 +109,8 @@ function Text({
       }
     };
 
-    const handleChange = (val) => {
-      setEditVal(val);
+    const handleChange = (newVal) => {
+      setEditVal(newVal);
     };
 
     const handleSave = () => {
@@ -164,7 +164,7 @@ function Text({
             vertical={vertical} 
             val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
             nolabel={nolabel} 
-            sx={labelSx}
+            sx={{...defaultSx, ...sx, ...labelSx}}
           />}
           {(editmode || isEditing) && inline ? (
             <>
@@ -248,9 +248,6 @@ function Text({
   const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
   const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
 
-  const valueRef = React.useRef();
-  const theme = useTheme();
-
   const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
@@ -316,7 +313,7 @@ function Text({
           vertical={vertical} 
           val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
           nolabel={nolabel} 
-          sx={labelSx}
+          sx={{...defaultSx, ...sx, ...labelSx}}
         />}
         {(editmode || isEditing) ? (
           <>
@@ -324,8 +321,18 @@ function Text({
               name={propName}
               open={editmode || isEditing}
               variant={"standard"}
-              sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
-
+              sx={{ ...defaultSx, ...sx}}
+              MenuProps={{
+                anchorOrigin: {
+                  vertical: "bottom",
+                  horizontal: "left"
+                },
+                transformOrigin: {
+                  vertical: "top",
+                  horizontal: "left"
+                },
+                getContentAnchorEl: null,
+              }}
               SelectDisplayProps={{style: {padding:'0px 20px 0px 0px '}}}
               size="small"
               autoWidth={true}
@@ -334,15 +341,14 @@ function Text({
               onKeyDown={(e) => keyPressed(e)}
               onClose={setIsEditingOff}
             >
-              <MenuItem value=""><em>Reset</em></MenuItem>
-              {options && options.map(opt => <MenuItem value={opt}>{opt}</MenuItem>)}
+              <MenuItem value="" dense={true}><em>unset</em></MenuItem>
+              {options && options.map(opt => <MenuItem value={opt} dense={true}>{opt}</MenuItem>)}
             </MUISelect>
           </>
         ) : (
           <Typography
             sx={{ ...defaultSx, ...sx }}
             onDoubleClick={handleEdit}
-            ref={valueRef}
           >
             {propVal}
           </Typography>
@@ -396,8 +402,8 @@ function Password({
     marginBottom: inline && pretty ? "8px" : "inherit"
   };
 
-  const handleChange = (val) => {
-    setEditVal(val);
+  const handleChange = (newVal) => {
+    setEditVal(newVal);
   };
 
   return (
@@ -407,7 +413,7 @@ function Password({
             vertical={vertical} 
             val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
             nolabel={nolabel} 
-            sx={labelSx}
+            sx={{...defaultSx, ...sx, ...labelSx}}
           />
         }
         
