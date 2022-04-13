@@ -27,7 +27,7 @@ function List({
   var addItemMode = (view && view[Globals.addItemModeFieldName]) || Globals.addItemModeDefault;
 
   const handleAddItem = React.useCallback(
-    ({item, addToLocalList = true, callback}) => {
+    ({item = {}, addToLocalList = true, callback} = {}) => {
       if (view[Globals.childlistFieldName]) {
         setLoginState({
           open: false,
@@ -68,23 +68,6 @@ function List({
       }
     }, [view, setLoginState, setViewData, setErrorMsg]
   );
-
-  React.useEffect(() => {
-    // add a new default item when requested
-    if (addItem && addItemMode === Globals.addItemModeDefault) {
-      setAddItem(false);
-      handleAddItem({});
-    }
-  }, [addItem, addItemMode, setAddItem, handleAddItem] );
-
-  var parsedSchema;
-
-  if (view) {
-    // parse the schema
-    parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
-  }
-
-  var rowNb = 0;
 
   const handleListAuth = React.useCallback(
     ({
@@ -130,7 +113,7 @@ function List({
           action: {
             method: "get",
             url: "http://localhost:3001/api/opentables/login",
-            callback: (success) => callback(success)
+            callback: callback
           },
           tryFirst: false
         });
@@ -140,11 +123,28 @@ function List({
   );
 
   React.useEffect(() => {
+    // add a new default item when requested
+    if (addItem && 
+        addItemMode === Globals.addItemModeDefault &&
+        handleListAuth({action: 'post'})) {
+      setAddItem(false);
+      handleAddItem();
+    };
+  }, [addItem, addItemMode, setAddItem, handleListAuth, handleAddItem] );
+
+  var parsedSchema;
+
+  if (view) {
+    // parse the schema
+    parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
+  }
+
+  var rowNb = 0;
+
+  React.useEffect(() => {
     if (addItemMode === Globals.addWithPersistentFormAndItems || 
         addItemMode === Globals.addWithPersistentFormNoItems) {
-      handleListAuth({
-        action: 'post'
-      });
+      handleListAuth({action: 'post'});
     }
   }, [view, addItemMode, setAddItem, handleListAuth] );
 
