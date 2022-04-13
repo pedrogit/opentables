@@ -254,9 +254,7 @@ class SchemaValidator {
     if (Globals.specialUsers.includes(val)) {
       return val;
     }
-    try {
-      val = this.validate_type_email(key, val);
-    } catch (err) {
+    if (val.length < 8) {
       throw new Error(
         NodeUtil.format(
           Errors.ErrMsg.SchemaValidator_InvalidType,

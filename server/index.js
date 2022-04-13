@@ -41,7 +41,7 @@ app.use(async (req, res, next) => {
     var [email, password] = Buffer.from(b64auth, "base64")
       .toString()
       .split(":");
-    email = email.toLowerCase();
+      email = email.toLowerCase();
 
     if (email !== "") {
       if (password === "") {
@@ -58,6 +58,7 @@ app.use(async (req, res, next) => {
             )
           );
         }
+        req.user = process.env.ADMIN_USERNAME;
       } else {
         item = await controler.simpleFind(Globals.userListId, { [Globals.emailFieldName]: email });
 
@@ -73,9 +74,10 @@ app.use(async (req, res, next) => {
             )
           );
         }
+        req.user = item[Globals.usernameFieldName];
       }
 
-      Utils.setCookieJWT(req, res, { email: email });
+      Utils.setCookieJWT(req, res, { username: req.user});
     }
   }
 
@@ -92,7 +94,7 @@ app.use(async (req, res, next) => {
         new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin))
       );
     }
-    req.user = jwt.decode(req.cookies.authtoken).email;
+    req.user = jwt.decode(req.cookies.authtoken).username;
   }
   return next();
 });

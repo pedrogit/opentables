@@ -18,6 +18,16 @@ var expect = chai.expect;
 
 let pw = "mypassword";
 
+function userUsername(user) {
+  return user == "admin"
+    ? process.env.ADMIN_USERNAME
+    : user == "owner"
+    ? "owner_username"
+    : user == "auth"
+    ? "other_username"
+    : "";
+}
+
 function userEmail(user) {
   return user == "admin"
     ? process.env.ADMIN_EMAIL
@@ -61,7 +71,7 @@ function init() {
 
     it("2 - Register the owner user", (done) => {
       newUser = {
-        username: "The",
+        [Globals.usernameFieldName]: "The Owner",
         [Globals.emailFieldName]: "owner@gmail.com",
         password: pw,
       };
@@ -92,7 +102,7 @@ function init() {
 
     it("3 - Register the other user", (done) => {
       newUser = {
-        username: "The",
+        [Globals.usernameFieldName]: "The Other",
         [Globals.emailFieldName]: "other@gmail.com",
         password: pw,
       };

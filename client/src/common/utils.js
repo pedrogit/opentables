@@ -316,7 +316,7 @@ exports.setCookieJWT = function (req, res, payload) {
     algorithm: "HS256",
   });
   res.cookie("authtoken", jwtoken, { httpOnly: false });
-  req.user = payload.email;
+  req.user = payload.username;
 };
 
 exports.isObjEmpty = function (obj) {
@@ -401,7 +401,7 @@ exports.validateRWPerm = function(
   } = {}
 ) {
   // admin has all permissions
-  if (user === process.env.ADMIN_EMAIL) {
+  if (user === process.env.ADMIN_USERNAME) {
     return true;
   }
 
@@ -541,7 +541,7 @@ exports.validateDPerm = function(
      throwError = true
   } = {}
 ) {
-  if (user && user === process.env.ADMIN_EMAIL) {
+  if (user && user === process.env.ADMIN_USERNAME) {
     return true;
   }
     
@@ -589,7 +589,7 @@ exports.validateCPerm = function(
      throwError = true
   } = {}
 ) {
-  if (user === process.env.ADMIN_EMAIL) {
+  if (user === process.env.ADMIN_USERNAME) {
     return true;
   }
 

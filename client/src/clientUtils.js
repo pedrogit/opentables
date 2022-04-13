@@ -5,7 +5,7 @@ const Globals = require("./common/globals");
 const getUser = function() {
   var authtoken = Cookies.get('authtoken');
   if (authtoken) {
-    var user = jwt.decode(authtoken).email;
+    var user = jwt.decode(authtoken).username;
     if (user !== null && user !=='') {
       return user;
     }

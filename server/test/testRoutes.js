@@ -1096,11 +1096,11 @@ describe("testRoutes.js List API", () => {
         });
     });
 
-    it("10.3 - Register another user with the same email", (done) => {
+    it("10.3 - Register another user with the same username", (done) => {
       const pw = "mypassword";
       var newUser2 = {
-        username: "Bad",
-        [Globals.emailFieldName]: newUser[Globals.emailFieldName],
+        [Globals.usernameFieldName]: newUser[Globals.usernameFieldName],
+        [Globals.emailFieldName]: 'dummy@gmail.com',
         password: pw,
       };
 
@@ -1119,8 +1119,8 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.deep.equal({
             err: NodeUtil.format(
               Errors.ErrMsg.SchemaValidator_NotUnique,
-              Globals.emailFieldName,
-              newUser[Globals.emailFieldName]
+              Globals.usernameFieldName,
+              newUser[Globals.usernameFieldName]
             ),
           });
           done();
@@ -1382,7 +1382,7 @@ describe("testRoutes.js List API", () => {
 
     var pw = "user2Password"
     var user2 = {
-      username: "User2Username",
+      [Globals.usernameFieldName]: "User2Username",
       [Globals.emailFieldName]: "User2@gmail.com"
     };
 
@@ -1421,7 +1421,7 @@ describe("testRoutes.js List API", () => {
       chai
         .request(server)
         .get(
-          "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId + "?filter=$isexactly_i:[$" + [Globals.emailFieldName] + ",\"" + user2[Globals.emailFieldName] + "\"]"
+          "/api/" + Globals.APIKeyword + "/" + Globals.viewOnUserListViewId + "?filter=$isexactly_i:[$" + [Globals.usernameFieldName] + ",\"" + user2[Globals.usernameFieldName] + "\"]"
         )
         .end((err, response) => {
           expect(response).to.have.status(200);

@@ -43,12 +43,12 @@ class Controler {
 
   async createBaseTables() {
     // clean the database
-    await this.deleteAll(process.env.ADMIN_EMAIL, true);
+    await this.deleteAll(process.env.ADMIN_USERNAME, true);
 
     console.log("Create the " + Globals.listOfAllLists['name'] + "...");
     try {
       var item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
+        process.env.ADMIN_USERNAME,
         Globals.voidListId,
         {...Globals.listOfAllLists}
       );
@@ -61,7 +61,7 @@ class Controler {
     console.log("Create the " + Globals.listOfAllViews['name'] + "...");
     try {
       item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
+        process.env.ADMIN_USERNAME,
         Globals.voidListId,
         {...Globals.listOfAllViews}
       );
@@ -74,7 +74,7 @@ class Controler {
     console.log("Create the " + Globals.listOfUsers['name'] + "...");
     try {
       item = await this.insertMany(
-        process.env.ADMIN_EMAIL,
+        process.env.ADMIN_USERNAME,
         Globals.listofAllListId,
         {...Globals.listOfUsers}
       );
@@ -89,7 +89,7 @@ class Controler {
       console.log("Create the " + view['name'] + "...");
       try {
         item = await this.insertMany(
-          process.env.ADMIN_EMAIL,
+          process.env.ADMIN_USERNAME,
           Globals.listofAllViewId,
           {...view}
         );
@@ -546,7 +546,7 @@ class Controler {
   }
 
   deleteAll(user, all = false) {
-    if (user !== process.env.ADMIN_EMAIL) {
+    if (user !== process.env.ADMIN_USERNAME) {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 

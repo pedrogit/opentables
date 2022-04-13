@@ -98,9 +98,9 @@ router.post(
   asyncHandler(async (req, res) => {
     const item = await controler.insertMany(req.user, req.params.listid, req.body);
 
-    // convert email to cookie token when registering
+    // convert username to cookie token when registering
     if (req.params.listid === Globals.userListId) {
-      Utils.setCookieJWT(req, res, { email: item[Globals.emailFieldName] });
+      Utils.setCookieJWT(req, res, { username: item[Globals.usernameFieldName] });
     }
 
     res.status(201).send(item);
