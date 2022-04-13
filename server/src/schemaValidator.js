@@ -250,9 +250,8 @@ class SchemaValidator {
   }
 
   validate_type_user(key, val) {
-    val = val && val.toLowerCase();
-    if (Globals.specialUsers.includes(val)) {
-      return val;
+    if (Globals.specialUsers.includes(val.toLowerCase())) {
+      return val.toLowerCase();
     }
     if (val.length < 8) {
       throw new Error(
