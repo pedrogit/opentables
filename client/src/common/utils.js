@@ -586,7 +586,7 @@ exports.validateCPerm = function(
     user = Globals.allUserName,
     list, 
     item,
-     throwError = true
+    throwError = true
   } = {}
 ) {
   if (user === process.env.ADMIN_USERNAME) {
