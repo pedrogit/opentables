@@ -255,6 +255,9 @@ class Schema {
       if (schema.hasProperty(prop, "options")) {
         return ("<Select val={" + prop + "} options={['" + schema.getProperty(prop, "options").join("', '") + "']} inline /> ")
       }
+      if (schema.getType(prop) === 'encrypted_string') {
+        return ("<Password val={" + prop + "} inline /> ")
+      }
       return ("<Text val={" + prop + "} inline /> ")
     })
     .join("");
