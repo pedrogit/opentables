@@ -34,6 +34,7 @@ class Controler {
 
   initialViews() {
     return [Globals.viewOnTheListOfAllViews, 
+            Globals.viewOnTheListOfAllLists, 
             Globals.viewOnTheListOfUsers,
             Globals.signUpViewOnTheListOfUsers,
             Globals.viewOnTheListOfUsersAtLoad,

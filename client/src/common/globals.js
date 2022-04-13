@@ -6,8 +6,9 @@ var Globals = {
   listofAllViewId: "000000000000000000000002",
   userListId: "000000000000000000000003",
   viewOnAllViewViewId: "000000000000000000000004",
-  viewOnUserListViewId: "000000000000000000000005",
-  signUpViewOnUserListViewId: "000000000000000000000006",
+  viewOnAllListViewId: "000000000000000000000005",
+  viewOnUserListViewId: "000000000000000000000006",
+  signUpViewOnUserListViewId: "000000000000000000000007",
 
   itemIdFieldName: "_id", // do not change
   listIdFieldName: "_listid",
@@ -63,6 +64,7 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.listofAllListId,
     [Globals.nameFieldName]: "List of all lists",
     [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
       "{" +
       Globals.nameFieldName + ": {type: string, required, default: 'List Name'}, " +
@@ -80,6 +82,7 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.listofAllViewId,
     [Globals.nameFieldName]: "List of all views",
     [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
       "{" +
       Globals.nameFieldName + ": {type: string, required, default: 'View Name'}, " +
@@ -105,6 +108,13 @@ Globals = {
       "username: {type: string, required, unique, " + Globals.noDefault + "}, " + 
       Globals.emailFieldName + ": {type: email, required, unique, lower, " + Globals.noDefault + "}, " + 
       "password: {type: encrypted_string, required, " + Globals.noDefault + "}",
+  },
+
+  viewOnTheListOfAllLists: {
+    [Globals.itemIdFieldName]: Globals.viewOnAllListViewId,
+    [Globals.nameFieldName]: "Lists",
+    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.childlistFieldName]: Globals.listofAllListId,
   },
 
   viewOnTheListOfAllViews: {
