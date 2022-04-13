@@ -61,7 +61,6 @@ function Text({
   inform = false, // component is part of a form
   pretty = false, // make inline inputs pretty
   editmode = false, // switch between read and edit mode
-  noeditdefault = false, // set to empty when resetting
   reset = false, // reset or not
   disableReset, // function to reset the reset mode
   vertical = false, // vertical lavels (horizontal otherwise)
@@ -77,15 +76,15 @@ function Text({
   const valueRef = React.useRef();
   const theme = useTheme();
 
-  const [editVal, setEditVal] = React.useState(noeditdefault ? "" : propVal);
+  const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
   React.useEffect(() => {
     if (reset) {
-      setEditVal(noeditdefault ? "" : defVal);
+      setEditVal(defVal);
       disableReset();
     }
-  }, [reset, noeditdefault, defVal, setEditVal, disableReset] );
+  }, [reset, defVal, setEditVal, disableReset] );
 
   if (val && (propName || editVal)) {
 
@@ -453,8 +452,7 @@ function ItemWrapperForm({
     inform: true, 
     inline: true, 
     pretty: true, 
-    editmode: true,
-    noeditdefault: true
+    editmode: true
   }
   const [childProps, setChildProps] = React.useState(defChildProps);
   const [recaptchaResponse, setRecaptchaResponse] = React.useState('');
