@@ -45,12 +45,13 @@ function Header({
         >
           <Stack direction='row' sx={{pl:'5px', pt:'5px'}}>
             {viewOwner &&
-                <><Typography 
+                <><Typography
+                  id="headerOwner"
                   sx={{
                     color: '#FAA', 
                     fontSize: "0.85em", 
                     fontStyle: "italic"
-                  }}>{viewOwner}</Typography><Typography 
+                  }}>{viewOwner}</Typography><Typography
                     sx={{
                       color: '#222', 
                       fontSize: "0.85em", 
@@ -113,7 +114,10 @@ function Header({
             </Tooltip>
           </Stack>
         </Stack>
-          <Typography sx={{fontWeight:'bold', pl:'5px', pb:'5px'}}>{viewName ? viewName : "Loading..."}</Typography>
+          <Typography 
+            id="headerViewName"
+            sx={{fontWeight:'bold', pl:'5px', pb:'5px'}}>{viewName ? viewName : "Loading..."}
+          </Typography>
       </Stack>
     </AppBar>
   )

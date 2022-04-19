@@ -161,8 +161,6 @@ class Controler {
   }
 
   static async validateRecaptcha(humanKey) {
-    //var humanKey = item[Globals.gRecaptchaResponse];
-    //delete item[Globals.gRecaptchaResponse];
     if (humanKey) {
       var isHuman;
       try {
@@ -174,9 +172,7 @@ class Controler {
       catch (err){
         throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
       }
-      /*if (isHuman === null || !isHuman.data || isHuman.data.success !== true) {
-        throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
-      }*/
+
       if (isHuman && isHuman.data && isHuman.data.success) {
         return
       }
@@ -555,24 +551,24 @@ class Controler {
     if (!all) {
       filter = {
         $and: [
-          { // list of all lists and list of all views
+          { // do not delete the list of all lists and the list of all views
             [Globals.listIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.voidListId),
             },
           },
-          { // users
+          /*{ // do not delete the users
             [Globals.listIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
-          },
-          { // users list
+          },*/
+          { // do not delete the users list
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
           }
         ],
       };
-
+      // do not delete the initial views (on list of view, on list of list, on user list)
       filter.$and = filter.$and.concat(this.initialViews().map(view => {
         return {
           [Globals.itemIdFieldName]: {

@@ -142,6 +142,7 @@ class Schema {
                 unique: { type: "boolean" },
                 required: { type: "boolean" },
                 hidden: { type: "boolean" },
+                minlength: { type: "integer" },
                 [Globals.noDefault]: { type: "boolean" },
                 options: {
                   anyOf: [

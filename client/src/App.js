@@ -180,7 +180,7 @@ function App({ initialViewid, appid }) {
           />
           <Box sx={{height: '100%', overflowY: 'auto'}}>
             <List
-              listType='Items'
+              listType={Globals.itemListType}
               view={viewData}
               setViewData={setViewData}
               setLoginState={setLoginState}

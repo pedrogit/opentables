@@ -26,7 +26,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   const emailRef = React.useRef();
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
-  const [loginButtonDisabled, setloginButtonDisabled] = React.useState(true);
+  const [loginButtonDisabled, setLoginButtonDisabled] = React.useState(true);
   const [doSuccessCallback, setDoSuccessCallback] = React.useState({callit: false, data: null});
 
   const theme = useTheme();
@@ -42,7 +42,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
 
   const handleClose = () => {
       setLoginState({...loginState, open: false, tryFirst: false});
-      setloginButtonDisabled(true);
+      setLoginButtonDisabled(true);
       setShowInvalidLoginHelper(false);
   };
 
@@ -54,7 +54,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   };
 
   const handleChange = () => {
-    setloginButtonDisabled(!(emailRef.current.value && passwordRef.current.value));
+    setLoginButtonDisabled(!(emailRef.current.value && passwordRef.current.value));
   }
 
   // handle callback only after the login dialog has closed (so the edit popover gets rendered at the right position)
@@ -275,7 +275,7 @@ function LoginButton({
 
   var loginButton = (
     <Button
-      id='LogoutIcon'
+      id='loginLogoutButton'
       variant="text" 
       color="inherit" 
       sx={{p: theme.openTable.buttonPadding, lineHeight: "normal"}}
@@ -298,7 +298,7 @@ function LoginButton({
   if (buttons) {
     loginButton = (
       <IconButton
-        id="loginButton" 
+        id="loginLogoutButton" 
         aria-label="home" 
         color="inherit"
         sx={{p: theme.openTable.buttonPadding}}

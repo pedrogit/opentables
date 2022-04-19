@@ -26,7 +26,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
   }, [errorMsg, autoClose, setErrorMsg]);
 
   return (
-    <Stack sx={{position: 'relative'}}>
+    <Stack sx={{position: 'relative'}} id="errorPanel">
       <Collapse in={errorMsg && errorMsg.open && errorMsg.open === true}>
       <Stack sx={{
         position: 'relative', 
@@ -56,7 +56,7 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
             sx={{padding: '5px'}}
             onClick={() => closeButton && clearTimeout(closeTimeOutRef.current)}
         >
-        <AlertTitle>{errorMsg && errorMsg.title ? errorMsg.title : 'Error'}</AlertTitle>
+        <AlertTitle>{errorMsg && errorMsg.title ? (typeof errorMsg.title === 'function' ? (errorMsg.title)() : errorMsg.title) : 'Error'}</AlertTitle>
         {(errorMsg && errorMsg.text && errorMsg.open && errorMsg.open === true) ? errorMsg.text : <span> </span>}
         </Alert>
         </Stack>

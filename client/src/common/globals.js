@@ -50,6 +50,10 @@ var Globals = {
 
   viewProperties: "View Properties",
   listProperties: "List Properties",
+
+  viewListType: "viewlist",
+  listListType: "listlist",
+  itemListType: "itemlist",
 };
 
 Globals = {
@@ -105,9 +109,9 @@ Globals = {
     [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
-      "username: {type: string, required, unique, " + Globals.noDefault + "}, " + 
+      "username: {type: string, required, unique, minlength: 6," + Globals.noDefault + "}, " + 
       Globals.emailFieldName + ": {type: email, required, unique, lower, " + Globals.noDefault + "}, " + 
-      "password: {type: encrypted_string, required, " + Globals.noDefault + "}",
+      "password: {type: encrypted_string, required, minlength: 8, " + Globals.noDefault + "}",
   },
 
   viewOnTheListOfAllLists: {

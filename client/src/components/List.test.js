@@ -11,20 +11,34 @@ describe('List', () => {
     const div = document.createElement('div');
     ReactDOM.render(
       <List 
-        type='Item' 
-        view={{[Globals.itemTemplateFieldName]: ''}} 
-        list={{[Globals.listSchemaFieldName]: {prop1: 'string'}}} 
-        items={[{[Globals.itemIdFieldName]: 1, prop1: 'toto'}]}
+        listId={Globals.itemListId}
+        view={{
+          [Globals.itemTemplateFieldName]: '',
+          [Globals.childlistFieldName]: {
+            [Globals.listSchemaFieldName]: {prop1: 'string'},
+            [Globals.itemsFieldName]: [{
+              [Globals.itemIdFieldName]: 1, 
+              prop1: 'toto'
+            }]
+          }
+        }} 
       />, div);
   });
 
   it('has a valid snapshot', () => {
     const component = renderer.create(
       <List 
-        type='Item' 
-        view={{[Globals.itemTemplateFieldName]: ''}} 
-        list={{[Globals.listSchemaFieldName]: {prop1: 'string'}}} 
-        items={[{[Globals.itemIdFieldName]: 1, prop1: 'toto'}]}
+      listId={Globals.itemListId}
+      view={{
+          [Globals.itemTemplateFieldName]: '',
+          [Globals.childlistFieldName]: {
+            [Globals.listSchemaFieldName]: {prop1: 'string'},
+            [Globals.itemsFieldName]: [{
+              [Globals.itemIdFieldName]: 1, 
+              prop1: 'toto'
+            }]
+          }
+        }} 
       />
     );
     let tree = component.toJSON();

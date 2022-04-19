@@ -5,13 +5,13 @@ exports[`Text has a valid snapshot 1`] = `
   className="css-m69qwo-MuiStack-root"
 >
   <p
-    className="MuiTypography-root MuiTypography-body1 css-g9b4dn-MuiTypography-root"
+    className="MuiTypography-root MuiTypography-body1 css-o6haml-MuiTypography-root"
   >
     Prop name
      :
   </p>
   <p
-    className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+    className="MuiTypography-root MuiTypography-body1 css-199lc0q-MuiTypography-root"
     onDoubleClick={[Function]}
   >
     prop value

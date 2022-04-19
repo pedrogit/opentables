@@ -192,7 +192,7 @@ function List({
     (editedItem, editedProperty) => {
       // if the edited property is part of the view or the list, 
       // reload the list because it generally have an effect on the whole list
-      if (listType === 'View' && editedProperty.includes(Globals.addItemModeFieldName)) {
+      if (listType === Globals.viewListType && editedProperty.includes(Globals.addItemModeFieldName)) {
         handleReload(false);
       }
       else {
@@ -214,7 +214,10 @@ function List({
   );
 
   return (
-    <Stack sx={sx}>
+    <Stack
+      id={listType && listType.toLowerCase()}
+      sx={sx}
+    >
       {((addItem && addItemMode === Globals.addItemModeAsForm) || 
          addItemMode === Globals.addWithPersistentFormAndItems || 
          addItemMode === Globals.addWithPersistentFormNoItems
@@ -236,7 +239,7 @@ function List({
           setErrorMsg={setErrorMsg}
           addLabel={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Register" : null)}
           addMessageText={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Welcome to OpenTable. You have been logged in..." : null)}
-          addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Congratulation!" : null)}
+          addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? (() => "Congratulation " + getUser() + " !") : null)}
           recaptcha={getUser() === Globals.allUserName}
           enableDeleteButton={false}
         />

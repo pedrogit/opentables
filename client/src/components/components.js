@@ -456,6 +456,8 @@ function ItemWrapperForm({
   }
   const [childProps, setChildProps] = React.useState(defChildProps);
   const [recaptchaResponse, setRecaptchaResponse] = React.useState('');
+  const [submitButtonDisabled, setSubmitButtonDisabled] = React.useState(true);
+
   const recaptchaRef = React.useRef();
   var options = {
     cancelLabel: "Cancel",
@@ -513,23 +515,28 @@ function ItemWrapperForm({
     }
   }
 
+  const extractValues = (target) => {
+    var item = {};
+    for (var i = 0; i < target.length - 1; i++) {
+      if (target[i].type !== "button" && 
+          target[i].type !== "fieldset" && 
+          target[i].name !== undefined && 
+          target[i].defaultValue !== undefined &&
+          target[i].defaultValue !== null &&
+          target[i].defaultValue !== "") {
+        item[target[i].name] = target[i].defaultValue;
+      }
+      if (target[i].name === Globals.gRecaptchaResponse && recaptchaResponse) {
+        item[Globals.gRecaptchaResponse] = recaptchaResponse;
+      }
+    }
+    return item;
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!otherProps.recaptcha || (otherProps.recaptcha && recaptchaResponse)) {
-      var newItem = {};
-      for (var i = 0; i < e.target.length - 1; i++) {
-        if (e.target[i].type !== "button" && 
-            e.target[i].type !== "fieldset" && 
-            e.target[i].name !== undefined && 
-            e.target[i].defaultValue !== undefined &&
-            e.target[i].defaultValue !== null &&
-            e.target[i].defaultValue !== "") {
-          newItem[e.target[i].name] = e.target[i].defaultValue;
-        }
-        if (e.target[i].name === Globals.gRecaptchaResponse) {
-          newItem[Globals.gRecaptchaResponse] = recaptchaResponse;
-        }
-      }
+      var newItem = extractValues(e.target);
       handlers.handleAddItem({
         item: newItem,
         addToLocalList: otherProps.addItemMode === Globals.addWithPersistentFormNoItems ? false : true,
@@ -540,7 +547,6 @@ function ItemWrapperForm({
             }
             options.addAction();
           }
-          //resetRecaptcha();
         }
       })
     }
@@ -560,10 +566,17 @@ function ItemWrapperForm({
     if (e.keyCode === 27) {
       options.cancelAction();
     }
+    if (e.keyCode !== 13 && e.keyCode !== 8 && e.keyCode !== 46) {
+      setSubmitButtonDisabled(false);
+    }
+    /*else {
+      setSubmitButtonDisabled(true);
+    }*/
   };
 
   return (
     <form
+      fullWidth
       onSubmit={handleSubmit}
       onKeyDown={keyPressed}
     >
@@ -574,8 +587,11 @@ function ItemWrapperForm({
       >
         {otherProps.recaptcha &&
           <ReCAPTCHA
+            id='g-recaptcha'
             ref={recaptchaRef}
-            sitekey="6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V"
+            sitekey={window.Cypress 
+                      ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' 
+                      : '6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V'}
             onChange={(value) => setRecaptchaResponse(value)}
             onExpired={() => setRecaptchaResponse('')}
           />
@@ -586,12 +602,11 @@ function ItemWrapperForm({
           alignItems="flex-end"
         >
           <ButtonGroup variant="contained" size="small">
-            <Button id="editCancelButton" onClick={() => options.cancelAction()}>{options.cancelLabel}</Button>
-            <Button id="editButton" type="submit">{options.addLabel}</Button>
+            <Button id="addCancelItemFormButton" onClick={() => options.cancelAction()}>{options.cancelLabel}</Button>
+            <Button id="addItemFormButton" type="submit" disabled={submitButtonDisabled}>{options.addLabel}</Button>
           </ButtonGroup>
         </Stack>
       </Stack>
-
     </form>
   )
 }
@@ -600,4 +615,4 @@ function allComponentsAsJson() {
   return { Text, Select, Label, Viewlink, Password, ItemWrapperForm };
 }
 
-export { allComponentsAsJson };
+export { allComponentsAsJson, Text };

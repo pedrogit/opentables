@@ -2,7 +2,8 @@
 
 exports[`App has a valid snapshot 1`] = `
 <div
-  className="MuiContainer-root MuiContainer-maxWidth100% MuiContainer-disableGutters App css-1hh4vb6-MuiContainer-root"
+  className="MuiContainer-root MuiContainer-maxWidth100% MuiContainer-disableGutters css-1hh4vb6-MuiContainer-root"
+  id="otapp_undefined"
 >
   <div
     className="css-1rzuxdl-MuiStack-root"
@@ -10,22 +11,332 @@ exports[`App has a valid snapshot 1`] = `
     <header
       className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionStatic css-1vbdj7k-MuiPaper-root-MuiAppBar-root"
       id="headerButtons"
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
     >
       <div
-        className="MuiToolbar-root MuiToolbar-dense css-1iqu06l-MuiToolbar-root"
+        className="css-qaa4va-MuiStack-root"
       >
+        <div
+          className="css-gmwslw-MuiStack-root"
+        >
+          <div
+            className="css-nx5hbk-MuiStack-root"
+          >
+            
+          </div>
+          <div
+            className="css-m69qwo-MuiStack-root"
+          >
+            <button
+              className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-izi8m9-MuiButtonBase-root-MuiButton-root"
+              disabled={false}
+              id="loginLogoutButton"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              Login
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-izi8m9-MuiButtonBase-root-MuiButton-root"
+              disabled={false}
+              id="signUpButton"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              Sign Up
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              aria-label="home"
+              aria-labelledby={null}
+              className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeMedium css-sfqjxq-MuiButtonBase-root-MuiIconButton-root"
+              data-mui-internal-clone-element={true}
+              disabled={false}
+              id="homeButton"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseOver={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              <svg
+                aria-hidden={true}
+                className="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root"
+                data-testid="HomeIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"
+                />
+              </svg>
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              aria-label="config panel"
+              aria-labelledby={null}
+              className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeMedium css-sfqjxq-MuiButtonBase-root-MuiIconButton-root"
+              data-mui-internal-clone-element={true}
+              disabled={false}
+              id="configPanelOpenButton"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseOver={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              <svg
+                aria-hidden={true}
+                className="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root"
+                data-testid="SettingsIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                />
+              </svg>
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              aria-label="reload list"
+              aria-labelledby={null}
+              className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeMedium css-sfqjxq-MuiButtonBase-root-MuiIconButton-root"
+              data-mui-internal-clone-element={true}
+              disabled={false}
+              id="reloadListButton"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseOver={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              <svg
+                aria-hidden={true}
+                className="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root"
+                data-testid="ReplayIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
+                />
+              </svg>
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+            <button
+              aria-label="add item"
+              aria-labelledby={null}
+              className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeMedium css-sfqjxq-MuiButtonBase-root-MuiIconButton-root"
+              data-mui-internal-clone-element={true}
+              disabled={false}
+              id="addItemButton"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseOver={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              <svg
+                aria-hidden={true}
+                className="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root"
+                data-testid="AddCircleOutlineIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                />
+              </svg>
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+          </div>
+        </div>
         <p
-          className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+          className="MuiTypography-root MuiTypography-body1 css-1is5szv-MuiTypography-root"
+          id="headerViewName"
         >
           Loading...
         </p>
-        <div
-          className="MuiBox-root css-i9gxme"
-        />
       </div>
     </header>
+    <div
+      className="css-1c888u-MuiStack-root"
+      id="errorPanel"
+    >
+      <div
+        className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+        style={
+          Object {
+            "minHeight": "0px",
+          }
+        }
+      >
+        <div
+          className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+        >
+          <div
+            className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+          >
+            <div
+              className="css-1ubnlwm-MuiStack-root"
+            >
+              <button
+                aria-label="close error panel"
+                className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeMedium css-8rcomd-MuiButtonBase-root-MuiIconButton-root"
+                disabled={false}
+                id="closeErrorMsgButton"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                tabIndex={0}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="HighlightOffIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                  />
+                </svg>
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+              <div
+                className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-sagy7s-MuiPaper-root-MuiAlert-root"
+                onClick={[Function]}
+                role="alert"
+              >
+                <div
+                  className="MuiAlert-icon css-1ytlwq5-MuiAlert-icon"
+                >
+                  <svg
+                    aria-hidden={true}
+                    className="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1vooibu-MuiSvgIcon-root"
+                    data-testid="ErrorOutlineIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
+                    />
+                  </svg>
+                </div>
+                <div
+                  className="MuiAlert-message css-acap47-MuiAlert-message"
+                >
+                  <div
+                    className="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom MuiAlertTitle-root css-yslrua-MuiTypography-root-MuiAlertTitle-root"
+                  >
+                    Error
+                  </div>
+                  <span>
+                     
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div
       className="css-5qjezb-MuiStack-root"
       id="loginForm"
@@ -54,7 +365,7 @@ exports[`App has a valid snapshot 1`] = `
                   className="css-t070a8-MuiStack-root"
                 >
                   <div
-                    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1muqmc4-MuiPaper-root-MuiAlert-root"
+                    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1jxkuvk-MuiPaper-root-MuiAlert-root"
                     role="alert"
                   >
                     <div
@@ -63,12 +374,12 @@ exports[`App has a valid snapshot 1`] = `
                       <svg
                         aria-hidden={true}
                         className="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1vooibu-MuiSvgIcon-root"
-                        data-testid="InfoOutlinedIcon"
+                        data-testid="ReportProblemOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20, 12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10, 10 0 0,0 12,2M11,17H13V11H11V17Z"
+                          d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"
                         />
                       </svg>
                     </div>
@@ -78,9 +389,9 @@ exports[`App has a valid snapshot 1`] = `
                       <div
                         className="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom MuiAlertTitle-root css-yslrua-MuiTypography-root-MuiAlertTitle-root"
                       >
-                        
+                        Permission denied
                       </div>
-                      
+                      You do not have permissions to view this list. Please login with valid credentials...
                     </div>
                   </div>
                   <div
@@ -153,7 +464,7 @@ exports[`App has a valid snapshot 1`] = `
                         </span>
                       </label>
                       <div
-                        className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1q6irb6-MuiInputBase-root-MuiOutlinedInput-root"
+                        className="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-13bwolq-MuiInputBase-root-MuiOutlinedInput-root"
                         onClick={[Function]}
                       >
                         <input
@@ -175,7 +486,9 @@ exports[`App has a valid snapshot 1`] = `
                         >
                           <button
                             aria-label="Toggle password visibility"
+                            aria-labelledby={null}
                             className="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
+                            data-mui-internal-clone-element={true}
                             disabled={false}
                             onBlur={[Function]}
                             onClick={[Function]}
@@ -186,6 +499,7 @@ exports[`App has a valid snapshot 1`] = `
                             onKeyUp={[Function]}
                             onMouseDown={[Function]}
                             onMouseLeave={[Function]}
+                            onMouseOver={[Function]}
                             onMouseUp={[Function]}
                             onTouchEnd={[Function]}
                             onTouchMove={[Function]}
@@ -204,6 +518,9 @@ exports[`App has a valid snapshot 1`] = `
                                 d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
                               />
                             </svg>
+                            <span
+                              className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                            />
                           </button>
                         </div>
                         <fieldset
@@ -249,6 +566,9 @@ exports[`App has a valid snapshot 1`] = `
                           type="button"
                         >
                           Cancel
+                          <span
+                            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                          />
                         </button>
                         <button
                           className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"

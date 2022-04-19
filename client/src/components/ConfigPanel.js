@@ -114,7 +114,7 @@ function ConfigPanel({
             </Box>
             <TabPanel value={value} index={0}>
               <List
-                listType='View'
+                listType={Globals.viewListType}
                 view={{
                   [Globals.childlistFieldName]: {
                     ...Globals.listOfAllViews,
@@ -131,7 +131,7 @@ function ConfigPanel({
             </TabPanel>
             <TabPanel value={value} index={1}>
               <List
-                listType='List'
+                listType={Globals.listListType}
                 view={{
                   [Globals.childlistFieldName]: {
                     ...Globals.listOfAllLists,

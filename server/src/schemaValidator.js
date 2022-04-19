@@ -39,6 +39,15 @@ class SchemaValidator {
     }
   }
 
+  reorderTests(tests) {
+    var orderedTests = tests;
+    if (orderedTests.includes('minlength')) {
+      orderedTests = orderedTests.filter(test => test !== 'minlength')
+      orderedTests.unshift('minlength');
+    }
+    return orderedTests;
+  }
+
   // traverse a json object calling provided callbacks according to the right level
   async traverse(obj, parentKey = null, level = 0, callbacks = null) {
     for (var key in obj) {
@@ -130,7 +139,26 @@ class SchemaValidator {
       if (obj[key] !== null && obj[key] !== '') {
         // if this.schema.schema[key] is an object iterate over each schema property for that property and call the corresponding validator
         if (typeof this.schema.schema[key] === "object") {
-          for (var property in this.schema.schema[key]) {
+          var orderedTests = this.reorderTests(Object.keys(this.schema.schema[key]));
+          //for (var property in this.schema.schema[key]) {
+          //orderedTests.forEach(async test => {
+          for (let test of orderedTests) {
+            var validatorName = "validate_" + test;
+
+            obj[key] = await this[validatorName](
+              this.schema.schema[key][test],
+              key,
+              obj[key], // pass object by value so the validator can modify it directly
+              (obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null)
+            );
+
+            // delete properties that were undef by the validator (like hidden ones)
+            if (this.post && obj[key] === undefined) {
+              delete obj[key];
+              break;
+            };
+          };
+              /*
               var validatorName = "validate_" + property;
               obj[key] = await this[validatorName](
                 this.schema.schema[key][property],
@@ -138,12 +166,11 @@ class SchemaValidator {
                 obj[key],
                 (obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null)
               ); // pass object by value so the validator can modify it directly
-              // delete properties that were undef by the validator (like hidden ones)
               if (this.post && obj[key] === undefined) {
                 delete obj[key];
                 break;
               }
-          }
+          }*/
         }
         // if this.schema.schema[key] is a simple type validate it
         else {
@@ -483,6 +510,15 @@ class SchemaValidator {
   }
 
   validate_nodefault(type, key, val) {
+    return val;
+  }
+
+  validate_minlength(length, key, val) {
+    if (length && val.trim().length < length) {
+      throw new Error(
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_MinLength, key, length)
+      );
+    }
     return val;
   }
 

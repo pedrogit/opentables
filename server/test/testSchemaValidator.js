@@ -451,4 +451,30 @@ describe("2 testSchemaValidator.js test string against schema", () => {
     var json = await schemaValidator.validateJson('"prop1": "c c"');
     expect(json).to.deep.equal({ prop1: "c c" });
   });
+
+  it("2.24 String minlength", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: string, minlength: 8}");
+    expect(schemaValidator).to.be.an("object");
+
+    await expectThrowsAsync(
+      () => schemaValidator.validateJson('{"prop1": xxx}'),
+      NodeUtil.format(Errors.ErrMsg.SchemaValidator_MinLength, 'prop1', 8)
+    );
+
+    var json = await schemaValidator.validateJson('"prop1": "yyyyyyyy"');
+    expect(json).to.deep.equal({ prop1: "yyyyyyyy" });
+  });
+
+  it("2.25 String minlength for encrypted_string", async () => {
+    var schemaValidator = new SchemaValidator("prop1: {type: encrypted_string, minlength: 8}");
+    expect(schemaValidator).to.be.an("object");
+
+    await expectThrowsAsync(
+      () => schemaValidator.validateJson('{"prop1": xxx}'),
+      NodeUtil.format(Errors.ErrMsg.SchemaValidator_MinLength, 'prop1', 8)
+    );
+
+    var json = await schemaValidator.validateJson('"prop1": "yyyyyyyy"');
+    expect(json.prop1.length).to.equal(60);
+  });
 });
