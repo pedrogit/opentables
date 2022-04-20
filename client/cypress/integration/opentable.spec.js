@@ -117,6 +117,13 @@ describe('Opentable basic tests', () => {
       cy.contains('Lists').should('be.visible');
     })
 
+    it('1.2 - Test the reload button', () => {
+      cy.get('#reloadListButton');
+      cy.wait(2000);
+      cy.contains('Views').should('be.visible');
+      cy.contains('Lists').should('be.visible');
+    })
+
     it('2.1 - Test Sign Up', () => {
       // make sure the login form is not visible
       cy.get('#loginForm').should('not.be.visible');
@@ -311,6 +318,7 @@ describe('Opentable basic tests', () => {
     // set the view
     cy.contains('First User View 1').click();
 
+    // change to form mode
     changeAddItemMode('form');
 
     // add and cancel
@@ -322,12 +330,13 @@ describe('Opentable basic tests', () => {
     // form should not be visible anymore
     cy.get('input[name="prop1"]').should('not.exist');
 
-
+    // change to persistant form mode
     changeAddItemMode('persistent_form');
     addAndDeleteItemWithForm(true);
-    // persistent form should still be there
+    // persistent form should still exists
     cy.get('input[name="prop1"]').should('exist');
 
+    // change to persistant form mode without items
     changeAddItemMode('persistent_form_no_items');
     // item list should have only one children
     cy.get('#itemlist').children().should('have.length', 1);
