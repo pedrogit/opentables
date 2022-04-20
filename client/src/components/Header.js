@@ -21,6 +21,7 @@ function Header({
   handleOpenConfigPanel,
   configButtonDisabled,
   setAddItem,
+  addItemButtonDisabled,
   setViewId,
   handleReload
 }) {
@@ -112,6 +113,7 @@ function Header({
                   onClick={() => setAddItem(true)}
                   sx={{p: theme.openTable.buttonPadding}}
                   disableFocusRipple={true}
+                  disabled={addItemButtonDisabled}
               >
                 <AddCircleOutlineIcon fontSize="small"/>
               </IconButton>

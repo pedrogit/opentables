@@ -120,6 +120,7 @@ function App({ initialViewid, appid }) {
           handleOpenConfigPanel={handleOpenConfigPanel}
           configButtonDisabled={getUser() === Globals.allUserName}
           setAddItem={setAddItem}
+          addItemButtonDisabled={viewData && (viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormAndItems || viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormNoItems)}
           setViewId={handleChangeViewId}
           handleReload={handleReload}
         />
