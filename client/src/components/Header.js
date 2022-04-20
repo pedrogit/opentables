@@ -29,7 +29,7 @@ function Header({
 
   return (
     <AppBar
-      id="headerButtons"
+      id="headerPanel"
       ref={headerRef}
       position="static" 
     >

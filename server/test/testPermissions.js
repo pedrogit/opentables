@@ -20,7 +20,7 @@ let pw = "mypassword";
 
 function userUsername(user) {
   return user == "admin"
-    ? process.env.ADMIN_USERNAME
+    ? Globals.adminUserName
     : user == "owner"
     ? "owner_username"
     : user == "auth"

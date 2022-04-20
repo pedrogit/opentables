@@ -58,7 +58,7 @@ app.use(async (req, res, next) => {
             )
           );
         }
-        req.user = process.env.ADMIN_USERNAME;
+        req.user = Globals.adminUserName;
       } else {
         item = await controler.simpleFind(Globals.userListId, { [Globals.emailFieldName]: email });
 

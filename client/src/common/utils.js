@@ -401,7 +401,7 @@ exports.validateRWPerm = function(
   } = {}
 ) {
   // admin has all permissions
-  if (user === process.env.ADMIN_USERNAME) {
+  if (user === Globals.adminUserName) {
     return true;
   }
 
@@ -541,7 +541,7 @@ exports.validateDPerm = function(
      throwError = true
   } = {}
 ) {
-  if (user && user === process.env.ADMIN_USERNAME) {
+  if (user && user === Globals.adminUserName) {
     return true;
   }
     
@@ -589,7 +589,7 @@ exports.validateCPerm = function(
     throwError = true
   } = {}
 ) {
-  if (user === process.env.ADMIN_USERNAME) {
+  if (user === Globals.adminUserName) {
     return true;
   }
 

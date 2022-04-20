@@ -188,6 +188,7 @@ function Text({
             </>
           ) : (
             <Typography
+              id={propName}
               sx={{ ...defaultSx, ...sx }}
               onDoubleClick={handleEdit}
               ref={valueRef}
@@ -346,6 +347,7 @@ function Text({
           </>
         ) : (
           <Typography
+            id={propName}
             sx={{ ...defaultSx, ...sx }}
             onDoubleClick={handleEdit}
           >
@@ -542,6 +544,7 @@ function ItemWrapperForm({
         addToLocalList: otherProps.addItemMode === Globals.addWithPersistentFormNoItems ? false : true,
         callback: (success) => {
           if (success) {
+            setSubmitButtonDisabled(true);
             if (options.addMessage) {
               handlers.setErrorMsg(options.addMessage);
             }

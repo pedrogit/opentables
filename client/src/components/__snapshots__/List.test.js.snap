@@ -21,6 +21,7 @@ exports[`List has a valid snapshot 1`] = `
       </p>
       <p
         className="MuiTypography-root MuiTypography-body1 css-199lc0q-MuiTypography-root"
+        id="prop1"
         onDoubleClick={[Function]}
       >
         toto

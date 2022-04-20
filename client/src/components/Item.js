@@ -226,7 +226,7 @@ function Item({
               </IconButton>
             </Tooltip>
           }
-          <ItemMoreMenu 
+          <ItemMoreMenu
             unsetProps={unsetProps}
             handleSetUnsetProperty={handleSetUnsetProperty}
           />

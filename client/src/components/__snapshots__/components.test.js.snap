@@ -12,6 +12,7 @@ exports[`Text has a valid snapshot 1`] = `
   </p>
   <p
     className="MuiTypography-root MuiTypography-body1 css-199lc0q-MuiTypography-root"
+    id="Prop name"
     onDoubleClick={[Function]}
   >
     prop value

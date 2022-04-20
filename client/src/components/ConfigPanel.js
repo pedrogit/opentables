@@ -97,7 +97,7 @@ function ConfigPanel({
               p: theme.openTable.buttonPadding,
               zIndex: '100'
             }}
-            id="closeErrorMsgButton"
+            id="closeConfigPanelButton"
             aria-label="close error panel" 
             color="inherit"
             onClick={() => toggleConfigPanel(false)}
@@ -108,8 +108,8 @@ function ConfigPanel({
           <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                <Tab label={Globals.viewProperties}/>
-                <Tab label={Globals.listProperties} />
+                <Tab id="viewProperties" label={Globals.viewProperties}/>
+                <Tab id="listProperties" label={Globals.listProperties} />
               </Tabs>
             </Box>
             <TabPanel value={value} index={0}>

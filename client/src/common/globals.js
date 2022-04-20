@@ -34,6 +34,7 @@ var Globals = {
   APIKeyword: "opentables",
   browserHistoryKey: "otviews",
 
+  adminUserName: "administrator",
   ownerUserName: "@owner",
   authUserName: "@auth", // all authenticated users
   allUserName: "@all", // non authenticated users
@@ -67,7 +68,7 @@ Globals = {
   listOfAllLists: {
     [Globals.itemIdFieldName]: Globals.listofAllListId,
     [Globals.nameFieldName]: "List of all lists",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
       "{" +
@@ -85,7 +86,7 @@ Globals = {
   listOfAllViews: {
     [Globals.itemIdFieldName]: Globals.listofAllViewId,
     [Globals.nameFieldName]: "List of all views",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
       "{" +
@@ -106,7 +107,7 @@ Globals = {
   listOfUsers: {
     [Globals.itemIdFieldName]: Globals.userListId,
     [Globals.nameFieldName]: "List of users",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
       "username: {type: string, required, unique, minlength: 6," + Globals.noDefault + "}, " + 
@@ -117,14 +118,14 @@ Globals = {
   viewOnTheListOfAllLists: {
     [Globals.itemIdFieldName]: Globals.viewOnAllListViewId,
     [Globals.nameFieldName]: "Lists",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.childlistFieldName]: Globals.listofAllListId,
   },
 
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
     [Globals.nameFieldName]: "Views",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemTemplateFieldName]: "<Viewlink text={name} viewid={" + Globals.itemIdFieldName + "}/>",
     [Globals.childlistFieldName]: Globals.listofAllViewId,
   },
@@ -132,14 +133,14 @@ Globals = {
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
     [Globals.nameFieldName]: "Users (add with default values)",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.childlistFieldName]: Globals.userListId,
   },
 
   signUpViewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.signUpViewOnUserListViewId,
     [Globals.nameFieldName]: "Sign Up (persistent form without items)",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.addItemModeFieldName]: Globals.addWithPersistentFormNoItems,
     [Globals.childlistFieldName]: Globals.userListId,
   },
@@ -147,7 +148,7 @@ Globals = {
   viewOnTheListOfUsersAtLoad: {
     [Globals.itemIdFieldName]: (Globals.voidListId + (Globals.signUpViewOnUserListViewId *1 + 1)).slice(-24),
     [Globals.nameFieldName]: "Users (persistent form with items)",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.addItemModeFieldName]: Globals.addWithPersistentFormAndItems,
     [Globals.childlistFieldName]: Globals.userListId,
   },
@@ -155,7 +156,7 @@ Globals = {
   viewOnTheListOfUsersAsForm: {
     [Globals.itemIdFieldName]: (Globals.voidListId + (Globals.signUpViewOnUserListViewId *1 + 2)).slice(-24),
     [Globals.nameFieldName]: "Users (add with form)",
-    [Globals.ownerFieldName]: process.env.ADMIN_USERNAME,
+    [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.addItemModeFieldName]: Globals.addItemModeAsForm,
     [Globals.childlistFieldName]: Globals.userListId,
   }

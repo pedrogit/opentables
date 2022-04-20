@@ -23,7 +23,7 @@ const signUp = ({
   cy.get('input[name="username"]').focus().type(localUsername).tab();
   cy.get('input[name="email"]').focus().type(localEmail).tab();
   fillRecaptcha();
-  cy.get('input[name="password"]').focus().type(password + '{enter}');
+  cy.get('input[name="password"]').focus().type(password);
   cy.get('#addItemFormButton').click();
   cy.get('#loginLogoutButton').should('contain', 'Logout');
   cy.wait(2000);
@@ -36,16 +36,22 @@ const login = ({
   localEmail: email,
   localPassword: password
 }) => {
-  cy.get('#loginLogoutButton').click();
-  cy.focused().type(localEmail).tab();
-  cy.focused().type(localPassword + '{enter}');
-  cy.get('#loginLogoutButton').should('contain', 'Logout');
-  cy.wait(2000);
+  cy.get('#loginLogoutButton')
+    .then($loginButton => {
+      if ($loginButton.text().includes('Logout')) {
+        cy.get('#loginLogoutButton').click();
+      }
+      cy.get('#loginLogoutButton').click();
+      cy.focused().type(localEmail).tab();
+      cy.focused().type(localPassword + '{enter}');
+      cy.get('#loginLogoutButton').should('contain', 'Logout');
+      cy.wait(2000);
+  });
 }
 
 const logout = () => {
   cy.get('#loginLogoutButton')
-    .then(($loginButton) => {
+    .then($loginButton => {
       if (!($loginButton.text().includes('Login'))) {
         cy.get('#loginLogoutButton').click();
       }
@@ -217,11 +223,115 @@ describe('Opentable basic tests', () => {
     })
   } // runAllTests
 
-  it('4.1 - Test creating a new list', () => {
+  it('4.1 - Test creating a new list and edit it', () => {
     login();
     cy.get('#addItemButton').click();
     cy.wait(1000);
     cy.get('#itemlist').should('contain', 'View Name');
+    cy.contains('View Name').should('be.visible');
+
+    // edit new view name
+    cy.contains('View Name').click();
+    cy.get('#configPanelOpenButton').click();
+    cy.wait(2000);
+
+    //cy.get('#listProperties').click();*/
+    cy.get('#viewlist').contains('View Name').dblclick();
+    cy.focused().type('{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}First User View 1{enter}');
+    
+    // close the config panel and make sure the view name was changed
+    cy.get('#closeConfigPanelButton').click();
+    cy.get('#headerPanel').should('contain', 'First User View 1');
+
+    // add a new item and edit it
+    cy.get('#addItemButton').click();
+    cy.get('#itemlist').contains('prop1').dblclick();
+    cy.focused().type(' edited{enter}');
+    cy.get('#itemlist').should('contain', 'prop1 edited');
+  });
+
+  it('5.1 - Test the different add item modes', () => {
+    const changeAddItemMode = (mode) => {
+      // open the config panel and change the add item mode to form
+      cy.get('#configPanelOpenButton').click();
+      cy.get('#viewlist')
+        .then($viewlist => {
+          if (!($viewlist.text().includes('Add_item_mode'))) {
+            cy.get('#viewlist').trigger('mouseover');
+            cy.get('#moreItemButton').click();
+            cy.contains('add_item_mode').click();
+            // escape the Add Unset Property menu
+            cy.get('body').click()
+          }
+        })
+         
+      cy.get('#viewlist').should('contain', 'Add_item_mode');
+      cy.get('#viewlist #add_item_mode').dblclick();
+      cy.contains(mode).click();
+      cy.wait(2000);
+      cy.get('#closeConfigPanelButton').click();
+    }
+
+    const addAndDeleteItemWithForm = (reset = false) => {
+      // add a new item in form mode
+      cy.get('#addItemButton').click();
+      cy.get('input[name="prop1"]').should('be.visible');
+      cy.get('#addCancelItemFormButton').should('be.visible');
+      cy.get('#addItemFormButton').should('be.visible');
+      cy.get('#addItemFormButton').should('be.disabled');
+      if (reset) {
+        cy.get('input[name="prop1"]').should('have.value', 'prop1');
+        cy.get('input[name="prop1"]').focus().type(' more text');
+        cy.get('#addCancelItemFormButton').click();
+        cy.get('input[name="prop1"]').should('not.contain', 'more text');
+      }
+      cy.get('input[name="prop1"]').focus().type(' ');
+      cy.get('#addItemFormButton').should('be.enabled');
+      cy.focused().type('edited 2{enter}');
+      cy.wait(2000);
+
+      // check for the presence af the new item only when not in persistent form no item mode
+      cy.get('#viewlist')
+        .then($viewlist => {
+          if (($viewlist.text().includes('Add_item_mode'))) {
+            // make sure it was added
+            cy.contains('prop1 edited 2').should('be.visible');
+
+            // delete it
+            cy.get('#itemlist').children().contains('prop1 edited 2').trigger('mouseover');
+            cy.get('#deleteItemButton').click();
+            cy.wait(2000);
+            cy.contains('prop1 edited 2').should('not.exist');
+          }
+        })
+    }
+
+    login();
+
+    // set the view
+    cy.contains('First User View 1').click();
+
+    changeAddItemMode('form');
+
+    // add and cancel
+    cy.get('#addItemButton').click();
+    cy.get('#addCancelItemFormButton').click();
+    cy.get('input[name="prop1"]').should('not.exist');
+
+    addAndDeleteItemWithForm();
+    // form should not be visible anymore
+    cy.get('input[name="prop1"]').should('not.exist');
+
+
+    changeAddItemMode('persistent_form');
+    addAndDeleteItemWithForm(true);
+    // persistent form should still be there
+    cy.get('input[name="prop1"]').should('exist');
+
+    changeAddItemMode('persistent_form_no_items');
+    // item list should have only one children
+    cy.get('#itemlist').children().should('have.length', 1);
+    addAndDeleteItemWithForm();
   })
     
 /*  it('1.3 - Makes the login form appear when adding an item, enter a valid password and check the edited value', () => {
