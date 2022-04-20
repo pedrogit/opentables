@@ -18,7 +18,8 @@ function Header({
   viewOwner, 
   viewName, 
   setLoginState, 
-  handleOpenConfigPanel, 
+  handleOpenConfigPanel,
+  configButtonDisabled,
   setAddItem,
   setViewId,
   handleReload
@@ -78,15 +79,18 @@ function Header({
               </IconButton>
             </Tooltip>
             <Tooltip title={Globals.listProperties}>
+              <span>
               <IconButton
                   id="configPanelOpenButton" 
                   aria-label="config panel" 
                   color="inherit"
                   sx={{p: theme.openTable.buttonPadding}}
                   onClick={handleOpenConfigPanel}
+                  disabled={configButtonDisabled}
               >
                 <SettingsIcon fontSize="small"/>
               </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title="Reload List">
               <IconButton

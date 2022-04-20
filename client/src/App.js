@@ -102,48 +102,10 @@ function App({ initialViewid, appid }) {
 
   const handleOpenConfigPanel = React.useCallback(
     () => {
-      var user = getUser();
-      var authView = Utils.validateRWPerm({
-        user: user,
-        item: viewData,
-        throwError: false
-      });
-      var authList = true;
-      if (viewData[Globals.childlistFieldName]) {
-        authList = Utils.validateRWPerm({
-          user: user,
-          list: viewData[Globals.childlistFieldName],
-          throwError: false
-        });
-      }
-      if (!(authView || authList)) {
-        // open login dialog
-        setLoginState({
-          open: true, 
-          msg: {
-            severity: "warning",
-            title: "Permission denied",
-            text:
-            'You do not have permissions to configure this list. Please login with valid credentials...',
-          },
-          action: {
-            method: "get",
-            url: "http://localhost:3001/api/opentables/login",
-            callback: (success) => {
-              if (success) {
-                toggleConfigPanel(!configPanelOpen);
-              }
-            }
-          },
-          tryFirst: false
-        });
-
-      }
-      else {
+      if (getUser() !== Globals.allUserName) {
         toggleConfigPanel(!configPanelOpen);
       }
-      return authView;
-    }, [setLoginState, viewData, configPanelOpen, toggleConfigPanel]
+    }, [configPanelOpen, toggleConfigPanel]
   );
 
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
@@ -156,6 +118,7 @@ function App({ initialViewid, appid }) {
           viewName={viewData ? viewData.name : ''}
           setLoginState={setLoginState} 
           handleOpenConfigPanel={handleOpenConfigPanel}
+          configButtonDisabled={getUser() === Globals.allUserName}
           setAddItem={setAddItem}
           setViewId={handleChangeViewId}
           handleReload={handleReload}
