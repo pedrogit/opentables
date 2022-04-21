@@ -69,14 +69,14 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.listofAllListId,
     [Globals.nameFieldName]: "List of all lists",
     [Globals.ownerFieldName]: Globals.adminUserName,
-    [Globals.itemCreatePermFieldName]: Globals.allUserName,
+    [Globals.itemCreatePermFieldName]: Globals.authUserName,
     [Globals.listSchemaFieldName]:
       "{" +
       Globals.nameFieldName + ": {type: string, required, default: 'List Name'}, " +
       Globals.ownerFieldName + ": {type: user, required}, " +
       Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.itemCreatePermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
+      Globals.itemCreatePermFieldName + ": {type: user_list, lower, default: " + Globals.authUserName + "}, " +
       Globals.itemReadPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
       Globals.itemReadWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
       Globals.listSchemaFieldName + ": {type: schema, required, default: 'prop1: string'}" +
@@ -87,7 +87,7 @@ Globals = {
     [Globals.itemIdFieldName]: Globals.listofAllViewId,
     [Globals.nameFieldName]: "List of all views",
     [Globals.ownerFieldName]: Globals.adminUserName,
-    [Globals.itemCreatePermFieldName]: Globals.allUserName,
+    [Globals.itemCreatePermFieldName]: Globals.authUserName,
     [Globals.listSchemaFieldName]:
       "{" +
       Globals.nameFieldName + ": {type: string, required, default: 'View Name'}, " +
