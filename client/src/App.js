@@ -108,6 +108,18 @@ function App({ initialViewid, appid }) {
     }, [configPanelOpen, toggleConfigPanel]
   );
 
+  const disableAddItemButton = () => {
+    var result = viewData === undefined || viewData === null ||
+                 viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormAndItems || 
+                 viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormNoItems || 
+                 !(Utils.validateCPerm({
+                   user: getUser(),
+                   list: viewData[Globals.childlistFieldName],
+                   throwError: false
+                 }));
+    return result;
+  }
+
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
     <ThemeProvider theme={theme}>
@@ -120,7 +132,7 @@ function App({ initialViewid, appid }) {
           handleOpenConfigPanel={handleOpenConfigPanel}
           configButtonDisabled={getUser() === Globals.allUserName}
           setAddItem={setAddItem}
-          addItemButtonDisabled={viewData && (viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormAndItems || viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormNoItems)}
+          addItemButtonDisabled={disableAddItemButton()}
           setViewId={handleChangeViewId}
           handleReload={handleReload}
         />
