@@ -55,6 +55,8 @@ var Globals = {
   viewListType: "viewlist",
   listListType: "listlist",
   itemListType: "itemlist",
+
+  permissionDenied: "Permission denied",
 };
 
 Globals = {

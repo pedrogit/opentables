@@ -42,7 +42,7 @@ const theme = createTheme({
 function App({ initialViewid, appid }) {
   const [viewid, setViewId] = React.useState(BrowserHistory.getViewIdFromURL(appid) ? BrowserHistory.getViewIdFromURL(appid) : initialViewid);
   const [viewData, setViewData] = React.useState(null);
-  const [configPanelOpen, toggleConfigPanel] = React.useState(false);
+  const [showConfigPanel, setShowConfigPanel] = React.useState(false);
   const [loginState, setLoginState] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
@@ -59,7 +59,7 @@ function App({ initialViewid, appid }) {
       setAddItem(false);
       setErrorMsg({open: false});
       if (toggleCfgPanel === undefined) {
-        toggleConfigPanel(false);
+        setShowConfigPanel(false);
       }
       if (viewData) {
         // make the list of items to flash to nothing before reloading
@@ -70,7 +70,7 @@ function App({ initialViewid, appid }) {
       }
       setViewId(newViewid);
       setReload(!reload);
-    }, [viewData, setAddItem, setErrorMsg, toggleConfigPanel, setViewData, setViewId, reload]
+    }, [viewData, setAddItem, setErrorMsg, setShowConfigPanel, setViewData, setViewId, reload]
   );
 
   React.useEffect(() => {
@@ -83,7 +83,7 @@ function App({ initialViewid, appid }) {
         open: false,
         msg: {
           severity: "warning",
-          title: "Permission denied",
+          title: Globals.permissionDenied,
           text: 'You do not have permissions to view this list. Please login with valid credentials...'
         },
         action: {
@@ -100,25 +100,11 @@ function App({ initialViewid, appid }) {
       });
   }, [reload, viewid, appid]);
 
-  const handleOpenConfigPanel = React.useCallback(
+  const toggleOpenConfigPanel = React.useCallback(
     () => {
-      if (getUser() !== Globals.allUserName) {
-        toggleConfigPanel(!configPanelOpen);
-      }
-    }, [configPanelOpen, toggleConfigPanel]
+        setShowConfigPanel(!showConfigPanel);
+    }, [showConfigPanel, setShowConfigPanel]
   );
-
-  const disableAddItemButton = () => {
-    var result = viewData === undefined || viewData === null ||
-                 viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormAndItems || 
-                 viewData[Globals.addItemModeFieldName] === Globals.addWithPersistentFormNoItems || 
-                 !(Utils.validateCPerm({
-                   user: getUser(),
-                   list: viewData[Globals.childlistFieldName],
-                   throwError: false
-                 }));
-    return result;
-  }
 
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
@@ -129,10 +115,30 @@ function App({ initialViewid, appid }) {
           viewOwner={viewData ? viewData.owner : ''} 
           viewName={viewData ? viewData.name : ''}
           setLoginState={setLoginState} 
-          handleOpenConfigPanel={handleOpenConfigPanel}
-          configButtonDisabled={getUser() === Globals.allUserName}
+          toggleOpenConfigPanel={toggleOpenConfigPanel}
+          configButtonDisabled={
+            !viewData ||
+            !Utils.validateRPerm({
+              user: getUser(),
+              list: Globals.listOfAllViews,
+              item: viewData,
+              throwError: false
+            })
+          }
           setAddItem={setAddItem}
-          addItemButtonDisabled={disableAddItemButton()}
+          showAddItemButton={
+            viewData && 
+            viewData[Globals.addItemModeFieldName] !== Globals.addWithPersistentFormAndItems && 
+            viewData[Globals.addItemModeFieldName] !== Globals.addWithPersistentFormNoItems
+          }
+          addItemButtonDisabled={
+            !viewData ||
+            !(Utils.validateCPerm({
+              user: getUser(),
+              list: viewData[Globals.childlistFieldName],
+              throwError: false
+            }))
+          }
           setViewId={handleChangeViewId}
           handleReload={handleReload}
         />
@@ -146,8 +152,8 @@ function App({ initialViewid, appid }) {
         {(viewData) ? (
           <>
           <ConfigPanel
-            configPanelOpen={configPanelOpen}
-            toggleConfigPanel={toggleConfigPanel}
+            showConfigPanel={showConfigPanel}
+            setShowConfigPanel={setShowConfigPanel}
             view={viewData}
             setViewData={setViewData}
             setLoginState={setLoginState}

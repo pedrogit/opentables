@@ -22,7 +22,8 @@ for (let name in Components) {
 
 function ItemMoreMenu({
   unsetProps,
-  handleSetUnsetProperty
+  handleSetUnsetProperty,
+  setUnsetPropertyButtonDisabled
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -69,13 +70,20 @@ function ItemMoreMenu({
           horizontal: 'right',
         }}
       >
-        <MenuItem dense>{unsetProps && unsetProps.length > 0 ? "Add Unset Property" : "No Unset Property to Add"}</MenuItem>
+        <MenuItem dense
+          disabled={setUnsetPropertyButtonDisabled}
+        >{
+          unsetProps && 
+          unsetProps.length > 0 ? "Add Unset Property" + (setUnsetPropertyButtonDisabled ? " (" + Globals.permissionDenied + ")" : ""): "No Unset Property to Add"
+        }</MenuItem>
         {unsetProps && unsetProps.map(prop => 
           <MenuItem
             sx={{ml: "10px"}}
             dense
-            onClick={() => handleSetUnsetProperty(prop)}>
-              {prop}
+            onClick={() => handleSetUnsetProperty(prop)}
+            disabled={setUnsetPropertyButtonDisabled}
+          >
+            {prop}
           </MenuItem>
         )}
       </Menu>
@@ -95,9 +103,11 @@ function Item({
   handleListAuth,
   handleAddItem,
   handleDeleteItem,
+  deleteButtonDisabled,
+  showDeleteButton,
   handleEditItem,
+  setUnsetPropertyButtonDisabled,
   setErrorMsg,
-  enableDeleteButton,
   ...otherProps
 }) {
   const [showButtons, setShowButtons] = React.useState(false);
@@ -121,7 +131,7 @@ function Item({
       open: false,
       msg: {
         severity: "warning",
-        title: "Permission denied",
+        title: Globals.permissionDenied,
         text:
         'You do not have permissions to edit "' +
         Object.keys(val)[0] +
@@ -213,22 +223,26 @@ function Item({
       />
       {showButtons && 
         <Stack sx={buttonSx} direction="row">
-          {enableDeleteButton &&
-            <Tooltip title="Delete Item">
+          {showDeleteButton &&
+            <Tooltip title={"Delete Item" + (deleteButtonDisabled ? " (" + Globals.permissionDenied + ")" : "")}>
+              <span>
               <IconButton
                 id="deleteItemButton"
                 aria-label="delete item" 
                 color="inherit"
                 sx={{p: theme.openTable.buttonPadding}}
                 onClick={() => handleDeleteItem(item[Globals.itemIdFieldName])}
+                disabled={deleteButtonDisabled}
               >
                 <HighlightOffIcon />
               </IconButton>
+              </span>
             </Tooltip>
           }
           <ItemMoreMenu
             unsetProps={unsetProps}
             handleSetUnsetProperty={handleSetUnsetProperty}
+            setUnsetPropertyButtonDisabled={setUnsetPropertyButtonDisabled}
           />
         </Stack>
       }

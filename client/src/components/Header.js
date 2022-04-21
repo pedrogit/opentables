@@ -18,9 +18,10 @@ function Header({
   viewOwner, 
   viewName, 
   setLoginState, 
-  handleOpenConfigPanel,
+  toggleOpenConfigPanel,
   configButtonDisabled,
   setAddItem,
+  showAddItemButton,
   addItemButtonDisabled,
   setViewId,
   handleReload
@@ -79,14 +80,14 @@ function Header({
                 <HomeIcon fontSize="small"/>
               </IconButton>
             </Tooltip>
-            <Tooltip title={Globals.listProperties}>
+            <Tooltip title={Globals.listProperties + (configButtonDisabled ? " (" + Globals.permissionDenied + ")" : "")}>
               <span>
               <IconButton
                   id="configPanelOpenButton" 
                   aria-label="config panel" 
                   color="inherit"
                   sx={{p: theme.openTable.buttonPadding}}
-                  onClick={handleOpenConfigPanel}
+                  onClick={toggleOpenConfigPanel}
                   disabled={configButtonDisabled}
               >
                 <SettingsIcon fontSize="small"/>
@@ -105,19 +106,23 @@ function Header({
                 <ReplayIcon fontSize="small"/>
               </IconButton>
             </Tooltip>
-            <Tooltip title="Add Item">
-              <IconButton
-                  id="addItemButton" 
-                  aria-label="add item" 
-                  color="inherit"
-                  onClick={() => setAddItem(true)}
-                  sx={{p: theme.openTable.buttonPadding}}
-                  disableFocusRipple={true}
-                  disabled={addItemButtonDisabled}
-              >
-                <AddCircleOutlineIcon fontSize="small"/>
-              </IconButton>
-            </Tooltip>
+            {showAddItemButton &&
+              <Tooltip title={"Add Item" + (addItemButtonDisabled ? " (" + Globals.permissionDenied + ")" : "")}>
+              <span>
+                <IconButton
+                    id="addItemButton" 
+                    aria-label="add item" 
+                    color="inherit"
+                    onClick={() => setAddItem(true)}
+                    sx={{p: theme.openTable.buttonPadding}}
+                    disableFocusRipple={true}
+                    disabled={addItemButtonDisabled}
+                >
+                  <AddCircleOutlineIcon fontSize="small"/>
+                </IconButton>
+              </span>
+              </Tooltip>
+            }
           </Stack>
         </Stack>
           <Typography 

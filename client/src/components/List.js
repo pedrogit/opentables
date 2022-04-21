@@ -19,7 +19,7 @@ function List({
   setAddItem,
   addItem,
   setErrorMsg,
-  enableDeleteButton = true,
+  showDeleteButton = true,
   handleReload,
   sx
 }) {
@@ -33,7 +33,7 @@ function List({
           open: false,
           msg: {
             severity: "warning",
-            title: "Permission denied",
+            title: Globals.permissionDenied,
             text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
           },
           action: {
@@ -69,6 +69,7 @@ function List({
     }, [view, setLoginState, setViewData, setErrorMsg]
   );
 
+  // determine user permission on patch and post. Open the login panel otherwise.
   const handleListAuth = React.useCallback(
     ({
       action = 'patch', 
@@ -104,7 +105,7 @@ function List({
           open: true, 
           msg: {
             severity: "warning",
-            title: "Permission denied",
+            title: Globals.permissionDenied,
             text:
             'You do not have permissions to edit ' + 
             (propName ? ('"' + propName + '"') : "item") +
@@ -141,6 +142,7 @@ function List({
 
   var rowNb = 0;
 
+  // check that the has permission to add an item
   React.useEffect(() => {
     if (addItemMode === Globals.addWithPersistentFormAndItems || 
         addItemMode === Globals.addWithPersistentFormNoItems) {
@@ -148,6 +150,7 @@ function List({
     }
   }, [view, addItemMode, setAddItem, handleListAuth] );
 
+  // handle the deletion of an item
   const handleDeleteItem = React.useCallback(
     (itemid, callback) => {
       if (view[Globals.childlistFieldName]) {
@@ -155,7 +158,7 @@ function List({
           open: false,
           msg: {
             severity: "warning",
-            title: "Permission denied",
+            title: Globals.permissionDenied,
             text:
             'You do not have permissions to delete items from this list. Please login with valid credentials...',
           },
@@ -187,6 +190,30 @@ function List({
       }
     }, [view, setLoginState, setViewData, setErrorMsg]
   );
+
+  // determine if delete button should be disabled
+  const deleteButtonDisabled = (item) => {
+    var disabled = view === undefined || view === null || 
+                 !(Utils.validateDPerm({
+                   user: getUser(),
+                   list: view[Globals.childlistFieldName],
+                   item: item,
+                   throwError: false
+                 }));
+    return disabled;
+  }
+
+  // determine if setUnsetProperty button should be disabled
+  const setUnsetPropertyButtonDisabled = (item) => {
+    var disabled = view === undefined || view === null || 
+                  !(Utils.validateRWPerm({
+                    user: getUser(),
+                    list: view[Globals.childlistFieldName],
+                    item: item,
+                    throwError: false
+                  }));
+    return disabled;
+  }
 
   const handleEditItem = React.useCallback(
     (editedItem, editedProperty) => {
@@ -232,6 +259,7 @@ function List({
           handleListAuth={handleListAuth}
           handleAddItem={handleAddItem}
           handleDeleteItem={handleDeleteItem}
+          showDeleteButton={false}
           setViewId={setViewId}
           addItemMode={addItemMode}
           setAddItem={setAddItem}
@@ -241,7 +269,6 @@ function List({
           addMessageText={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Welcome to OpenTable. You have been logged in..." : null)}
           addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? (() => "Congratulation " + getUser() + " !") : null)}
           recaptcha={getUser() === Globals.allUserName}
-          enableDeleteButton={false}
         />
       }
       {(view && 
@@ -262,10 +289,12 @@ function List({
             handleListAuth={handleListAuth}
             handleAddItem={handleAddItem}
             handleDeleteItem={handleDeleteItem}
+            deleteButtonDisabled={deleteButtonDisabled(item)}
+            showDeleteButton={showDeleteButton}
             handleEditItem={handleEditItem}
+            setUnsetPropertyButtonDisabled={setUnsetPropertyButtonDisabled(item)}
             setViewId={setViewId}
             setErrorMsg={setErrorMsg}
-            enableDeleteButton={enableDeleteButton}
           />
         );
       })}

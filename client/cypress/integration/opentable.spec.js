@@ -279,9 +279,14 @@ describe('Opentable basic tests', () => {
       cy.get('#closeConfigPanelButton').click();
     }
 
-    const addAndDeleteItemWithForm = (reset = false) => {
-      // add a new item in form mode
-      cy.get('#addItemButton').click();
+    const addAndDeleteItemWithForm = (reset, type) => {
+      if (type === 'form') {
+        // add a new item in form mode
+        cy.get('#addItemButton').click();
+      }
+      else {
+        cy.get('#addItemButton').should('not.exist');
+      }
       cy.get('input[name="prop1"]').should('be.visible');
       cy.get('#addCancelItemFormButton').should('be.visible');
       cy.get('#addItemFormButton').should('be.visible');
@@ -326,13 +331,13 @@ describe('Opentable basic tests', () => {
     cy.get('#addCancelItemFormButton').click();
     cy.get('input[name="prop1"]').should('not.exist');
 
-    addAndDeleteItemWithForm();
+    addAndDeleteItemWithForm(false, 'form');
     // form should not be visible anymore
     cy.get('input[name="prop1"]').should('not.exist');
 
     // change to persistant form mode
     changeAddItemMode('persistent_form');
-    addAndDeleteItemWithForm(true);
+    addAndDeleteItemWithForm(true, 'persistent_form');
     // persistent form should still exists
     cy.get('input[name="prop1"]').should('exist');
 
@@ -340,7 +345,7 @@ describe('Opentable basic tests', () => {
     changeAddItemMode('persistent_form_no_items');
     // item list should have only one children
     cy.get('#itemlist').children().should('have.length', 1);
-    addAndDeleteItemWithForm();
+    addAndDeleteItemWithForm(false, 'persistent_form_no_items');
   })
     
 /*  it('1.3 - Makes the login form appear when adding an item, enter a valid password and check the edited value', () => {

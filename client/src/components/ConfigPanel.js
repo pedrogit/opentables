@@ -40,8 +40,8 @@ TabPanel.propTypes = {
 };
 
 function ConfigPanel({
-  configPanelOpen,
-  toggleConfigPanel,
+  showConfigPanel,
+  setShowConfigPanel,
   view,
   setViewData,
   setLoginState,
@@ -82,7 +82,7 @@ function ConfigPanel({
 
   return (
     <Stack sx={{backgroundColor: theme.palette.primary.palebg}}>
-      <Collapse in={configPanelOpen}>
+      <Collapse in={showConfigPanel}>
         <Stack sx={{
           position: 'relative', 
           borderBottomWidth: '5px', 
@@ -100,7 +100,7 @@ function ConfigPanel({
             id="closeConfigPanelButton"
             aria-label="close error panel" 
             color="inherit"
-            onClick={() => toggleConfigPanel(false)}
+            onClick={() => setShowConfigPanel(false)}
           >
             <HighlightOffIcon />
           </IconButton>
@@ -125,7 +125,7 @@ function ConfigPanel({
                 setLoginState={setLoginState}
                 setViewData={handleEditView}
                 setErrorMsg={setErrorMsg}
-                enableDeleteButton={false}
+                showDeleteButton={false}
                 handleReload={handleReload}
               />
             </TabPanel>
@@ -141,7 +141,7 @@ function ConfigPanel({
                 setLoginState={setLoginState}
                 setViewData={handleEditList}
                 setErrorMsg={setErrorMsg}
-                enableDeleteButton={false}
+                showDeleteButton={false}
                 handleReload={handleReload}
               />
             </TabPanel>
