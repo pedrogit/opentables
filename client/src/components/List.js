@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 
 import getUser from "../clientUtils";
 const Schema = require("../common/schema");
-
+const TemplateParser = require("../common/templateParser");
 const Utils = require("../common/utils");
 const Globals = require("../common/globals");
 
@@ -240,6 +240,16 @@ function List({
     }, [listType, view, setViewData, handleReload]
   );
 
+  const getUnsetProperties = (item) => {
+    var unsetProps = parsedSchema.getUnsetProps(item);
+    if (view[Globals.itemTemplateFieldName]) {
+      const tParser = new TemplateParser(view[Globals.itemTemplateFieldName]);
+      var templateProps = tParser.getUsedProperties();
+      unsetProps = unsetProps.filter(prop => templateProps.includes(prop));
+    }
+    return unsetProps;
+  }
+
   return (
     <Stack
       id={listType && listType.toLowerCase()}
@@ -283,7 +293,7 @@ function List({
             listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
             item={item}
             defItem={parsedSchema.getAllDefaults({user: getUser(), listSchema: listSchemaStr})}
-            unsetProps={parsedSchema.getUnsetProps(item)}
+            unsetProps={getUnsetProperties(item)}
             rowNb={rowNb}
             setLoginState={setLoginState}
             handleListAuth={handleListAuth}
