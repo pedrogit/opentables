@@ -29,7 +29,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
               className="css-t070a8-MuiStack-root"
             >
               <div
-                className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-h1vr4d-MuiPaper-root-MuiAlert-root"
+                className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-hp9f8j-MuiPaper-root-MuiAlert-root"
                 role="alert"
               >
                 <div
@@ -66,10 +66,8 @@ exports[`LoginForm has a valid snapshot 1`] = `
                   onKeyDown={[Function]}
                 >
                   <label
-                    className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1sumxir-MuiFormLabel-root-MuiInputLabel-root"
+                    className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1kty9di-MuiFormLabel-root-MuiInputLabel-root"
                     data-shrink={true}
-                    htmlFor="mui-4"
-                    id="mui-4-label"
                   >
                     Email Address
                     <span
@@ -102,12 +100,11 @@ exports[`LoginForm has a valid snapshot 1`] = `
                       className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
                     >
                       <legend
-                        className="css-1in441m"
+                        className="css-186xcr5"
                       >
                         <span>
                           Email Address
-                           
-                          *
+                           *
                         </span>
                       </legend>
                     </fieldset>
@@ -118,10 +115,8 @@ exports[`LoginForm has a valid snapshot 1`] = `
                   onKeyDown={[Function]}
                 >
                   <label
-                    className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1sumxir-MuiFormLabel-root-MuiInputLabel-root"
+                    className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-1kty9di-MuiFormLabel-root-MuiInputLabel-root"
                     data-shrink={true}
-                    htmlFor="mui-6"
-                    id="mui-6-label"
                   >
                     Password
                     <span
@@ -197,12 +192,11 @@ exports[`LoginForm has a valid snapshot 1`] = `
                       className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
                     >
                       <legend
-                        className="css-1in441m"
+                        className="css-186xcr5"
                       >
                         <span>
                           Password
-                           
-                          *
+                           *
                         </span>
                       </legend>
                     </fieldset>
@@ -212,11 +206,11 @@ exports[`LoginForm has a valid snapshot 1`] = `
                   className="css-181c0ax-MuiStack-root"
                 >
                   <div
-                    className="MuiButtonGroup-root MuiButtonGroup-contained css-zqcytf-MuiButtonGroup-root"
+                    className="MuiButtonGroup-root MuiButtonGroup-contained css-dr3dyz-MuiButtonGroup-root"
                     role="group"
                   >
                     <button
-                      className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
+                      className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
                       disabled={false}
                       id="loginCancelButton"
                       onBlur={[Function]}
@@ -241,7 +235,7 @@ exports[`LoginForm has a valid snapshot 1`] = `
                       />
                     </button>
                     <button
-                      className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
+                      className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-11qr2p8-MuiButtonBase-root-MuiButton-root"
                       disabled={true}
                       id="loginButton"
                       onBlur={[Function]}
@@ -271,9 +265,12 @@ exports[`LoginForm has a valid snapshot 1`] = `
               >
                 <span
                   className="notranslate"
-                >
-                  ​
-                </span>
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": "&#8203;",
+                    }
+                  }
+                />
               </p>
             </div>
           </div>

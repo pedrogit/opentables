@@ -27,7 +27,7 @@ exports[`App has a valid snapshot 1`] = `
             className="css-m69qwo-MuiStack-root"
           >
             <button
-              className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-izi8m9-MuiButtonBase-root-MuiButton-root"
+              className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root css-izi8m9-MuiButtonBase-root-MuiButton-root"
               disabled={false}
               id="loginLogoutButton"
               onBlur={[Function]}
@@ -52,7 +52,7 @@ exports[`App has a valid snapshot 1`] = `
               />
             </button>
             <button
-              className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root  css-izi8m9-MuiButtonBase-root-MuiButton-root"
+              className="MuiButton-root MuiButton-text MuiButton-textInherit MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorInherit MuiButtonBase-root css-izi8m9-MuiButtonBase-root-MuiButton-root"
               disabled={false}
               id="signUpButton"
               onBlur={[Function]}
@@ -116,7 +116,7 @@ exports[`App has a valid snapshot 1`] = `
               />
             </button>
             <span
-              aria-label="List Properties"
+              aria-label="List Properties (Permission denied)"
               aria-labelledby={null}
               className=""
               data-mui-internal-clone-element={true}
@@ -131,7 +131,7 @@ exports[`App has a valid snapshot 1`] = `
                 aria-label="config panel"
                 className="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-colorInherit MuiIconButton-sizeMedium css-sfqjxq-MuiButtonBase-root-MuiIconButton-root"
                 disabled={true}
-                id="showConfigPanelButton"
+                id="configPanelOpenButton"
                 onBlur={[Function]}
                 onClick={[Function]}
                 onContextMenu={[Function]}
@@ -194,45 +194,6 @@ exports[`App has a valid snapshot 1`] = `
               >
                 <path
                   d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
-                />
-              </svg>
-              <span
-                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-            <button
-              aria-label="add item"
-              aria-labelledby={null}
-              className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeMedium css-sfqjxq-MuiButtonBase-root-MuiIconButton-root"
-              data-mui-internal-clone-element={true}
-              disabled={false}
-              id="addItemButton"
-              onBlur={[Function]}
-              onClick={[Function]}
-              onContextMenu={[Function]}
-              onDragLeave={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onMouseDown={[Function]}
-              onMouseLeave={[Function]}
-              onMouseOver={[Function]}
-              onMouseUp={[Function]}
-              onTouchEnd={[Function]}
-              onTouchMove={[Function]}
-              onTouchStart={[Function]}
-              tabIndex={0}
-              type="button"
-            >
-              <svg
-                aria-hidden={true}
-                className="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root"
-                data-testid="AddCircleOutlineIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
                 />
               </svg>
               <span
@@ -307,7 +268,7 @@ exports[`App has a valid snapshot 1`] = `
                 />
               </button>
               <div
-                className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-e014r0-MuiPaper-root-MuiAlert-root"
+                className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-sagy7s-MuiPaper-root-MuiAlert-root"
                 onClick={[Function]}
                 role="alert"
               >
@@ -372,7 +333,7 @@ exports[`App has a valid snapshot 1`] = `
                   className="css-t070a8-MuiStack-root"
                 >
                   <div
-                    className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1lzuyui-MuiPaper-root-MuiAlert-root"
+                    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiAlert-root MuiAlert-standardPrimary MuiAlert-standard css-1jxkuvk-MuiPaper-root-MuiAlert-root"
                     role="alert"
                   >
                     <div
@@ -409,10 +370,8 @@ exports[`App has a valid snapshot 1`] = `
                       onKeyDown={[Function]}
                     >
                       <label
-                        className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-obzh51-MuiFormLabel-root-MuiInputLabel-root"
+                        className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-19v7tfd-MuiFormLabel-root-MuiInputLabel-root"
                         data-shrink={true}
-                        htmlFor="mui-12"
-                        id="mui-12-label"
                       >
                         Email Address
                         <span
@@ -445,12 +404,11 @@ exports[`App has a valid snapshot 1`] = `
                           className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
                         >
                           <legend
-                            className="css-1in441m"
+                            className="css-186xcr5"
                           >
                             <span>
                               Email Address
-                               
-                              *
+                               *
                             </span>
                           </legend>
                         </fieldset>
@@ -461,10 +419,8 @@ exports[`App has a valid snapshot 1`] = `
                       onKeyDown={[Function]}
                     >
                       <label
-                        className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-obzh51-MuiFormLabel-root-MuiInputLabel-root"
+                        className="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary Mui-required css-19v7tfd-MuiFormLabel-root-MuiInputLabel-root"
                         data-shrink={true}
-                        htmlFor="mui-14"
-                        id="mui-14-label"
                       >
                         Password
                         <span
@@ -540,12 +496,11 @@ exports[`App has a valid snapshot 1`] = `
                           className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
                         >
                           <legend
-                            className="css-1in441m"
+                            className="css-186xcr5"
                           >
                             <span>
                               Password
-                               
-                              *
+                               *
                             </span>
                           </legend>
                         </fieldset>
@@ -555,11 +510,11 @@ exports[`App has a valid snapshot 1`] = `
                       className="css-181c0ax-MuiStack-root"
                     >
                       <div
-                        className="MuiButtonGroup-root MuiButtonGroup-contained css-do7yro-MuiButtonGroup-root"
+                        className="MuiButtonGroup-root MuiButtonGroup-contained css-4ev3t9-MuiButtonGroup-root"
                         role="group"
                       >
                         <button
-                          className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
+                          className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
                           disabled={false}
                           id="loginCancelButton"
                           onBlur={[Function]}
@@ -584,7 +539,7 @@ exports[`App has a valid snapshot 1`] = `
                           />
                         </button>
                         <button
-                          className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
+                          className="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButtonBase-root Mui-disabled MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary css-1ok23mg-MuiButtonBase-root-MuiButton-root"
                           disabled={true}
                           id="loginButton"
                           onBlur={[Function]}
@@ -614,9 +569,12 @@ exports[`App has a valid snapshot 1`] = `
                   >
                     <span
                       className="notranslate"
-                    >
-                      ​
-                    </span>
+                      dangerouslySetInnerHTML={
+                        Object {
+                          "__html": "&#8203;",
+                        }
+                      }
+                    />
                   </p>
                 </div>
               </div>
