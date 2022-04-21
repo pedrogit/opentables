@@ -579,7 +579,6 @@ function ItemWrapperForm({
 
   return (
     <form
-      fullWidth
       onSubmit={handleSubmit}
       onKeyDown={keyPressed}
     >
@@ -593,7 +592,7 @@ function ItemWrapperForm({
             id='g-recaptcha'
             ref={recaptchaRef}
             sitekey={window.Cypress 
-                      ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' 
+                      ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // always positive key
                       : '6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V'}
             onChange={(value) => setRecaptchaResponse(value)}
             onExpired={() => setRecaptchaResponse('')}
