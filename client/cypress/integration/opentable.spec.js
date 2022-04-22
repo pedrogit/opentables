@@ -303,9 +303,9 @@ describe('Opentable basic tests', () => {
       cy.wait(2000);
 
       // check for the presence af the new item only when not in persistent form no item mode
-      cy.get('#viewlist')
-        .then($viewlist => {
-          if (($viewlist.text().includes('Add_item_mode'))) {
+      cy.get('#headerViewName')
+        .then($headerName => {
+          if (($headerName.text().includes('First USer View 1'))) {
             // make sure it was added
             cy.contains('prop1 edited 2').should('be.visible');
 

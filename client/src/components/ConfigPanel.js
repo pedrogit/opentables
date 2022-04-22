@@ -113,7 +113,7 @@ function ConfigPanel({
               </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
-              <List
+              {showConfigPanel && <List
                 listType={Globals.viewListType}
                 view={{
                   [Globals.childlistFieldName]: {
@@ -127,10 +127,10 @@ function ConfigPanel({
                 setErrorMsg={setErrorMsg}
                 showDeleteButton={false}
                 handleReload={handleReload}
-              />
+              />}
             </TabPanel>
             <TabPanel value={value} index={1}>
-              <List
+              {showConfigPanel && <List
                 listType={Globals.listListType}
                 view={{
                   [Globals.childlistFieldName]: {
@@ -143,7 +143,7 @@ function ConfigPanel({
                 setErrorMsg={setErrorMsg}
                 showDeleteButton={false}
                 handleReload={handleReload}
-              />
+              />}
             </TabPanel>
           </Box>
         </Stack>
