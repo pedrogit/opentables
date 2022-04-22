@@ -398,44 +398,47 @@ function Password({
   const [editVal, setEditVal] = React.useState(propVal === defVal ? "" : propVal);
   const theme = useTheme();
 
-  var defaultSx = {
-    marginTop: inline && pretty ? "8px" : "inherit",
-    marginBottom: inline && pretty ? "8px" : "inherit"
-  };
+  if (val && (propName || editVal)) {
+    var defaultSx = {
+      marginTop: inline && pretty ? "8px" : "inherit",
+      marginBottom: inline && pretty ? "8px" : "inherit"
+    };
 
-  const handleChange = (newVal) => {
-    setEditVal(newVal);
-  };
+    const handleChange = (newVal) => {
+      setEditVal(newVal);
+    };
 
-  return (
-    <>
-      <Stack direction={vertical ? "column" : "row"}>
-        {!pretty && <Label 
-            vertical={vertical} 
-            val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
-            nolabel={nolabel} 
-            sx={{...defaultSx, ...sx, ...labelSx}}
+    return (
+      <>
+        <Stack direction={vertical ? "column" : "row"}>
+          {!pretty && <Label 
+              vertical={vertical} 
+              val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
+              nolabel={nolabel} 
+              sx={{...defaultSx, ...sx, ...labelSx}}
+            />
+          }
+          
+          <VisibilityPasswordTextField
+            name={propName}
+            value={editVal}
+            sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
+            inputProps={pretty? {} : {
+              style: {padding: "0px"}
+            }}
+            variant={inline && !pretty ? "filled" : "outlined"}
+            size="small"
+            fullWidth
+            label={inline && !pretty ? null : (label ? label : propName.charAt(0).toUpperCase() + propName.slice(1))}
+            autoComplete="off"
+            onChange={(e) => handleChange(e.target.value)}
+            InputLabelProps={{shrink: true}}
           />
-        }
-        
-        <VisibilityPasswordTextField
-          name={propName}
-          value={editVal}
-          sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
-          inputProps={pretty? {} : {
-            style: {padding: "0px"}
-          }}
-          variant={inline && !pretty ? "filled" : "outlined"}
-          size="small"
-          fullWidth
-          label={inline && !pretty ? null : (label ? label : propName.charAt(0).toUpperCase() + propName.slice(1))}
-          autoComplete="off"
-          onChange={(e) => handleChange(e.target.value)}
-          InputLabelProps={{shrink: true}}
-        />
-      </Stack>
-    </>
-  )
+        </Stack>
+      </>
+    )
+  }
+  return null
 }
 
 /*************************
