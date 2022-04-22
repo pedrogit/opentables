@@ -157,9 +157,17 @@ function Item({
   };
 
   const handleSetUnsetProperty = (prop) => {
-    handleSaveProperty({
-      [prop]: defItem[prop]
-    })
+    if (item[Globals.itemIdFieldName]) {
+      handleSaveProperty({
+        [prop]: defItem[prop]
+      })
+    }
+    else if (otherProps.setEditingItem) {
+      otherProps.setEditingItem({
+        ...item,
+        [prop]: defItem[prop]
+      });
+    }
   }
 
   const handleItemAuth = ({action = 'patch', propName, callback}) => {

@@ -3,15 +3,17 @@ import Item from "./Item";
 import Stack from "@mui/material/Stack";
 
 import getUser from "../clientUtils";
-const Schema = require("../common/schema");
+//const Schema = require("../common/schema");
 const TemplateParser = require("../common/templateParser");
 const Utils = require("../common/utils");
 const Globals = require("../common/globals");
+var _ = require('lodash');
 
 // a list receive a view and a list of items
 function List({
   listType,
   view,
+  parsedSchema,
   listSchemaStr,
   setLoginState,
   setViewId,
@@ -23,8 +25,18 @@ function List({
   handleReload,
   sx
 }) {
+  const [editingItem, setEditingItem] = React.useState(parsedSchema.getRequiredDefaults({user: getUser()}));
+  const [oldParsedSchema, setOldParsedSchema] = React.useState(parsedSchema);
   // set a default value for addItemMode
   var addItemMode = (view && view[Globals.addItemModeFieldName]) || Globals.addItemModeDefault;
+
+  // compute a default item for form mode
+  React.useEffect(() => {
+    if (!(_.isEqual(parsedSchema, oldParsedSchema))) {
+      setEditingItem(parsedSchema.getRequiredDefaults({user: getUser()}));
+      setOldParsedSchema(parsedSchema);
+    }
+  }, [parsedSchema, oldParsedSchema, setEditingItem]);
 
   const handleAddItem = React.useCallback(
     ({item = {}, addToLocalList = true, callback} = {}) => {
@@ -124,7 +136,7 @@ function List({
   );
 
   React.useEffect(() => {
-    // add a new default item when requested
+    // add a new default item when hitting the add button
     if (addItem && 
         addItemMode === Globals.addItemModeDefault &&
         handleListAuth({action: 'post'})) {
@@ -132,15 +144,6 @@ function List({
       handleAddItem();
     };
   }, [addItem, addItemMode, setAddItem, handleListAuth, handleAddItem] );
-
-  var parsedSchema;
-
-  if (view) {
-    // parse the schema
-    parsedSchema = new Schema(view[Globals.childlistFieldName][Globals.listSchemaFieldName]);
-  }
-
-  var rowNb = 0;
 
   // check that the has permission to add an item
   React.useEffect(() => {
@@ -250,20 +253,25 @@ function List({
     return unsetProps;
   }
 
+  var rowNb = 0;
   return (
     <Stack
       id={listType && listType.toLowerCase()}
       sx={sx}
     >
-      {((addItem && addItemMode === Globals.addItemModeAsForm) || 
-         addItemMode === Globals.addWithPersistentFormAndItems || 
-         addItemMode === Globals.addWithPersistentFormNoItems
-         ) &&
+      {(editingItem && 
+        (
+          (addItem && addItemMode === Globals.addItemModeAsForm) || 
+          addItemMode === Globals.addWithPersistentFormAndItems || 
+          addItemMode === Globals.addWithPersistentFormNoItems
+        )
+      ) &&
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + (view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate({hidden: true})) + "</ItemWrapperForm>"}
           listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
-          item={parsedSchema.getRequiredDefaults({user: getUser()})}
+          item={editingItem}
           defItem={parsedSchema.getAllDefaults({user: getUser()})}
+          unsetProps={getUnsetProperties(editingItem)}
           rowNb={0}
           setLoginState={setLoginState}
           handleListAuth={handleListAuth}
@@ -279,6 +287,7 @@ function List({
           addMessageText={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? "Welcome to OpenTable. You have been logged in..." : null)}
           addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? (() => "Congratulation " + getUser() + " !") : null)}
           recaptcha={getUser() === Globals.allUserName}
+          setEditingItem={setEditingItem}
         />
       }
       {(view && 

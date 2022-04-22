@@ -15,6 +15,7 @@ import ErrorPanel from "./components/ErrorPanel";
 import {LoginForm} from "./components/LoginForm";
 import getUser from "./clientUtils";
 import * as BrowserHistory from "./browserHistory";
+const Schema = require("../../client/src/common/schema");
 const Globals = require("../../client/src/common/globals");
 const Utils = require("./common/utils");
 
@@ -164,6 +165,7 @@ function App({ initialViewid, appid }) {
             <List
               listType={Globals.itemListType}
               view={viewData}
+              parsedSchema={new Schema(viewData[Globals.childlistFieldName][Globals.listSchemaFieldName])}
               setViewData={setViewData}
               setLoginState={setLoginState}
               setViewId={handleChangeViewId}

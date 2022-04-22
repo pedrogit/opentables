@@ -69,15 +69,21 @@ function Text({
   labelSx = {}, // label sx
   sx  // component sx
 }) {
-  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
-  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
-  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
+  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : '';
+  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : '';
+  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : '';
 
   const valueRef = React.useRef();
   const theme = useTheme();
 
   const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
+
+  React.useEffect(() => {
+    if (val && val.val) {
+      setEditVal(val.val);
+    }
+  }, [val] );
 
   React.useEffect(() => {
     if (reset) {

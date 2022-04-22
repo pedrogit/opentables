@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 // local imports
 import List from "./List";
 const Globals = require("../common/globals");
+const Schema = require("../common/schema");
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -121,6 +122,7 @@ function ConfigPanel({
                     [Globals.itemsFieldName]: view ? [view] : []
                   }
                 }}
+                parsedSchema={new Schema((Globals.listOfAllViews)[Globals.listSchemaFieldName])}
                 listSchemaStr={view[Globals.childlistFieldName][Globals.listSchemaFieldName]}
                 setLoginState={setLoginState}
                 setViewData={handleEditView}
@@ -138,6 +140,7 @@ function ConfigPanel({
                     [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
                   }
                 }}
+                parsedSchema={new Schema((Globals.listOfAllLists)[Globals.listSchemaFieldName])}
                 setLoginState={setLoginState}
                 setViewData={handleEditList}
                 setErrorMsg={setErrorMsg}
