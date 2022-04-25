@@ -58,7 +58,7 @@ function Label({
 function Text({
   val, 
   inline = false, // edit mode is inline 
-  inform = false, // component is part of a form
+  wrappedInform = false, // component is part of a form
   pretty = false, // make inline inputs pretty
   editmode = false, // switch between read and edit mode
   vertical = false, // vertical lavels (horizontal otherwise)
@@ -76,8 +76,9 @@ function Text({
   const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
+  // reset the editValue when the component is updated with a new val
   React.useEffect(() => {
-    if (val && val.val) {
+    if (val && val.val !== undefined) {
       setEditVal(val.val);
     }
   }, [val] );
@@ -90,7 +91,7 @@ function Text({
     };
 
     const handleEdit = (e) => {
-      if (!inform) {
+      if (!wrappedInform) {
         val.handleItemAuth({
           action: 'patch', 
           propName: val.prop, 
@@ -105,7 +106,8 @@ function Text({
     };
 
     const handleChange = (newVal) => {
-      if (inform) {
+      if (wrappedInform) {
+        // change the List editingItem
         val.handleSaveProperty({ [propName]: newVal });
       }
       else {
@@ -114,7 +116,7 @@ function Text({
     };
 
     const handleSave = () => {
-      if (!inform && editVal !== propVal) {
+      if (!wrappedInform && editVal !== propVal) {
         val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
           if (success) {
             setIsEditingOff();
@@ -125,7 +127,7 @@ function Text({
     };
 
     const keyPressed = (e) => {
-      if (!inform) {
+      if (!wrappedInform) {
         if (e.keyCode === 13) { // enter
           handleSave();
         }
@@ -137,7 +139,7 @@ function Text({
     };
 
     const setIsEditingOff = () => {
-      if (!inform) {
+      if (!wrappedInform) {
         setIsEditing(false);
         if (!editVal) {
           setEditVal(propVal);
@@ -183,7 +185,7 @@ function Text({
                 onChange={(e) => handleChange(e.target.value)}
                 onKeyDown={(e) => keyPressed(e)}
                 InputLabelProps={{shrink: true}}
-                autoFocus={inform ? false : true}
+                autoFocus={wrappedInform ? false : true}
               />
             </ClickAwayListener>
             </>
@@ -234,7 +236,7 @@ function Text({
  function Select({
   val,
   options,
-  inform = false, // component is part of a form
+  wrappedInform = false, // component is surrounded with a ItemWrapperForm form
   pretty = false, // make inline inputs pretty
   editmode = false, // init in edit mode
   vertical = false, // vertical lavels (horizontal otherwise)
@@ -252,12 +254,12 @@ function Text({
   if (val && (propName || editVal)) {
 
     var defaultSx = {
-      marginTop: inform && pretty && (editmode || isEditing) ? "8px" : "inherit",
-      marginBottom: inform && pretty && (editmode || isEditing) ? "8px" : "inherit"
+      marginTop: wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit",
+      marginBottom: wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit"
     };
 
     const handleEdit = (e) => {
-      if (!inform) {
+      if (!wrappedInform) {
         val.handleItemAuth({
           action: 'patch', 
           propName: val.prop, 
@@ -272,7 +274,7 @@ function Text({
     };
 
     const handleChange = (newVal) => {
-      if (!inform && newVal !== propVal) {
+      if (!wrappedInform && newVal !== propVal) {
         val.handleSaveProperty({ [propName]: newVal }, (success, data) => {
           if (success) {
             setIsEditingOff();
@@ -290,7 +292,7 @@ function Text({
     };
 
     const setIsEditingOff = () => {
-      if (!inform) {
+      if (!wrappedInform) {
         setIsEditing(false);
         if (!editVal) {
           setEditVal(propVal);
@@ -300,7 +302,7 @@ function Text({
 
     return (
       <Stack direction={vertical ? "column" : "row"}>
-        {(!(inform && pretty) || !(editmode || isEditing)) && <Label 
+        {(!(wrappedInform && pretty) || !(editmode || isEditing)) && <Label 
           vertical={vertical} 
           val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
           nolabel={nolabel} 
@@ -434,7 +436,7 @@ function Password({
  *  
  *  Add cancel (or add or reset) and Add (or Register) buttons 
  *  around the item template and set the template component
- *  properties to necessary values (inform, inline, pretty)
+ *  properties to necessary values (wrappedInform, inline, pretty)
  *************************/
 function ItemWrapperForm({
   handlers, 
@@ -442,7 +444,7 @@ function ItemWrapperForm({
   children
 }) {
   const defChildProps = {
-    inform: true, 
+    wrappedInform: true, 
     inline: true, 
     pretty: true, 
     editmode: true
