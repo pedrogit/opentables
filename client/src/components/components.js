@@ -78,7 +78,7 @@ function Text({
 
   // reset the editValue when the component is updated with a new val
   React.useEffect(() => {
-    if (val && val.val !== undefined) {
+    if (wrappedInform && val && val.val !== undefined) {
       setEditVal(val.val);
     }
   }, [val] );
