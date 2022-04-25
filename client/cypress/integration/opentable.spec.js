@@ -54,6 +54,7 @@ const logout = () => {
     .then($loginButton => {
       if (!($loginButton.text().includes('Login'))) {
         cy.get('#loginLogoutButton').click();
+        cy.wait(1000);
       }
     });
   cy.get('#loginLogoutButton').should('contain', 'Login');
@@ -242,10 +243,15 @@ describe('Opentable basic tests', () => {
     cy.get('#configPanelOpenButton').click();
     cy.wait(2000);
 
-    //cy.get('#listProperties').click();*/
     cy.get('#viewlist').contains('View Name').dblclick();
     cy.focused().type('{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}First User View 1{enter}');
     
+    // add an optional property to the schema
+    cy.get('#listProperties').click();
+    cy.get('#listlist').contains('prop1').dblclick();
+    cy.focused().type('{selectAll}prop1: {{}type: string, required}, prop2: string{enter}');
+
+
     // close the config panel and make sure the view name was changed
     cy.get('#closeConfigPanelButton').click();
     cy.get('#headerPanel').should('contain', 'First User View 1');
@@ -255,17 +261,39 @@ describe('Opentable basic tests', () => {
     cy.get('#itemlist').contains('prop1').dblclick();
     cy.focused().type(' edited{enter}');
     cy.get('#itemlist').should('contain', 'prop1 edited');
+
+    // add the second property
+    cy.get('#itemlist').children().contains('prop1 edited').trigger('mouseover');
+    cy.get('#moreOptionsButton').click();
+    cy.get('li').contains('prop2').click();
+    cy.get('body').click()
+    cy.get('#itemlist').should('contain', 'prop2');
+
+    // and fill it
+    cy.get('#itemlist').contains('prop2').dblclick();
+    cy.focused().type(' edited{enter}');
+
+    // unfill it to make it disappear
+    cy.get('#itemlist').contains('prop2').dblclick();
+    cy.focused().type('{selectAll}{backspace}{enter}');
+    cy.get('#prop2').should('not.exist');
+
+    // unfill it to make it disappear
+    cy.get('#itemlist').contains('prop1').dblclick();
+    cy.focused().type('{selectAll}{backspace}{enter}');
+    cy.get('#itemlist').should('contain', 'prop1');
   });
 
   it('5.1 - Test the different add item modes', () => {
     const changeAddItemMode = (mode) => {
       // open the config panel and change the add item mode to form
       cy.get('#configPanelOpenButton').click();
+      cy.get('#viewProperties').click();
       cy.get('#viewlist')
         .then($viewlist => {
           if (!($viewlist.text().includes('Add_item_mode'))) {
             cy.get('#viewlist').trigger('mouseover');
-            cy.get('#moreItemButton').click();
+            cy.get('#moreOptionsButton').click();
             cy.contains('add_item_mode').click();
             // escape the Add Unset Property menu
             cy.get('body').click()
@@ -288,6 +316,7 @@ describe('Opentable basic tests', () => {
         cy.get('#addItemButton').should('not.exist');
       }
       cy.get('input[name="prop1"]').should('be.visible');
+
       cy.get('#addCancelItemFormButton').should('be.visible');
       cy.get('#addItemFormButton').should('be.visible');
       cy.get('#addItemFormButton').should('be.disabled');
@@ -296,16 +325,30 @@ describe('Opentable basic tests', () => {
         cy.get('input[name="prop1"]').focus().type(' more text');
         cy.get('#addCancelItemFormButton').click();
         cy.get('input[name="prop1"]').should('not.contain', 'more text');
+        cy.get('input[name="prop2"]').should('not.exist');
+
       }
       cy.get('input[name="prop1"]').focus().type(' ');
       cy.get('#addItemFormButton').should('be.enabled');
-      cy.focused().type('edited 2{enter}');
-      cy.wait(2000);
+      cy.focused().type('edited 2');
 
-      // check for the presence af the new item only when not in persistent form no item mode
+      // add and fill the second property
+      cy.get('#itemlist').trigger('mouseover');
+      cy.get('#moreOptionsButton').click();
+      cy.get('li').contains('prop2').click();
+      cy.get('body').click();
+
+      // make sure it was added
+      cy.get('input[name="prop2"]').should('be.visible');
+
+      // save the new item
+      cy.get('#addItemFormButton').click();
+      cy.wait(1000);
+
+      // check for the presence of the new item only when it is still visible (not in persistent form no item mode)
       cy.get('#headerViewName')
         .then($headerName => {
-          if (($headerName.text().includes('First USer View 1'))) {
+          if (($headerName.text().includes('First User View 1'))) {
             // make sure it was added
             cy.contains('prop1 edited 2').should('be.visible');
 
@@ -328,8 +371,14 @@ describe('Opentable basic tests', () => {
 
     // add and cancel
     cy.get('#addItemButton').click();
+    cy.get('input[name="prop1"]').focus().type(' edited');
+
     cy.get('#addCancelItemFormButton').click();
     cy.get('input[name="prop1"]').should('not.exist');
+
+    // make sure the editing field was reset
+    cy.get('#addItemButton').click();
+    cy.get('input[name="prop1"]').should('have.value', 'prop1');
 
     addAndDeleteItemWithForm(false, 'form');
     // form should not be visible anymore

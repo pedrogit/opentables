@@ -30,13 +30,19 @@ function List({
   // set a default value for addItemMode
   var addItemMode = (view && view[Globals.addItemModeFieldName]) || Globals.addItemModeDefault;
 
+  const resetEditingItem = React.useCallback(
+    () => {
+      setEditingItem(parsedSchema.getRequiredDefaults({user: getUser()}));
+    }, [parsedSchema, setEditingItem]
+  );
+
   // compute a default item for form mode
   React.useEffect(() => {
     if (!(_.isEqual(parsedSchema, oldParsedSchema))) {
-      setEditingItem(parsedSchema.getRequiredDefaults({user: getUser()}));
+      resetEditingItem();
       setOldParsedSchema(parsedSchema);
     }
-  }, [parsedSchema, oldParsedSchema, setEditingItem]);
+  }, [parsedSchema, oldParsedSchema, resetEditingItem]);
 
   const handleAddItem = React.useCallback(
     ({item = {}, addToLocalList = true, callback} = {}) => {
@@ -66,6 +72,7 @@ function List({
                     [Globals.itemsFieldName]: newItemsData
                   }
                 });
+                resetEditingItem();
               }
               if (callback && typeof callback === 'function') {
                 callback(success, newitem);
@@ -78,7 +85,7 @@ function List({
       else {
         setErrorMsg({text: "No list is associated to this view. You can not add items..."});
       }
-    }, [view, setLoginState, setViewData, setErrorMsg]
+    }, [view, setLoginState, setViewData, setErrorMsg, resetEditingItem]
   );
 
   // determine user permission on patch and post. Open the login panel otherwise.
@@ -288,6 +295,7 @@ function List({
           addMessageTitle={(view[Globals.itemIdFieldName] === Globals.signUpViewOnUserListViewId ? (() => "Congratulation " + getUser() + " !") : null)}
           recaptcha={getUser() === Globals.allUserName}
           setEditingItem={setEditingItem}
+          resetEditingItem={resetEditingItem}
         />
       }
       {(view && 

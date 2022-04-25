@@ -61,8 +61,6 @@ function Text({
   inform = false, // component is part of a form
   pretty = false, // make inline inputs pretty
   editmode = false, // switch between read and edit mode
-  reset = false, // reset or not
-  disableReset, // function to reset the reset mode
   vertical = false, // vertical lavels (horizontal otherwise)
   label, // label
   nolabel = false, // do not display label
@@ -71,7 +69,6 @@ function Text({
 }) {
   const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : '';
   const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : '';
-  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : '';
 
   const valueRef = React.useRef();
   const theme = useTheme();
@@ -84,13 +81,6 @@ function Text({
       setEditVal(val.val);
     }
   }, [val] );
-
-  React.useEffect(() => {
-    if (reset) {
-      setEditVal(defVal);
-      disableReset();
-    }
-  }, [reset, defVal, setEditVal, disableReset] );
 
   if (val && (propName || editVal)) {
 
@@ -115,7 +105,12 @@ function Text({
     };
 
     const handleChange = (newVal) => {
-      setEditVal(newVal);
+      if (inform) {
+        val.handleSaveProperty({ [propName]: newVal });
+      }
+      else {
+        setEditVal(newVal);
+      }
     };
 
     const handleSave = () => {
@@ -242,8 +237,6 @@ function Text({
   inform = false, // component is part of a form
   pretty = false, // make inline inputs pretty
   editmode = false, // init in edit mode
-  reset = false, // reset or not
-  disableReset, // function to reset the reset mode
   vertical = false, // vertical lavels (horizontal otherwise)
   label, // label
   nolabel = false, // do not display label
@@ -252,17 +245,9 @@ function Text({
 }) {
   const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
   const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
-  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
 
   const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
-
-  React.useEffect(() => {
-    if (reset) {
-      setEditVal(defVal);
-      disableReset();
-    }
-  }, [reset, defVal, setEditVal, disableReset] );
 
   if (val && (propName || editVal)) {
 
@@ -390,8 +375,6 @@ function Password({
   inline = true, // inline or popop (for now always inline)
   pretty = false, // make inline inputs pretty
   vertical = false, // label placement
-  reset = false, // reset or not
-  disableReset, // function to reset the reset mode
   label, // label to display
   nolabel = false, // do not display any label
   labelSx = {}, // label sx
@@ -399,9 +382,8 @@ function Password({
 }) {
   const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
   const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
-  const defVal = val ? (val.def === undefined ? "Missing default value" : val.def) : undefined;
 
-  const [editVal, setEditVal] = React.useState(propVal === defVal ? "" : propVal);
+  const [editVal, setEditVal] = React.useState(propVal);
   const theme = useTheme();
 
   if (val && (propName || editVal)) {
@@ -465,14 +447,16 @@ function ItemWrapperForm({
     pretty: true, 
     editmode: true
   }
-  const [childProps, setChildProps] = React.useState(defChildProps);
   const [recaptchaResponse, setRecaptchaResponse] = React.useState('');
   const [submitButtonDisabled, setSubmitButtonDisabled] = React.useState(true);
 
   const recaptchaRef = React.useRef();
   var options = {
     cancelLabel: "Cancel",
-    cancelAction: () => otherProps.setAddItem(false),
+    cancelAction: () => {
+      resetForm();
+      otherProps.setAddItem(false);
+    },
     addLabel: "Add",
     addAction: () => otherProps.setAddItem(false)
   };
@@ -497,10 +481,6 @@ function ItemWrapperForm({
     }
   }
 
-  const disableReset = () => {
-    setChildProps(defChildProps)
-  }
-
   const resetRecaptcha = () => {
     if (recaptchaRef && recaptchaRef.current) {
       setRecaptchaResponse('');
@@ -510,11 +490,7 @@ function ItemWrapperForm({
 
   const resetForm = () => {
     resetRecaptcha();
-    setChildProps({
-      ...defChildProps, 
-      reset: true, 
-      disableReset: disableReset
-    });
+    otherProps.resetEditingItem();
   }
   
   if (otherProps.addItemMode === Globals.addWithPersistentFormAndItems) {
@@ -569,7 +545,7 @@ function ItemWrapperForm({
 
   const childrenWithProp = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, childProps);  
+      return React.cloneElement(child, defChildProps);  
     }
     return child;
   });
