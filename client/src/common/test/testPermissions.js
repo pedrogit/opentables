@@ -37,8 +37,7 @@ for (let i = 0; i < 800; i++) {
       },
       item: {
         [Globals.readWritePermFieldName]: 'admin' // so that validateRWPerm is always false
-      },
-      throwError: false
+      }
     }
 
     if (csvtest.list_rw_permission.substring(0, 5) !== 'unset') {
@@ -70,8 +69,7 @@ for (let i = 0; i < 800; i++) {
         [Globals.ownerFieldName]: 'listowner',
       },
       item: {
-      },
-      throwError: false
+      }
     }
 
     if (csvtest.list_rw_permission.substring(0, 5) !== 'unset') {
@@ -103,8 +101,7 @@ for (let i = 0; i < 800; i++) {
         [Globals.ownerFieldName]: 'listowner',
       },
       item: {
-      },
-      throwError: false
+      }
     }
 
     if (csvtest.list_rw_permission.substring(0, 5) !== 'unset') {

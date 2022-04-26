@@ -129,8 +129,7 @@ function App({ initialViewid, appid }) {
             !Utils.validateRPerm({
               user: getUser(),
               list: Globals.listOfAllViews,
-              item: viewData,
-              throwError: false
+              item: viewData
             })
           }
           setAddItem={setAddItem}
@@ -143,8 +142,7 @@ function App({ initialViewid, appid }) {
             !viewData ||
             !(Utils.validateCPerm({
               user: getUser(),
-              list: viewData[Globals.childlistFieldName],
-              throwError: false
+              list: viewData[Globals.childlistFieldName]
             }))
           }
           setViewId={handleChangeViewId}

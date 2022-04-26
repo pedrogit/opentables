@@ -96,17 +96,15 @@ function List({
       propName = '', 
       callback
     }) => {
-      var auth = Utils.validateRWPerm({
+      if (Utils.validateRWPerm({
         user: getUser(),
         list: view[Globals.childlistFieldName],
-        item: item,
-        throwError: false
-      });
-      
-      if (auth) {
+        item: item
+      })) {
         if (callback && typeof callback === 'function') {
           callback(true);
         }
+        return true;
       }
       else {
         // open login dialog
@@ -126,7 +124,7 @@ function List({
           tryFirst: false
         });
       }
-      return auth;
+      return false;
     }, [view, setLoginState]
   );
 
@@ -143,8 +141,7 @@ function List({
     if (addItemMode === Globals.addWithPersistentFormNoItems &&
         !Utils.validateCPerm({
           user: getUser(),
-          list: view[Globals.childlistFieldName],
-          throwError: false
+          list: view[Globals.childlistFieldName]
         })) {
       // open login dialog
       setLoginState({
@@ -210,8 +207,7 @@ function List({
                  !(Utils.validateDPerm({
                    user: getUser(),
                    list: view[Globals.childlistFieldName],
-                   item: item,
-                   throwError: false
+                   item: item
                  }));
     return disabled;
   }
@@ -222,8 +218,7 @@ function List({
                   !(Utils.validateRWPerm({
                     user: getUser(),
                     list: view[Globals.childlistFieldName],
-                    item: item,
-                    throwError: false
+                    item: item
                   }));
     return disabled;
   }
@@ -277,8 +272,7 @@ function List({
         ) &&
         Utils.validateCPerm({
           user: getUser(),
-          list: view[Globals.childlistFieldName],
-          throwError: false
+          list: view[Globals.childlistFieldName]
         })
        ) &&
         <Item

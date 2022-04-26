@@ -289,7 +289,8 @@ class Controler {
     if (Controler.isList(item)) {
       Utils.validateRPerm({
           user: user,
-          list: item
+          list: item,
+          throwError: true
         }
       )
 
@@ -375,7 +376,8 @@ class Controler {
       Utils.validateRPerm({
         user: user,
         list: parentList,
-        item: item
+        item: item,
+        throwError: true
       });
 
       // add embedded items if there are any
@@ -413,7 +415,8 @@ class Controler {
     // validate permissions
     Utils.validateCPerm({
       user: user,
-      list: parentList
+      list: parentList,
+      throwError: true
     });
 
     // validate item against schema
@@ -494,7 +497,8 @@ class Controler {
     Utils.validateRWPerm({
       user: user,
       list: parentList,
-      item: item
+      item: item,
+      throwError: true
     });
 
     // validate item against schema
@@ -610,7 +614,8 @@ class Controler {
     Utils.validateDPerm({
         user: user,
         list: parentList,
-        item: item
+        item: item,
+        throwError: true
       });
     if (Controler.isList(item)) {
       // delete all associated items

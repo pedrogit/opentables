@@ -397,7 +397,7 @@ exports.validateRWPerm = function(
     list,
     item,
     readWrite = true,
-    throwError = true
+    throwError = false
   } = {}
 ) {
   // admin has all permissions
@@ -482,7 +482,7 @@ exports.validateRPerm = function(
     user = Globals.allUserName,
     list, 
     item,
-    throwError = true
+    throwError = false
   } = {}
 ) {
   // if user has RW permission, he also has read permission
@@ -538,7 +538,7 @@ exports.validateDPerm = function(
     user = Globals.allUserName,
     list, 
     item,
-     throwError = true
+    throwError = false
   } = {}
 ) {
   if (user && user === Globals.adminUserName) {
@@ -586,7 +586,7 @@ exports.validateCPerm = function(
     user = Globals.allUserName,
     list, 
     item,
-    throwError = true
+    throwError = false
   } = {}
 ) {
   if (user === Globals.adminUserName) {
@@ -603,7 +603,7 @@ exports.validateCPerm = function(
       } : list
     ),
     item: item,
-    throwError: throwError
+    throwError: false
   })) {
     return true;
   };
