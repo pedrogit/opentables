@@ -81,7 +81,7 @@ function Text({
     if (wrappedInform && val && val.val !== undefined) {
       setEditVal(val.val);
     }
-  }, [val] );
+  }, [val, wrappedInform] );
 
   if (val && (propName || editVal)) {
 
@@ -92,14 +92,15 @@ function Text({
 
     const handleEdit = (e) => {
       if (!wrappedInform) {
-        val.handleItemAuth({
-          action: 'patch', 
+        val.checkItemEditPerm({
           propName: val.prop, 
-          callback: (auth) => {
-            if (!editVal) {
-              setEditVal(propVal);
+          callback: (success) => {
+            if (success) {
+              if (!editVal) {
+                setEditVal(propVal);
+              }
+              setIsEditing(true);
             }
-            setIsEditing(true);
           }
         });
       }
@@ -260,14 +261,16 @@ function Text({
 
     const handleEdit = (e) => {
       if (!wrappedInform) {
-        val.handleItemAuth({
+        val.checkItemEditPerm({
           action: 'patch', 
           propName: val.prop, 
-          callback: (auth) => {
-            if (!editVal) {
-              setEditVal(propVal);
+          callback: (success) => {
+            if (success) {
+              if (!editVal) {
+                setEditVal(propVal);
+              }
+              setIsEditing(true);
             }
-            setIsEditing(true);
           }
         });
       }

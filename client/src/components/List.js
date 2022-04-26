@@ -23,6 +23,7 @@ function List({
   setErrorMsg,
   showDeleteButton = true,
   handleReload,
+  handleRefresh,
   sx
 }) {
   const [editingItem, setEditingItem] = React.useState(parsedSchema.getRequiredDefaults({user: getUser()}));
@@ -89,29 +90,18 @@ function List({
   );
 
   // determine user permission on patch and post. Open the login panel otherwise.
-  const handleListAuth = React.useCallback(
+  const checkListEditPerm = React.useCallback(
     ({
-      action = 'patch', 
       item = null, 
       propName = '', 
       callback
     }) => {
-      var auth = false;
-      if (action === "patch") {
-        auth = Utils.validateRWPerm({
-          user: getUser(),
-          list: view[Globals.childlistFieldName],
-          item: item,
-          throwError: false
-        });
-      }
-      else if (action === "post") {
-        auth = Utils.validateCPerm({
-          user: getUser(),
-          list: view[Globals.childlistFieldName],
-          throwError: false
-        });
-      }
+      var auth = Utils.validateRWPerm({
+        user: getUser(),
+        list: view[Globals.childlistFieldName],
+        item: item,
+        throwError: false
+      });
       
       if (auth) {
         if (callback && typeof callback === 'function') {
@@ -126,9 +116,7 @@ function List({
             severity: "warning",
             title: Globals.permissionDenied,
             text:
-            'You do not have permissions to edit ' + 
-            (propName ? ('"' + propName + '"') : "item") +
-            '. Please login with valid credentials...'
+            'You do not have permissions to edit "' + propName + '". Please login with valid credentials...'
           },
           action: {
             method: "get",
@@ -144,21 +132,36 @@ function List({
 
   React.useEffect(() => {
     // add a new default item when hitting the add button
-    if (addItem && 
-        addItemMode === Globals.addItemModeDefault &&
-        handleListAuth({action: 'post'})) {
+    if (addItem && addItemMode === Globals.addItemModeDefault) {
       setAddItem(false);
       handleAddItem();
     };
-  }, [addItem, addItemMode, setAddItem, handleListAuth, handleAddItem] );
+  }, [addItem, addItemMode, setAddItem, handleAddItem] ); 
 
   // check that the has permission to add an item
   React.useEffect(() => {
-    if (addItemMode === Globals.addWithPersistentFormAndItems || 
-        addItemMode === Globals.addWithPersistentFormNoItems) {
-      handleListAuth({action: 'post'});
+    if (addItemMode === Globals.addWithPersistentFormNoItems &&
+        !Utils.validateCPerm({
+          user: getUser(),
+          list: view[Globals.childlistFieldName],
+          throwError: false
+        })) {
+      // open login dialog
+      setLoginState({
+        open: true, 
+        msg: {
+          severity: "warning",
+          title: Globals.permissionDenied,
+          text: 'You do not have permissions to add new items. Please login with valid credentials...'        },
+        action: {
+          method: "get",
+          url: "http://localhost:3001/api/opentables/login",
+          callback: handleRefresh
+        },
+        tryFirst: false
+      });
     }
-  }, [view, addItemMode, setAddItem, handleListAuth] );
+  }, [view, addItemMode, handleRefresh, setLoginState] );
 
   // handle the deletion of an item
   const handleDeleteItem = React.useCallback(
@@ -271,8 +274,13 @@ function List({
           (addItem && addItemMode === Globals.addItemModeAsForm) || 
           addItemMode === Globals.addWithPersistentFormAndItems || 
           addItemMode === Globals.addWithPersistentFormNoItems
-        )
-      ) &&
+        ) &&
+        Utils.validateCPerm({
+          user: getUser(),
+          list: view[Globals.childlistFieldName],
+          throwError: false
+        })
+       ) &&
         <Item
           template={"<ItemWrapperForm handlers={handlers} otherProps={otherProps}>" + (view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate({hidden: true})) + "</ItemWrapperForm>"}
           listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
@@ -281,7 +289,7 @@ function List({
           unsetProps={getUnsetProperties(editingItem)}
           rowNb={0}
           setLoginState={setLoginState}
-          handleListAuth={handleListAuth}
+          checkListEditPerm={checkListEditPerm}
           handleAddItem={handleAddItem}
           handleDeleteItem={handleDeleteItem}
           showDeleteButton={false}
@@ -313,7 +321,7 @@ function List({
             unsetProps={getUnsetProperties(item)}
             rowNb={rowNb}
             setLoginState={setLoginState}
-            handleListAuth={handleListAuth}
+            checkListEditPerm={checkListEditPerm}
             handleAddItem={handleAddItem}
             handleDeleteItem={handleDeleteItem}
             deleteButtonDisabled={deleteButtonDisabled(item)}

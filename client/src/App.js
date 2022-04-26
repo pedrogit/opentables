@@ -48,12 +48,19 @@ function App({ initialViewid, appid }) {
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
   const [reload, setReload] = React.useState(false);
+  const [refresh, setRefresh] = React.useState(false);
 
   // handleReload is necessary because the viewid is not 
   // available where handleReload is called
   const handleReload = (toggleCfgPanel) => {
     handleChangeViewId(viewid, toggleCfgPanel);
   };
+
+  const handleRefresh = React.useCallback(
+    () => {
+      setRefresh(!refresh);
+    }, [refresh, setRefresh]
+  );
 
   const handleChangeViewId = React.useCallback(
     (newViewid, toggleCfgPanel) => {
@@ -80,25 +87,25 @@ function App({ initialViewid, appid }) {
 
   React.useEffect(() => {
     // initial loading of list data
-      setLoginState({
-        open: false,
-        msg: {
-          severity: "warning",
-          title: Globals.permissionDenied,
-          text: 'You do not have permissions to view this list. Please login with valid credentials...'
-        },
-        action: {
-          method: "get",
-          url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
-          callback: (success, data) => {
-            if (success) {
-              setViewData(data);
-              BrowserHistory.pushHistoryState(appid, viewid);
-            }
+    setLoginState({
+      open: false,
+      msg: {
+        severity: "warning",
+        title: Globals.permissionDenied,
+        text: 'You do not have permissions to view this list. Please login with valid credentials...'
+      },
+      action: {
+        method: "get",
+        url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
+        callback: (success, data) => {
+          if (success) {
+            setViewData(data);
+            BrowserHistory.pushHistoryState(appid, viewid);
           }
-        },
-        tryFirst: true
-      });
+        }
+      },
+      tryFirst: true
+    });
   }, [reload, viewid, appid]);
 
   const toggleOpenConfigPanel = React.useCallback(
@@ -169,6 +176,8 @@ function App({ initialViewid, appid }) {
               setViewData={setViewData}
               setLoginState={setLoginState}
               setViewId={handleChangeViewId}
+              handleReload={handleReload}
+              handleRefresh={handleRefresh}
               setAddItem={setAddItem}
               addItem={addItem}
               setErrorMsg={setErrorMsg}

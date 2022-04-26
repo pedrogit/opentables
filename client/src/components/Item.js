@@ -100,7 +100,7 @@ function Item({
   rowNb,
   setLoginState,
   setViewId,
-  handleListAuth,
+  checkListEditPerm,
   handleAddItem,
   handleDeleteItem,
   deleteButtonDisabled,
@@ -178,9 +178,8 @@ function Item({
     }
   }
 
-  const handleItemAuth = ({action = 'patch', propName, callback}) => {
-    handleListAuth({
-      action: 'patch', 
+  const checkItemEditPerm = ({action = 'patch', propName, callback}) => {
+    checkListEditPerm({
       item: item, 
       propName: propName, 
       callback: callback
@@ -194,7 +193,7 @@ function Item({
       if (item.hasOwnProperty(key) && key !== Globals.childlistFieldName) {
         result[key] = {
           handleSaveProperty: handleSaveProperty,
-          handleItemAuth: handleItemAuth,
+          checkItemEditPerm: checkItemEditPerm,
           setViewId: setViewId,
           prop: key,
           val: item[key] ? item[key] : "",
@@ -205,7 +204,7 @@ function Item({
     result.handlers = {
       handleAddItem: handleAddItem,
       handleSaveProperty: handleSaveProperty,
-      handleListAuth: handleListAuth,
+      checkListEditPerm: checkListEditPerm,
       setErrorMsg: setErrorMsg
     };
     if (otherProps) {
