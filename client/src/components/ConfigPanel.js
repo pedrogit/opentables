@@ -45,7 +45,7 @@ function ConfigPanel({
   setShowConfigPanel,
   view,
   setViewData,
-  setLoginState,
+  setAuthAPIRequest,
   setErrorMsg,
   handleReload
 }) {
@@ -124,7 +124,7 @@ function ConfigPanel({
                 }}
                 parsedSchema={new Schema((Globals.listOfAllViews)[Globals.listSchemaFieldName])}
                 listSchemaStr={view[Globals.childlistFieldName][Globals.listSchemaFieldName]}
-                setLoginState={setLoginState}
+                setAuthAPIRequest={setAuthAPIRequest}
                 setViewData={handleEditView}
                 setErrorMsg={setErrorMsg}
                 showDeleteButton={false}
@@ -141,7 +141,7 @@ function ConfigPanel({
                   }
                 }}
                 parsedSchema={new Schema((Globals.listOfAllLists)[Globals.listSchemaFieldName])}
-                setLoginState={setLoginState}
+                setAuthAPIRequest={setAuthAPIRequest}
                 setViewData={handleEditList}
                 setErrorMsg={setErrorMsg}
                 showDeleteButton={false}

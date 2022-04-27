@@ -22,7 +22,7 @@ import getUser from "../clientUtils";
 const Errors = require("../common/errors");
 const Globals = require("../common/globals");
 
-function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
+function LoginForm({ authAPIRequest, setAuthAPIRequest, setErrorMsg, sx }) {
   const emailRef = React.useRef();
   const passwordRef = React.useRef();
   const [showInvalidLoginHelper, setShowInvalidLoginHelper] = React.useState(false);
@@ -32,16 +32,20 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   const theme = useTheme();
 
   React.useEffect(() => {
-    if (loginState && loginState.open) {
+    if (authAPIRequest && !authAPIRequest.tryBeforeShowLogin) {
       // don't make the values disappear when closing
       emailRef.current.value = '';
       passwordRef.current.value = '';
       emailRef.current.focus();
     }
-  }, [loginState]);
+  }, [authAPIRequest]);
 
   const handleClose = () => {
-      setLoginState({...loginState, open: false, tryFirst: false});
+      setAuthAPIRequest({
+        tryBeforeShowLogin: true,
+        warningMsg: authAPIRequest.warningMsg,
+        callback: authAPIRequest.callback
+      });
       setLoginButtonDisabled(true);
       setShowInvalidLoginHelper(false);
   };
@@ -60,38 +64,40 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   // handle callback only after the login dialog has closed (so the edit popover gets rendered at the right position)
   const handleSuccessCallback = () => {
     if (doSuccessCallback.callit) {
-      if (loginState.action.callback && typeof loginState.action.callback === 'function') {
-        loginState.action.callback(true, doSuccessCallback.data);
+      if (authAPIRequest.callback && typeof authAPIRequest.callback === 'function') {
+        authAPIRequest.callback(true, doSuccessCallback.data);
       }
       setDoSuccessCallback({callit: false, data: null});
     }
   }
 
   const doAction = (addCredentials = false) => {
-    if (loginState !== undefined && loginState.action !== undefined) {
+    if (authAPIRequest !== undefined && authAPIRequest.method && authAPIRequest.method !== null) {
       // if credentials were entered add an authorization header
       if (addCredentials) {
-        loginState.action = {
-          ...loginState.action,
-          headers: {
-            authorization:
-              "Basic " +
-              Buffer.from(
-                emailRef.current.value + ":" + passwordRef.current.value
-              ).toString("base64"),
-          },
-        };
-      }
-      axios({ ...loginState.action, withCredentials: true })
+        authAPIRequest.headers = {
+          authorization:
+            "Basic " +
+            Buffer.from(emailRef.current.value + ":" + passwordRef.current.value)
+                  .toString("base64"),
+        }
+      };
+      axios({
+        method: authAPIRequest.method,
+        url: "http://localhost:3001/api/opentables/" + authAPIRequest.urlParams,
+        data: authAPIRequest.data,
+        headers: authAPIRequest.headers,
+        withCredentials: true
+      })
         .then((res) => {
           if (res.status === 200 || res.status === 201 || res.statusText.toUpperCase() === "OK") {
             handleClose();
-            if (loginState.open && !res.data) {
+            if (!authAPIRequest.tryBeforeShowLogin && !res.data) {
               setDoSuccessCallback({callit: true, data: null});
             }
             else {
-              if (loginState.action.callback && typeof loginState.action.callback === 'function') {
-                loginState.action.callback(true, res.data);
+              if (authAPIRequest.callback && typeof authAPIRequest.callback === 'function') {
+                authAPIRequest.callback(true, res.data);
               }
             }
             return true;
@@ -111,37 +117,31 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
             }
             // good credential but still forbidden (leave login form open)
             else if (error.response.status === 403) {
-              setLoginState({
-                ...loginState,
-                open: true,
-                msg: {
-                  ...loginState.msg,
-                  iteration: (loginState.msg['iteration'] === undefined ? 0 : loginState.msg['iteration'] + 1)
-                },
-                tryFirst: false
+              setAuthAPIRequest({
+                ...authAPIRequest,
+                tryBeforeShowLogin: false,
+                displayCount: (authAPIRequest['displayCount'] === undefined ? 0 : authAPIRequest['displayCount'] + 1)
               });
             }
             // other server errors
             else {
-              setLoginState({
-                open: false,
-                tryFirst: false
+              setAuthAPIRequest({
+                tryBeforeShowLogin: false
               });
               setErrorMsg({text: error.response.data.err});
-              if (loginState.action.callback && typeof loginState.action.callback === 'function') {
-                loginState.action.callback(false, error.response.data.err);
+              if (authAPIRequest.callback && typeof authAPIRequest.callback === 'function') {
+                authAPIRequest.callback(false, error.response.data.err);
               }
             }
           }
           // connection errors
           else {
-            setLoginState({
-              open: false,
-              tryFirst: false
+            setAuthAPIRequest({
+              tryBeforeShowLogin: false
             });
             setErrorMsg({text: error.message});
-            if (loginState.action.callback && typeof loginState.action.callback === 'function') {
-              loginState.action.callback(false, error.message);
+            if (authAPIRequest.callback && typeof authAPIRequest.callback === 'function') {
+              authAPIRequest.callback(false, error.message);
             }
           }
           return false;
@@ -151,14 +151,14 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
   };
 
   // try to perform the action before opening
-  if (loginState !== undefined && loginState.tryFirst !== undefined && loginState.tryFirst === true) {
+  if (authAPIRequest !== undefined && authAPIRequest.tryBeforeShowLogin !== undefined && authAPIRequest.tryBeforeShowLogin === true) {
     doAction();
   }
 
   return (
     <Stack id='loginForm' sx={{backgroundColor: theme.palette.primary.palebg}}>
       <Collapse 
-        in={loginState && loginState.open} 
+        in={authAPIRequest && !authAPIRequest.tryBeforeShowLogin && authAPIRequest.method && authAPIRequest.method !== null} 
         
         onExited={handleSuccessCallback}
       >
@@ -166,17 +166,19 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
           <FormControl sx={{width: '100%'}}>
             <Stack spacing={2} padding='5px'>
               <Alert severity={
-                  loginState === undefined || loginState.msg === undefined || loginState.msg.severity === undefined ? 'info' : loginState.msg.severity
+                  authAPIRequest.warningMsg ? 'warning' : 'info'
                 } 
                 color="primary"
                 sx={{padding: 0, backgroundColor: theme.palette.primary.palebg}}>
                 <AlertTitle>{
-                  loginState === undefined || loginState.msg === undefined || loginState.msg.title === undefined ? '' : loginState.msg.title + 
-                  (loginState.msg.iteration === undefined || loginState.msg.iteration < 1 ? '' : ' (' + loginState.msg.iteration + ')')
+                  (authAPIRequest.warningMsg ? Globals.permissionDenied : 'Login') + 
+                  (authAPIRequest.displayCount && authAPIRequest.displayCount > 1 ? ' (' + authAPIRequest.displayCount + ')' : '')
                 }
                 </AlertTitle>
                   {
-                    loginState === undefined || loginState.msg === undefined || loginState.msg.text === undefined ? '' : loginState.msg.text
+                    (authAPIRequest.warningMsg ? 'You do not have permission to ' + authAPIRequest.warningMsg + '. ' : '') + 
+                                      'Please login with valid credentials...'
+                    //authAPIRequest.msg === undefined || authAPIRequest.msg.text === undefined ? '' : authAPIRequest.msg.text
                   }
               </Alert>
 
@@ -234,7 +236,7 @@ function LoginForm({ loginState, setLoginState, setErrorMsg, sx }) {
 
 function LoginButton({ 
   setViewId,
-  setLoginState,
+  setAuthAPIRequest,
   handleReload,
   buttons
 }) {
@@ -252,23 +254,15 @@ function LoginButton({
       handleReload();
     }
     else {
-      setLoginState({
-        open: true, 
-        msg: {
-          severity: "info",
-          title: "Login",
-          text:  'Please login with valid credentials...'
-        },
-        action: {
-          method: "get",
-          url: "http://localhost:3001/api/opentables/login",
-          callback: (success, data) => {
-            if (success) {
-              handleReload();
-            }
+      setAuthAPIRequest({
+        method: 'get',
+        tryBeforeShowLogin: false,
+        urlParams: 'login',
+        callback: (success, data) => {
+          if (success) {
+            handleReload();
           }
-        },
-        tryFirst: false
+        }
       });
     }
   }

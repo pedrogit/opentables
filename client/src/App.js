@@ -44,7 +44,7 @@ function App({ initialViewid, appid }) {
   const [viewid, setViewId] = React.useState(BrowserHistory.getViewIdFromURL(appid) ? BrowserHistory.getViewIdFromURL(appid) : initialViewid);
   const [viewData, setViewData] = React.useState(null);
   const [showConfigPanel, setShowConfigPanel] = React.useState(false);
-  const [loginState, setLoginState] = React.useState({open: false});
+  const [authAPIRequest, setAuthAPIRequest] = React.useState({open: false});
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [addItem, setAddItem] = React.useState(false);
   const [reload, setReload] = React.useState(false);
@@ -87,24 +87,17 @@ function App({ initialViewid, appid }) {
 
   React.useEffect(() => {
     // initial loading of list data
-    setLoginState({
-      open: false,
-      msg: {
-        severity: "warning",
-        title: Globals.permissionDenied,
-        text: 'You do not have permissions to view this list. Please login with valid credentials...'
-      },
-      action: {
-        method: "get",
-        url: "http://localhost:3001/api/opentables/" + (viewid ? viewid : ''),
-        callback: (success, data) => {
-          if (success) {
-            setViewData(data);
-            BrowserHistory.pushHistoryState(appid, viewid);
-          }
+    setAuthAPIRequest({
+      method: 'get',
+      tryBeforeShowLogin: true,
+      warningMsg: 'view this list',
+      urlParams: viewid ? viewid : '',
+      callback: (success, data) => {
+        if (success) {
+          setViewData(data);
+          BrowserHistory.pushHistoryState(appid, viewid);
         }
-      },
-      tryFirst: true
+      }
     });
   }, [reload, viewid, appid]);
 
@@ -122,7 +115,7 @@ function App({ initialViewid, appid }) {
         <Header 
           viewOwner={viewData ? viewData.owner : ''} 
           viewName={viewData ? viewData.name : ''}
-          setLoginState={setLoginState} 
+          setAuthAPIRequest={setAuthAPIRequest} 
           toggleOpenConfigPanel={toggleOpenConfigPanel}
           configButtonDisabled={
             !viewData ||
@@ -151,8 +144,8 @@ function App({ initialViewid, appid }) {
         <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
         <LoginForm 
           sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
-          loginState={loginState}
-          setLoginState={setLoginState}
+          authAPIRequest={authAPIRequest}
+          setAuthAPIRequest={setAuthAPIRequest}
           setErrorMsg={setErrorMsg}
         />
         {(viewData) ? (
@@ -162,7 +155,7 @@ function App({ initialViewid, appid }) {
             setShowConfigPanel={setShowConfigPanel}
             view={viewData}
             setViewData={setViewData}
-            setLoginState={setLoginState}
+            setAuthAPIRequest={setAuthAPIRequest}
             setErrorMsg={setErrorMsg}
             handleReload={handleReload}
           />
@@ -172,7 +165,7 @@ function App({ initialViewid, appid }) {
               view={viewData}
               parsedSchema={new Schema(viewData[Globals.childlistFieldName][Globals.listSchemaFieldName])}
               setViewData={setViewData}
-              setLoginState={setLoginState}
+              setAuthAPIRequest={setAuthAPIRequest}
               setViewId={handleChangeViewId}
               handleReload={handleReload}
               handleRefresh={handleRefresh}

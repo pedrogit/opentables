@@ -17,7 +17,7 @@ const Globals = require("../common/globals");
 function Header({ 
   viewOwner, 
   viewName, 
-  setLoginState, 
+  setAuthAPIRequest, 
   toggleOpenConfigPanel,
   configButtonDisabled,
   setAddItem,
@@ -65,7 +65,7 @@ function Header({
           <Stack direction='row'>
             <LoginButton 
               setViewId={setViewId} 
-              setLoginState={setLoginState}
+              setAuthAPIRequest={setAuthAPIRequest}
               handleReload={handleReload}
               buttons={isSmall}
             />

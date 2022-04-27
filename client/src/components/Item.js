@@ -98,7 +98,7 @@ function Item({
   unsetProps,
   defItem,
   rowNb,
-  setLoginState,
+  setAuthAPIRequest,
   setViewId,
   checkListEditPerm,
   handleAddItem,
@@ -128,31 +128,20 @@ function Item({
 
   const handleSaveProperty = (val, callback) => {
     if (item[Globals.itemIdFieldName]) {
-      setLoginState({
-        open: false,
-        msg: {
-          severity: "warning",
-          title: Globals.permissionDenied,
-          text:
-          'You do not have permissions to edit "' +
-          Object.keys(val)[0] +
-          '". Please login with valid credentials...',
-        },
-        action: {
-          method: "patch",
-          url: "http://localhost:3001/api/opentables/" +
-              item[Globals.itemIdFieldName],
-          data: val,
-          callback: (success, data) => {
-            if (success) {
-              handleEditItem(data, Object.keys(val));
-            }
-            if (callback && typeof callback === 'function') {
-              callback(success, data);
-            }
+      setAuthAPIRequest({
+        method: 'patch',
+        tryBeforeShowLogin: true,
+        warningMsg: 'edit "' + Object.keys(val)[0] + '"',
+        urlParams: item[Globals.itemIdFieldName],
+        data: val,
+        callback: (success, data) => {
+          if (success) {
+            handleEditItem(data, Object.keys(val));
           }
-        },
-        tryFirst: true
+          if (callback && typeof callback === 'function') {
+            callback(success, data);
+          }
+        }
       });
     }
     else if (otherProps.setEditingItem) {

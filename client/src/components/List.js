@@ -15,7 +15,7 @@ function List({
   view,
   parsedSchema,
   listSchemaStr,
-  setLoginState,
+  setAuthAPIRequest,
   setViewId,
   setViewData,
   setAddItem,
@@ -48,45 +48,38 @@ function List({
   const handleAddItem = React.useCallback(
     ({item = {}, addToLocalList = true, callback} = {}) => {
       if (view[Globals.childlistFieldName]) {
-        setLoginState({
-          open: false,
-          msg: {
-            severity: "warning",
-            title: Globals.permissionDenied,
-            text: 'You do not have permissions to add items to this list. Please login with valid credentials...'
-          },
-          action: {
-            method: "post",
-            url: "http://localhost:3001/api/opentables/" + view[Globals.childlistFieldName][Globals.itemIdFieldName],
-            data: item,
-            callback: (success, newitem) => {
-              if (success && addToLocalList) {
-                var newItemsData = view[Globals.childlistFieldName][Globals.itemsFieldName];
-                if (!newItemsData) {
-                  newItemsData = [];
+        setAuthAPIRequest({
+          method: 'post',
+          tryBeforeShowLogin: true,
+          warningMsg: 'add new items to this list',
+          urlParams: view[Globals.childlistFieldName][Globals.itemIdFieldName],
+          data: item,
+          callback: (success, newitem) => {
+            if (success && addToLocalList) {
+              var newItemsData = view[Globals.childlistFieldName][Globals.itemsFieldName];
+              if (!newItemsData) {
+                newItemsData = [];
+              }
+              newItemsData.unshift(newitem);
+              setViewData({
+                ...view,
+                [Globals.childlistFieldName]: {
+                  ...view[Globals.childlistFieldName],
+                  [Globals.itemsFieldName]: newItemsData
                 }
-                newItemsData.unshift(newitem);
-                setViewData({
-                  ...view,
-                  [Globals.childlistFieldName]: {
-                    ...view[Globals.childlistFieldName],
-                    [Globals.itemsFieldName]: newItemsData
-                  }
-                });
-                resetEditingItem();
-              }
-              if (callback && typeof callback === 'function') {
-                callback(success, newitem);
-              }
+              });
+              resetEditingItem();
             }
-          },
-          tryFirst: true
+            if (callback && typeof callback === 'function') {
+              callback(success, newitem);
+            }
+          }
         });
       }
       else {
         setErrorMsg({text: "No list is associated to this view. You can not add items..."});
       }
-    }, [view, setLoginState, setViewData, setErrorMsg, resetEditingItem]
+    }, [view, setAuthAPIRequest, setViewData, setErrorMsg, resetEditingItem]
   );
 
   // determine user permission on patch and post. Open the login panel otherwise.
@@ -108,24 +101,16 @@ function List({
       }
       else {
         // open login dialog
-        setLoginState({
-          open: true, 
-          msg: {
-            severity: "warning",
-            title: Globals.permissionDenied,
-            text:
-            'You do not have permissions to edit "' + propName + '". Please login with valid credentials...'
-          },
-          action: {
-            method: "get",
-            url: "http://localhost:3001/api/opentables/login",
-            callback: callback
-          },
-          tryFirst: false
+        setAuthAPIRequest({
+          method: 'get',
+          tryBeforeShowLogin: false,
+          warningMsg: 'edit "' + propName + '"',
+          urlParams: 'login',
+          callback: callback
         });
       }
       return false;
-    }, [view, setLoginState]
+    }, [view, setAuthAPIRequest]
   );
 
   React.useEffect(() => {
@@ -144,61 +129,47 @@ function List({
           list: view[Globals.childlistFieldName]
         })) {
       // open login dialog
-      setLoginState({
-        open: true, 
-        msg: {
-          severity: "warning",
-          title: Globals.permissionDenied,
-          text: 'You do not have permissions to add new items. Please login with valid credentials...'        },
-        action: {
-          method: "get",
-          url: "http://localhost:3001/api/opentables/login",
-          callback: handleRefresh
-        },
-        tryFirst: false
+      setAuthAPIRequest({
+        method: 'get',
+        tryBeforeShowLogin: false,
+        warningMsg: 'add new items to this list',
+        urlParams: 'login',
+        callback: handleRefresh
       });
     }
-  }, [view, addItemMode, handleRefresh, setLoginState] );
+  }, [view, addItemMode, handleRefresh, setAuthAPIRequest] );
 
   // handle the deletion of an item
   const handleDeleteItem = React.useCallback(
     (itemid, callback) => {
       if (view[Globals.childlistFieldName]) {
-        setLoginState({
-          open: false,
-          msg: {
-            severity: "warning",
-            title: Globals.permissionDenied,
-            text:
-            'You do not have permissions to delete items from this list. Please login with valid credentials...',
-          },
-          action: {
-            method: "delete",
-            url: "http://localhost:3001/api/opentables/" + itemid,
-            callback: (success, data) => {
-              if (success) {
-                var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
-                newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
-                setViewData({
-                  ...view,
-                  [Globals.childlistFieldName]: {
-                    ...view[Globals.childlistFieldName],
-                    [Globals.itemsFieldName]: newItemsData
-                  }
-                });
-              }
-              if (callback && typeof callback === 'function') {
-                callback(success, data);
-              }
+        setAuthAPIRequest({
+          method: 'delete',
+          tryBeforeShowLogin: true,
+          warningMsg: 'delete items from this list',
+          urlParams: itemid,
+          callback: (success, data) => {
+            if (success) {
+              var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
+              newItemsData = newItemsData.filter(item => item[Globals.itemIdFieldName] !== itemid);
+              setViewData({
+                ...view,
+                [Globals.childlistFieldName]: {
+                  ...view[Globals.childlistFieldName],
+                  [Globals.itemsFieldName]: newItemsData
+                }
+              });
             }
-          },
-          tryFirst: true
+            if (callback && typeof callback === 'function') {
+              callback(success, data);
+            }
+          }
         });
       }
       else {
         setErrorMsg({text: "No list is associated to this view. You can not delete items..."});
       }
-    }, [view, setLoginState, setViewData, setErrorMsg]
+    }, [view, setAuthAPIRequest, setViewData, setErrorMsg]
   );
 
   // determine if delete button should be disabled
@@ -282,7 +253,7 @@ function List({
           defItem={parsedSchema.getAllDefaults({user: getUser()})}
           unsetProps={getUnsetProperties(editingItem)}
           rowNb={0}
-          setLoginState={setLoginState}
+          setAuthAPIRequest={setAuthAPIRequest}
           checkListEditPerm={checkListEditPerm}
           handleAddItem={handleAddItem}
           handleDeleteItem={handleDeleteItem}
@@ -314,7 +285,7 @@ function List({
             defItem={parsedSchema.getAllDefaults({user: getUser(), listSchema: listSchemaStr})}
             unsetProps={getUnsetProperties(item)}
             rowNb={rowNb}
-            setLoginState={setLoginState}
+            setAuthAPIRequest={setAuthAPIRequest}
             checkListEditPerm={checkListEditPerm}
             handleAddItem={handleAddItem}
             handleDeleteItem={handleDeleteItem}
