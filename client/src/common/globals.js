@@ -57,6 +57,7 @@ var Globals = {
   itemListType: "itemlist",
 
   permissionDenied: "Permission denied",
+  permissionDeniedOnListOrItems: "permission_denied"
 };
 
 Globals = {

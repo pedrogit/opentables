@@ -91,18 +91,11 @@ function Text({
     };
 
     const handleEdit = (e) => {
-      if (!wrappedInform) {
-        val.checkItemEditPerm({
-          propName: val.prop, 
-          callback: (success) => {
-            if (success) {
-              if (!editVal) {
-                setEditVal(propVal);
-              }
-              setIsEditing(true);
-            }
-          }
-        });
+      if (!wrappedInform && val.checkItemEditPerm(propName)) {
+        if (!editVal) {
+          setEditVal(propVal);
+        }
+        setIsEditing(true);
       }
     };
 
@@ -260,19 +253,11 @@ function Text({
     };
 
     const handleEdit = (e) => {
-      if (!wrappedInform) {
-        val.checkItemEditPerm({
-          action: 'patch', 
-          propName: val.prop, 
-          callback: (success) => {
-            if (success) {
-              if (!editVal) {
-                setEditVal(propVal);
-              }
-              setIsEditing(true);
-            }
-          }
-        });
+      if (!wrappedInform && val.checkItemEditPerm(propName)) {
+        if (!editVal) {
+          setEditVal(propVal);
+        }
+        setIsEditing(true);
       }
     };
 

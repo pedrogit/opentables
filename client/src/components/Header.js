@@ -99,7 +99,7 @@ function Header({
                   id="reloadListButton" 
                   aria-label="reload list" 
                   color="inherit"
-                  onClick={() => handleReload()}
+                  onClick={() => handleReload(true)}
                   sx={{p: theme.openTable.buttonPadding}}
                   disableFocusRipple={true}
               >

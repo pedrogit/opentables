@@ -260,7 +260,7 @@ function LoginButton({
         urlParams: 'login',
         callback: (success, data) => {
           if (success) {
-            handleReload();
+            handleReload(true);
           }
         }
       });

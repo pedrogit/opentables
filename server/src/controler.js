@@ -287,88 +287,100 @@ class Controler {
     }
 
     if (Controler.isList(item)) {
-      Utils.validateRPerm({
-          user: user,
-          list: item,
-          throwError: true
-        }
-      )
-
-      if (!noitems) {
-        var lookup = {
-          from: Globals.mongoCollectionName,
-          localField: Globals.itemIdFieldName,
-          foreignField: Globals.listIdFieldName,
-          as: Globals.itemsFieldName,
-        };
-
-        if (filter) {
-          var mongoDBFilter = new Filter(filter);
-          var jsonFilter = mongoDBFilter.final();
-          lookup.let = { x: "$" + Globals.itemIdFieldName };
-          lookup.pipeline = [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$" + Globals.listIdFieldName, "$$x"] },
-                    jsonFilter,
-                  ],
-                },
-              },
-            },
-          ];
-          delete lookup.localField;
-          delete lookup.foreignField;
-        }
-
-        var pipeline = [
-          { $match: { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) } },
-          { $lookup: lookup },
-          // remove the listid property since it is the same as the list itemid
-          { $unset: Globals.itemsFieldName + "." + Globals.listIdFieldName },
-        ];
-
-        // remove hidden properties
-        const schema = new Schema(item[Globals.listSchemaFieldName]);
-
-        schema.getHidden().map(async (hidden) => {
-          pipeline.push({ $unset: [Globals.itemsFieldName] + "." + hidden })
-        });
-
-        item = await this.coll.aggregate(pipeline).toArray();
-        item = item[0];
-
-        // remove items for which the user do not have read permissions
-        item[Globals.itemsFieldName] = item[Globals.itemsFieldName].filter((subItem) => {
-          return Utils.validateRPerm({
+      if (Utils.validateRPerm({
+        user: user,
+        list: item,
+        ignoreListItem: true
+      })) {
+        if (!noitems) {
+          if (Utils.validateRPerm({
             user: user,
             list: item,
-            item: subItem,
-            throwError: false
-          });
-        });
+          })) {
+            var lookup = {
+              from: Globals.mongoCollectionName,
+              localField: Globals.itemIdFieldName,
+              foreignField: Globals.listIdFieldName,
+              as: Globals.itemsFieldName,
+            };
 
-        // delete the items property if there are none
-        if (item[Globals.itemsFieldName].length === 0) {
-          delete item[Globals.itemsFieldName];
+            if (filter) {
+              var mongoDBFilter = new Filter(filter);
+              var jsonFilter = mongoDBFilter.final();
+              lookup.let = { x: "$" + Globals.itemIdFieldName };
+              lookup.pipeline = [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ["$" + Globals.listIdFieldName, "$$x"] },
+                        jsonFilter,
+                      ],
+                    },
+                  },
+                },
+              ];
+              delete lookup.localField;
+              delete lookup.foreignField;
+            }
+
+            var pipeline = [
+              { $match: { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) } },
+              { $lookup: lookup },
+              // remove the listid property since it is the same as the list itemid
+              { $unset: Globals.itemsFieldName + "." + Globals.listIdFieldName },
+            ];
+
+            // remove hidden properties
+            const schema = new Schema(item[Globals.listSchemaFieldName]);
+
+            schema.getHidden().map(async (hidden) => {
+              pipeline.push({ $unset: [Globals.itemsFieldName] + "." + hidden })
+            });
+
+            item = await this.coll.aggregate(pipeline).toArray();
+            item = item[0];
+
+            // remove items for which the user do not have read permissions
+            item[Globals.itemsFieldName] = item[Globals.itemsFieldName].filter((subItem) => {
+              return Utils.validateRPerm({
+                user: user,
+                list: item,
+                item: subItem
+              });
+            });
+
+            // delete the items property if there are none
+            if (item[Globals.itemsFieldName].length === 0) {
+              delete item[Globals.itemsFieldName];
+            }
+          }
+          else {
+            item = {
+              ...item,
+              [Globals.itemsFieldName]: Globals.permissionDeniedOnListOrItems
+            }
+          }
         }
+
+        var parentList = await this.getParentList(item[Globals.listIdFieldName]);
+
+        var items = item[Globals.itemsFieldName];
+        // post validate list properties against schema (mostly to remove hidden properties)
+        item = await this.validateItems(
+          parentList[Globals.listSchemaFieldName],
+          Utils.objWithout(item, Globals.itemsFieldName),
+          user,
+          parentList[Globals.itemIdFieldName],
+          {
+            post: true
+          }
+        );
+        item[Globals.itemsFieldName] = items;
       }
-
-      var parentList = await this.getParentList(item[Globals.listIdFieldName]);
-
-      var items = item[Globals.itemsFieldName];
-      // post validate the item against schema (mostly to remove hidden properties)
-      item = await this.validateItems(
-        parentList[Globals.listSchemaFieldName],
-        Utils.objWithout(item, Globals.itemsFieldName),
-        user,
-        parentList[Globals.itemIdFieldName],
-        {
-          post: true
-        }
-      );
-      item[Globals.itemsFieldName] = items;
+      else {
+        item = Globals.permissionDeniedOnListOrItems
+      }
     } else {
       // find item schema
       var parentList = await this.getParentList(item[Globals.listIdFieldName]);

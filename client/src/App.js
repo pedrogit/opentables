@@ -11,7 +11,7 @@ import List from "./components/List";
 import Header from "./components/Header";
 
 import ConfigPanel from "./components/ConfigPanel";
-import ErrorPanel from "./components/ErrorPanel";
+import {ErrorPanel, UncontrolledErrorPanel} from "./components/ErrorPanel";
 import {LoginForm} from "./components/LoginForm";
 import getUser from "./clientUtils";
 import * as BrowserHistory from "./browserHistory";
@@ -52,8 +52,8 @@ function App({ initialViewid, appid }) {
 
   // handleReload is necessary because the viewid is not 
   // available where handleReload is called
-  const handleReload = (toggleCfgPanel) => {
-    handleChangeViewId(viewid, toggleCfgPanel);
+  const handleReload = (leaveConfigPanelOpen = false) => {
+    handleChangeViewId(viewid, leaveConfigPanelOpen);
   };
 
   const handleRefresh = React.useCallback(
@@ -63,10 +63,10 @@ function App({ initialViewid, appid }) {
   );
 
   const handleChangeViewId = React.useCallback(
-    (newViewid, toggleCfgPanel) => {
+    (newViewid, leaveConfigPanelOpen) => {
       setAddItem(false);
       setErrorMsg({open: false});
-      if (toggleCfgPanel === undefined) {
+      if (leaveConfigPanelOpen === undefined || leaveConfigPanelOpen === false) {
         setShowConfigPanel(false);
       }
       if (viewData) {
@@ -132,7 +132,8 @@ function App({ initialViewid, appid }) {
             viewData[Globals.addItemModeFieldName] !== Globals.addWithPersistentFormNoItems
           }
           addItemButtonDisabled={
-            !viewData ||
+            !viewData || 
+            viewData[Globals.childlistFieldName] === Globals.permissionDeniedOnListOrItems ||
             !(Utils.validateCPerm({
               user: getUser(),
               list: viewData[Globals.childlistFieldName]
@@ -141,14 +142,19 @@ function App({ initialViewid, appid }) {
           setViewId={handleChangeViewId}
           handleReload={handleReload}
         />
-        <ErrorPanel errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>
+        <ErrorPanel 
+          errorMsg={errorMsg} 
+          setErrorMsg={setErrorMsg} 
+          autoClose={errorMsg && errorMsg.autoClose}
+          closebutton={errorMsg && errorMsg.closebutton}
+        />
         <LoginForm 
           sx={{borderBottomWidth: '5px', borderBottomStyle: 'solid', borderBottomColor: theme.palette.primary.main}}
           authAPIRequest={authAPIRequest}
           setAuthAPIRequest={setAuthAPIRequest}
           setErrorMsg={setErrorMsg}
         />
-        {(viewData) ? (
+        {viewData ? (
           <>
           <ConfigPanel
             showConfigPanel={showConfigPanel}
@@ -159,21 +165,34 @@ function App({ initialViewid, appid }) {
             setErrorMsg={setErrorMsg}
             handleReload={handleReload}
           />
-          <Box sx={{height: '100%', overflowY: 'auto'}}>
-            <List
-              listType={Globals.itemListType}
-              view={viewData}
-              parsedSchema={new Schema(viewData[Globals.childlistFieldName][Globals.listSchemaFieldName])}
-              setViewData={setViewData}
-              setAuthAPIRequest={setAuthAPIRequest}
-              setViewId={handleChangeViewId}
-              handleReload={handleReload}
-              handleRefresh={handleRefresh}
-              setAddItem={setAddItem}
-              addItem={addItem}
-              setErrorMsg={setErrorMsg}
-            />
-          </Box>
+          {viewData[Globals.childlistFieldName] &&
+            (viewData[Globals.childlistFieldName] === Globals.permissionDeniedOnListOrItems
+              ? <UncontrolledErrorPanel 
+                  errorMsg = {{
+                    severity: 'warning',
+                    title: 'Warning',
+                    text: "You do not have the permission to view this list..."
+                  }}
+                  autoClose={false}
+                  closeButton={false}
+                />
+              : <Box sx={{height: '100%', overflowY: 'auto'}}>
+                  <List
+                    listType={Globals.itemListType}
+                    view={viewData}
+                    parsedSchema={new Schema(viewData[Globals.childlistFieldName][Globals.listSchemaFieldName])}
+                    setViewData={setViewData}
+                    setAuthAPIRequest={setAuthAPIRequest}
+                    setViewId={handleChangeViewId}
+                    handleReload={handleReload}
+                    handleRefresh={handleRefresh}
+                    setAddItem={setAddItem}
+                    addItem={addItem}
+                    setErrorMsg={setErrorMsg}
+                  />
+                </Box>
+            )
+          }
           </>
         ) : (
           <Container className="progress" sx={{display: 'flex', justifyContent: 'center'}}>

@@ -2,6 +2,7 @@ import React from "react";
 import Item from "./Item";
 import Stack from "@mui/material/Stack";
 
+import {UncontrolledErrorPanel} from "./ErrorPanel";
 import getUser from "../clientUtils";
 //const Schema = require("../common/schema");
 const TemplateParser = require("../common/templateParser");
@@ -48,33 +49,34 @@ function List({
   const handleAddItem = React.useCallback(
     ({item = {}, addToLocalList = true, callback} = {}) => {
       if (view[Globals.childlistFieldName]) {
-        setAuthAPIRequest({
-          method: 'post',
-          tryBeforeShowLogin: true,
-          warningMsg: 'add new items to this list',
-          urlParams: view[Globals.childlistFieldName][Globals.itemIdFieldName],
-          data: item,
-          callback: (success, newitem) => {
-            if (success && addToLocalList) {
-              var newItemsData = view[Globals.childlistFieldName][Globals.itemsFieldName];
-              if (!newItemsData) {
-                newItemsData = [];
-              }
-              newItemsData.unshift(newitem);
-              setViewData({
-                ...view,
-                [Globals.childlistFieldName]: {
-                  ...view[Globals.childlistFieldName],
-                  [Globals.itemsFieldName]: newItemsData
+        //if (view[Globals.childlistFieldName] instanceof Array) {
+          setAuthAPIRequest({
+            method: 'post',
+            tryBeforeShowLogin: true,
+            warningMsg: 'add new items to this list',
+            urlParams: view[Globals.childlistFieldName][Globals.itemIdFieldName],
+            data: item,
+            callback: (success, newitem) => {
+              if (success && addToLocalList) {
+                var newItemsData = view[Globals.childlistFieldName][Globals.itemsFieldName];
+                if (!newItemsData) {
+                  newItemsData = [];
                 }
-              });
-              resetEditingItem();
+                newItemsData.unshift(newitem);
+                setViewData({
+                  ...view,
+                  [Globals.childlistFieldName]: {
+                    ...view[Globals.childlistFieldName],
+                    [Globals.itemsFieldName]: newItemsData
+                  }
+                });
+                resetEditingItem();
+              }
+              if (callback && typeof callback === 'function') {
+                callback(success, newitem);
+              }
             }
-            if (callback && typeof callback === 'function') {
-              callback(success, newitem);
-            }
-          }
-        });
+          });
       }
       else {
         setErrorMsg({text: "No list is associated to this view. You can not add items..."});
@@ -84,33 +86,13 @@ function List({
 
   // determine user permission on patch and post. Open the login panel otherwise.
   const checkListEditPerm = React.useCallback(
-    ({
-      item = null, 
-      propName = '', 
-      callback
-    }) => {
-      if (Utils.validateRWPerm({
+    (item) => {
+      return Utils.validateRWPerm({
         user: getUser(),
         list: view[Globals.childlistFieldName],
         item: item
-      })) {
-        if (callback && typeof callback === 'function') {
-          callback(true);
-        }
-        return true;
-      }
-      else {
-        // open login dialog
-        setAuthAPIRequest({
-          method: 'get',
-          tryBeforeShowLogin: false,
-          warningMsg: 'edit "' + propName + '"',
-          urlParams: 'login',
-          callback: callback
-        });
-      }
-      return false;
-    }, [view, setAuthAPIRequest]
+      })
+    }, [view]
   );
 
   React.useEffect(() => {
@@ -121,7 +103,8 @@ function List({
     };
   }, [addItem, addItemMode, setAddItem, handleAddItem] ); 
 
-  // check that the has permission to add an item
+  // display the login panel if the user does not have permission 
+  // to add an item in persistent form no item mode
   React.useEffect(() => {
     if (addItemMode === Globals.addWithPersistentFormNoItems &&
         !Utils.validateCPerm({
@@ -194,12 +177,21 @@ function List({
     return disabled;
   }
 
+  const requireReload = React.useCallback(
+    (editedProperty) => {
+      return (listType === Globals.viewListType && editedProperty.includes(Globals.addItemModeFieldName)) ||
+            (listType === Globals.listListType && editedProperty.includes(Globals.itemReadPermFieldName)) ||
+            (listType === Globals.listListType && editedProperty.includes(Globals.readPermFieldName))
+            ;
+    }, [listType]
+  );
+
   const handleEditItem = React.useCallback(
     (editedItem, editedProperty) => {
       // if the edited property is part of the view or the list, 
       // reload the list because it generally have an effect on the whole list
-      if (listType === Globals.viewListType && editedProperty.includes(Globals.addItemModeFieldName)) {
-        handleReload(false);
+      if (requireReload(editedProperty)) {
+        handleReload(true);
       }
       else {
         var newItemsData = [...view[Globals.childlistFieldName][Globals.itemsFieldName]];
@@ -216,7 +208,7 @@ function List({
           }
         });
       }
-    }, [listType, view, setViewData, handleReload]
+    }, [view, setViewData, requireReload, handleReload]
   );
 
   const getUnsetProperties = (item) => {
@@ -229,7 +221,12 @@ function List({
     return unsetProps;
   }
 
+  var noItemsRPerm = view[Globals.childlistFieldName][Globals.itemsFieldName] === Globals.permissionDeniedOnListOrItems;
+  var emptyList = noItemsRPerm || 
+                  (view[Globals.childlistFieldName][Globals.itemsFieldName] instanceof Array && 
+                   view[Globals.childlistFieldName][Globals.itemsFieldName].length === 0);
   var rowNb = 0;
+
   return (
     <Stack
       id={listType && listType.toLowerCase()}
@@ -271,33 +268,56 @@ function List({
           resetEditingItem={resetEditingItem}
         />
       }
-      {(view && 
-       view[Globals.childlistFieldName] && 
-       view[Globals.childlistFieldName][Globals.itemsFieldName]) && 
-       view[Globals.childlistFieldName][Globals.itemsFieldName].map((item) => {
-        rowNb = rowNb + 1;
-        return (
-          <Item
-            key={item[Globals.itemIdFieldName]}
-            template={view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate()}
-            listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
-            item={item}
-            defItem={parsedSchema.getAllDefaults({user: getUser(), listSchema: listSchemaStr})}
-            unsetProps={getUnsetProperties(item)}
-            rowNb={rowNb}
-            setAuthAPIRequest={setAuthAPIRequest}
-            checkListEditPerm={checkListEditPerm}
-            handleAddItem={handleAddItem}
-            handleDeleteItem={handleDeleteItem}
-            deleteButtonDisabled={deleteButtonDisabled(item)}
-            showDeleteButton={showDeleteButton}
-            handleEditItem={handleEditItem}
-            setUnsetPropertyButtonDisabled={setUnsetPropertyButtonDisabled(item)}
-            setViewId={setViewId}
-            setErrorMsg={setErrorMsg}
-          />
-        );
-      })}
+      { view && 
+        view[Globals.childlistFieldName] && 
+        view[Globals.childlistFieldName][Globals.itemsFieldName] && 
+        (noItemsRPerm
+          ? <UncontrolledErrorPanel 
+              errorMsg = {{
+                severity: 'warning',
+                title: 'Warning',
+                text: "You do not have the permission to view items from this list..."
+              }}
+              autoClose={false}
+              closeButton={false}
+            />
+          : (emptyList
+              ? <UncontrolledErrorPanel 
+                  errorMsg = {{
+                    severity: 'warning',
+                    title: 'Warning',
+                    text: "There are no items in this list yet..."
+                  }}
+                  autoClose={false}
+                  closeButton={false}
+                />
+              : view[Globals.childlistFieldName][Globals.itemsFieldName].map((item) => {
+                rowNb = rowNb + 1;
+                return (
+                  <Item
+                    key={item[Globals.itemIdFieldName]}
+                    template={view[Globals.itemTemplateFieldName] || parsedSchema.getDefaultTemplate()}
+                    listid={view[Globals.childlistFieldName][Globals.itemIdFieldName]}
+                    item={item}
+                    defItem={parsedSchema.getAllDefaults({user: getUser(), listSchema: listSchemaStr})}
+                    unsetProps={getUnsetProperties(item)}
+                    rowNb={rowNb}
+                    setAuthAPIRequest={setAuthAPIRequest}
+                    checkListEditPerm={checkListEditPerm}
+                    handleAddItem={handleAddItem}
+                    handleDeleteItem={handleDeleteItem}
+                    deleteButtonDisabled={deleteButtonDisabled(item)}
+                    showDeleteButton={showDeleteButton}
+                    handleEditItem={handleEditItem}
+                    setUnsetPropertyButtonDisabled={setUnsetPropertyButtonDisabled(item)}
+                    setViewId={setViewId}
+                    setErrorMsg={setErrorMsg}
+                  />
+                );
+              })
+            )
+        )
+      }
     </Stack>
   );
 }

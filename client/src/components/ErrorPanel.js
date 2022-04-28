@@ -70,4 +70,14 @@ ErrorPanel.defaultProps = {
   closeButton: true
 }
 
-export default ErrorPanel;
+function UncontrolledErrorPanel({ errorMsg, autoClose, closeButton }) {
+  const [unControlledErrorMsg, setErrorMsg] = React.useState(errorMsg);
+  return <ErrorPanel 
+    errorMsg={unControlledErrorMsg}
+    setErrorMsg={setErrorMsg}
+    autoClose={autoClose}
+    closeButton={closeButton}
+  />
+}
+
+export { ErrorPanel, UncontrolledErrorPanel };

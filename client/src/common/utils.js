@@ -297,18 +297,21 @@ exports.simpleJSONToJSON = function (simpleJSONStr) {
 };
 
 exports.objWithout = function (obj, without) {
-  var newObj = { ...obj };
-  if (without && typeof without === "string") {
-    without = [without];
+  if (typeof obj === "object") {
+    var newObj = { ...obj };
+    if (without && typeof without === "string") {
+      without = [without];
+    }
+    if (typeof newObj === "object" && without instanceof Array) {
+      without.forEach((x) => {
+        if (newObj.hasOwnProperty(x)) {
+          delete newObj[x];
+        }
+      });
+    }
+    return newObj;
   }
-  if (typeof newObj === "object" && without instanceof Array) {
-    without.forEach((x) => {
-      if (newObj.hasOwnProperty(x)) {
-        delete newObj[x];
-      }
-    });
-  }
-  return newObj;
+  return obj;
 };
 
 exports.setCookieJWT = function (req, res, payload) {
@@ -395,6 +398,7 @@ exports.validateRWPerm = function(
   {
     user = Globals.allUserName,
     list,
+    ignoreListItem = false,
     item,
     readWrite = true,
     throwError = false
@@ -430,7 +434,7 @@ exports.validateRWPerm = function(
   }
 
   // handle list item_rw_p permission only if it is set
-  if (list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) {
+  if (!ignoreListItem && list && list.hasOwnProperty(Globals.itemReadWritePermFieldName)) {
     let splittedRW = list[Globals.itemReadWritePermFieldName].split(/\s*,\s*/);
     // cumulate only in rw mode
     if (readWrite) {
@@ -480,7 +484,8 @@ exports.validateRWPerm = function(
 exports.validateRPerm = function(
   {
     user = Globals.allUserName,
-    list, 
+    list,
+    ignoreListItem = false,
     item,
     throwError = false
   } = {}
@@ -489,6 +494,7 @@ exports.validateRPerm = function(
   if (exports.validateRWPerm({
     user: user,
     list: list,
+    ignoreListItem: ignoreListItem,
     item: item,
     throwError: false
   })) {
@@ -526,6 +532,7 @@ exports.validateRPerm = function(
   return exports.validateRWPerm({
     user: user,
     list: newList,
+    ignoreListItem: ignoreListItem,
     item: newItem,
     readWrite: false,
     throwError: throwError

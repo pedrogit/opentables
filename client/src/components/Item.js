@@ -167,12 +167,16 @@ function Item({
     }
   }
 
-  const checkItemEditPerm = ({action = 'patch', propName, callback}) => {
-    checkListEditPerm({
-      item: item, 
-      propName: propName, 
-      callback: callback
-    });
+  const checkItemEditPerm = (propName) => {
+    if (checkListEditPerm(item)) {
+      return true;
+    }
+    setErrorMsg({
+      severity: 'info',
+      title: Globals.permissionDenied,
+      text: 'You do not have permission to edit "' + propName + '". Please login with valid credentials...'
+    })
+    return false;
   }
 
   const setBindings = (item) => {

@@ -81,6 +81,22 @@ function ConfigPanel({
     }, [view, setViewData]
   );
 
+  var parentViewView = {
+    [Globals.childlistFieldName]: {
+      ...Globals.listOfAllViews,
+      [Globals.itemsFieldName]: view ? [view] : []
+    }
+  }
+
+  var parentListView = {
+    [Globals.childlistFieldName]: {
+      ...Globals.listOfAllLists,
+      [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
+    }
+  }
+
+  var noListRPerm = parentListView[Globals.childlistFieldName][Globals.itemsFieldName][0] === Globals.permissionDeniedOnListOrItems;
+
   return (
     <Stack sx={{backgroundColor: theme.palette.primary.palebg}}>
       <Collapse in={showConfigPanel}>
@@ -110,18 +126,17 @@ function ConfigPanel({
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                 <Tab id="viewProperties" label={Globals.viewProperties}/>
-                <Tab id="listProperties" label={Globals.listProperties} />
+                <Tab 
+                  id="listProperties"
+                  disabled={noListRPerm}
+                  label={Globals.listProperties + (noListRPerm ? " (" + Globals.permissionDenied + ")" : "")}
+                />
               </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
               {showConfigPanel && <List
                 listType={Globals.viewListType}
-                view={{
-                  [Globals.childlistFieldName]: {
-                    ...Globals.listOfAllViews,
-                    [Globals.itemsFieldName]: view ? [view] : []
-                  }
-                }}
+                view={parentViewView}
                 parsedSchema={new Schema((Globals.listOfAllViews)[Globals.listSchemaFieldName])}
                 listSchemaStr={view[Globals.childlistFieldName][Globals.listSchemaFieldName]}
                 setAuthAPIRequest={setAuthAPIRequest}
@@ -134,12 +149,7 @@ function ConfigPanel({
             <TabPanel value={value} index={1}>
               {showConfigPanel && <List
                 listType={Globals.listListType}
-                view={{
-                  [Globals.childlistFieldName]: {
-                    ...Globals.listOfAllLists,
-                    [Globals.itemsFieldName]: view[Globals.childlistFieldName] ? [view[Globals.childlistFieldName]] : []
-                  }
-                }}
+                view={parentListView}
                 parsedSchema={new Schema((Globals.listOfAllLists)[Globals.listSchemaFieldName])}
                 setAuthAPIRequest={setAuthAPIRequest}
                 setViewData={handleEditList}
