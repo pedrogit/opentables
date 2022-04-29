@@ -4,8 +4,9 @@ const Globals = require("../../src/common/globals");
 const username = "First User";
 const email = "firstuser@gmail.com";
 const password = "1firstuser";
-const runAllTests = true;
-const runOnlyLast = false;
+
+const runOnlyLastTest = false;
+const reCreateDatabase = !runOnlyLastTest || false;
 
 const reload = () => {
   cy.visit('http://localhost:3000');
@@ -75,8 +76,8 @@ const fillRecaptcha = () => {
   cy.wait(2000);
 }
 
-if (!runOnlyLast) {
-  describe('Initial setup', () => {
+if (reCreateDatabase) {
+  describe('0 - Initial setup', () => {
     it('1.1 - Clean the database', () => {
       cy.request({
         method: 'DELETE', 
@@ -89,7 +90,7 @@ if (!runOnlyLast) {
     })
   })
 
-  if (!runAllTests) {
+  if (runOnlyLastTest) {
     describe('Recreate a usable database', () => {
       it('1.1 - Create the first user', () => {
         reload();
@@ -121,144 +122,141 @@ const changeAddItemMode = (mode) => {
   cy.get('#closeConfigPanelButton').click();
 }
 
-describe('Opentable basic tests', () => {
-
+describe('1 - Basic tests', () => {
   beforeEach(() => {
-    // Cypress starts out with a blank slate for each test
-    // so we must tell it to visit our website with the `cy.visit()` command.
-    // Since we want to visit the same URL at the start of all our tests,
-    // we include it in our beforeEach function so that it runs before each test
     reload();
   })
 
   afterEach(() => {
-    // Cypress starts out with a blank slate for each test
-    // so we must tell it to visit our website with the `cy.visit()` command.
-    // Since we want to visit the same URL at the start of all our tests,
-    // we include it in our beforeEach function so that it runs before each test
   })
 
-  if (!runOnlyLast) {
-    if (runAllTests) {
-      it('1.1 - Make sure the list of view is displayed by default', () => {
-        cy.contains('Views').should('be.visible');
-        cy.contains('Lists').should('be.visible');
-      })
+  if (!runOnlyLastTest) {
+    it('1.1 - Make sure the list of view is displayed by default', () => {
+      cy.contains('Views').should('be.visible');
+      cy.contains('Lists').should('be.visible');
+    })
+  }
 
-      it('1.2 - Test the reload button', () => {
-        cy.get('#reloadListButton');
-        cy.wait(2000);
-        cy.contains('Views').should('be.visible');
-        cy.contains('Lists').should('be.visible');
-      })
+  if (!runOnlyLastTest) {
+    it('1.2 - Test the reload button', () => {
+      cy.get('#reloadListButton');
+      cy.wait(2000);
+      cy.contains('Views').should('be.visible');
+      cy.contains('Lists').should('be.visible');
+    })
+  }
 
-      it('2.1 - Test Sign Up', () => {
-        // make sure the login form is not visible
-        cy.get('#loginForm').should('not.be.visible');
+  if (!runOnlyLastTest) {
+    it('1.3 - Test Sign Up', () => {
+      // make sure the login form is not visible
+      cy.get('#loginForm').should('not.be.visible');
 
-        // click on the SignUp button
-        cy.get('#signUpButton').click();
+      // click on the SignUp button
+      cy.get('#signUpButton').click();
 
-        // make sure the Register button is disabled when nothing is entered yet
-        cy.get('#addItemFormButton').should('be.disabled');
-        
-        // test submitting just after the register button is activated
-        cy.get('input[name="username"]').focus().type('F');
-        cy.get('#addItemFormButton').should('not.be.disabled');
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'You failed to prove that you are not a robot...');
-        
-        // now after the recaptcha is filled
-        fillRecaptcha();
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'Item is not valid. "email" is missing...');
+      // make sure the Register button is disabled when nothing is entered yet
+      cy.get('#addItemFormButton').should('be.disabled');
+      
+      // test submitting just after the register button is activated
+      cy.get('input[name="username"]').focus().type('F');
+      cy.get('#addItemFormButton').should('not.be.disabled');
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'You failed to prove that you are not a robot...');
+      
+      // now after the recaptcha is filled
+      fillRecaptcha();
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'Item is not valid. "email" is missing...');
 
-        // fill in more username info and email and click
-        cy.get('input[name="username"]').focus().type('irst');
-        cy.get('input[name="email"]').focus().type('firstuser@gmail.com');
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'Item is not valid. "password" is missing...');
-        
-        // fill in the password
-        cy.get('input[name="password"]').focus().type('1first');
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'Item is not valid. "username" should have a minimum of 6 characters...');
+      // fill in more username info and email and click
+      cy.get('input[name="username"]').focus().type('irst');
+      cy.get('input[name="email"]').focus().type('firstuser@gmail.com');
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'Item is not valid. "password" is missing...');
+      
+      // fill in the password
+      cy.get('input[name="password"]').focus().type('1first');
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'Item is not valid. "username" should have a minimum of 6 characters...');
 
-        // fill in remaining username info
-        cy.get('input[name="username"]').focus().type(' User');
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'Item is not valid. "password" should have a minimum of 8 characters...');
+      // fill in remaining username info
+      cy.get('input[name="username"]').focus().type(' User');
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'Item is not valid. "password" should have a minimum of 8 characters...');
 
-        // success!
-        cy.get('input[name="password"]').focus().type('user');
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'Congratulation First User');
+      // success!
+      cy.get('input[name="password"]').focus().type('user');
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'Congratulation First User');
 
-        // logout
-        logout();
+      // logout
+      logout();
 
-        // try inserting a new user with the same username
-        // click on the SignUp button
-        cy.get('#signUpButton').click();
-        cy.get('input[name="username"]').focus().type('First User');
-        cy.get('input[name="email"]').focus().type(email);
-        cy.get('input[name="password"]').focus().type('xxxxxxx');
-        fillRecaptcha();
-        cy.get('#addItemFormButton').click();
-        cy.get('#errorPanel').should('contain', 'Item is not valid. "username" should be unique but value (First User) already exists...');
-        
-        // cancel to return to the main view
-        cy.get('#addCancelItemFormButton').click();
-        cy.get('#headerViewName').should('contain', 'Views');
-      })
+      // try inserting a new user with the same username
+      // click on the SignUp button
+      cy.get('#signUpButton').click();
+      cy.get('input[name="username"]').focus().type('First User');
+      cy.get('input[name="email"]').focus().type(email);
+      cy.get('input[name="password"]').focus().type('xxxxxxx');
+      fillRecaptcha();
+      cy.get('#addItemFormButton').click();
+      cy.get('#errorPanel').should('contain', 'Item is not valid. "username" should be unique but value (First User) already exists...');
+      
+      // cancel to return to the main view
+      cy.get('#addCancelItemFormButton').click();
+      cy.get('#headerViewName').should('contain', 'Views');
+    })
+  }
 
-      it('3.1 - Test the login form', () => {
-        // make sure the login form is not visible
-        cy.get('#loginForm').should('not.be.visible');
+  if (!runOnlyLastTest) {
+    it('1.4 - Test the login form', () => {
+      // make sure the login form is not visible
+      cy.get('#loginForm').should('not.be.visible');
 
-        // login
-        cy.get('#loginLogoutButton').click();
-        cy.get('#loginForm').should('be.visible');
-        cy.get('#emailInput').should('have.focus');
-        cy.get('#loginButton').should('be.disabled');
-        cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
-        cy.focused().type(email);
-        cy.get('#loginButton').should('be.disabled');
+      // login
+      cy.get('#loginLogoutButton').click();
+      cy.get('#loginForm').should('be.visible');
+      cy.get('#emailInput').should('have.focus');
+      cy.get('#loginButton').should('be.disabled');
+      cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
+      cy.focused().type(email);
+      cy.get('#loginButton').should('be.disabled');
 
-        // cancel
-        cy.get('#loginCancelButton').click();
-        cy.get('#loginForm').should('not.be.visible');
+      // cancel
+      cy.get('#loginCancelButton').click();
+      cy.get('#loginForm').should('not.be.visible');
 
-        // start again with bad email
-        cy.get('#loginLogoutButton').click();
-        cy.focused().type("x" + email).tab();
-        cy.focused().type(password);
-        cy.get('#loginButton').should('not.be.disabled');
-        cy.focused().type('{enter}');
-        cy.get('#loginHelper').should('contain', 'Invalid email or password...');
+      // start again with bad email
+      cy.get('#loginLogoutButton').click();
+      cy.focused().type("x" + email).tab();
+      cy.focused().type(password);
+      cy.get('#loginButton').should('not.be.disabled');
+      cy.focused().type('{enter}');
+      cy.get('#loginHelper').should('contain', 'Invalid email or password...');
 
-        // make sure the helper text disappear when entering new text
-        cy.focused().type('x');
-        cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
-        cy.get('#loginCancelButton').click();
+      // make sure the helper text disappear when entering new text
+      cy.focused().type('x');
+      cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
+      cy.get('#loginCancelButton').click();
 
-        // start again with good email but bad password
-        cy.get('#loginForm').should('not.be.visible');
-        cy.get('#loginLogoutButton').click();
-        cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
-        cy.focused().type(email).tab();
-        cy.focused().type("x" + password + '{enter}');
-        cy.get('#loginHelper').should('contain', 'Invalid email or password...');
-        cy.get('#loginCancelButton').click();
+      // start again with good email but bad password
+      cy.get('#loginForm').should('not.be.visible');
+      cy.get('#loginLogoutButton').click();
+      cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
+      cy.focused().type(email).tab();
+      cy.focused().type("x" + password + '{enter}');
+      cy.get('#loginHelper').should('contain', 'Invalid email or password...');
+      cy.get('#loginCancelButton').click();
 
-        // start again with everything good and logout
-        cy.get('#loginForm').should('not.be.visible');
-        login();
-        logout();
-      })
-    } // runAllTests
+      // start again with everything good and logout
+      cy.get('#loginForm').should('not.be.visible');
+      login();
+      logout();
+    })
+  }
 
-    it('4.1 - Test creating a new list and edit it', () => {
+  if (!runOnlyLastTest || reCreateDatabase) {
+    it('1.5 - Test creating a new list and edit it', () => {
       login();
       cy.get('#addItemButton').click();
       cy.wait(1000);
@@ -310,8 +308,10 @@ describe('Opentable basic tests', () => {
       cy.focused().type('{selectAll}{backspace}{enter}');
       cy.get('#itemlist').should('contain', 'prop1');
     });
+  }
 
-    it('5.1 - Test the different add item modes', () => {
+  if (!runOnlyLastTest) {
+    it('1.6 - Test the different add item modes', () => {
       const addAndDeleteItemWithForm = (reset, type) => {
         if (type === Globals.addItemModeAsForm) {
           // add a new item in form mode
@@ -415,16 +415,24 @@ describe('Opentable basic tests', () => {
       cy.contains('prop1 edited 2').should('not.exist');
 
     })
-  }  // runOnlyLast
+  }  // runOnlyLastTest
+}) // describe('1 - Basic tests'
 
-  it('6.1 - Test UI behavior when unauthorized (@all) with different add item modes', () => {
-    // All default permissions
+describe('2 - UI permission behavior tests', () => {
+  beforeEach(() => {
+    reload();
+  })
 
-    // set the view
-    cy.contains('First User View 1').click();
+  afterEach(() => {
+  })
 
-    if (!runOnlyLast) {
-    }
+  if (!runOnlyLastTest) {}
+    it('2.1 - Test UI behavior when unauthorized (@all) with different add item modes', () => {
+      // All default permissions
+
+      // set the view
+      cy.contains('First User View 1').click();
+
       /////////////////////////////////////////////////////
       // login and change the add item mode to persistent_form_no_items
       login();
@@ -493,26 +501,27 @@ describe('Opentable basic tests', () => {
       cy.get('li').contains(Globals.permissionDenied).should('exist'); // and is not enabled
       cy.get('body').click();
 
-    /////////////////////////////////////////////////////
-    // login and change the add item mode to default_value
-    login();
-    changeAddItemMode(Globals.addItemModeDefault);
-    cy.get('input[name="prop1"]').should('not.exist');
-    cy.get('#addItemButton').should('exist');
-    cy.get('#addItemButton').should('be.enabled');
+      /////////////////////////////////////////////////////
+      // login and change the add item mode to default_value
+      login();
+      changeAddItemMode(Globals.addItemModeDefault);
+      cy.get('input[name="prop1"]').should('not.exist');
+      cy.get('#addItemButton').should('exist');
+      cy.get('#addItemButton').should('be.enabled');
 
-    // test as @all
-    logout();
-    cy.get('input[name="prop1"]').should('not.exist');
-    cy.get('#addItemButton').should('exist');
-    cy.get('#addItemButton').should('not.be.enabled');
-    cy.get('#itemlist').children().contains('prop1').trigger('mouseover');
-    cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
-    cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is enabled
-    cy.get('#moreOptionsButton').should('exist'); // check moreOption button is displayed
-    cy.get('#moreOptionsButton').click();
-    cy.get('li').contains(Globals.addOptionalPropertyMenu).should('exist'); // check Add optional property exists
-    cy.get('li').contains(Globals.permissionDenied).should('exist'); // and is not enabled
-    cy.get('body').click();
-  })
-})
+      // test as @all
+      logout();
+      cy.get('input[name="prop1"]').should('not.exist');
+      cy.get('#addItemButton').should('exist');
+      cy.get('#addItemButton').should('not.be.enabled');
+      cy.get('#itemlist').children().contains('prop1').trigger('mouseover');
+      cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
+      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is enabled
+      cy.get('#moreOptionsButton').should('exist'); // check moreOption button is displayed
+      cy.get('#moreOptionsButton').click();
+      cy.get('li').contains(Globals.addOptionalPropertyMenu).should('exist'); // check Add optional property exists
+      cy.get('li').contains(Globals.permissionDenied).should('exist'); // and is not enabled
+      cy.get('body').click();
+    })
+  //} // runOnlyLastTest
+}) //describe('2 - UI permission behavior tests'
