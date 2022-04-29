@@ -57,7 +57,11 @@ var Globals = {
   itemListType: "itemlist",
 
   permissionDenied: "Permission denied",
-  permissionDeniedOnListOrItems: "permission_denied"
+  permissionDeniedOnListOrItems: "permission_denied",
+
+  addOptionalPropertyMenu: "Add Optional Property",
+  noOptionalPropertyToAddMenu: "No Optional Property to Add"
+
 };
 
 Globals = {

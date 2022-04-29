@@ -74,7 +74,7 @@ function ItemMoreMenu({
           disabled={setUnsetPropertyButtonDisabled}
         >{
           unsetProps && 
-          unsetProps.length > 0 ? "Add Unset Property" + (setUnsetPropertyButtonDisabled ? " (" + Globals.permissionDenied + ")" : ""): "No Unset Property to Add"
+          unsetProps.length > 0 ? Globals.addOptionalPropertyMenu + (setUnsetPropertyButtonDisabled ? " (" + Globals.permissionDenied + ")" : ""): Globals.noOptionalPropertyToAddMenu
         }</MenuItem>
         {unsetProps && unsetProps.map(prop => 
           <MenuItem
