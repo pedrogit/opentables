@@ -9,7 +9,7 @@ const runOnlyLastTest = false;
 const reCreateDatabase = !runOnlyLastTest || false;
 
 const reload = () => {
-  cy.visit('http://localhost:3000');
+  cy.visit('/');
   cy.wait(2000);
 }
 
@@ -101,25 +101,54 @@ if (reCreateDatabase) {
   }
 }
 
-const changeAddItemMode = (mode) => {
+const setConfigProperty = (property, value, viewProp = true, ) => {
   // open the config panel and change the add item mode to form
   cy.get('#configPanelOpenButton').click();
-  cy.get('#viewProperties').click();
+  var id = '#' + (viewProp ? 'view' : 'list') + 'list';
+  cy.get('#' + (viewProp ? 'view' : 'list') + 'Properties').click();
   cy.get('#viewlist')
-    .then($viewlist => {
-      if (!($viewlist.text().includes('Add_item_mode'))) {
-        cy.get('#viewlist').trigger('mouseover');
+    .then($list => {
+      // if the property is not already set, add it from the Add Optional Property menu
+      if (!($list.text().includes(property.substring(1)))) {
+        cy.get(id).trigger('mouseover');
         cy.get('#moreOptionsButton').click();
-        cy.contains('add_item_mode').click();
+        cy.contains(property).click();
       }
     })
+
   // escape the Add Unset Property menu if it is open
   cy.get('body').click();
-  cy.get('#viewlist').should('contain', 'Add_item_mode');
-  cy.get('#viewlist #add_item_mode').dblclick();
-  cy.get('ul').contains(mode).first().click();
+
+  // make sure the property is present or was added
+  cy.get(id).should('contain', property.substring(1));
+
+  // edit it
+  cy.get(id + ' #' + property).dblclick();
+
+  cy.get('input[name="' + property + '"]')
+    .then($control => {
+      //cy.task('log', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+      //cy.task('log', $control.parent().attr())
+      //cy.task('log', Cypress.dom.isJquery($control));
+      //cy.task('log', $control.prop('outerHTML'));
+      //cy.task('log', 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
+
+      if ($control.prop('outerHTML').includes('Select')) {
+        cy.get('ul').contains(value).first().click();
+      }
+      else {
+        cy.get('input[name="' + property + '"]').focus().type('{selectAll}{backspace}' + value + '{enter}');
+      }
+    })
   cy.wait(2000);
   cy.get('#closeConfigPanelButton').click();
+}
+
+const deleteItem = (text) => {
+  cy.get('#itemlist').children().contains(text).trigger('mouseover');
+  cy.get('#deleteItemButton').click();
+  cy.wait(1000);
+  cy.contains(text).should('not.exist');
 }
 
 describe('1 - Basic tests', () => {
@@ -307,6 +336,9 @@ describe('1 - Basic tests', () => {
       cy.get('#itemlist').contains('prop1').dblclick();
       cy.focused().type('{selectAll}{backspace}{enter}');
       cy.get('#itemlist').should('contain', 'prop1');
+
+      // delete it
+      deleteItem('prop1');
     });
   }
 
@@ -358,10 +390,7 @@ describe('1 - Basic tests', () => {
               cy.contains('prop1 edited 2').should('be.visible');
 
               // delete it
-              cy.get('#itemlist').children().contains('prop1 edited 2').trigger('mouseover');
-              cy.get('#deleteItemButton').click();
-              cy.wait(2000);
-              cy.contains('prop1 edited 2').should('not.exist');
+              deleteItem('prop1 edited 2');
             }
           })
       }
@@ -372,7 +401,7 @@ describe('1 - Basic tests', () => {
       cy.contains('First User View 1').click();
 
       // change to form mode
-      changeAddItemMode(Globals.addItemModeAsForm);
+      setConfigProperty('add_item_mode', Globals.addItemModeAsForm);
 
       // add and cancel
       cy.get('#addItemButton').click();
@@ -390,13 +419,15 @@ describe('1 - Basic tests', () => {
       cy.get('input[name="prop1"]').should('not.exist');
 
       // change to persistant form mode
-      changeAddItemMode(Globals.addWithPersistentFormAndItems);
+      setConfigProperty('add_item_mode', Globals.addWithPersistentFormAndItems);
+
       addAndDeleteItemWithForm(true, Globals.addWithPersistentFormAndItems);
       // persistent form should still exists
       cy.get('input[name="prop1"]').should('exist');
 
       // change to persistant form mode without items
-      changeAddItemMode(Globals.addWithPersistentFormNoItems);
+      setConfigProperty('add_item_mode', Globals.addWithPersistentFormNoItems);
+
       // item list should have only one children
       cy.get('#itemlist').children().should('have.length', 1);
       addAndDeleteItemWithForm(false, Globals.addWithPersistentFormNoItems);
@@ -404,16 +435,13 @@ describe('1 - Basic tests', () => {
       // delete it
       cy.get('#headerViewName').should('contain', 'Views');
       cy.contains('First User View 1').click();
-      changeAddItemMode(Globals.addWithPersistentFormAndItems);
+      setConfigProperty('add_item_mode', Globals.addWithPersistentFormAndItems);
+
       // make sure it was added
       cy.contains('prop1 edited 2').should('be.visible');
 
       // now delete it
-      cy.get('#itemlist').children().contains('prop1 edited 2').trigger('mouseover');
-      cy.get('#deleteItemButton').click();
-      cy.wait(2000);
-      cy.contains('prop1 edited 2').should('not.exist');
-
+      deleteItem('prop1 edited 2');
     })
   }  // runOnlyLastTest
 }) // describe('1 - Basic tests'
@@ -426,7 +454,7 @@ describe('2 - UI permission behavior tests', () => {
   afterEach(() => {
   })
 
-  if (!runOnlyLastTest) {}
+  if (!runOnlyLastTest) {
     it('2.1 - Test UI behavior when unauthorized (@all) with different add item modes', () => {
       // All default permissions
 
@@ -436,10 +464,15 @@ describe('2 - UI permission behavior tests', () => {
       /////////////////////////////////////////////////////
       // login and change the add item mode to persistent_form_no_items
       login();
-      //changeAddItemMode(Globals.addItemModeDefault);
-      changeAddItemMode(Globals.addWithPersistentFormNoItems);
+      setConfigProperty('add_item_mode', Globals.addWithPersistentFormNoItems);
+
       cy.get('input[name="prop1"]').should('exist'); // check form is displayed
       cy.get('#addItemButton').should('not.exist'); // check add button is not displayed
+
+      // add an item for future tests
+      cy.get('input[name="prop1"]').focus().type(' {enter}');
+      cy.wait(2000);
+      cy.contains('First User View 1').click();
 
       logout();
       // since we are not logged in and the list is in persistent_form_no_items
@@ -451,8 +484,7 @@ describe('2 - UI permission behavior tests', () => {
       /////////////////////////////////////////////////////
       // login and change the add item mode to persistent_form
       login();
-      //changeAddItemMode(Globals.addItemModeDefault);
-      changeAddItemMode(Globals.addWithPersistentFormAndItems);
+      setConfigProperty('add_item_mode', Globals.addWithPersistentFormAndItems);
       
       cy.get('input[name="prop1"]').should('exist'); // check form is displayed
       cy.get('#addItemButton').should('not.exist'); // check add button is not displayed
@@ -481,8 +513,8 @@ describe('2 - UI permission behavior tests', () => {
       /////////////////////////////////////////////////////
       // login and change the add item mode to form
       login();
-      //changeAddItemMode(Globals.addItemModeDefault);
-      changeAddItemMode(Globals.addItemModeAsForm);
+      setConfigProperty('add_item_mode', Globals.addItemModeAsForm);
+
       cy.get('input[name="prop1"]').should('not.exist');
       cy.get('#addItemButton').should('exist');
       cy.get('#addItemButton').should('be.enabled');
@@ -504,7 +536,8 @@ describe('2 - UI permission behavior tests', () => {
       /////////////////////////////////////////////////////
       // login and change the add item mode to default_value
       login();
-      changeAddItemMode(Globals.addItemModeDefault);
+      setConfigProperty('add_item_mode', Globals.addItemModeDefault);
+
       cy.get('input[name="prop1"]').should('not.exist');
       cy.get('#addItemButton').should('exist');
       cy.get('#addItemButton').should('be.enabled');
@@ -523,5 +556,13 @@ describe('2 - UI permission behavior tests', () => {
       cy.get('li').contains(Globals.permissionDenied).should('exist'); // and is not enabled
       cy.get('body').click();
     })
-  //} // runOnlyLastTest
+  } // runOnlyLastTest\
+
+  it('2.2 - Test UI behavior when @all have RW permission on view', () => {
+    login();
+    cy.contains('First User View 1').click();
+    setConfigProperty('rw_permissions', '@all');
+
+  })
+
 }) //describe('2 - UI permission behavior tests'
