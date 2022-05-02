@@ -13,6 +13,11 @@ const reload = () => {
   cy.wait(2000);
 }
 
+const goHome = () => {
+  cy.get('#homeButton').click();
+  cy.wait(2000);
+}
+
 const signUp = ({
   localUsername,
   localEmail,
@@ -106,7 +111,7 @@ const setConfigProperty = (property, value, viewProp = true, ) => {
   cy.get('#configPanelOpenButton').click();
   var id = '#' + (viewProp ? 'view' : 'list') + 'list';
   cy.get('#' + (viewProp ? 'view' : 'list') + 'Properties').click();
-  cy.get('#viewlist')
+  cy.get(id)
     .then($list => {
       // if the property is not already set, add it from the Add Optional Property menu
       if (!($list.text().includes(property.substring(1)))) {
@@ -558,11 +563,130 @@ describe('2 - UI permission behavior tests', () => {
     })
   } // runOnlyLastTest\
 
-  it('2.2 - Test UI behavior when @all have RW permission on view', () => {
-    login();
-    cy.contains('First User View 1').click();
-    setConfigProperty('rw_permissions', '@all');
+  if (!runOnlyLastTest) {
+    it('2.2.1 - Test UI behavior when @all have RW permission on view', () => {
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('rw_permissions', '@all');
 
-  })
+      // @all should be able to add unset properties and change at least one of them
+      logout();
+      setConfigProperty('add_item_mode', 'unset');
+      setConfigProperty('add_item_mode', Globals.addItemModeDefault);
 
+      // reset the permission to its default value
+      login();
+      setConfigProperty('rw_permissions', '');
+      logout();
+    })
+
+    it('2.2.2 - Test UI behavior when only @owner have R permission on view', () => {
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('r_permissions', '@owner');
+
+      // @all should NOT be able to view the list
+      logout();
+      cy.get('#loginForm').should('contain', Globals.permissionDenied);
+      // from the list of views as well
+      goHome()
+      cy.contains('First User View 1').should('not.exist');
+
+      // reset the permission to its default value
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('r_permissions', '');
+      logout();
+    })
+
+    it('2.2.3 - Test UI behavior when @owner have R permission and @all have RW permission on view', () => {
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('r_permissions', '@owner');
+      setConfigProperty('rw_permissions', '@all');
+
+      // @all gets granted r_permission and should be able to add unset 
+      // properties and change at least one of them
+      logout();
+      setConfigProperty('add_item_mode', 'unset');
+      setConfigProperty('add_item_mode', Globals.addItemModeDefault);
+
+      // reset the permission to its default value
+      login();
+      setConfigProperty('rw_permissions', '');
+      setConfigProperty('r_permissions', '');
+      logout();
+    })
+  } // runOnlyLastTest\
+
+  if (!runOnlyLastTest) {
+    it('2.3.1 - Test UI behavior when @all have RW permission on list', () => {
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('rw_permissions', '@all', false);
+
+      // @all should be able to add unset properties and change at least one of them
+      logout();
+      setConfigProperty('rw_permissions', '', false);
+
+      // but not to edit list items
+      cy.get('#itemlist').contains('prop1').dblclick();
+      cy.get('#errorPanel').should('contain', Globals.permissionDenied);
+
+    })
+
+    it('2.3.2 - Test UI behavior when only @owner have R permission on list', () => {
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('r_permissions', '@owner', false);
+
+      // @all should NOT be able to view the list
+      logout();
+      cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
+      cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
+
+      // @all should be able to view the view properties but not the list properties
+      cy.get('#configPanelOpenButton').click();
+      cy.get('#viewProperties').click();
+      cy.contains('Add_item_mode').should('exist');
+      cy.get('#listProperties').should('contain', 'List Properties (Permission denied)');
+
+      // @all should be able to view the list view the list of all views as
+      goHome();
+      cy.contains('First User View 1').click();
+      cy.get('#headerViewName').should('contain', 'First User View 1');
+
+      // reset the permission to its default value
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('r_permissions', '', false);
+      logout();
+    })
+
+    it('2.3.3 - Test UI behavior when @owner have R permission and @all have RW permission on view', () => {
+      login();
+      cy.contains('First User View 1').click();
+      setConfigProperty('r_permissions', '@owner', false);
+      setConfigProperty('rw_permissions', '@all', false);
+
+      // @all should be able to view, delete, add and edit items
+      deleteItem('prop1');
+      cy.get('#addItemButton').click();
+      cy.wait(1000);
+      cy.get('#itemlist').contains('prop1').dblclick();
+      cy.focused().type(' edited{enter}');
+
+      // @all gets granted r_permission and should be able to add unset 
+      // properties and change at least one of them
+      logout();
+      setConfigProperty('r_permissions', '', false);
+
+      // reset the permission to its default value
+      login();
+      setConfigProperty('rw_permissions', '');
+      logout();
+    })
+  } // runOnlyLastTest\
+
+  
 }) //describe('2 - UI permission behavior tests'

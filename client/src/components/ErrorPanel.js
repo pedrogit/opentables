@@ -7,7 +7,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
-function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
+function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton, panelId = "errorPanel" }) {
   const theme = useTheme();
   var closeTimeOutRef = React.useRef(null);
   var openTimeOutRef = React.useRef(null);
@@ -26,7 +26,10 @@ function ErrorPanel({ errorMsg, setErrorMsg, autoClose, closeButton }) {
   }, [errorMsg, autoClose, setErrorMsg]);
 
   return (
-    <Stack sx={{position: 'relative'}} id="errorPanel">
+    <Stack 
+      sx={{position: 'relative'}} 
+      id={panelId}
+    >
       <Collapse in={errorMsg && errorMsg.open && errorMsg.open === true}>
       <Stack sx={{
         position: 'relative', 
@@ -73,6 +76,7 @@ ErrorPanel.defaultProps = {
 function UncontrolledErrorPanel({ errorMsg, autoClose, closeButton }) {
   const [unControlledErrorMsg, setErrorMsg] = React.useState(errorMsg);
   return <ErrorPanel 
+    panelId="uncontrolledErrorPanel"
     errorMsg={unControlledErrorMsg}
     setErrorMsg={setErrorMsg}
     autoClose={autoClose}
