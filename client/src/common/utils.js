@@ -553,15 +553,13 @@ exports.validateDPerm = function(
   }
     
   // if user is list owner, grant delete permission
-  if (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName])
-  {
+  if (list && list.hasOwnProperty(Globals.ownerFieldName) && user === list[Globals.ownerFieldName]) {
     return true;
   }
 
   // if item owner is set, user must be item owner to get delete permission
   if (item && item.hasOwnProperty(Globals.ownerFieldName)) {
-    if (user === item[Globals.ownerFieldName])
-    {
+    if (user === item[Globals.ownerFieldName]) {
       return true;
     }
   }
