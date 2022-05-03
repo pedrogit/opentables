@@ -110,13 +110,18 @@ function Text({
     };
 
     const handleSave = () => {
-      if (!wrappedInform && editVal !== propVal) {
-        val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
-          if (success) {
-            setIsEditingOff();
-            setEditVal(val[propName]);
-          }
-        });
+      if (!wrappedInform) {
+        if (editVal !== propVal) {
+          val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
+            if (success) {
+              setIsEditingOff();
+              setEditVal(val[propName]);
+            }
+          });
+        }
+        else {
+          setIsEditingOff();
+        }
       }
     };
 
