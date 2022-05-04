@@ -1,9 +1,13 @@
 /// <reference types="cypress" />
 const Globals = require("../../src/common/globals");
 
-const username = "First User";
-const email = "firstuser@gmail.com";
-const password = "1firstuser";
+const firstUserUsername = "First User";
+const firstUserEmail = "firstuser@gmail.com";
+const firstUserPassword = "1firstuser";
+
+const secondUserUsername = "Second User";
+const secondUserEmail = "seconduser@gmail.com";
+const secondUserPassword = "1seconduser";
 
 const runOnlyLastTest = false;
 const reCreateDatabase = !runOnlyLastTest || false;
@@ -20,17 +24,18 @@ const goHome = () => {
 }
 
 const signUp = ({
-  localUsername,
-  localEmail,
-  localPassword
+  username,
+  email,
+  password
 } = {
-  localUsername: username,
-  localEmail: email,
-  localPassword: password
+  username: firstUserUsername,
+  email: firstUserEmail,
+  password: firstUserPassword
 }) => {
+  logout();
   cy.get('#signUpButton').click();
-  cy.get('input[name="username"]').focus().type(localUsername).tab();
-  cy.get('input[name="email"]').focus().type(localEmail).tab();
+  cy.get('input[name="username"]').focus().type(username).tab();
+  cy.get('input[name="email"]').focus().type(email).tab();
   fillRecaptcha();
   cy.get('input[name="password"]').focus().type(password);
   cy.get('#addItemFormButton').click();
@@ -39,29 +44,24 @@ const signUp = ({
 }
 
 const login = ({
-  localEmail,
-  localPassword
+  email,
+  password
 } = {
-  localEmail: email,
-  localPassword: password
+  email: firstUserEmail,
+  password: firstUserPassword
 }) => {
-  cy.get('#loginLogoutButton')
-    .then($loginButton => {
-      if ($loginButton.text().includes('Logout')) {
-        cy.get('#loginLogoutButton').click();
-      }
-      cy.get('#loginLogoutButton').click();
-      cy.focused().type(localEmail).tab();
-      cy.focused().type(localPassword + '{enter}');
-      cy.wait(2000);
-      cy.get('#loginLogoutButton').should('contain', 'Logout');
-  });
+  logout();
+  cy.get('#loginLogoutButton').click();
+  cy.focused().type(email).tab();
+  cy.focused().type(password + '{enter}');
+  cy.wait(2000);
+  cy.get('#loginLogoutButton').should('contain', 'Logout');
 }
 
 const logout = () => {
   cy.get('#loginLogoutButton')
     .then($loginButton => {
-      if (!($loginButton.text().includes('Login'))) {
+      if ($loginButton.text().includes('Logout')) {
         cy.get('#loginLogoutButton').click();
         cy.wait(1000);
       }
@@ -103,16 +103,26 @@ if (reCreateDatabase) {
         signUp();
         logout();
       })
+
+      it('1.2 - Create the second user', () => {
+        reload();
+        signUp({
+          username: secondUserUsername,
+          email: secondUserEmail,
+          password: secondUserPassword
+        });
+        logout();
+      })
     })
   }
 }
 
-const setProperty = (property, value = 'prop1 edited', propType = 'item', ) => {
+const setProperty = (property, value = 'prop1 edited', type = 'item', ) => {
   // open the config panel and change the add item mode to form
-  var id = '#' + propType + 'list';
-  if (propType !== 'item') {
+  var id = '#' + type + 'list';
+  if (type !== 'item') {
     cy.get('#configPanelOpenButton').click();
-    cy.get('#' + propType + 'Properties').click();
+    cy.get('#' + type + 'Properties').click();
   }
   cy.get(id)
     .then($list => {
@@ -149,7 +159,53 @@ const setProperty = (property, value = 'prop1 edited', propType = 'item', ) => {
       }
     })
   cy.wait(2000);
-  if (propType !== 'item') {
+  if (type !== 'item') {
+    cy.get('#closeConfigPanelButton').click();
+  }
+}
+
+const canSeeProperties = (type = 'view') => {
+  //var id = '#' + type + 'list';
+  cy.get('#configPanelOpenButton').click();
+  cy.get('#' + type + 'Properties').click();
+  cy.get('#' + type + 'list').should('contain', 'Name');
+  cy.get('#closeConfigPanelButton').click();
+}
+
+const canSeeViewPropertiesButNotListOnes = () => {
+  // warning on items
+  cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
+  cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
+
+  // can see view properties but not list properties
+  canSeeProperties();
+  cy.get('#configPanelOpenButton').click();
+  cy.get('#listProperties').should('contain', 'List Properties (Permission denied)');
+  cy.get('#closeConfigPanelButton').click();
+
+  cy.get('#addItemButton').should('exist'); // check add button is displayed
+  cy.get('#addItemButton').should('be.disabled'); // check add button is enabled
+  cy.get('#deleteItemButton').should('not.exist'); // check delete button is displayed
+}
+
+const canSeeButNotSetProperty = (type = 'item') => {
+  var id = '#' + type + 'list';
+
+  // open the config panel
+  if (type !== 'item') {
+    cy.get('#configPanelOpenButton').click();
+    cy.get('#' + type + 'Properties').click();
+  }
+  if (type !== 'item') {
+    cy.get('#' + type + 'list #name').dblclick();
+  }
+  else if (type === 'item') {
+    cy.get('#itemlist #prop1').dblclick();
+  }
+  cy.get('#errorPanel').should('contain', Globals.permissionDenied);
+
+  // close the config panel
+  if (type !== 'item') {
     cy.get('#closeConfigPanelButton').click();
   }
 }
@@ -209,7 +265,7 @@ describe('1 - Basic tests', () => {
 
       // fill in more username info and email and click
       cy.get('input[name="username"]').focus().type('irst');
-      cy.get('input[name="email"]').focus().type('firstuser@gmail.com');
+      cy.get('input[name="email"]').focus().type(firstUserEmail);
       cy.get('#addItemFormButton').click();
       cy.get('#errorPanel').should('contain', 'Item is not valid. "password" is missing...');
       
@@ -235,7 +291,7 @@ describe('1 - Basic tests', () => {
       // click on the SignUp button
       cy.get('#signUpButton').click();
       cy.get('input[name="username"]').focus().type('First User');
-      cy.get('input[name="email"]').focus().type(email);
+      cy.get('input[name="email"]').focus().type(firstUserEmail);
       cy.get('input[name="password"]').focus().type('xxxxxxx');
       fillRecaptcha();
       cy.get('#addItemFormButton').click();
@@ -244,6 +300,13 @@ describe('1 - Basic tests', () => {
       // cancel to return to the main view
       cy.get('#addCancelItemFormButton').click();
       cy.get('#headerViewName').should('contain', 'Views');
+
+      // sign up another user for further tests
+      signUp({
+        username: secondUserUsername,
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
     })
   }
 
@@ -258,7 +321,7 @@ describe('1 - Basic tests', () => {
       cy.get('#emailInput').should('have.focus');
       cy.get('#loginButton').should('be.disabled');
       cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
-      cy.focused().type(email);
+      cy.focused().type(firstUserEmail);
       cy.get('#loginButton').should('be.disabled');
 
       // cancel
@@ -267,8 +330,8 @@ describe('1 - Basic tests', () => {
 
       // start again with bad email
       cy.get('#loginLogoutButton').click();
-      cy.focused().type("x" + email).tab();
-      cy.focused().type(password);
+      cy.focused().type("x" + firstUserEmail).tab();
+      cy.focused().type(firstUserPassword);
       cy.get('#loginButton').should('not.be.disabled');
       cy.focused().type('{enter}');
       cy.get('#loginHelper').should('contain', 'Invalid email or password...');
@@ -282,8 +345,8 @@ describe('1 - Basic tests', () => {
       cy.get('#loginForm').should('not.be.visible');
       cy.get('#loginLogoutButton').click();
       cy.get('#loginHelper').should('not.contain', 'Invalid email or password...');
-      cy.focused().type(email).tab();
-      cy.focused().type("x" + password + '{enter}');
+      cy.focused().type(firstUserEmail).tab();
+      cy.focused().type("x" + firstUserPassword + '{enter}');
       cy.get('#loginHelper').should('contain', 'Invalid email or password...');
       cy.get('#loginCancelButton').click();
 
@@ -499,7 +562,7 @@ describe('2 - UI permission behavior tests', () => {
       cy.get('#addItemButton').should('not.exist'); // check add button is not displayed
       cy.get('#itemlist').children().contains('prop1').trigger('mouseover');
       cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
-      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is enabled
+      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is not enabled
       cy.get('#moreOptionsButton').should('exist'); // check moreOption button is displayed
       cy.get('#moreOptionsButton').click();
       cy.get('li').contains(Globals.addOptionalPropertyMenu).should('exist'); // check Add optional property exists
@@ -522,7 +585,7 @@ describe('2 - UI permission behavior tests', () => {
       cy.get('#addItemButton').should('not.be.enabled');
       cy.get('#itemlist').children().contains('prop1').trigger('mouseover');
       cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
-      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is enabled
+      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is not enabled
       cy.get('#moreOptionsButton').should('exist'); // check moreOption button is displayed
       cy.get('#moreOptionsButton').click();
       cy.get('li').contains(Globals.addOptionalPropertyMenu).should('exist'); // check Add optional property exists
@@ -538,14 +601,14 @@ describe('2 - UI permission behavior tests', () => {
       cy.get('#addItemButton').should('exist');
       cy.get('#addItemButton').should('be.enabled');
 
-      // test as @all
+      // test as unauthenticated users
       logout();
       cy.get('input[name="prop1"]').should('not.exist');
       cy.get('#addItemButton').should('exist');
       cy.get('#addItemButton').should('not.be.enabled');
       cy.get('#itemlist').children().contains('prop1').trigger('mouseover');
       cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
-      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is enabled
+      cy.get('#deleteItemButton').should('not.be.enabled'); // check delete button is not enabled
       cy.get('#moreOptionsButton').should('exist'); // check moreOption button is displayed
       cy.get('#moreOptionsButton').click();
       cy.get('li').contains(Globals.addOptionalPropertyMenu).should('exist'); // check Add optional property exists
@@ -559,15 +622,26 @@ describe('2 - UI permission behavior tests', () => {
       // view R perm = @all
       // view RW perm = @owner
 
-      // @all should be able to view the list
+      /////////////////////////////////////////
+      // second user should be able to see view properties but not to set them
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
       cy.contains('First User View 1').click();
       cy.get('#headerViewName').should('contain', 'First User View 1');
 
       // but not to edit its view properties
-      cy.get('#configPanelOpenButton').click();
-      cy.get('#viewProperties').click();
-      cy.get('#viewlist #add_item_mode').dblclick();
-      cy.get('#errorPanel').should('contain', Globals.permissionDenied);
+      canSeeButNotSetProperty('view');
+
+      /////////////////////////////////////////
+      // same for unauthenticated users
+      logout();
+      cy.contains('First User View 1').click();
+      cy.get('#headerViewName').should('contain', 'First User View 1');
+
+      // but not to edit its view properties
+      canSeeButNotSetProperty('view');
     })
 
     it('2.2.2 - Test UI behavior when @all have RW permission on view', () => {
@@ -577,11 +651,19 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       setProperty('rw_permissions', '@all', 'view');
 
-      // @all should be able to add unset properties and change at least one of them
-      logout();
+      /////////////////////////////////////////
+      // second user should be able to add and edit view unset properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
       setProperty('add_item_mode', 'unset', 'view');
       setProperty('add_item_mode', Globals.addItemModeDefault, 'view');
 
+      /////////////////////////////////////////
+      // unauthenticated users should be able to see view properties but not to set them
+      logout();
+      canSeeButNotSetProperty('view');
     })
 
     it('2.2.3 - Test UI behavior when @owner have R permission and @all have RW permission on view', () => {
@@ -591,27 +673,50 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       setProperty('r_permissions', '@owner', 'view');
 
-      // @all gets granted r_permission and should be able to add unset 
-      // properties and change at least one of them
-      logout();
+      /////////////////////////////////////////
+      // second user gets rw permission on view and should be able to set view properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
       setProperty('add_item_mode', 'unset', 'view');
       setProperty('add_item_mode', Globals.addItemModeDefault, 'view');
+
+      /////////////////////////////////////////
+      // unauthenticated users should not be able to view the list and be presented with a login form
+      logout();
+      cy.get('#loginForm').should('contain', Globals.permissionDenied);
+      // neither from the list of views
+      goHome()
+      cy.contains('First User View 1').should('not.exist');
     })
     
     it('2.2.4 - Test UI behavior when only @owner have R permission on view', () => {
       // view R perm = @owner
       // view RW perm = @owner
-      //login();
+      login();
       cy.contains('First User View 1').click();
       setProperty('rw_permissions', '', 'view');
 
-      // @all should NOT be able to view the list
-      //logout();
+      /////////////////////////////////////////
+      // second user should NOT be able to view the list at all
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      cy.get('#loginForm').should('contain', Globals.permissionDenied);
+      goHome()
+      cy.contains('First User View 1').should('not.exist');
+    
+      /////////////////////////////////////////
+      // unauthenticated users should NOT be able to view the list at all
+      logout();
       cy.get('#loginForm').should('contain', Globals.permissionDenied);
       // neither from the list of views
       goHome()
       cy.contains('First User View 1').should('not.exist');
 
+      /////////////////////////////////////////
       // reset the r_permission to its default value
       login();
       cy.contains('First User View 1').click();
@@ -624,20 +729,34 @@ describe('2 - UI permission behavior tests', () => {
     it('2.3.1 - Test UI behavior with default permissions on list', () => {
       // list R perm = @all
       // list RW perm = @owner
-    
-      // @all should be able to view the list
+
+      /////////////////////////////////////////
+      // second user should be able to view list properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
       cy.contains('First User View 1').click();
       cy.get('#headerViewName').should('contain', 'First User View 1');
- 
-      // but not to edit its list properties
-      cy.get('#configPanelOpenButton').click();
-      cy.get('#listProperties').click();
-      cy.get('#listlist #name').dblclick();
-      cy.get('#errorPanel').should('contain', Globals.permissionDenied);
- 
+
+      // but not to edit them
+      canSeeButNotSetProperty('list');
+
       // neither its items
-      cy.get('#itemlist').contains('prop1').dblclick();
-      cy.get('#errorPanel').should('contain', Globals.permissionDenied);
+      canSeeButNotSetProperty('item');
+
+      /////////////////////////////////////////
+      // unauthenticated users should be able to view the list
+      goHome();
+      logout();
+      cy.contains('First User View 1').click();
+      cy.get('#headerViewName').should('contain', 'First User View 1');
+
+      // but not to edit its list properties
+      canSeeButNotSetProperty('list');
+
+      // neither its items
+      canSeeButNotSetProperty('item');
     })
     
     it('2.3.2 - Test UI behavior when @all have RW permission on list', () => {
@@ -647,14 +766,33 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       setProperty('rw_permissions', '@all', 'list');
 
-      // @all should be able to add unset properties and change at least one of them
-      logout();
+      /////////////////////////////////////////
+      // second user should be able to view list properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      cy.contains('First User View 1').click();
+      cy.get('#headerViewName').should('contain', 'First User View 1');
+
+      // edit them
       setProperty('rw_permissions', '@all', 'list');
 
-      // and to edit list items
+      // and edit item properties as well
       setProperty('prop1');
-      //cy.get('#itemlist').contains('prop1').dblclick();
-      //cy.get('#errorPanel').should('contain', Globals.permissionDenied);
+
+      /////////////////////////////////////////
+      // unauthenticated users should be able to see view properties
+      goHome();
+      logout();
+      cy.contains('First User View 1').click();
+      cy.get('#headerViewName').should('contain', 'First User View 1');
+
+      // but not to edit list ones
+      canSeeButNotSetProperty('list');
+ 
+      // neither items
+      canSeeButNotSetProperty('item');
     })
 
     it('2.3.3 - Test UI behavior when @owner have R permission and @all have RW permission on list', () => {
@@ -664,18 +802,26 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       setProperty('r_permissions', '@owner', 'list');
 
-      // @all gets granted r_permission and should be able to add unset 
-      // properties and change at least one of them
-      logout();
+      /////////////////////////////////////////
+      // second user should be able to view list properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      // edit them
       setProperty('r_permissions', '@owner', 'list');
-      
-      // @all should be able to view and edit items (not add yet and not delete since he is not owner)
+
+      // and edit item properties as well
       setProperty('prop1');
-      //deleteItem('prop1');
-      cy.get('#addItemButton').should('exist'); // check add button is displayed
-      cy.get('#addItemButton').should('be.disabled'); // check add button is enabled
-      cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
-      cy.get('#deleteItemButton').should('be.disabled'); // check delete button is enabled
+     
+      /////////////////////////////////////////
+      // unauthenticated users should be able to see view properties but not list ones, neither items
+      goHome();
+      logout();
+      cy.contains('First User View 1').click();
+      cy.get('#headerViewName').should('contain', 'First User View 1');
+      
+      canSeeViewPropertiesButNotListOnes();
     })
 
     it('2.3.4 - Test UI behavior when only @owner have R permission on list', () => {
@@ -685,21 +831,18 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       setProperty('rw_permissions', '@owner', 'list');
 
-      // @all should NOT be able to view the list
+      /////////////////////////////////////////
+      // second user should be able to view list properties but not list ones
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      canSeeViewPropertiesButNotListOnes();
+
+      /////////////////////////////////////////
+      // same for unauthenticated users
       logout();
-      cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
-      cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
-
-      // @all should be able to view the view properties but not the list properties
-      cy.get('#configPanelOpenButton').click();
-      cy.get('#viewProperties').click();
-      cy.contains('Add_item_mode').should('exist');
-      cy.get('#listProperties').should('contain', 'List Properties (Permission denied)');
-
-      // @all should be able to view the list view in the list of all views
-      goHome();
-      cy.contains('First User View 1').click();
-      cy.get('#headerViewName').should('contain', 'First User View 1');
+      canSeeViewPropertiesButNotListOnes();
 
       // reset permissions to their default
       login();
