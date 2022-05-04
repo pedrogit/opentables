@@ -60,7 +60,12 @@ var Globals = {
   permissionDeniedOnListOrItems: "permission_denied",
 
   addOptionalPropertyMenu: "Add Optional Property",
-  noOptionalPropertyToAddMenu: "No Optional Property to Add"
+  noOptionalPropertyToAddMenu: "No Optional Property to Add",
+
+  noPermissionViewList: "You do not have the permission to view this list...",
+  noPermissionViewItems: "You do not have the permission to view items from this list..."
+
+
 
 };
 

@@ -276,7 +276,7 @@ function List({
               errorMsg = {{
                 severity: 'warning',
                 title: 'Warning',
-                text: "You do not have the permission to view items from this list..."
+                text: Globals.noPermissionViewItems
               }}
               autoClose={false}
               closeButton={false}

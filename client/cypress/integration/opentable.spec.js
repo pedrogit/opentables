@@ -117,7 +117,7 @@ if (reCreateDatabase) {
   }
 }
 
-const setProperty = (property, value = 'prop1 edited', type = 'item', ) => {
+const setProperty = (property = 'prop1', value = 'prop1 edited', type = 'item', ) => {
   // open the config panel and change the add item mode to form
   var id = '#' + type + 'list';
   if (type !== 'item') {
@@ -172,10 +172,16 @@ const canSeeProperties = (type = 'view') => {
   cy.get('#closeConfigPanelButton').click();
 }
 
-const canSeeViewPropertiesButNotListOnes = () => {
-  // warning on items
+const cantSeeItems = (neitherView) => {
   cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
-  cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
+  cy.get('#uncontrolledErrorPanel').should('contain', neitherView ? Globals.noPermissionViewList : Globals.noPermissionViewItems);
+}
+
+const canSeeViewPropertiesButNotListOnes = () => {
+  // warning on items\
+  cantSeeItems(true);
+  //cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
+  //cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
 
   // can see view properties but not list properties
   canSeeProperties();
@@ -854,21 +860,26 @@ describe('2 - UI permission behavior tests', () => {
 
   } // runOnlyLastTest\
   
-  if (false && !runOnlyLastTest) {
+  if (!runOnlyLastTest) {
     it('2.4.1 - Test UI behavior with default permissions on list items', () => {
       // list_item R perm = @all
       // list_item RW perm = @owner
     
-      // @all should be able to view the list
       cy.contains('First User View 1').click();
       cy.get('#headerViewName').should('contain', 'First User View 1');
+      
+      /////////////////////////////////////////
+      // second user should be able to view item properties but not to edit them
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      canSeeButNotSetProperty('item');
 
-      // and the items 
-      cy.get('#itemlist').should('contain', 'Prop1');
-     
-      // but not to edit them
-      cy.get('#itemlist').contains('prop1').dblclick();
-      cy.get('#errorPanel').should('contain', Globals.permissionDenied);
+      /////////////////////////////////////////
+      // same for unauthenticated users
+      logout();
+      canSeeButNotSetProperty('item');
     })
     
     it('2.4.2 - Test UI behavior when @all have RW permission on list items', () => {
@@ -879,74 +890,74 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       setProperty('item_rw_permissions', '@all', 'list');
 
-      // @all should be able to add, edit and delete items
-      logout();
-      cy.get('#addItemButton').should('exist');
-      cy.get('#addItemButton').should('be.disabled');
-      setProperty('prop1', 'prop1 edited', 'item');
-      setProperty('prop2', 'prop2 edited', 'item');
-      cy.get('#itemlist').should('contain', 'Prop2');
-      deleteItem('Prop2');
+      /////////////////////////////////////////
+      // second user should be able to set item properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      setProperty();
 
-      login();
-      cy.contains('First User View 1').click();
-      setProperty('item_rw_permissions', '@all', 'list');
+      /////////////////////////////////////////
+      // but not unauthenticated users
+      logout();
+      canSeeButNotSetProperty('item');
     })
 
-    it('2.4.3 - Test UI behavior when only @owner have R permission on list items', () => {
-      // list_item R perm = @owner
-      // list_item RW perm = @owner
-      login();
-      cy.contains('First User View 1').click();
-      setProperty('r_permissions', '@owner', 'list');
-
-      // @all should NOT be able to view the list
-      logout();
-      cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
-      cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
-
-      // @all should be able to view the view properties but not the list properties
-      cy.get('#configPanelOpenButton').click();
-      cy.get('#viewProperties').click();
-      cy.contains('Add_item_mode').should('exist');
-      cy.get('#listProperties').should('contain', 'List Properties (Permission denied)');
-
-      // @all should be able to view the list view in the list of all views
-      goHome();
-      cy.contains('First User View 1').click();
-      cy.get('#headerViewName').should('contain', 'First User View 1');
-
-      // reset the permission to its default value
-      login();
-      cy.contains('First User View 1').click();
-      setProperty('r_permissions', '', 'list');
-      logout();
-    })
-
-    it('2.4.4 - Test UI behavior when @owner have R permission and @all have RW permission on list items', () => {
+    it('2.4.3 - Test UI behavior when @owner have R permission and @all have RW permission on list items', () => {
       // list_item R perm = @owner
       // list_item RW perm = @all
       login();
       cy.contains('First User View 1').click();
-      setProperty('r_permissions', '@owner', 'list');
-      setProperty('rw_permissions', '@all', 'list');
+      setProperty('item_r_permissions', '@owner', 'list');
 
-      // @all should NOT be able to view, delete, add and edit items
+      /////////////////////////////////////////
+      // second user should be able to set item properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      setProperty();
+
+      /////////////////////////////////////////
+      // unauthenticated users should not be able to see them
       logout();
-      deleteItem('prop1');
-      cy.get('#addItemButton').click();
-      cy.wait(1000);
-      cy.get('#itemlist').contains('prop1').dblclick();
-      cy.focused().type(' edited{enter}');
+      canSeeProperties('view');
+      canSeeProperties('list');
+      cantSeeItems();
+    })
+    
+    it('2.4.4 - Test UI behavior when only @owner have R permission on list items', () => {
+      // list_item R perm = @owner
+      // list_item RW perm = @owner
+      login();
+      cy.contains('First User View 1').click();
+      setProperty('item_rw_permissions', '@owner', 'list');
 
-      // @all gets granted r_permission and should be able to add unset 
-      // properties and change at least one of them
-      setProperty('r_permissions', '', 'list');
+      /////////////////////////////////////////
+      // second user should be able to set item properties
+      login({
+        email: secondUserEmail,
+        password: secondUserPassword
+      });
+      canSeeProperties('view');
+      canSeeProperties('list');
+      cantSeeItems();
+
+      /////////////////////////////////////////
+      // same for unauthenticated users
+      logout();
+      canSeeProperties('view');
+      canSeeProperties('list');
+      cantSeeItems();
 
       // reset the permission to its default value
       login();
-      setProperty('rw_permissions', '', 'list');
+      setProperty('item_r_permissions', '', 'list');
+      setProperty('item_rw_permissions', '', 'list');
       logout();
     })
+
+
   } // runOnlyLastTest\
 }) //describe('2 - UI permission behavior tests'

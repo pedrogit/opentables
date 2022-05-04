@@ -174,7 +174,7 @@ function App({ initialViewid, appid }) {
                   errorMsg = {{
                     severity: 'warning',
                     title: 'Warning',
-                    text: "You do not have the permission to view this list..."
+                    text: Globals.noPermissionViewList
                   }}
                   autoClose={false}
                   closeButton={false}
