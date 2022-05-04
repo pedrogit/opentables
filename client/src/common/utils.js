@@ -401,6 +401,7 @@ exports.validateRWPerm = function(
     ignoreListItem = false,
     item,
     readWrite = true,
+    acceptAll = false,
     throwError = false
   } = {}
 ) {
@@ -467,9 +468,9 @@ exports.validateRWPerm = function(
   //   includes @auth and the user is not @all OR
   //   includes the user
   if (
-    mergedPerm.includes(Globals.allUserName) ||
-    (mergedPerm.includes(Globals.authUserName) && user !== Globals.allUserName) ||
-    mergedPerm.includes(user)
+    ((!readWrite || (readWrite && acceptAll)) && mergedPerm.includes(Globals.allUserName)) ||
+    ((mergedPerm.includes(Globals.authUserName) || mergedPerm.includes(Globals.allUserName)) && user !== Globals.allUserName) ||
+    (mergedPerm.includes(user) && user !== Globals.allUserName)
   ) {
     return true;
   }
@@ -608,6 +609,7 @@ exports.validateCPerm = function(
       } : list
     ),
     item: item,
+    acceptAll: list[Globals.itemCreatePermFieldName] ? true : false,
     throwError: false
   })) {
     return true;

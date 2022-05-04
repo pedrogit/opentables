@@ -133,7 +133,9 @@ function App({ initialViewid, appid }) {
           }
           addItemButtonDisabled={
             !viewData ||
-            (getUser() === '@all' && viewData[Globals.addItemModeFieldName] === Globals.addItemModeDefault) ||
+            (getUser() === Globals.allUserName && 
+             (!viewData[Globals.addItemModeFieldName] || 
+             viewData[Globals.addItemModeFieldName] === Globals.addItemModeDefault)) ||
             viewData[Globals.childlistFieldName] === Globals.permissionDeniedOnListOrItems ||
             !(Utils.validateCPerm({
               user: getUser(),

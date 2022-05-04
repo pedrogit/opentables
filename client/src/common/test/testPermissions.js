@@ -16,7 +16,7 @@ const permissionTests = csv.parse(csvdata, {
   skip_empty_lines: true
 });
 
-//for (let i = 600; i < 800; i++) {
+//for (let i = 15; i < 16; i++) {
 for (let i = 0; i < 800; i++) {
   let csvtest = permissionTests[i];
   let csvtestshort = {
@@ -124,4 +124,37 @@ for (let i = 0; i < 800; i++) {
 
     done();
   });
+
+  it(i + '.4 - Test validateCPerm as ' + csvtest.user + " with (" + JSON.stringify(csvtestshort) + ")", (done) => {
+    let test = {
+      testnb: csvtest.testnb,
+      user: csvtest.user,
+      list: {
+        [Globals.ownerFieldName]: 'listowner',
+      },
+      item: {
+      }
+    }
+
+    if (csvtest.list_rw_permission.substring(0, 5) !== 'unset') {
+      test.list[Globals.readWritePermFieldName] = csvtest.list_rw_permission;
+    }
+
+    if (csvtest.list_item_rw_permission.substring(0, 5) !== 'unset') {
+      test.list[Globals.itemReadWritePermFieldName] = csvtest.list_item_rw_permission;
+    }
+
+    if (csvtest.item_owner.substring(0, 5) !== 'unset') {
+      test.item[Globals.ownerFieldName] = csvtest.item_owner;
+    }
+    
+    if (csvtest.item_rw_permission.substring(0, 5) !== 'unset') {
+      test.item[Globals.readWritePermFieldName] = csvtest.item_rw_permission;
+    }
+    var result = Utils.validateCPerm(test) ? 'TRUE': 'FALSE';
+    expect(result).to.equal(csvtest.result_rw);
+
+    done();
+  });
+
 }
