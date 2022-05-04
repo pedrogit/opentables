@@ -198,7 +198,8 @@ class Controler {
     var newItems;
     var gRecaptchaResponse;
 
-    // remember recaptcha
+    // remember recaptcha so we can remove it as a property and we 
+    // can validate it AFTER validating other properties
     if (strict && !post && user === Globals.allUserName) {
       gRecaptchaResponse = items[Globals.gRecaptchaResponse];
       delete items[Globals.gRecaptchaResponse];
