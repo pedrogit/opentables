@@ -18,6 +18,25 @@ const reload = () => {
   cy.wait(2000);
 }
 
+/////////////////////////////////////////
+// available functions
+//
+// goHome();
+// signUp();
+// login();
+// logout();
+// fillRecaptcha();
+// setProperty(property = 'prop1', value = 'prop1 edited', type = 'item');
+// canDeleteItem();
+// cantDeleteItem();
+// canAddItem();
+// cantAddItem();
+// canSeeProperties(type = 'view');
+// cantSeeItems(neitherView);
+// canSeeViewPropertiesButNotListOnes();
+// canSeeButNotSetProperty(type = 'item');
+// deleteItem(text);
+
 const goHome = () => {
   cy.get('#homeButton').click();
   cy.wait(2000);
@@ -82,42 +101,7 @@ const fillRecaptcha = () => {
   cy.wait(2000);
 }
 
-if (reCreateDatabase) {
-  describe('0 - Initial setup', () => {
-    it('1.1 - Clean the database', () => {
-      cy.request({
-        method: 'DELETE', 
-        url: 'http://localhost:3001/api/opentables', 
-        auth: {
-          username: "admin@gmail.com",
-          password: "admin"
-        }
-      })
-    })
-  })
-
-  if (runOnlyLastTest) {
-    describe('Recreate a usable database', () => {
-      it('1.1 - Create the first user', () => {
-        reload();
-        signUp();
-        logout();
-      })
-
-      it('1.2 - Create the second user', () => {
-        reload();
-        signUp({
-          username: secondUserUsername,
-          email: secondUserEmail,
-          password: secondUserPassword
-        });
-        logout();
-      })
-    })
-  }
-}
-
-const setProperty = (property = 'prop1', value = 'prop1 edited', type = 'item', ) => {
+const setProperty = (property = 'prop1', value = 'prop1 edited', type = 'item' ) => {
   // open the config panel and change the add item mode to form
   var id = '#' + type + 'list';
   if (type !== 'item') {
@@ -159,9 +143,32 @@ const setProperty = (property = 'prop1', value = 'prop1 edited', type = 'item', 
       }
     })
   cy.wait(2000);
+
   if (type !== 'item') {
     cy.get('#closeConfigPanelButton').click();
   }
+}
+
+const canDeleteItem = () => {
+  cy.get('#itemlist').trigger('mouseover');
+  cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
+  cy.get('#deleteItemButton').should('be.enabled'); // check delete button is displayed
+}
+
+const cantDeleteItem = () => {
+  cy.get('#itemlist').trigger('mouseover');
+  cy.get('#deleteItemButton').should('exist'); // check delete button is displayed
+  cy.get('#deleteItemButton').should('be.disabled'); // check delete button is displayed
+}
+
+const canAddItem = () => {
+  cy.get('#addItemButton').should('exist'); // check add button is displayed
+  cy.get('#addItemButton').should('be.enabled'); // check add button is enabled
+}
+
+const cantAddItem = () => {
+  cy.get('#addItemButton').should('exist'); // check add button is displayed
+  cy.get('#addItemButton').should('be.disabled'); // check add button is enabled
 }
 
 const canSeeProperties = (type = 'view') => {
@@ -178,10 +185,8 @@ const cantSeeItems = (neitherView) => {
 }
 
 const canSeeViewPropertiesButNotListOnes = () => {
-  // warning on items\
+  // warning on items
   cantSeeItems(true);
-  //cy.get('#uncontrolledErrorPanel').should('contain', 'Warning');
-  //cy.get('#uncontrolledErrorPanel').should('contain', 'You do not have the permission to view this list...');
 
   // can see view properties but not list properties
   canSeeProperties();
@@ -222,6 +227,42 @@ const deleteItem = (text) => {
   cy.wait(1000);
   cy.contains(text).should('not.exist');
 }
+
+if (reCreateDatabase) {
+  describe('0 - Initial setup', () => {
+    it('0.1 - Clean the database', () => {
+      cy.request({
+        method: 'DELETE', 
+        url: 'http://localhost:3001/api/opentables', 
+        auth: {
+          username: "admin@gmail.com",
+          password: "admin"
+        }
+      })
+    })
+  })
+
+  if (runOnlyLastTest) {
+    describe('Recreate a usable database', () => {
+      it('0.1 - Create the first user', () => {
+        reload();
+        signUp();
+        logout();
+      })
+
+      it('0.2 - Create the second user', () => {
+        reload();
+        signUp({
+          username: secondUserUsername,
+          email: secondUserEmail,
+          password: secondUserPassword
+        });
+        logout();
+      })
+    })
+  }
+}
+
 
 describe('1 - Basic tests', () => {
   beforeEach(() => {
@@ -749,7 +790,9 @@ describe('2 - UI permission behavior tests', () => {
       canSeeButNotSetProperty('list');
 
       // neither its items
+      cantAddItem();
       canSeeButNotSetProperty('item');
+      cantDeleteItem();
 
       /////////////////////////////////////////
       // unauthenticated users should be able to view the list
@@ -762,7 +805,9 @@ describe('2 - UI permission behavior tests', () => {
       canSeeButNotSetProperty('list');
 
       // neither its items
+      cantAddItem();
       canSeeButNotSetProperty('item');
+      cantDeleteItem();
     })
     
     it('2.3.2 - Test UI behavior when @all have RW permission on list', () => {
@@ -784,8 +829,12 @@ describe('2 - UI permission behavior tests', () => {
       // edit them
       setProperty('rw_permissions', '@all', 'list');
 
-      // and edit item properties as well
+      // and add and edit item properties as well
+      canAddItem();
       setProperty('prop1');
+
+      // but not delete them since he is not owner
+      cantDeleteItem();
 
       /////////////////////////////////////////
       // unauthenticated users should be able to see view properties
@@ -798,7 +847,9 @@ describe('2 - UI permission behavior tests', () => {
       canSeeButNotSetProperty('list');
  
       // neither items
+      cantAddItem();
       canSeeButNotSetProperty('item');
+      cantDeleteItem();
     })
 
     it('2.3.3 - Test UI behavior when @owner have R permission and @all have RW permission on list', () => {
@@ -818,8 +869,12 @@ describe('2 - UI permission behavior tests', () => {
       setProperty('r_permissions', '@owner', 'list');
 
       // and edit item properties as well
+      canAddItem();
       setProperty('prop1');
-     
+
+      // but not delete them since he is not owner
+      cantDeleteItem();
+
       /////////////////////////////////////////
       // unauthenticated users should be able to see view properties but not list ones, neither items
       goHome();
@@ -827,6 +882,7 @@ describe('2 - UI permission behavior tests', () => {
       cy.contains('First User View 1').click();
       cy.get('#headerViewName').should('contain', 'First User View 1');
       
+      cantAddItem();
       canSeeViewPropertiesButNotListOnes();
     })
 
@@ -843,11 +899,15 @@ describe('2 - UI permission behavior tests', () => {
         email: secondUserEmail,
         password: secondUserPassword
       });
+
+      cantAddItem();
       canSeeViewPropertiesButNotListOnes();
 
       /////////////////////////////////////////
       // same for unauthenticated users
       logout();
+
+      cantAddItem();
       canSeeViewPropertiesButNotListOnes();
 
       // reset permissions to their default
