@@ -63,10 +63,8 @@ var Globals = {
   noOptionalPropertyToAddMenu: "No Optional Property to Add",
 
   noPermissionViewList: "You do not have the permission to view this list...",
-  noPermissionViewItems: "You do not have the permission to view items from this list..."
-
-
-
+  noPermissionViewItems: "You do not have the permission to view items from this list...",
+  noItemsInList: "There are no items in this list yet..."
 };
 
 Globals = {

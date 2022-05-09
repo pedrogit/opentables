@@ -223,6 +223,7 @@ function List({
 
   var noItemsRPerm = view[Globals.childlistFieldName][Globals.itemsFieldName] === Globals.permissionDeniedOnListOrItems;
   var emptyList = noItemsRPerm || 
+                  view[Globals.childlistFieldName][Globals.itemsFieldName] === undefined ||
                   (view[Globals.childlistFieldName][Globals.itemsFieldName] instanceof Array && 
                    view[Globals.childlistFieldName][Globals.itemsFieldName].length === 0);
   var rowNb = 0;
@@ -269,29 +270,18 @@ function List({
         />
       }
       { view && 
-        view[Globals.childlistFieldName] && 
-        view[Globals.childlistFieldName][Globals.itemsFieldName] && 
-        (noItemsRPerm
+        view[Globals.childlistFieldName] &&
+        (noItemsRPerm || emptyList
           ? <UncontrolledErrorPanel 
               errorMsg = {{
                 severity: 'warning',
                 title: 'Warning',
-                text: Globals.noPermissionViewItems
+                text: noItemsRPerm ? Globals.noPermissionViewItems : Globals.noItemsInList
               }}
               autoClose={false}
               closeButton={false}
             />
-          : (emptyList
-              ? <UncontrolledErrorPanel 
-                  errorMsg = {{
-                    severity: 'warning',
-                    title: 'Warning',
-                    text: "There are no items in this list yet..."
-                  }}
-                  autoClose={false}
-                  closeButton={false}
-                />
-              : view[Globals.childlistFieldName][Globals.itemsFieldName].map((item) => {
+          : view[Globals.childlistFieldName][Globals.itemsFieldName].map((item) => {
                 rowNb = rowNb + 1;
                 return (
                   <Item
@@ -314,8 +304,7 @@ function List({
                     setErrorMsg={setErrorMsg}
                   />
                 );
-              })
-            )
+            })
         )
       }
     </Stack>
