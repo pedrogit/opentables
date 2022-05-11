@@ -223,7 +223,6 @@ function List({
 
   var noItemsRPerm = view[Globals.childlistFieldName][Globals.itemsFieldName] === Globals.permissionDeniedOnListOrItems;
   var emptyList = noItemsRPerm || 
-                  view[Globals.childlistFieldName][Globals.itemsFieldName] === undefined ||
                   (view[Globals.childlistFieldName][Globals.itemsFieldName] instanceof Array && 
                    view[Globals.childlistFieldName][Globals.itemsFieldName].length === 0);
   var rowNb = 0;
@@ -271,6 +270,7 @@ function List({
       }
       { view && 
         view[Globals.childlistFieldName] &&
+        view[Globals.childlistFieldName][Globals.itemsFieldName] &&
         (noItemsRPerm || emptyList
           ? <UncontrolledErrorPanel 
               errorMsg = {{

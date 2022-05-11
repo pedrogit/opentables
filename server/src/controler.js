@@ -350,11 +350,6 @@ class Controler {
                 item: subItem
               });
             });
-
-            // delete the items property if there are none
-            if (item[Globals.itemsFieldName].length === 0) {
-              delete item[Globals.itemsFieldName];
-            }
           }
           else {
             item = {

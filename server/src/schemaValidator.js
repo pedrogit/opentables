@@ -299,9 +299,7 @@ class SchemaValidator {
       if (!(valArr instanceof Array)) {
         valArr = valArr.split(/\s*\,\s*/);
       }
-      valArr.map((v) => {
-        this.validate_type_user(key, v);
-      });
+      valArr = valArr.map((v) => this.validate_type_user(key, v));
     } catch (err) {
       throw new Error(
         NodeUtil.format(
@@ -312,7 +310,7 @@ class SchemaValidator {
         )
       );
     }
-    return val.toLowerCase();
+    return valArr.join(', ');
   }
 
   validate_type_string(key, val) {

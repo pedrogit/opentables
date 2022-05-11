@@ -356,10 +356,10 @@ describe("2 testSchemaValidator.js test string against schema", () => {
 
   it("2.15 Valid user_list", async () => {
     var schemaValidator = new SchemaValidator("prop1: user_list");
-    var json = await schemaValidator.validateJson('"prop1": "@All, BB@gmail.com"');
+    var json = await schemaValidator.validateJson('"prop1": "@All, First User"');
 
     expect(json).to.be.an("object");
-    expect(json).to.deep.equal({ prop1: "@all, bb@gmail.com" });
+    expect(json).to.deep.equal({ prop1: "@all, First User" });
   });
 
   it("2.16 Valid boolean", async () => {

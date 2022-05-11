@@ -174,12 +174,12 @@ describe("testRoutes.js List API", () => {
         .request(server)
         .get("/api/" + Globals.APIKeyword + "/" + listIdToPatch)
         .end((err, response) => {
-          lastList = {
-            ...lastList,
-          };
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal(lastList);
+          expect(response.body).to.deep.equal({
+            ...lastList,
+            [Globals.itemsFieldName] : []
+          });
           done();
         });
     });
@@ -864,7 +864,10 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal(lastList);
+          expect(response.body).to.deep.equal({
+            ...lastList,
+            [Globals.itemsFieldName] : []
+          });
           done();
         });
     });
@@ -924,7 +927,10 @@ describe("testRoutes.js List API", () => {
         .end((err, response) => {
           expect(response).to.have.status(200);
           expect(response.body).to.be.a("object");
-          expect(response.body).to.deep.equal(lastList);
+          expect(response.body).to.deep.equal({
+            ...lastList,
+            [Globals.itemsFieldName] : []
+          });
           done();
         });
     });
