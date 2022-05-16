@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 var Globals = {
   voidListId: "000000000000000000000000",
   listofAllListId: "000000000000000000000001",
