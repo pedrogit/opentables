@@ -12,8 +12,6 @@ const Utils = require("../../client/src/common/utils");
 const server = require("../index");
 const controler = require("../src/controler");
 
-controler.init();
-
 chai.use(chaihttp);
 
 var expect = chai.expect;
@@ -27,6 +25,14 @@ describe("testRoutes.js List API", () => {
   var lastItems;
   var listOfAllList = { ...Globals.listOfAllLists };
   var userList;
+
+  before(done => {
+    server.on('started', () => {
+      controler.createBaseTables(() => {
+        done()
+      })
+    })
+  })
 
   describe("1 - Invalid URL and DELETE ALL", () => {
     it("1.1 - Test an invalid URL. It should return a NOT FOUND on invalid URL", (done) => {

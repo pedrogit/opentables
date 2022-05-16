@@ -12,8 +12,12 @@ const Schema = require("../../client/src/common/schema");
 const SchemaValidator = require("./schemaValidator");
 
 class Controler {
-  constructor() {
-    MongoDB.MongoClient.connect(process.env.MONGODB_ADDRESS, (err, ldb) => {
+  init(callback) {
+    MongoDB.MongoClient.connect(
+      (process.env.NODE_ENV === "development" ? 
+        process.env.MONGODB_ADDRESS_DEVEL : 
+        process.env.MONGODB_ADDRESS_PROD),
+      (err, ldb) => {
       if (err) {
         throw new Errors.InternalServerError(
           Errors.ErrMsg.Database_CouldNotConnect
@@ -22,14 +26,12 @@ class Controler {
       this.coll = ldb
         .db(Globals.mongoDatabaseName)
         .collection(Globals.mongoCollectionName);
-      if (this.reset) {
-        this.createBaseTables();
+
+      // call the callback
+      if (callback && typeof callback === 'function') {
+        callback();
       }
     });
-  }
-
-  init() {
-    this.reset = true;
   }
 
   initialViews() {
@@ -42,7 +44,7 @@ class Controler {
           ]
   }
 
-  async createBaseTables() {
+  async createBaseTables(callback) {
     // clean the database
     await this.deleteAll(Globals.adminUserName, true);
 
@@ -100,6 +102,11 @@ class Controler {
         process.exit();
       }  
     })
+
+    // call the callback
+    if (callback && typeof callback === 'function') {
+      callback();
+    }
   }
 
   static isList(item) {
@@ -129,7 +136,7 @@ class Controler {
     }
     const idFilter = { [Globals.listIdFieldName]: MongoDB.ObjectId(listid) };
     const newFilter = { ...idFilter, ...filter };
-    const items = this.coll.findOne(newFilter);
+    const items = await this.coll.findOne(newFilter);
     return items;
   }
 
@@ -166,7 +173,10 @@ class Controler {
       try {
         isHuman = await axios.post(
           "https://www.google.com/recaptcha/api/siteverify?secret=" +
-          process.env.RECAPTCHA_SERVER_KEY + "&response=" + humanKey
+          (process.env.NODE_ENV === "development" ? 
+            process.env.RECAPTCHA_SERVER_KEY_DEVEL : 
+            process.env.RECAPTCHA_SERVER_KEY_PROD) + 
+          "&response=" + humanKey
         );
       }
       catch (err){
@@ -554,7 +564,7 @@ class Controler {
     return item;
   }
 
-  deleteAll(user, all = false) {
+  async deleteAll(user, all = false) {
     if (user !== Globals.adminUserName) {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
@@ -627,7 +637,7 @@ class Controler {
       });
     if (Controler.isList(item)) {
       // delete all associated items
-      this.coll.deleteMany({
+      await this.coll.deleteMany({
         [Globals.listIdFieldName]: MongoDB.ObjectId(
           item[Globals.itemIdFieldName]
         ),

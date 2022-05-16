@@ -84,7 +84,7 @@ function LoginForm({ authAPIRequest, setAuthAPIRequest, setErrorMsg, sx }) {
       };
       axios({
         method: authAPIRequest.method,
-        url: "http://localhost:3001/api/opentables/" + authAPIRequest.urlParams,
+        url: "/api/opentables/" + authAPIRequest.urlParams,
         data: authAPIRequest.data,
         headers: authAPIRequest.headers,
         withCredentials: true

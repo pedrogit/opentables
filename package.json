@@ -4,15 +4,15 @@
   "description": "Restful server of configurable and formattable tables",
   "main": "server/index.js",
   "scripts": {
-    "test-template": "nodemon --inspect --exec \"mocha client/src/common/test/testTemplateParser.js --timeout 0\"",
-    "test-schema": "nodemon --inspect --exec \"mocha server/test/testSchemaValidator.js --timeout 0\"",
-    "test-utils": "nodemon --inspect --exec \"mocha client/src/common/test/testUtils.js --timeout 0\"",
-    "test-permissions": "nodemon --inspect --exec \"mocha client/src/common/test/testPermissions.js --timeout 0\"",
-    "test-common": "nodemon --inspect --exec \"mocha client/src/common/test/testUtils.js client/src/common/test/testFilter.js server/test/testSchemaValidator.js client/src/common/test/testPermissions.js --timeout 0\"",
-    "test-routes": "nodemon --inspect --exec \"mocha server/test/testRoutes.js --timeout 0\"",
-    "start-server": "node ./server/index.js",
-    "debug-server": "nodemon --nolazy --inspect --watch ./client/src/common --watch ./server/src --watch ./server/index.js ./server/index.js",
-    "build-client": "webpack --mode production"
+    "test-template": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha client/src/common/test/testTemplateParser.js --timeout 0\"",
+    "test-schema": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha server/test/testSchemaValidator.js --timeout 0\"",
+    "test-utils": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha client/src/common/test/testUtils.js --timeout 0\"",
+    "test-permissions": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha client/src/common/test/testPermissions.js --timeout 0\"",
+    "test-common": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha client/src/common/test/testUtils.js client/src/common/test/testFilter.js server/test/testSchemaValidator.js client/src/common/test/testPermissions.js --timeout 0\"",
+    "test-routes": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha server/test/testRoutes.js --timeout 0\"",
+    "start": "node ./server/index.js",
+    "debug-server": "cross-env NODE_ENV=development nodemon --nolazy --inspect --watch ./client/src/common --watch ./server/src --watch ./server/index.js ./server/index.js",
+    "build": "cd client && npm install && npm run build:widget"
   },
   "repository": {
     "type": "git",
@@ -48,6 +48,7 @@
   "devDependencies": {
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
+    "cross-env": "^7.0.3",
     "csvtojson": "^2.0.10",
     "mocha": "^9.0.2",
     "nodemon": "^2.0.10",

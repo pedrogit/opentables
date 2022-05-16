@@ -315,7 +315,7 @@ exports.objWithout = function (obj, without) {
 };
 
 exports.setCookieJWT = function (req, res, payload) {
-  var jwtoken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+  var jwtoken = jwt.sign(payload, process.env.AUTH_SECRET_TOKEN, {
     algorithm: "HS256",
   });
   res.cookie("authtoken", jwtoken, { httpOnly: false });

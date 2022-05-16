@@ -14,7 +14,7 @@ const controler = require("./src/controler");
 const router = require("./src/router");
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(
   cors({
@@ -84,7 +84,7 @@ app.use(async (req, res, next) => {
   // check in the cookie
   else if (req.cookies.authtoken) {
     try {
-      jwt.verify(req.cookies.authtoken, process.env.TOKEN_SECRET, {
+      jwt.verify(req.cookies.authtoken, process.env.AUTH_SECRET_TOKEN, {
         algorithms: ["HS256"],
       });
       // resend the cookie
@@ -119,9 +119,13 @@ app.use((err, req, res, next) => {
   return res.status(err.statusCode).json({ err: err.message });
 });
 
-// Start the server
-server = app.listen(PORT, () => {
-  console.log("App started on port " + PORT);
-});
+// Start the BD and then the server
+controler.init(() => {
+  app.listen(PORT, () => {
+    console.log("Server started on port " + PORT + 
+      " in " + (process.env.NODE_ENV || "production") + " mode...");
+    app.emit('started');
+  });
+})
 
-module.exports = server;
+module.exports = app;
