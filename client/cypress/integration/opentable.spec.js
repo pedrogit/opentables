@@ -43,6 +43,11 @@ const goHome = () => {
   cy.wait(2000);
 }
 
+const clicklOnListName = (name) => {
+  cy.contains(name).click();
+  cy.wait(1000);
+}
+
 const signUp = ({
   username,
   email,
@@ -473,7 +478,6 @@ describe('1 - Basic tests', () => {
           cy.get('#addCancelItemFormButton').click();
           cy.get('input[name="prop1"]').should('not.contain', 'more text');
           cy.get('input[name="prop2"]').should('not.exist');
-
         }
         cy.get('input[name="prop1"]').focus().type(' ');
         cy.get('#addItemFormButton').should('be.enabled');
@@ -490,7 +494,7 @@ describe('1 - Basic tests', () => {
 
         // save the new item
         cy.get('#addItemFormButton').click();
-        cy.wait(1000);
+        cy.wait(1500);
 
         // check for the presence of the new item only when it is still visible (not in persistent form no item mode)
         cy.get('#headerViewName')
@@ -508,7 +512,7 @@ describe('1 - Basic tests', () => {
       login();
 
       // set the view
-      cy.contains('First User View 1').click();
+      clicklOnListName('First User View 1');
 
       // change to form mode
       setProperty('add_item_mode', Globals.addItemModeAsForm, 'view');
@@ -544,7 +548,7 @@ describe('1 - Basic tests', () => {
 
       // delete it
       cy.get('#headerViewName').should('contain', 'Views');
-      cy.contains('First User View 1').click();
+      clicklOnListName('First User View 1');
       setProperty('add_item_mode', Globals.addWithPersistentFormAndItems, 'view');
 
       // make sure it was added
@@ -573,7 +577,7 @@ if (testPermissions) {
         // Test with default permissions
 
         // set the view
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
 
         /////////////////////////////////////////////////////
         // login and change the add item mode to persistent_form_no_items
@@ -588,7 +592,7 @@ if (testPermissions) {
         cy.wait(2000);
 
         // we were redirected to the home list, return to the editing list
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
 
         logout();
         // since we are not logged in and the list is in persistent_form_no_items
@@ -685,7 +689,7 @@ if (testPermissions) {
           email: secondUserEmail,
           password: secondUserPassword
         });
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
 
         // but not to edit its view properties
@@ -694,7 +698,7 @@ if (testPermissions) {
         /////////////////////////////////////////
         // same for unauthenticated users
         logout();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
 
         // but not to edit its view properties
@@ -705,7 +709,7 @@ if (testPermissions) {
         // view R perm = @all
         // view RW perm = @all
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('rw_permissions', '@all', 'view');
 
         /////////////////////////////////////////
@@ -727,7 +731,7 @@ if (testPermissions) {
         // view R perm = @owner
         // view RW perm = @all
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('r_permissions', '@owner', 'view');
 
         /////////////////////////////////////////
@@ -752,7 +756,7 @@ if (testPermissions) {
         // view R perm = @owner
         // view RW perm = @owner
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('rw_permissions', '', 'view');
 
         /////////////////////////////////////////
@@ -776,7 +780,7 @@ if (testPermissions) {
         /////////////////////////////////////////
         // reset the r_permission to its default value
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('r_permissions', '', 'view');
         logout();
       })
@@ -793,7 +797,7 @@ if (testPermissions) {
           email: secondUserEmail,
           password: secondUserPassword
         });
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
 
         // but not to edit them
@@ -808,7 +812,7 @@ if (testPermissions) {
         // unauthenticated users should be able to view the list
         goHome();
         logout();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
 
         // but not to edit its list properties
@@ -824,7 +828,7 @@ if (testPermissions) {
         // list R perm = @all
         // list RW perm = @all
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('rw_permissions', '@all', 'list');
 
         /////////////////////////////////////////
@@ -833,7 +837,7 @@ if (testPermissions) {
           email: secondUserEmail,
           password: secondUserPassword
         });
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
 
         // edit them
@@ -850,7 +854,7 @@ if (testPermissions) {
         // unauthenticated users should be able to see view properties
         goHome();
         logout();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
 
         // but not to edit list ones
@@ -866,7 +870,7 @@ if (testPermissions) {
         // list R perm = @owner
         // list RW perm = @all
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('r_permissions', '@owner', 'list');
 
         /////////////////////////////////////////
@@ -889,7 +893,7 @@ if (testPermissions) {
         // unauthenticated users should be able to see view properties but not list ones, neither items
         goHome();
         logout();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
         
         cantAddItem();
@@ -900,7 +904,7 @@ if (testPermissions) {
         // list R perm = @owner
         // list RW perm = @owner
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('rw_permissions', '@owner', 'list');
 
         /////////////////////////////////////////
@@ -922,7 +926,7 @@ if (testPermissions) {
 
         // reset permissions to their default
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('r_permissions', '', 'list');
         setProperty('rw_permissions', '', 'list');
         logout();
@@ -935,7 +939,7 @@ if (testPermissions) {
         // list_item R perm = @all
         // list_item RW perm = @owner
       
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         cy.get('#headerViewName').should('contain', 'First User View 1');
         
         /////////////////////////////////////////
@@ -957,7 +961,7 @@ if (testPermissions) {
         // list_item RW perm = @all
 
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('item_rw_permissions', '@all', 'list');
 
         /////////////////////////////////////////
@@ -978,7 +982,7 @@ if (testPermissions) {
         // list_item R perm = @owner
         // list_item RW perm = @all
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('item_r_permissions', '@owner', 'list');
 
         /////////////////////////////////////////
@@ -1001,7 +1005,7 @@ if (testPermissions) {
         // list_item R perm = @owner
         // list_item RW perm = @owner
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         setProperty('item_rw_permissions', '@owner', 'list');
 
         /////////////////////////////////////////
@@ -1035,7 +1039,7 @@ if (testPermissions) {
         // item RW perm = @owner
 
         login();
-        cy.contains('First User View 1').click();
+        clicklOnListName('First User View 1');
         // change schema so it is possible to set item R and RW properties
         setProperty(Globals.listSchemaFieldName, 'prop1: {type: string, required}, prop2: string, ' + Globals.readPermFieldName + ': {type: user_list, default: ' + Globals.allUserName + '}, ' + Globals.readWritePermFieldName + ': {type: user_list, default: ' + Globals.ownerUserName + '}', 'list');
 
@@ -1066,8 +1070,7 @@ if (testPermissions) {
         // item RW perm = @owner
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set permission on the item to their defaults
         setProperty(Globals.readPermFieldName, Globals.allUserName, 'item');
@@ -1096,8 +1099,7 @@ if (testPermissions) {
         // item RW perm = @all
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set RW permission to @all
         setProperty(Globals.readWritePermFieldName, Globals.allUserName, 'item');
@@ -1125,8 +1127,7 @@ if (testPermissions) {
         // item RW perm = @all
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set R permission to @owner
         setProperty(Globals.readPermFieldName, Globals.ownerUserName, 'item');
@@ -1153,8 +1154,7 @@ if (testPermissions) {
         // item RW perm = @owner
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set RW permission to @owner
         setProperty(Globals.readWritePermFieldName, Globals.ownerUserName, 'item');
@@ -1189,8 +1189,7 @@ if (testPermissions) {
         // item RW perm = @owner
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set permission on the item
         setProperty(Globals.readPermFieldName, secondUserUsername, 'item');
@@ -1218,8 +1217,7 @@ if (testPermissions) {
         // item RW perm = "Second User"
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set RW permission to "Second User"
         setProperty(Globals.readWritePermFieldName, secondUserUsername, 'item');
@@ -1246,8 +1244,7 @@ if (testPermissions) {
         // item RW perm = "Second User"
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set R permission to @owner
         setProperty(Globals.readPermFieldName, Globals.ownerUserName, 'item');
@@ -1274,8 +1271,7 @@ if (testPermissions) {
         // item RW perm = @owner
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
 
         // set RW permission to @owner
         setProperty(Globals.readWritePermFieldName, Globals.ownerUserName, 'item');
@@ -1309,8 +1305,8 @@ if (testPermissions) {
         // item RW perm = "Second User"
 
         login();
-        cy.contains('First User View 1').click();
-        cy.wait(1000);
+        clicklOnListName('First User View 1');
+
         // change schema so it is possible to set item R and RW properties
         setProperty(Globals.listSchemaFieldName, 'prop1: {type: string, required}, prop2: string, ' + Globals.ownerFieldName + ':  {type: user, required}, ' + Globals.readPermFieldName + ': {type: user_list, default: ' + Globals.allUserName + '}, ' + Globals.readWritePermFieldName + ': {type: user_list, default: ' + Globals.ownerUserName + '}', 'list');
 
