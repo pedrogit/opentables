@@ -12,7 +12,7 @@
     "test-routes": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha server/test/testRoutes.js --timeout 0\"",
     "start": "node ./server/index.js",
     "debug-server": "cross-env NODE_ENV=development nodemon --nolazy --inspect --watch ./client/src/common --watch ./server/src --watch ./server/index.js ./server/index.js",
-    "build": "cd client && npm install && npm run build:widget"
+    "xbuild": "cross-env BUILD_PATH='../public' cd client && npm install && npm run build:widget"
   },
   "repository": {
     "type": "git",
