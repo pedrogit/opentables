@@ -351,5 +351,8 @@ MigrationBackup/
 .env
 public/bundle.js
 public/bundle.js.LICENSE.txt
-public/index.js
-public/index.css
+client/.parcel-cache/6ebe5c211ff70bce
+client/.parcel-cache/38bacc7f7f57be17
+client/.parcel-cache/data.mdb
+client/.parcel-cache/eaec4b5795941a45.txt
+client/.parcel-cache/lock.mdb
