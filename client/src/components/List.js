@@ -3,7 +3,7 @@ import Item from "./Item";
 import Stack from "@mui/material/Stack";
 
 import {UncontrolledErrorPanel} from "./ErrorPanel";
-import getUser from "../clientUtils";
+import {getUser} from "../clientUtils";
 //const Schema = require("../common/schema");
 const TemplateParser = require("../common/templateParser");
 const Utils = require("../common/utils");

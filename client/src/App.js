@@ -13,7 +13,7 @@ import Header from "./components/Header";
 import ConfigPanel from "./components/ConfigPanel";
 import {ErrorPanel, UncontrolledErrorPanel} from "./components/ErrorPanel";
 import {LoginForm} from "./components/LoginForm";
-import getUser from "./clientUtils";
+import {getUser} from "./clientUtils";
 import * as BrowserHistory from "./browserHistory";
 const Schema = require("../../client/src/common/schema");
 const Globals = require("../../client/src/common/globals");

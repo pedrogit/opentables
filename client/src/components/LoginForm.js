@@ -18,7 +18,7 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import Tooltip from '@mui/material/Tooltip';
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
-import getUser from "../clientUtils";
+import {getUser} from "../clientUtils";
 const Errors = require("../common/errors");
 const Globals = require("../common/globals");
 
