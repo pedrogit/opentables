@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { assert } = require("chai");
 const jwt = require("jsonwebtoken");
 
 const Globals = require("./globals");
@@ -64,9 +63,6 @@ exports.isSurroundedBy = function (str, edges) {
   if (edgeArr.length === 1) {
     edgeArr.push(edgeArr[0]);
   }
-  assert(edgeArr.length === 2);
-  assert(edgeArr[0].length === 1);
-  assert(edgeArr[1].length === 1);
   return (
     str.length > 1 &&
     str.slice(0, 1) === edgeArr[0] &&
@@ -97,9 +93,6 @@ exports.trimFromEdges = function (
   if (trimArr.length === 1) {
     trimArr.push(trimArr[0]);
   }
-  assert(trimArr.length === 2);
-  assert(trimArr[0].length === 1);
-  assert(trimArr[1].length === 1);
 
   // remove trimming spaces before trimming provided characters if requested
   if (trimSpacesBefore) {
