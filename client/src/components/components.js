@@ -571,7 +571,7 @@ function ItemWrapperForm({
           <ReCAPTCHA
             id='g-recaptcha'
             ref={recaptchaRef}
-            sitekey={window.Cypress && !window.location.href.includes('heroku')
+            sitekey={window.Cypress
               ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // always positive key
               : '6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V'}
             onChange={(value) => setRecaptchaResponse(value)}

@@ -1,6 +1,8 @@
 /// <reference types="cypress" />
 const Globals = require("../../src/common/globals");
 
+const adminPW = "admin";
+
 const firstUserUsername = "First User";
 const firstUserEmail = "firstuser@gmail.com";
 const firstUserPassword = "1firstuser";
@@ -244,10 +246,10 @@ if (reCreateDatabase) {
     it('0.1 - Clean the database', () => {
       cy.request({
         method: 'DELETE', 
-        url: 'http://localhost:3001/api/opentables', 
+        url: '/api/opentables', 
         auth: {
           username: "admin@gmail.com",
-          password: "admin"
+          password: adminPW
         }
       })
     })
