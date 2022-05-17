@@ -14,7 +14,6 @@ import { useTheme } from "@mui/material/styles";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
-import {getClientRecaptchaKey} from "../clientUtils";
 
 const Globals = require("../common/globals");
 const Errors = require("../common/errors");
@@ -572,7 +571,9 @@ function ItemWrapperForm({
           <ReCAPTCHA
             id='g-recaptcha'
             ref={recaptchaRef}
-            sitekey={getClientRecaptchaKey()}
+            sitekey={window.Cypress 
+              ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // always positive key
+              : '6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V'}
             onChange={(value) => setRecaptchaResponse(value)}
             onExpired={() => setRecaptchaResponse('')}
           />

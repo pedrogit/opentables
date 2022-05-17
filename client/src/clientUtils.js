@@ -14,23 +14,4 @@ const getUser = () => {
   return Globals.allUserName;
 }
 
-const getScriptURL = () => {
-  var allScript = document.getElementsByTagName('script');
-  var myScript = allScript[allScript.length - 1];
-  return myScript.src;
-};
-
-const getClientRecaptchaKey = () => {
-  if (window.Cypress) {
-    console.log('Using test client Recaptcha key');
-    return '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // always positive key
-  }
-  if (getScriptURL().includes('heroku')) {
-    console.log('Using production Heroku Recaptcha key');
-    return '6LdPHvkfAAAAAPnCFRuXO62WCccpsnp8SRh1JdDS'
-  }
-  console.log('Using production localhost Recaptcha key');
-  return '6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V';
-}
-
-export {getUser, getScriptURL, getClientRecaptchaKey}
+export {getUser}
