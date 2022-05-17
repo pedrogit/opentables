@@ -171,6 +171,7 @@ class Schema {
         },
       },
       additionalProperties: false,
+      type: "object",
     };
     var ajv = new Ajv({ allErrors: false });
     var validate = ajv.compile(jsonschema);
