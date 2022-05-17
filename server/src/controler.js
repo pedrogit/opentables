@@ -13,19 +13,23 @@ const SchemaValidator = require("./schemaValidator");
 
 class Controler {
   init(callback) {
+    if (!process.env.MONGODB_ADDRESS_DEVEL && !process.env.MONGODB_ADDRESS_PROD) {
+      console.log('ERROR: MONGODB_ADDRESS is not defined. ' + Errors.ErrMsg.Database_CouldNotConnect + ' EXITING...');
+      process.exit();
+    }
     MongoDB.MongoClient.connect(
       (process.env.NODE_ENV === "development" ? 
         process.env.MONGODB_ADDRESS_DEVEL : 
         process.env.MONGODB_ADDRESS_PROD),
       (err, ldb) => {
       if (err) {
-        throw new Errors.InternalServerError(
-          Errors.ErrMsg.Database_CouldNotConnect
-        );
+          console.log('ERROR: ' + Errors.ErrMsg.Database_CouldNotConnect + ' EXITING...');
+          process.exit();
       }
       this.coll = ldb
         .db(Globals.mongoDatabaseName)
         .collection(Globals.mongoCollectionName);
+      console.log('Connected to MongoDB @ ' + ldb.s.url + '...');
 
       // call the callback
       if (callback && typeof callback === 'function') {
