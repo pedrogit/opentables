@@ -154,7 +154,7 @@ class Schema {
                         type: "string",
                         minLength: 1
                       },
-                      minLength: 1
+                      minItems: 1
                     }
                   ]
                 },
