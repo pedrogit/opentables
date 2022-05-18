@@ -86,6 +86,9 @@ exports.trimFromEdges = function (
 ) {
   var trimArr = [];
   if (trim instanceof Array) {
+    if (trim.length > 2) {
+      throw new Error("Trim array should not contain more than two strings...");
+    }
     trimArr = trim;
   } else {
     trimArr.push(trim);
@@ -94,6 +97,9 @@ exports.trimFromEdges = function (
     trimArr.push(trimArr[0]);
   }
 
+  if (trimArr[0].length > 1 || trimArr[1].length > 1) {
+    throw new Error("Trim strings should contain only one character...");
+  }
   // remove trimming spaces before trimming provided characters if requested
   if (trimSpacesBefore) {
     str = str.trim();

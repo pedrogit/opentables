@@ -35,13 +35,13 @@ describe("testUtils.js Test Utils functions", () => {
     it("4 - Provides 2 characters long remove strings", () => {
       expect(function () {
         Utils.trimFromEdges('"aaaa"', ["({", "})"]);
-      }).to.throw("Unspecified AssertionError");
+      }).to.throw("Trim strings should contain only one character...");
     });
 
     it("5 - Provides 3 remove strings", () => {
       expect(function () {
         Utils.trimFromEdges('"aaaa"', ["({", "})", '"']);
-      }).to.throw("Unspecified AssertionError");
+      }).to.throw("Trim array should not contain more than two strings...");
     });
 
     it("6 - With space at the end without removing them first", () => {
