@@ -1,5 +1,5 @@
 const chai = require("chai");
-const Utils = require("../../commonUtils");
+const Utils = require("../commonUtils");
 
 var expect = chai.expect;
 
