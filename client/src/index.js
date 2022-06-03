@@ -1,6 +1,8 @@
+import { DriveEtaOutlined } from "@mui/icons-material";
 import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
+import { createRoot } from 'react-dom/client';
+
+//import "./index.css";
 import App from "./App";
 
 // Find all widget divs
@@ -10,10 +12,9 @@ var appid = 0;
 
 // Inject our React App into each class
 widgetDivs.forEach((div) => {
-  ReactDOM.render(
+  createRoot(div).render(
     /*<React.StrictMode>*/
     <App initialViewid={div.dataset.viewid} appid={appid++}/>
-    /*</React.StrictMode>*/,
-     div
+    /*</React.StrictMode>*/
   );
 });

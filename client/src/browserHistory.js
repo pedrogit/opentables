@@ -1,6 +1,6 @@
 
-  const Globals = require("../../client/src/common/globals");
-  const Utils = require("./common/utils");
+  const Globals = require("../../common/globals");
+  const Utils = require("./clientUtils");
 
   var appRegistry = [];
 

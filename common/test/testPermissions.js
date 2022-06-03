@@ -4,11 +4,11 @@ const path = require("path");
 var fs = require('fs');
 
 const Globals = require("../globals");
-const Utils = require("../utils");
+const ValidatePerm = require("../validatePerm");
 
 var expect = chai.expect;
 
-var csvFilePath = path.resolve("./client/src/common/test/testPermissions.csv");
+var csvFilePath = path.resolve("./common/test/testPermissions.csv");
 var csvdata = fs.readFileSync(csvFilePath);
 
 const permissionTests = csv.parse(csvdata, {
@@ -55,7 +55,7 @@ for (let i = 0; i < 800; i++) {
     if (csvtest.item_rw_permission.substring(0, 5) !== 'unset') {
       test.item[Globals.readPermFieldName] = csvtest.item_rw_permission;
     }
-    var result = Utils.validateRPerm(test) ? 'TRUE': 'FALSE';
+    var result = ValidatePerm.validateRPerm(test) ? 'TRUE': 'FALSE';
     expect(result).to.equal(csvtest.result_r);
 
     done();
@@ -87,7 +87,7 @@ for (let i = 0; i < 800; i++) {
     if (csvtest.item_rw_permission.substring(0, 5) !== 'unset') {
       test.item[Globals.readWritePermFieldName] = csvtest.item_rw_permission;
     }
-    var result = Utils.validateRWPerm(test) ? 'TRUE': 'FALSE';
+    var result = ValidatePerm.validateRWPerm(test) ? 'TRUE': 'FALSE';
     expect(result).to.equal(csvtest.result_rw);
 
     done();
@@ -119,7 +119,7 @@ for (let i = 0; i < 800; i++) {
     if (csvtest.item_rw_permission.substring(0, 5) !== 'unset') {
       test.item[Globals.readWritePermFieldName] = csvtest.item_rw_permission;
     }
-    var result = Utils.validateDPerm(test) ? 'TRUE': 'FALSE';
+    var result = ValidatePerm.validateDPerm(test) ? 'TRUE': 'FALSE';
     expect(result).to.equal(csvtest.result_d);
 
     done();
@@ -151,7 +151,7 @@ for (let i = 0; i < 800; i++) {
     if (csvtest.item_rw_permission.substring(0, 5) !== 'unset') {
       test.item[Globals.readWritePermFieldName] = csvtest.item_rw_permission;
     }
-    var result = Utils.validateCPerm(test) ? 'TRUE': 'FALSE';
+    var result = ValidatePerm.validateCPerm(test) ? 'TRUE': 'FALSE';
     expect(result).to.equal(csvtest.result_rw);
 
     done();

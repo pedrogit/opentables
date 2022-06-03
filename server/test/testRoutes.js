@@ -5,9 +5,9 @@ const libCookie = require("cookie");
 const setCookie = require("set-cookie-parser");
 const NodeUtil = require("util");
 
-const Globals = require("../../client/src/common/globals");
-const Errors = require("../../client/src/common/errors");
-const Utils = require("../../client/src/common/utils");
+const Globals = require("../../common/globals");
+const Errors = require("../../common/errors");
+const Utils = require("../../common/commonUtils");
 
 const server = require("../index");
 const controler = require("../src/controler");

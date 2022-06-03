@@ -3,7 +3,7 @@ const Ajv = require("ajv");
 
 const Globals = require("./globals");
 const Errors = require("./errors");
-const Utils = require("./utils");
+const SimpleJSON = require("./simpleJSON");
 
 const validTypes = [
   "objectid",
@@ -27,7 +27,7 @@ class Schema {
     }
     if (typeof schema === "string") {
       try {
-        this.schema = Utils.simpleJSONToJSON(schema);
+        this.schema = SimpleJSON.simpleJSONToJSON(schema);
       } catch (err) {
         throw new Error(
           NodeUtil.format(

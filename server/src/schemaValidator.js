@@ -2,10 +2,10 @@ const MongoDB = require("mongodb");
 const NodeUtil = require("util");
 const bcrypt = require("bcrypt");
 
-const Globals = require("../../client/src/common/globals");
-const Errors = require("../../client/src/common/errors");
-const Utils = require("../../client/src/common/utils");
-const Schema = require("../../client/src/common/schema");
+const Globals = require("../../common/globals");
+const Errors = require("../../common/errors");
+const SimpleJSON = require("../../common/simpleJSON");
+const Schema = require("../../common/schema");
 
 class SchemaValidator {
   constructor(schema, controler = null, listid = null, post = false) {
@@ -76,7 +76,7 @@ class SchemaValidator {
     var json;
     if (typeof jsonstr === "string") {
       try {
-        json = Utils.simpleJSONToJSON(jsonstr);
+        json = SimpleJSON.simpleJSONToJSON(jsonstr);
       } catch (err) {
         throw new Error(
           NodeUtil.format(Errors.ErrMsg.SchemaValidator_Malformed, err.message)
@@ -531,14 +531,14 @@ class SchemaValidator {
     var options = options_str;
     if (typeof options === "string") {
       const optRX = new RegExp(
-        Utils.RXStr.singleQuotedStr +
+        SimpleJSON.RXStr.singleQuotedStr +
         "|" +
-        Utils.RXStr.doubleQuotedStr +
+        SimpleJSON.RXStr.doubleQuotedStr +
         "|" +
-        Utils.RXStr.worldValue, 'g');
+        SimpleJSON.RXStr.worldValue, 'g');
       options = options_str.match(optRX);
-      options = options.map(opt => Utils.trimFromEdges(opt, '"'));
-      options = options.map(opt => Utils.trimFromEdges(opt, "'"));
+      options = options.map(opt => SimpleJSON.trimFromEdges(opt, '"'));
+      options = options.map(opt => SimpleJSON.trimFromEdges(opt, "'"));
     }
     if (options === null || options.length < 1) {
       throw new Error(

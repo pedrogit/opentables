@@ -15,9 +15,10 @@ import {ErrorPanel, UncontrolledErrorPanel} from "./components/ErrorPanel";
 import {LoginForm} from "./components/LoginForm";
 import {getUser} from "./clientUtils";
 import * as BrowserHistory from "./browserHistory";
-const Schema = require("../../client/src/common/schema");
-const Globals = require("../../client/src/common/globals");
-const Utils = require("./common/utils");
+const Schema = require("../../common/schema");
+const Globals = require("../../common/globals");
+const Utils = require("../../common/commonUtils");
+const ValidatePerm = require("../../common/validatePerm");
 
 const theme = createTheme({
   palette: {
@@ -109,8 +110,8 @@ function App({ initialViewid, appid }) {
 
   //console.log('Render App (' + (data ? 'filled' : 'empty') + ')...');
   return (
-    <ThemeProvider theme={theme}>
-      <Container id={"otapp_" + appid} disableGutters maxWidth="100%" sx={{height: "100%"}}>
+    <ThemeProvider theme={theme} >
+      <Container id={"xotapp_" + appid} disableGutters maxWidth="100%" sx={{height: "100%"}}>
       <Stack sx={{height: "100%"}}>
         <Header 
           viewOwner={viewData ? viewData.owner : ''} 
@@ -119,7 +120,7 @@ function App({ initialViewid, appid }) {
           toggleOpenConfigPanel={toggleOpenConfigPanel}
           configButtonDisabled={
             !viewData ||
-            !Utils.validateRPerm({
+            !ValidatePerm.validateRPerm({
               user: getUser(),
               list: Globals.listOfAllViews,
               item: viewData
@@ -137,7 +138,7 @@ function App({ initialViewid, appid }) {
              (!viewData[Globals.addItemModeFieldName] || 
              viewData[Globals.addItemModeFieldName] === Globals.addItemModeDefault)) ||
             viewData[Globals.childlistFieldName] === Globals.permissionDeniedOnListOrItems ||
-            !(Utils.validateCPerm({
+            !(ValidatePerm.validateCPerm({
               user: getUser(),
               list: viewData[Globals.childlistFieldName]
             }))

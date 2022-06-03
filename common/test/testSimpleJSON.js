@@ -1,5 +1,5 @@
 const chai = require("chai");
-const Utils = require("../utils");
+const SimpleJSON = require("../simpleJSON");
 
 var expect = chai.expect;
 
@@ -18,130 +18,130 @@ var replaceStrInObject = function(obj, searchStr, replaceStr) {
   return obj;
 }
 
-describe("testUtils.js Test Utils functions", () => {
+describe("testSimpleJSON.js Test simpleJSON functions", () => {
   describe("A - Test trimFromEdges()", () => {
     it('1 - Simple test. Default to removing double quotes"', () => {
-      expect(Utils.trimFromEdges('"aaaa"')).to.equal("aaaa");
+      expect(SimpleJSON.trimFromEdges('"aaaa"')).to.equal("aaaa");
     });
 
     it("2 - Simple test. Explicitly provides double quotes as a character", () => {
-      expect(Utils.trimFromEdges('"aaaa"', '"')).to.equal("aaaa");
+      expect(SimpleJSON.trimFromEdges('"aaaa"', '"')).to.equal("aaaa");
     });
 
     it("3 - Simple test. Explicitly provides double quotes as an array", () => {
-      expect(Utils.trimFromEdges('"aaaa"', ['"'])).to.equal("aaaa");
+      expect(SimpleJSON.trimFromEdges('"aaaa"', ['"'])).to.equal("aaaa");
     });
 
     it("4 - Provides 2 characters long remove strings", () => {
       expect(function () {
-        Utils.trimFromEdges('"aaaa"', ["({", "})"]);
+        SimpleJSON.trimFromEdges('"aaaa"', ["({", "})"]);
       }).to.throw("Trim strings should contain only one character...");
     });
 
     it("5 - Provides 3 remove strings", () => {
       expect(function () {
-        Utils.trimFromEdges('"aaaa"', ["({", "})", '"']);
+        SimpleJSON.trimFromEdges('"aaaa"', ["({", "})", '"']);
       }).to.throw("Trim array should not contain more than two strings...");
     });
 
     it("6 - With space at the end without removing them first", () => {
-      var result = Utils.trimFromEdges('"aaaa" ');
+      var result = SimpleJSON.trimFromEdges('"aaaa" ');
       expect(result).to.equal('"aaaa" ');
     });
 
     it("7 - With space at the end removing them first", () => {
-      var result = Utils.trimFromEdges('"aaaa" ', '"', true, true);
+      var result = SimpleJSON.trimFromEdges('"aaaa" ', '"', true, true);
       expect(result).to.equal("aaaa");
     });
 
     it("8 - With space at the end removing them first and removing inside spaces too", () => {
-      var result = Utils.trimFromEdges('"aaaa " ', '"', true, true);
+      var result = SimpleJSON.trimFromEdges('"aaaa " ', '"', true, true);
       expect(result).to.equal("aaaa");
     });
 
     it("9 - With two brackets", () => {
-      var result = Utils.trimFromEdges("{aaaa}", ["{", "}"]);
+      var result = SimpleJSON.trimFromEdges("{aaaa}", ["{", "}"]);
       expect(result).to.equal("aaaa");
     });
 
     it("10 - Remove surrounding space even if trimming characters are not found", () => {
-      var result = Utils.trimFromEdges(" {aaaa}", '"', true, false);
+      var result = SimpleJSON.trimFromEdges(" {aaaa}", '"', true, false);
       expect(result).to.equal("{aaaa}");
     });
 
     it("11 - Remove space surrounding trimmed string when trimming characters are not found has no effect", () => {
-      var result = Utils.trimFromEdges(" {aaaa }", '"', true, true);
+      var result = SimpleJSON.trimFromEdges(" {aaaa }", '"', true, true);
       expect(result).to.equal("{aaaa }");
     });
   });
 
   describe("B - Test isSurroundedBy()", () => {
     it('1 - First arg undefined', () => {
-      expect(Utils.isSurroundedBy(undefined, '"')).to.equal(false);
+      expect(SimpleJSON.isSurroundedBy(undefined, '"')).to.equal(false);
     });
 
     it('2 - Second arg undefined', () => {
-      expect(Utils.isSurroundedBy('"aaaa"', undefined)).to.equal(false);
+      expect(SimpleJSON.isSurroundedBy('"aaaa"', undefined)).to.equal(false);
     });
     
     it('3 - Simple test', () => {
-      expect(Utils.isSurroundedBy('"aaaa"', '"')).to.equal(true);
+      expect(SimpleJSON.isSurroundedBy('"aaaa"', '"')).to.equal(true);
     });
   });
 
   describe("C - Test completeTrueValues()", () => {
     it("1 - Simple test", () => {
-      var result = Utils.completeTrueValues("{pr1: {required}}");
+      var result = SimpleJSON.completeTrueValues("{pr1: {required}}");
       expect(result).to.equal("{pr1: {required: true}}");
     });
 
     it("2 - Simple string", () => {
-      var result = Utils.completeTrueValues("pr1, pr2, pr3");
+      var result = SimpleJSON.completeTrueValues("pr1, pr2, pr3");
       expect(result).to.equal("pr1: true, pr2: true, pr3: true");
     });
 
     it("3 - No spaces", () => {
-      var result = Utils.completeTrueValues("{pr1:{required}}");
+      var result = SimpleJSON.completeTrueValues("{pr1:{required}}");
       expect(result).to.equal("{pr1:{required: true}}");
     });
 
     it("4 - More spaces", () => {
-      var result = Utils.completeTrueValues("{pr1: {  required  }}");
+      var result = SimpleJSON.completeTrueValues("{pr1: {  required  }}");
       expect(result).to.equal("{pr1: {  required: true  }}");
     });
 
     it("5 - More complex key", () => {
-      var result = Utils.completeTrueValues("{00fi-eld_1: {00fi-eld_2}}");
+      var result = SimpleJSON.completeTrueValues("{00fi-eld_1: {00fi-eld_2}}");
       expect(result).to.equal("{00fi-eld_1: {00fi-eld_2: true}}");
     });
 
     it("6 - Double quoted key", () => {
-      var result = Utils.completeTrueValues('{pr1: {  "required"  }}');
+      var result = SimpleJSON.completeTrueValues('{pr1: {  "required"  }}');
       expect(result).to.equal('{pr1: {  "required": true  }}');
     });
 
     it("7 - More values", () => {
-      var result = Utils.completeTrueValues("{a: {b, c}}");
+      var result = SimpleJSON.completeTrueValues("{a: {b, c}}");
       expect(result).to.equal("{a: {b: true, c: true}}");
     });
 
     it("8 - Double quoted keys", () => {
-      var result = Utils.completeTrueValues('{a: {"b"}}');
+      var result = SimpleJSON.completeTrueValues('{a: {"b"}}');
       expect(result).to.equal('{a: {"b": true}}');
     });
 
     it("9 - Single quoted keys", () => {
-      var result = Utils.completeTrueValues("{a: {'b'}}");
+      var result = SimpleJSON.completeTrueValues("{a: {'b'}}");
       expect(result).to.equal("{a: {'b': true}}");
     });
 
     it("10 - Array of strings", () => {
-      var result = Utils.completeTrueValues('{a: [b, c, d]}');
+      var result = SimpleJSON.completeTrueValues('{a: [b, c, d]}');
       expect(result).to.equal('{a: [b, c, d]}');
     });
     
     it("11 - Double quoted list of strings", () => {
-      var result = Utils.completeTrueValues('{a: \"b, c, d\"}');
+      var result = SimpleJSON.completeTrueValues('{a: \"b, c, d\"}');
       expect(result).to.equal('{a: \"b, c, d\"}');
     });
 
@@ -149,52 +149,52 @@ describe("testUtils.js Test Utils functions", () => {
 
   describe("D - Test unescapeChar()", () => {
     it("1 - Single quote alone 1", () => {
-      var result = Utils.unescapeChar("'", "'");
+      var result = SimpleJSON.unescapeChar("'", "'");
       expect(result).to.deep.equal("'");
     });
     
     it("2 - Single quote alone 2", () => {
-      var result = Utils.unescapeChar("\'", "'");
+      var result = SimpleJSON.unescapeChar("\'", "'");
       expect(result).to.deep.equal("'");
     });
 
     it("3 - Implicitely escaped single quote", () => {
-      var result = Utils.unescapeChar("\\'", "'");
+      var result = SimpleJSON.unescapeChar("\\'", "'");
       expect(result).to.deep.equal("'");
     });
 
     it("4 - Explicitely escaped single quote", () => {
-      var result = Utils.unescapeChar("\\\'", "'");
+      var result = SimpleJSON.unescapeChar("\\\'", "'");
       expect(result).to.deep.equal("'");
     });
 
     it("5 - Unescaped single quote preceded by two backslashes", () => {
-      var result = Utils.unescapeChar("\\\\'", "'");
+      var result = SimpleJSON.unescapeChar("\\\\'", "'");
       expect(result).to.deep.equal("\\\\'");
     });
 
     it("6 - Implicitely escaped single quote preceded by two backslashes", () => {
-      var result = Utils.unescapeChar("\\\\\'", "'");
+      var result = SimpleJSON.unescapeChar("\\\\\'", "'");
       expect(result).to.deep.equal("\\\\'");
     });
 
     it("7 - Explicitely escaped single quote preceded by two backslashes", () => {
-      var result = Utils.unescapeChar("\\\\\\'", "'");
+      var result = SimpleJSON.unescapeChar("\\\\\\'", "'");
       expect(result).to.deep.equal("\\\\'");
     });
 
     it("8 - Unescape final double quote", () => {
-      var result = Utils.unescapeChar('\\"', '"$');
+      var result = SimpleJSON.unescapeChar('\\"', '"$');
       expect(result).to.deep.equal('"');
     });
 
     it("9 - Unescape final double quote", () => {
-      var result = Utils.unescapeChar('\\\"', '"$');
+      var result = SimpleJSON.unescapeChar('\\\"', '"$');
       expect(result).to.deep.equal('"');
     });
 
     it("10 - Unescape final double quote", () => {
-      var result = Utils.unescapeChar('\\\\"', '"$');
+      var result = SimpleJSON.unescapeChar('\\\\"', '"$');
       expect(result).to.deep.equal('\\\\"');
     });
   });
@@ -202,104 +202,104 @@ describe("testUtils.js Test Utils functions", () => {
   describe("E - Test escapeUnescapedChar()", () => {
     it("1 - Single quote alone", () => {
       // there is zero escape char so ' is escaped
-      var result = Utils.escapeUnescapedChar("'", "'");
+      var result = SimpleJSON.escapeUnescapedChar("'", "'");
       expect(result).to.deep.equal("\\'");
     });
 
     it("2 - Single quote with 0 backslash", () => {
       // there is zero escape char so ' is escaped
-      var result = Utils.escapeUnescapedChar("a'b", "'");
+      var result = SimpleJSON.escapeUnescapedChar("a'b", "'");
       expect(result).to.deep.equal("a\\'b");
     });
 
     it("3 - Single quote with 1 backslash", () => {
       // \ count for zero escape char so ' is escaped
-      var result = Utils.escapeUnescapedChar("a\'bc\'d", "'");
+      var result = SimpleJSON.escapeUnescapedChar("a\'bc\'d", "'");
       expect(result).to.deep.equal("a\\'bc\\'d");
     });
 
     it("4 - Single quote with 2 backslash", () => {
       // \\ count for one escape char so it is just kept, not escaped
-      var result = Utils.escapeUnescapedChar("a\\'bc\\'d", "'");
+      var result = SimpleJSON.escapeUnescapedChar("a\\'bc\\'d", "'");
       expect(result).to.deep.equal("a\\'bc\\'d");
     });
 
     it("5 - Single quote with 3 backslash", () => {
       // \\ count for one escape char and \' is unescaped
-      var result = Utils.escapeUnescapedChar("a\\\'bc\\\'d", "'");
+      var result = SimpleJSON.escapeUnescapedChar("a\\\'bc\\\'d", "'");
       expect(result).to.deep.equal("a\\'bc\\'d");
     });
 
     it("6 - Single quote with 4 backslash", () => {
       // \\\\ are two backslashes, they are both escaped
-      var result = Utils.escapeUnescapedChar("a\\\\'bc\\\\'d", "'");
+      var result = SimpleJSON.escapeUnescapedChar("a\\\\'bc\\\\'d", "'");
       expect(result).to.deep.equal("a\\\\\\\\\\'bc\\\\\\\\\\'d");
     });
 
     it("7 - Single quote with 5 backslash", () => {
-      var result = Utils.escapeUnescapedChar("a\\\\\'bc\\\\\'d", "'");
+      var result = SimpleJSON.escapeUnescapedChar("a\\\\\'bc\\\\\'d", "'");
       expect(result).to.deep.equal("a\\\\\\\\\\'bc\\\\\\\\\\'d");
     });
 
     it("8 - Double quote with 0 backslash", () => {
-      var result = Utils.escapeUnescapedChar('a"b', '"');
+      var result = SimpleJSON.escapeUnescapedChar('a"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("9 - Double quote with 1 backslash", () => {
-      var result = Utils.escapeUnescapedChar('a\"b', '"');
+      var result = SimpleJSON.escapeUnescapedChar('a\"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("10 - Double quote with 2 backslash", () => {
-      var result = Utils.escapeUnescapedChar('a\\"b', '"');
+      var result = SimpleJSON.escapeUnescapedChar('a\\"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("11 - Double quote with 3 backslash", () => {
-      var result = Utils.escapeUnescapedChar('a\\\"b', '"');
+      var result = SimpleJSON.escapeUnescapedChar('a\\\"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("12 - Double quote with 4 backslash", () => {
-      var result = Utils.escapeUnescapedChar('a\\\\"b', '"');
+      var result = SimpleJSON.escapeUnescapedChar('a\\\\"b', '"');
       expect(result).to.deep.equal('a\\\\\\\\\\"b');
     });
 
     it("13 - Double quote with 5 backslash", () => {
-      var result = Utils.escapeUnescapedChar('a\\\\\"b', '"');
+      var result = SimpleJSON.escapeUnescapedChar('a\\\\\"b', '"');
       expect(result).to.deep.equal('a\\\\\\\\\\"b');
     });
   });
 
   describe("F - Test doubleQuoteKeys()", () => {
     it("1 - Simple test", () => {
-      var result = Utils.doubleQuoteKeys("{pr1: required}");
+      var result = SimpleJSON.doubleQuoteKeys("{pr1: required}");
       expect(result).to.equal('{"pr1": required}');
     });
 
     it("2 - Already double quoted", () => {
-      var result = Utils.doubleQuoteKeys('{"pr1": required}');
+      var result = SimpleJSON.doubleQuoteKeys('{"pr1": required}');
       expect(result).to.equal('{"pr1": required}');
     });
 
     it("3 - Key starting with a dollars sign", () => {
-      var result = Utils.doubleQuoteKeys("{$pr1: required}");
+      var result = SimpleJSON.doubleQuoteKeys("{$pr1: required}");
       expect(result).to.equal('{"$pr1": required}');
     });
 
     it("4 - Quoted value containing a key", () => {
-      var result = Utils.doubleQuoteKeys('{pr1: "b:", pr2: ""}');
+      var result = SimpleJSON.doubleQuoteKeys('{pr1: "b:", pr2: ""}');
       expect(result).to.equal('{"pr1": "b:", "pr2": ""}');
     });
 
     it("5 - Quoted value containing a key and excaped quotes", () => {
-      var result = Utils.doubleQuoteKeys('{pr1: "b :\\"", pr2: "b :\\"\\""}');
+      var result = SimpleJSON.doubleQuoteKeys('{pr1: "b :\\"", pr2: "b :\\"\\""}');
       expect(result).to.equal('{"pr1": "b :\\"", "pr2": "b :\\"\\""}');
     });
 
     it("6 - Quoted value containing a boolean", () => {
-      var result = Utils.doubleQuoteKeys('{pr1: true, pr2: false}');
+      var result = SimpleJSON.doubleQuoteKeys('{pr1: true, pr2: false}');
       expect(result).to.equal('{"pr1": true, "pr2": false}');
     });
   });
@@ -332,7 +332,7 @@ describe("testUtils.js Test Utils functions", () => {
           /*if (key === 'test27') {
             console.log(key);
           }*/
-          var result = Utils.doubleQuoteValues(specialCaseTests[key].trim());
+          var result = SimpleJSON.doubleQuoteValues(specialCaseTests[key].trim());
           expect(result).to.equal(specialCaseExpectedStr[key].trim());
         });
       }
@@ -347,7 +347,7 @@ describe("testUtils.js Test Utils functions", () => {
           /*if (key === 'test01') {
             console.log(key);
           }*/
-          var result = Utils.simpleJSONToJSON(specialCaseTests[key].trim());
+          var result = SimpleJSON.simpleJSONToJSON(specialCaseTests[key].trim());
           expect(result).to.deep.equal(specialCaseExpectedObj[key]);
         });
       }
@@ -713,7 +713,7 @@ describe("testUtils.js Test Utils functions", () => {
           /*if (key === 'test83') {
             console.log(key);
           }*/
-          var result = Utils.doubleQuoteValues(singleQuotesTests[key].trim());
+          var result = SimpleJSON.doubleQuoteValues(singleQuotesTests[key].trim());
           expect(result).to.equal(singleQuotesExpectedStr[key].trim());
         });
       }
@@ -722,32 +722,32 @@ describe("testUtils.js Test Utils functions", () => {
 
   describe("J - Test simpleJSONToJSON() with multi level object strings", () => {
     it("Simple test", () => {
-      var result = Utils.simpleJSONToJSON("pr1: {required}");
+      var result = SimpleJSON.simpleJSONToJSON("pr1: {required}");
       expect(result).to.deep.equal({ pr1: { required: true } });
     });
 
     it("Test empty JSON schema", () => {
-      var result = Utils.simpleJSONToJSON("{}");
+      var result = SimpleJSON.simpleJSONToJSON("{}");
       expect(result).to.deep.equal({});
     });
 
     it("Test simple string", () => {
-      var result = Utils.simpleJSONToJSON("abc");
+      var result = SimpleJSON.simpleJSONToJSON("abc");
       expect(result).to.deep.equal({ abc: true });
     });
 
     it("Simple test with two values", () => {
-      var result = Utils.simpleJSONToJSON("a: {b, c}");
+      var result = SimpleJSON.simpleJSONToJSON("a: {b, c}");
       expect(result).to.deep.equal({ a: { b: true, c: true } });
     });
 
     it("Simple test with one set value and two unset values", () => {
-      var result = Utils.simpleJSONToJSON("a: {b, c:true, d}");
+      var result = SimpleJSON.simpleJSONToJSON("a: {b, c:true, d}");
       expect(result).to.deep.equal({ a: { b: true, c: true, d: true } });
     });
 
     it("Simple test with two base values", () => {
-      var result = Utils.simpleJSONToJSON("a: {b, c}, d: {e}");
+      var result = SimpleJSON.simpleJSONToJSON("a: {b, c}, d: {e}");
       expect(result).to.deep.equal({ a: { b: true, c: true }, d: { e: true } });
     });
   });
@@ -762,18 +762,18 @@ describe("testUtils.js Test Utils functions", () => {
           }
           if (key === 'test53' || key === 'test55') {
             /*try {
-              Utils.simpleJSONToJSON(singleQuotesTests[key].trim());
+              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim());
             }
             catch(err) {
               console.log(err);
             }*/
             expect(function () {
-              Utils.simpleJSONToJSON(singleQuotesTests[key].trim())
+              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim())
             }).to.throw(singleQuotesExpectedObj[key]);
           }
           
           else {
-            var result = Utils.simpleJSONToJSON(singleQuotesTests[key].trim());
+            var result = SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim());
             expect(result).to.deep.equal(singleQuotesExpectedObj[key]);
           }
         });
@@ -791,40 +791,21 @@ describe("testUtils.js Test Utils functions", () => {
           }*/
           if (key === 'test53' || key === 'test55') {
             /*try {
-              Utils.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim());
+              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim());
             }
             catch(err) {
               console.log(err);
             }*/
             expect(function () {
-              Utils.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim())
+              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim())
             }).to.throw(singleQuotesExpectedObj[key]);
           }
           else {
-            var result = Utils.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim());
+            var result = SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim());
             expect(result).to.deep.equal(replaceStrInObject(singleQuotesExpectedObj[key], /'/g, "\""));
           }
         });
       }
     }
-  });
-
-  describe("M - Test objWithout()", () => {
-    it("Simple test with without as a string", () => {
-      var result = Utils.objWithout({ a: 1, b: 2 }, "b");
-      expect(result).to.deep.equal({ a: 1 });
-    });
-
-    it("Simple test with without as an array", () => {
-      var result = Utils.objWithout({ a: 1, b: 2, c: 3 }, ["a", "c"]);
-      expect(result).to.deep.equal({ b: 2 });
-    });
-
-    it("Simple that object is deeply copied", () => {
-      var obj1 = { a: 1, b: 2, c: 3 };
-      var result = Utils.objWithout(obj1, ["a", "c"]);
-      expect(result).to.deep.equal({ b: 2 });
-      expect(obj1).to.deep.equal(obj1);
-    });
   });
 });

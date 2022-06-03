@@ -19,8 +19,8 @@ import Tooltip from '@mui/material/Tooltip';
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 import {getUser} from "../clientUtils";
-const Errors = require("../common/errors");
-const Globals = require("../common/globals");
+const Errors = require("../../../common/errors");
+const Globals = require("../../../common/globals");
 
 function LoginForm({ authAPIRequest, setAuthAPIRequest, setErrorMsg, sx }) {
   const emailRef = React.useRef();

@@ -3,9 +3,9 @@ const url = require("url");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
-const Globals = require("../../client/src/common/globals");
-const Utils = require("../../client/src/common/utils");
-const Errors = require("../../client/src/common/errors");
+const Globals = require("../../common/globals");
+const Utils = require("./serverUtils");
+const Errors = require("../../common/errors");
 
 const controler = require("./controler");
 const router = express.Router();

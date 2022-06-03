@@ -6,9 +6,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const NodeUtil = require("util");
 
-const Globals = require("../client/src/common/globals");
-const Errors = require("../client/src/common/errors");
-const Utils = require("../client/src/common/utils");
+const Globals = require("../common/globals");
+const Errors = require("../common/errors");
+const Utils = require("./src/serverUtils");
 
 const controler = require("./src/controler");
 const router = require("./src/router");

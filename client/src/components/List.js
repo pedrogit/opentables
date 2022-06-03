@@ -4,10 +4,9 @@ import Stack from "@mui/material/Stack";
 
 import {UncontrolledErrorPanel} from "./ErrorPanel";
 import {getUser} from "../clientUtils";
-//const Schema = require("../common/schema");
-const TemplateParser = require("../common/templateParser");
-const Utils = require("../common/utils");
-const Globals = require("../common/globals");
+const TemplateParser = require("../../../common/templateParser");
+const ValidatePerm = require("../../../common/validatePerm");
+const Globals = require("../../../common/globals");
 var _ = require('lodash');
 
 // a list receive a view and a list of items
@@ -87,7 +86,7 @@ function List({
   // determine user permission on patch and post. Open the login panel otherwise.
   const checkListEditPerm = React.useCallback(
     (item) => {
-      return Utils.validateRWPerm({
+      return ValidatePerm.validateRWPerm({
         user: getUser(),
         list: view[Globals.childlistFieldName],
         item: item
@@ -107,7 +106,7 @@ function List({
   // to add an item in persistent form no item mode
   React.useEffect(() => {
     if (addItemMode === Globals.addWithPersistentFormNoItems &&
-        !Utils.validateCPerm({
+        !ValidatePerm.validateCPerm({
           user: getUser(),
           list: view[Globals.childlistFieldName]
         })) {
@@ -158,7 +157,7 @@ function List({
   // determine if delete button should be disabled
   const deleteButtonDisabled = (item) => {
     var disabled = view === undefined || view === null || 
-                 !(Utils.validateDPerm({
+                 !(ValidatePerm.validateDPerm({
                    user: getUser(),
                    list: view[Globals.childlistFieldName],
                    item: item
@@ -169,7 +168,7 @@ function List({
   // determine if setUnsetProperty button should be disabled
   const setUnsetPropertyButtonDisabled = (item) => {
     var disabled = view === undefined || view === null || 
-                  !(Utils.validateRWPerm({
+                  !(ValidatePerm.validateRWPerm({
                     user: getUser(),
                     list: view[Globals.childlistFieldName],
                     item: item
@@ -238,7 +237,7 @@ function List({
           addItemMode === Globals.addWithPersistentFormAndItems || 
           addItemMode === Globals.addWithPersistentFormNoItems
         ) &&
-        Utils.validateCPerm({
+        ValidatePerm.validateCPerm({
           user: getUser(),
           list: view[Globals.childlistFieldName]
         })

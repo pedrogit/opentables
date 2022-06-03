@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-const Globals = require("../../src/common/globals");
+const Globals = require("../../common/globals");
 
 const adminPW = "admin";
 

@@ -15,8 +15,8 @@ import ReCAPTCHA from "react-google-recaptcha";
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 
-const Globals = require("../common/globals");
-const Errors = require("../common/errors");
+const Globals = require("../../../common/globals");
+const Errors = require("../../../common/errors");
 
 /********************
  *  Label component

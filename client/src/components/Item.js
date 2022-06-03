@@ -11,7 +11,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 import * as Components from "./components";
-const Globals = require("../common/globals");
+const Globals = require("../../../common/globals");
 
 // Define all components in the current scope
 // so they can be used directly, without

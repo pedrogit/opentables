@@ -12,7 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Tooltip from '@mui/material/Tooltip';
 
 import {LoginButton} from "./LoginForm";
-const Globals = require("../common/globals");
+const Globals = require("../../../common/globals");
 
 function Header({ 
   viewOwner, 

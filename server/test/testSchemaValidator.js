@@ -3,9 +3,9 @@ const chai = require("chai");
 const NodeUtil = require("util");
 
 const SchemaValidator = require("../src/schemavalidator");
-const Errors = require("../../client/src/common/errors");
+const Errors = require("../../common/errors");
 const { stringify } = require("ajv");
-const Globals = require("../../client/src/common/globals");
+const Globals = require("../../common/globals");
 
 var expect = chai.expect;
 

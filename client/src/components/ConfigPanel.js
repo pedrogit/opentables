@@ -11,8 +11,8 @@ import PropTypes from 'prop-types';
 
 // local imports
 import List from "./List";
-const Globals = require("../common/globals");
-const Schema = require("../common/schema");
+const Globals = require("../../../common/globals");
+const Schema = require("../../../common/schema");
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

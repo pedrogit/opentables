@@ -1,4 +1,4 @@
-const Utils = require("./utils");
+const SimpleJSON = require("./simpleJSON");
 const Errors = require("./errors");
 const NodeUtil = require("util");
 
@@ -6,7 +6,7 @@ class Filter {
   constructor(filter) {
     if (typeof filter === "string") {
       try {
-        this.filter = Utils.simpleJSONToJSON(filter);
+        this.filter = SimpleJSON.simpleJSONToJSON(filter);
       } catch (err) {
         throw new Error(
           NodeUtil.format(Errors.ErrMsg.OTFilter_InvalidFilter, filter)

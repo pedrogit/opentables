@@ -3,11 +3,13 @@ const NodeUtil = require("util");
 const axios = require("axios");
 require("dotenv").config();
 
-const Errors = require("../../client/src/common/errors");
-const Utils = require("../../client/src/common/utils");
-const Globals = require("../../client/src/common/globals");
-const Filter = require("../../client/src/common/filter");
-const Schema = require("../../client/src/common/schema");
+const Errors = require("../../common/errors");
+const Utils = require("../../common/commonUtils");
+const ValidatePerm = require("../../common/validatePerm");
+
+const Globals = require("../../common/globals");
+const Filter = require("../../common/filter");
+const Schema = require("../../common/schema");
 
 const SchemaValidator = require("./schemaValidator");
 
@@ -302,13 +304,13 @@ class Controler {
     }
 
     if (Controler.isList(item)) {
-      if (Utils.validateRPerm({
+      if (ValidatePerm.validateRPerm({
         user: user,
         list: item,
         ignoreListItem: true
       })) {
         if (!noitems) {
-          if (Utils.validateRPerm({
+          if (ValidatePerm.validateRPerm({
             user: user,
             list: item,
           })) {
@@ -358,7 +360,7 @@ class Controler {
 
             // remove items for which the user do not have read permissions
             item[Globals.itemsFieldName] = item[Globals.itemsFieldName].filter((subItem) => {
-              return Utils.validateRPerm({
+              return ValidatePerm.validateRPerm({
                 user: user,
                 list: item,
                 item: subItem
@@ -395,7 +397,7 @@ class Controler {
       // find item schema
       var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
-      Utils.validateRPerm({
+      ValidatePerm.validateRPerm({
         user: user,
         list: parentList,
         item: item,
@@ -435,7 +437,7 @@ class Controler {
     var parentList = await this.getParentList(listid);
 
     // validate permissions
-    Utils.validateCPerm({
+    ValidatePerm.validateCPerm({
       user: user,
       list: parentList,
       throwError: true
@@ -516,7 +518,7 @@ class Controler {
     // find item schema
     var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
-    Utils.validateRWPerm({
+    ValidatePerm.validateRWPerm({
       user: user,
       list: parentList,
       item: item,
@@ -633,7 +635,7 @@ class Controler {
     var parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
     // check user permissions
-    Utils.validateDPerm({
+    ValidatePerm.validateDPerm({
         user: user,
         list: parentList,
         item: item,

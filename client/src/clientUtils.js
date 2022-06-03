@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 const jwt = require("jsonwebtoken");
-const Globals = require("./common/globals");
+const Globals = require("../../common/globals");
 
 const getUser = () => {
   var authtoken = Cookies.get('authtoken');
@@ -14,4 +14,9 @@ const getUser = () => {
   return Globals.allUserName;
 }
 
-export {getUser}
+const getURLParam = (paramName) => {
+  var url = new URL(window.location.href);
+  return url.searchParams.get(paramName);
+}
+
+export {getUser, getURLParam}
