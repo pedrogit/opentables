@@ -343,6 +343,7 @@ describe('1 - Basic tests', () => {
       cy.get('input[name="password"]').focus().type('user');
       cy.get('#addItemFormButton').click();
       cy.get('#errorPanel').should('contain', 'Congratulation First User');
+      cy.wait(1000);
 
       // logout
       logout();

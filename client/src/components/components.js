@@ -525,10 +525,10 @@ function ItemWrapperForm({
         callback: (success) => {
           if (success) {
             setSubmitButtonDisabled(true);
+            options.addAction();
             if (options.addMessage) {
               handlers.setErrorMsg(options.addMessage);
             }
-            options.addAction();
           }
         }
       })
