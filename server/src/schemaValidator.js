@@ -277,7 +277,7 @@ class SchemaValidator {
     if (Globals.specialUsers.includes(val.toLowerCase())) {
       return val.toLowerCase();
     }
-    if (val.length < 8) {
+    if (val.length < Globals.usernameMinLength) {
       throw new Error(
         NodeUtil.format(
           Errors.ErrMsg.SchemaValidator_InvalidType,

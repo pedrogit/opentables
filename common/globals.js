@@ -14,6 +14,7 @@ let Globals = {
   nameFieldName: "name",
   listSchemaFieldName: "schema",
   usernameFieldName: "username",
+  usernameMinLength: 6,
   emailFieldName: "email",
   itemTemplateFieldName: "item_template",
   childlistFieldName: "_childlist",
@@ -115,7 +116,7 @@ Globals = {
     [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
-      `username: {type: string, required, unique, minlength: 6,${Globals.noDefault}}, ` +
+      `username: {type: user, required, unique, ${Globals.noDefault}}, ` +
       `${Globals.emailFieldName}: {type: email, required, unique, lower, ${Globals.noDefault}}, ` +
       `password: {type: encrypted_string, required, minlength: 8, ${Globals.noDefault}}`,
   },
