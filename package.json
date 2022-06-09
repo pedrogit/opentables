@@ -16,7 +16,9 @@
     "test-components": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha client/src/components/components.test.js --timeout 0\"",
     "start-server": "node ./server/index.js",
     "debug-server": "cross-env NODE_ENV=development nodemon --nolazy --inspect --watch ./common --watch ./server/src --watch ./server/index.js ./server/index.js",
-    "cypress:open": "cypress open",
+    "cypress:open": "cypress open --browser chrome --e2e",
+    "cypress:open-edge": "cypress open --browser edge --e2e",
+    "cypress:run": "cypress run --browser chrome --config video=false,screenshotOnRunFailure=false",
     "debug-client": "webpack serve --open --config ./webpack.dev.js",
     "build": "webpack --config ./webpack.prod.js"
   },
