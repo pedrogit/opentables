@@ -281,7 +281,9 @@ function LoginForm({ authAPIRequest, setAuthAPIRequest, setErrorMsg, sx }) {
                 error={showInvalidLoginHelper}
                 sx={{ mt: "2px", fontSize: "14px", fontStyle: "italic" }}
               >
-                {showInvalidLoginHelper ? "Invalid email or password..." : " "}
+                {showInvalidLoginHelper
+                  ? Errors.ErrMsg.InvalidEmailPassword
+                  : " "}
               </FormHelperText>
             </Stack>
           </FormControl>

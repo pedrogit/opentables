@@ -1,7 +1,10 @@
 /* global cy */
 /* eslint-env mocha */
 /// <reference types="cypress" />
+const NodeUtil = require("util");
+
 const Globals = require("../../common/globals");
+const Errors = require("../../common/errors");
 
 const adminPW = "admin";
 
@@ -327,17 +330,14 @@ describe("1 - Basic tests", () => {
       cy.get('input[name="username"]').focus().type("F");
       cy.get("#addItemFormButton").should("not.be.disabled");
       cy.get("#addItemFormButton").click();
-      cy.get("#errorPanel").should(
-        "contain",
-        "You failed to prove that you are not a robot..."
-      );
+      cy.get("#errorPanel").should("contain", Errors.ErrMsg.Recaptcha_Failed);
 
       // now after the recaptcha is filled
       fillRecaptcha();
       cy.get("#addItemFormButton").click();
       cy.get("#errorPanel").should(
         "contain",
-        'Item is not valid. "email" is missing...'
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, "email")
       );
 
       // fill in more username info and email and click
@@ -346,7 +346,7 @@ describe("1 - Basic tests", () => {
       cy.get("#addItemFormButton").click();
       cy.get("#errorPanel").should(
         "contain",
-        'Item is not valid. "password" is missing...'
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, "password")
       );
 
       // fill in the password
@@ -354,7 +354,11 @@ describe("1 - Basic tests", () => {
       cy.get("#addItemFormButton").click();
       cy.get("#errorPanel").should(
         "contain",
-        'Item is not valid. "username" should have a minimum of 6 characters...'
+        NodeUtil.format(
+          Errors.ErrMsg.SchemaValidator_MinLength,
+          "username",
+          Globals.usernameMinLength
+        )
       );
 
       // fill in remaining username info
@@ -362,7 +366,11 @@ describe("1 - Basic tests", () => {
       cy.get("#addItemFormButton").click();
       cy.get("#errorPanel").should(
         "contain",
-        'Item is not valid. "password" should have a minimum of 8 characters...'
+        NodeUtil.format(
+          Errors.ErrMsg.SchemaValidator_MinLength,
+          "password",
+          Globals.passwordMinLength
+        )
       );
 
       // success!
@@ -384,7 +392,11 @@ describe("1 - Basic tests", () => {
       cy.get("#addItemFormButton").click();
       cy.get("#errorPanel").should(
         "contain",
-        'Item is not valid. "username" should be unique but value (First User) already exists...'
+        NodeUtil.format(
+          Errors.ErrMsg.SchemaValidator_NotUnique,
+          "username",
+          "First User"
+        )
       );
 
       // cancel to return to the main view
@@ -412,7 +424,7 @@ describe("1 - Basic tests", () => {
       cy.get("#loginButton").should("be.disabled");
       cy.get("#loginHelper").should(
         "not.contain",
-        "Invalid email or password..."
+        Errors.ErrMsg.InvalidEmailPassword
       );
       cy.focused().type(firstUserEmail);
       cy.get("#loginButton").should("be.disabled");
@@ -427,13 +439,16 @@ describe("1 - Basic tests", () => {
       cy.focused().type(firstUserPassword);
       cy.get("#loginButton").should("not.be.disabled");
       cy.focused().type("{enter}");
-      cy.get("#loginHelper").should("contain", "Invalid email or password...");
+      cy.get("#loginHelper").should(
+        "contain",
+        Errors.ErrMsg.InvalidEmailPassword
+      );
 
       // make sure the helper text disappear when entering new text
       cy.focused().type("x");
       cy.get("#loginHelper").should(
         "not.contain",
-        "Invalid email or password..."
+        Errors.ErrMsg.InvalidEmailPassword
       );
       cy.get("#loginCancelButton").click();
 
@@ -442,11 +457,14 @@ describe("1 - Basic tests", () => {
       cy.get("#loginLogoutButton").click();
       cy.get("#loginHelper").should(
         "not.contain",
-        "Invalid email or password..."
+        Errors.ErrMsg.InvalidEmailPassword
       );
       cy.focused().type(firstUserEmail).tab();
       cy.focused().type(`x${firstUserPassword}{enter}`);
-      cy.get("#loginHelper").should("contain", "Invalid email or password...");
+      cy.get("#loginHelper").should(
+        "contain",
+        Errors.ErrMsg.InvalidEmailPassword
+      );
       cy.get("#loginCancelButton").click();
 
       // start again with everything good and logout

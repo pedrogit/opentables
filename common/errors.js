@@ -42,6 +42,7 @@ const ErrMsg = {
     "User does not have sufficient permission to execute this request...",
   MalformedID: "Malformed ID (%s)...",
   CouldNotCreate: "Could not create %s...",
+  InvalidEmailPassword: "Invalid email or password...",
 
   Schema_Null: "Schema can not be null...",
   Schema_Malformed: "JSON schema is not well formed...",

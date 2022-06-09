@@ -280,10 +280,9 @@ class SchemaValidator {
     if (val.length < Globals.usernameMinLength) {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_MinLength,
           key,
-          val,
-          "user"
+          Globals.usernameMinLength
         )
       );
     }
