@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 const MongoDB = require("mongodb");
 const NodeUtil = require("util");
 const bcrypt = require("bcrypt");
@@ -14,7 +15,7 @@ class SchemaValidator {
     }
 
     if (
-      !Schema.prototype.isPrototypeOf(schema) &&
+      !Object.prototype.isPrototypeOf.call(Schema.prototype, schema) &&
       (typeof schema === "string" || typeof schema === "object")
     ) {
       this.schema = new Schema(schema);
@@ -22,7 +23,7 @@ class SchemaValidator {
       this.schema = schema;
     }
 
-    if (!Schema.prototype.isPrototypeOf(this.schema)) {
+    if (!Object.prototype.isPrototypeOf.call(Schema.prototype, this.schema)) {
       throw new Error(Errors.ErrMsg.Schema_Malformed);
     }
 
@@ -39,41 +40,42 @@ class SchemaValidator {
     }
   }
 
-  reorderTests(tests) {
-    var orderedTests = tests;
-    if (orderedTests.includes('minlength')) {
-      orderedTests = orderedTests.filter(test => test !== 'minlength')
-      orderedTests.unshift('minlength');
+  static reorderTests(tests) {
+    let orderedTests = tests;
+    if (orderedTests.includes("minlength")) {
+      orderedTests = orderedTests.filter((test) => test !== "minlength");
+      orderedTests.unshift("minlength");
     }
     return orderedTests;
   }
 
   // traverse a json object calling provided callbacks according to the right level
   async traverse(obj, parentKey = null, level = 0, callbacks = null) {
-    for (var key in obj) {
-      //console.log(' '.repeat(2 * (level)) + key + " : " + JSON.stringify(obj[key]));
-      if (
-        !(callbacks[level] === null) &&
-        typeof callbacks[level] === "function"
-      ) {
-        await callbacks[level](key, obj, parentKey);
-      }
+    const promises = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (callbacks[level] && typeof callbacks[level] === "function") {
+          promises.push(callbacks[level](key, obj, parentKey));
+        }
 
-      if (
-        obj[key] !== null &&
-        typeof obj[key] === "object" &&
-        obj[key].constructor.name !== "ObjectId"
-      ) {
-        //going one step down in the object tree!!
-        await this.traverse(obj[key], key, ++level, callbacks);
-        level--;
+        if (
+          obj[key] !== null &&
+          typeof obj[key] === "object" &&
+          obj[key].constructor.name !== "ObjectId"
+        ) {
+          // going one step down in the object tree!!
+          promises.push(this.traverse(obj[key], key, level + 1, callbacks));
+        }
       }
     }
+
+    await Promise.all(promises);
   }
 
   // validate a json string against this schema
   async validateJson(jsonstr, strict = true, user = null) {
-    var json;
+    let json;
     if (typeof jsonstr === "string") {
       try {
         json = SimpleJSON.simpleJSONToJSON(jsonstr);
@@ -93,27 +95,29 @@ class SchemaValidator {
         // generate default values for all required properties
         json = this.schema.getRequiredDefaults({
           throwIfNoDefault: true,
-          user: user
+          user,
         });
       }
-    }
-    else {
+    } else {
       if (strict) {
         // check that every required property are provided
-        this.schema.getRequired().forEach(key => {
+        this.schema.getRequired().forEach((key) => {
           if (!jsonkeys.includes(key)) {
             throw new Error(
               NodeUtil.format(Errors.ErrMsg.SchemaValidator_MissingProp, key)
             );
           }
-        })
+        });
       }
       // set a default for each required property
-      Object.keys(json).forEach(key => {
-        if (this.schema.isRequired(key) && (json[key] === null || json[key] === '')) {
+      Object.keys(json).forEach((key) => {
+        if (
+          this.schema.isRequired(key) &&
+          (json[key] === null || json[key] === "")
+        ) {
           json[key] = this.schema.getDefault(key, user);
         }
-      })
+      });
     }
 
     // 2) if strict invalidate non schema properties
@@ -127,6 +131,7 @@ class SchemaValidator {
   }
 
   // validate passed JSON properties
+  // eslint-disable-next-line no-unused-vars
   async validateField(key, obj, parentKey) {
     // do not validate item ids
     if (key !== Globals.itemIdFieldName) {
@@ -136,44 +141,39 @@ class SchemaValidator {
         );
       }
       // do not validate empty values
-      if (obj[key] !== null && obj[key] !== '') {
+      if (obj[key] !== null && obj[key] !== "") {
         // if this.schema.schema[key] is an object iterate over each schema property for that property and call the corresponding validator
         if (typeof this.schema.schema[key] === "object") {
-          var orderedTests = this.reorderTests(Object.keys(this.schema.schema[key]));
-          //for (var property in this.schema.schema[key]) {
-          //orderedTests.forEach(async test => {
-          for (let test of orderedTests) {
-            var validatorName = "validate_" + test;
+          const orderedTests = SchemaValidator.reorderTests(
+            Object.keys(this.schema.schema[key])
+          );
+          // for (var property in this.schema.schema[key]) {
+          // orderedTests.forEach(async test => {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const test of orderedTests) {
+            const validatorName = `validate_${test}`;
 
-            obj[key] = await this[validatorName](
+            // eslint-disable-next-line no-await-in-loop
+            const testResult = await this[validatorName](
               this.schema.schema[key][test],
               key,
-              obj[key], // pass object by value so the validator can modify it directly
-              (obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null)
+              obj[key],
+              obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null
             );
+            // eslint-disable-next-line no-param-reassign
+            obj[key] = testResult;
 
             // delete properties that were undef by the validator (like hidden ones)
             if (this.post && obj[key] === undefined) {
+              // eslint-disable-next-line no-param-reassign
               delete obj[key];
               break;
-            };
-          };
-              /*
-              var validatorName = "validate_" + property;
-              obj[key] = await this[validatorName](
-                this.schema.schema[key][property],
-                key,
-                obj[key],
-                (obj[Globals.itemIdFieldName] ? obj[Globals.itemIdFieldName] : null)
-              ); // pass object by value so the validator can modify it directly
-              if (this.post && obj[key] === undefined) {
-                delete obj[key];
-                break;
-              }
-          }*/
+            }
+          }
         }
         // if this.schema.schema[key] is a simple type validate it
         else {
+          // eslint-disable-next-line no-param-reassign
           obj[key] = await this.validate_type(
             this.schema.schema[key],
             key,
@@ -181,8 +181,8 @@ class SchemaValidator {
           );
         }
       }
-    }
-    else {
+    } else {
+      // eslint-disable-next-line no-param-reassign
       obj[key] = await this.validate_type_objectid(
         Globals.itemIdFieldName,
         obj[key]
@@ -191,9 +191,8 @@ class SchemaValidator {
   }
 
   validate_type(type, key, val) {
-    var typeValidatorName = "validate_type_" + type;
-    val = this[typeValidatorName](key, val);
-    return val;
+    const typeValidatorName = `validate_type_${type}`;
+    return this[typeValidatorName](key, val);
   }
 
   validate_type_objectid(key, val) {
@@ -254,15 +253,13 @@ class SchemaValidator {
     if (this.post) {
       return val;
     }
-    
-    var valArr = val;
+
+    let valArr = val;
     try {
       if (!(valArr instanceof Array)) {
-        valArr = valArr.split(/\s*\,\s*/);
+        valArr = valArr.split(/\s*,\s*/);
       }
-      valArr.map((v) => {
-        this.validate_type_embedded_itemid(key, v);
-      });
+      valArr.map((v) => this.validate_type_embedded_itemid(key, v));
     } catch (err) {
       throw new Error(
         NodeUtil.format(
@@ -294,10 +291,10 @@ class SchemaValidator {
   }
 
   validate_type_user_list(key, val) {
-    var valArr = val;
+    let valArr = val;
     try {
       if (!(valArr instanceof Array)) {
-        valArr = valArr.split(/\s*\,\s*/);
+        valArr = valArr.split(/\s*,\s*/);
       }
       valArr = valArr.map((v) => this.validate_type_user(key, v));
     } catch (err) {
@@ -310,7 +307,7 @@ class SchemaValidator {
         )
       );
     }
-    return valArr.join(', ');
+    return valArr.join(", ");
   }
 
   validate_type_string(key, val) {
@@ -357,8 +354,8 @@ class SchemaValidator {
       );
     }
     if (val !== "") {
-      var encryptedStr = await this.validate_encrypt(null, key, val);
-      return encryptedStr;      
+      const encryptedStr = await this.validate_encrypt(null, key, val);
+      return encryptedStr;
     }
     return val;
   }
@@ -388,6 +385,7 @@ class SchemaValidator {
         )
       );
     }
+    // eslint-disable-next-line no-new
     new Schema(val);
     return val;
   }
@@ -416,30 +414,29 @@ class SchemaValidator {
         "email"
       )
     );
-    var emailRegExp = new RegExp(
-      "^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*.?[a-zA-Z0-9])*.[a-zA-Z](-?[a-zA-Z0-9])+$"
-    );
+    const emailRegExp =
+      /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*.?[a-zA-Z0-9])*.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     if (!email) {
       throw emailError;
     }
 
-    var emailParts = email.split("@");
+    const emailParts = email.split("@");
 
     if (emailParts.length !== 2) {
       throw emailError;
     }
 
-    var account = emailParts[0];
-    var address = emailParts[1];
+    const account = emailParts[0];
+    const address = emailParts[1];
 
     if (account.length > 64) {
       throw emailError;
     } else if (address.length > 255) {
       throw emailError;
     }
-    var domainParts = address.split(".");
+    const domainParts = address.split(".");
     if (
-      domainParts.some(function (part) {
+      domainParts.some((part) => {
         return part.length > 63;
       })
     ) {
@@ -466,7 +463,7 @@ class SchemaValidator {
     if (this.post) {
       return undefined;
     }
-    var hash = await bcrypt.hash(val, 10);
+    const hash = await bcrypt.hash(val, 10);
     return hash;
   }
 
@@ -475,12 +472,12 @@ class SchemaValidator {
     if (!this.controler) {
       throw new Error(Errors.ErrMsg.SchemaValidator_NoControler);
     }
-    var filter = { [key]: val };
+    let filter = { [key]: val };
     if (itemid) {
       filter = {
         ...filter,
-        [Globals.itemIdFieldName] : {$ne: itemid}
-      }
+        [Globals.itemIdFieldName]: { $ne: itemid },
+      };
     }
     const item = await this.controler.simpleFind(this.listid, filter);
 
@@ -494,7 +491,7 @@ class SchemaValidator {
   }
 
   validate_required(type, key, val) {
-    if (val === undefined || val === null || val === '') {
+    if (val === undefined || val === null || val === "") {
       throw new Error(
         NodeUtil.format(Errors.ErrMsg.SchemaValidator_Required, key)
       );
@@ -527,29 +524,32 @@ class SchemaValidator {
     return val;
   }
 
-  validate_options(options_str, key, val) {
-    var options = options_str;
+  validate_options(optionStr, key, val) {
+    let options = optionStr;
     if (typeof options === "string") {
       const optRX = new RegExp(
-        SimpleJSON.RXStr.singleQuotedStr +
-        "|" +
-        SimpleJSON.RXStr.doubleQuotedStr +
-        "|" +
-        SimpleJSON.RXStr.worldValue, 'g');
-      options = options_str.match(optRX);
-      options = options.map(opt => SimpleJSON.trimFromEdges(opt, '"'));
-      options = options.map(opt => SimpleJSON.trimFromEdges(opt, "'"));
+        `${SimpleJSON.RXStr.singleQuotedStr}|${SimpleJSON.RXStr.doubleQuotedStr}|${SimpleJSON.RXStr.worldValue}`,
+        "g"
+      );
+      options = optionStr.match(optRX);
+      options = options.map((opt) => SimpleJSON.trimFromEdges(opt, '"'));
+      options = options.map((opt) => SimpleJSON.trimFromEdges(opt, "'"));
     }
     if (options === null || options.length < 1) {
       throw new Error(
-        NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidOption, options_str)
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidOption, optionStr)
       );
     }
     if (options.includes(val)) {
       return val;
     }
     throw new Error(
-      NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidOptionValue, val, key, options_str)
+      NodeUtil.format(
+        Errors.ErrMsg.SchemaValidator_InvalidOptionValue,
+        val,
+        key,
+        optionStr
+      )
     );
   }
 }

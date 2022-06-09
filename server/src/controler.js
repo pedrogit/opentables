@@ -15,102 +15,114 @@ const SchemaValidator = require("./schemaValidator");
 
 class Controler {
   init(callback) {
-    if (!process.env.MONGODB_ADDRESS_DEVEL && !process.env.MONGODB_ADDRESS_PROD) {
-      console.log('ERROR: MONGODB_ADDRESS is not defined. ' + Errors.ErrMsg.Database_CouldNotConnect + ' EXITING...');
+    if (
+      !process.env.MONGODB_ADDRESS_DEVEL &&
+      !process.env.MONGODB_ADDRESS_PROD
+    ) {
+      console.log(
+        `ERROR: MONGODB_ADDRESS is not defined. ${Errors.ErrMsg.Database_CouldNotConnect} EXITING...`
+      );
       process.exit();
     }
     MongoDB.MongoClient.connect(
-      (process.env.NODE_ENV === "development" ? 
-        process.env.MONGODB_ADDRESS_DEVEL : 
-        process.env.MONGODB_ADDRESS_PROD),
+      process.env.NODE_ENV === "development"
+        ? process.env.MONGODB_ADDRESS_DEVEL
+        : process.env.MONGODB_ADDRESS_PROD,
       (err, ldb) => {
-      if (err) {
-          console.log('ERROR: ' + Errors.ErrMsg.Database_CouldNotConnect + ' EXITING...');
+        if (err) {
+          console.log(
+            `ERROR: ${Errors.ErrMsg.Database_CouldNotConnect} EXITING...`
+          );
           process.exit();
-      }
-      this.coll = ldb
-        .db(Globals.mongoDatabaseName)
-        .collection(Globals.mongoCollectionName);
-      console.log('Connected to MongoDB @ ' + ldb.s.url + '...');
+        }
+        this.coll = ldb
+          .db(Globals.mongoDatabaseName)
+          .collection(Globals.mongoCollectionName);
+        console.log(`Connected to MongoDB @ ${ldb.s.url}...`);
 
-      // call the callback
-      if (callback && typeof callback === 'function') {
-        callback();
+        // call the callback
+        if (callback && typeof callback === "function") {
+          callback();
+        }
       }
-    });
+    );
   }
 
-  initialViews() {
-    return [Globals.viewOnTheListOfAllViews, 
-            Globals.viewOnTheListOfAllLists, 
-            Globals.viewOnTheListOfUsers,
-            Globals.signUpViewOnTheListOfUsers,
-            Globals.viewOnTheListOfUsersAtLoad,
-            Globals.viewOnTheListOfUsersAsForm
-          ]
+  static initialViews() {
+    return [
+      Globals.viewOnTheListOfAllViews,
+      Globals.viewOnTheListOfAllLists,
+      Globals.viewOnTheListOfUsers,
+      Globals.signUpViewOnTheListOfUsers,
+      Globals.viewOnTheListOfUsersAtLoad,
+      Globals.viewOnTheListOfUsersAsForm,
+    ];
   }
 
   async createBaseTables(callback) {
     // clean the database
     await this.deleteAll(Globals.adminUserName, true);
 
-    console.log("Create the " + Globals.listOfAllLists['name'] + "...");
+    console.log(`Create the ${Globals.listOfAllLists.name}...`);
     try {
-      var item = await this.insertMany(
+      await this.insertMany(
         Globals.adminUserName,
         Globals.voidListId,
-        {...Globals.listOfAllLists}
+        Globals.listOfAllLists
       );
     } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfAllLists['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
+      const msg = NodeUtil.format(
+        Errors.ErrMsg.CouldNotCreate,
+        Globals.listOfAllLists.name
+      );
+      console.log(`ERROR: ${msg} EXITING...`);
       process.exit();
     }
 
-    console.log("Create the " + Globals.listOfAllViews['name'] + "...");
+    console.log(`Create the ${Globals.listOfAllViews.name}...`);
     try {
-      item = await this.insertMany(
-        Globals.adminUserName,
-        Globals.voidListId,
-        {...Globals.listOfAllViews}
-      );
+      await this.insertMany(Globals.adminUserName, Globals.voidListId, {
+        ...Globals.listOfAllViews,
+      });
     } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfAllViews['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
+      const msg = NodeUtil.format(
+        Errors.ErrMsg.CouldNotCreate,
+        Globals.listOfAllViews.name
+      );
+      console.log(`ERROR: ${msg} EXITING...`);
       process.exit();
     }
 
-    console.log("Create the " + Globals.listOfUsers['name'] + "...");
+    console.log(`Create the ${Globals.listOfUsers.name}...`);
     try {
-      item = await this.insertMany(
-        Globals.adminUserName,
-        Globals.listofAllListId,
-        {...Globals.listOfUsers}
-      );
+      await this.insertMany(Globals.adminUserName, Globals.listOfAllListId, {
+        ...Globals.listOfUsers,
+      });
     } catch (err) {
-      var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, Globals.listOfUsers['name'])
-      console.log('ERROR: ' + msg + ' EXITING...');
+      const msg = NodeUtil.format(
+        Errors.ErrMsg.CouldNotCreate,
+        Globals.listOfUsers.name
+      );
+      console.log(`ERROR: ${msg} EXITING...`);
       process.exit();
     }
 
     // create the initial views
-    this.initialViews().forEach(async view => {
-      console.log("Create the " + view['name'] + "...");
+    Controler.initialViews().forEach(async (view) => {
+      console.log(`Create the ${view.name}...`);
       try {
-        item = await this.insertMany(
-          Globals.adminUserName,
-          Globals.listofAllViewId,
-          {...view}
-        );
+        await this.insertMany(Globals.adminUserName, Globals.listOfAllViewId, {
+          ...view,
+        });
       } catch (err) {
-        var msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, view['name'])
-        console.log('ERROR: ' + msg + ' EXITING...');
+        const msg = NodeUtil.format(Errors.ErrMsg.CouldNotCreate, view.name);
+        console.log(`ERROR: ${msg} EXITING...`);
         process.exit();
-      }  
-    })
+      }
+    });
 
     // call the callback
-    if (callback && typeof callback === 'function') {
+    if (callback && typeof callback === "function") {
       callback();
     }
   }
@@ -118,7 +130,7 @@ class Controler {
   static isList(item) {
     return (
       item[Globals.listIdFieldName] &&
-      (item[Globals.listIdFieldName].toString() === Globals.listofAllListId ||
+      (item[Globals.listIdFieldName].toString() === Globals.listOfAllListId ||
         Controler.hasVoidParent(item))
     );
   }
@@ -131,7 +143,11 @@ class Controler {
   }
 
   static isOrphanList(id) {
-    return id === Globals.voidListId || id === Globals.listofAllListId || id === Globals.listofAllViewId;
+    return (
+      id === Globals.voidListId ||
+      id === Globals.listOfAllListId ||
+      id === Globals.listOfAllViewId
+    );
   }
 
   async simpleFind(listid, filter) {
@@ -147,14 +163,14 @@ class Controler {
   }
 
   async getParentList(listid) {
-    var parentList;
+    let parentList;
 
     if (!MongoDB.ObjectId.isValid(listid)) {
       throw new Errors.BadRequest(
         NodeUtil.format(Errors.ErrMsg.MalformedID, listid)
       );
     }
-    
+
     if (listid.toString() === Globals.voidListId) {
       parentList = Globals.listOfAllLists;
     } else {
@@ -164,10 +180,7 @@ class Controler {
     }
     if (!parentList) {
       throw new Errors.NotFound(
-        NodeUtil.format(
-          Errors.ErrMsg.List_NotFound,
-          listid
-        )
+        NodeUtil.format(Errors.ErrMsg.List_NotFound, listid)
       );
     }
     return parentList;
@@ -175,22 +188,21 @@ class Controler {
 
   static async validateRecaptcha(humanKey) {
     if (humanKey) {
-      var isHuman;
+      let isHuman;
       try {
         isHuman = await axios.post(
-          "https://www.google.com/recaptcha/api/siteverify?secret=" +
-          (process.env.NODE_ENV === "development" ? 
-            process.env.RECAPTCHA_SERVER_KEY_DEVEL : 
-            process.env.RECAPTCHA_SERVER_KEY_PROD) + 
-          "&response=" + humanKey
+          `https://www.google.com/recaptcha/api/siteverify?secret=${
+            process.env.NODE_ENV === "development"
+              ? process.env.RECAPTCHA_SERVER_KEY_DEVEL
+              : process.env.RECAPTCHA_SERVER_KEY_PROD
+          }&response=${humanKey}`
         );
-      }
-      catch (err){
+      } catch (err) {
         throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
       }
 
       if (isHuman && isHuman.data && isHuman.data.success) {
-        return
+        return;
       }
     }
     throw new Errors.BadRequest(Errors.ErrMsg.Recaptcha_Failed);
@@ -202,42 +214,39 @@ class Controler {
     otherwise throw an error.
   */
   async validateItems(
-    schemaStr, 
+    schemaStr,
     items,
     user,
     listid,
-    {
-      strict = false,
-      post = false
-    }
+    { strict = false, post = false }
   ) {
-    var newItems;
-    var gRecaptchaResponse;
+    let newItems;
+    let gRecaptchaResponse;
 
-    // remember recaptcha so we can remove it as a property and we 
+    // remember recaptcha so we can remove it as a property and we
     // can validate it AFTER validating other properties
     if (strict && !post && user === Globals.allUserName) {
       gRecaptchaResponse = items[Globals.gRecaptchaResponse];
+      // eslint-disable-next-line no-param-reassign
       delete items[Globals.gRecaptchaResponse];
     }
 
     // validate provided JSON against the schema
     try {
       const schema = new Schema(schemaStr);
-      const schemaValidator = new SchemaValidator(
-        schema,
-        this,
-        listid,
-        post
-      );
+      const schemaValidator = new SchemaValidator(schema, this, listid, post);
 
       // validate many or one
       if (items instanceof Array) {
         // validate many
         newItems = await Promise.all(
           items.map(async (thisItem) => {
+            // eslint-disable-next-line no-param-reassign
             delete thisItem[Globals.listIdFieldName];
-            var newItem = await schemaValidator.validateJson(thisItem, strict);
+            const newItem = await schemaValidator.validateJson(
+              thisItem,
+              strict
+            );
             // add listid to the item
             if (strict && listid) {
               newItem[Globals.listIdFieldName] = MongoDB.ObjectId(listid);
@@ -247,6 +256,7 @@ class Controler {
         );
       } else {
         // validate only one
+        // eslint-disable-next-line no-param-reassign
         delete items[Globals.listIdFieldName];
         newItems = await schemaValidator.validateJson(items, strict, user);
         if (strict && listid) {
@@ -264,7 +274,7 @@ class Controler {
     return newItems;
   }
 
-  /*makePipeline() {
+  /* makePipeline() {
 
   }
 
@@ -284,7 +294,7 @@ class Controler {
     // traverse the item to build the pipeline
 
     // query
-  }*/
+  } */
 
   async findWithItems(user, itemid, filter, noitems) {
     if (!MongoDB.ObjectId.isValid(itemid)) {
@@ -293,7 +303,7 @@ class Controler {
       );
     }
 
-    var item = await this.coll.findOne({
+    let item = await this.coll.findOne({
       [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid),
     });
 
@@ -304,17 +314,21 @@ class Controler {
     }
 
     if (Controler.isList(item)) {
-      if (ValidatePerm.validateRPerm({
-        user: user,
-        list: item,
-        ignoreListItem: true
-      })) {
+      if (
+        ValidatePerm.validateRPerm({
+          user,
+          list: item,
+          ignoreListItem: true,
+        })
+      ) {
         if (!noitems) {
-          if (ValidatePerm.validateRPerm({
-            user: user,
-            list: item,
-          })) {
-            var lookup = {
+          if (
+            ValidatePerm.validateRPerm({
+              user,
+              list: item,
+            })
+          ) {
+            const lookup = {
               from: Globals.mongoCollectionName,
               localField: Globals.itemIdFieldName,
               foreignField: Globals.listIdFieldName,
@@ -322,15 +336,15 @@ class Controler {
             };
 
             if (filter) {
-              var mongoDBFilter = new Filter(filter);
-              var jsonFilter = mongoDBFilter.final();
-              lookup.let = { x: "$" + Globals.itemIdFieldName };
+              const mongoDBFilter = new Filter(filter);
+              const jsonFilter = mongoDBFilter.final();
+              lookup.let = { x: `$${Globals.itemIdFieldName}` };
               lookup.pipeline = [
                 {
                   $match: {
                     $expr: {
                       $and: [
-                        { $eq: ["$" + Globals.listIdFieldName, "$$x"] },
+                        { $eq: [`$${Globals.listIdFieldName}`, "$$x"] },
                         jsonFilter,
                       ],
                     },
@@ -341,43 +355,52 @@ class Controler {
               delete lookup.foreignField;
             }
 
-            var pipeline = [
-              { $match: { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) } },
+            const pipeline = [
+              {
+                $match: { [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) },
+              },
               { $lookup: lookup },
               // remove the listid property since it is the same as the list itemid
-              { $unset: Globals.itemsFieldName + "." + Globals.listIdFieldName },
+              {
+                $unset: `${Globals.itemsFieldName}.${Globals.listIdFieldName}`,
+              },
             ];
 
             // remove hidden properties
             const schema = new Schema(item[Globals.listSchemaFieldName]);
 
             schema.getHidden().map(async (hidden) => {
-              pipeline.push({ $unset: [Globals.itemsFieldName] + "." + hidden })
+              pipeline.push({
+                $unset: `${[Globals.itemsFieldName]}.${hidden}`,
+              });
             });
 
             item = await this.coll.aggregate(pipeline).toArray();
-            item = item[0];
+            [item] = item;
 
             // remove items for which the user do not have read permissions
-            item[Globals.itemsFieldName] = item[Globals.itemsFieldName].filter((subItem) => {
-              return ValidatePerm.validateRPerm({
-                user: user,
-                list: item,
-                item: subItem
-              });
-            });
-          }
-          else {
+            item[Globals.itemsFieldName] = item[Globals.itemsFieldName].filter(
+              (subItem) => {
+                return ValidatePerm.validateRPerm({
+                  user,
+                  list: item,
+                  item: subItem,
+                });
+              }
+            );
+          } else {
             item = {
               ...item,
-              [Globals.itemsFieldName]: Globals.permissionDeniedOnListOrItems
-            }
+              [Globals.itemsFieldName]: Globals.permissionDeniedOnListOrItems,
+            };
           }
         }
 
-        var parentList = await this.getParentList(item[Globals.listIdFieldName]);
+        const parentList = await this.getParentList(
+          item[Globals.listIdFieldName]
+        );
 
-        var items = item[Globals.itemsFieldName];
+        const items = item[Globals.itemsFieldName];
         // post validate list properties against schema (mostly to remove hidden properties)
         item = await this.validateItems(
           parentList[Globals.listSchemaFieldName],
@@ -385,34 +408,44 @@ class Controler {
           user,
           parentList[Globals.itemIdFieldName],
           {
-            post: true
+            post: true,
           }
         );
         item[Globals.itemsFieldName] = items;
-      }
-      else {
-        item = Globals.permissionDeniedOnListOrItems
+      } else {
+        item = Globals.permissionDeniedOnListOrItems;
       }
     } else {
       // find item schema
-      var parentList = await this.getParentList(item[Globals.listIdFieldName]);
+      const parentList = await this.getParentList(
+        item[Globals.listIdFieldName]
+      );
 
       ValidatePerm.validateRPerm({
-        user: user,
+        user,
         list: parentList,
-        item: item,
-        throwError: true
+        item,
+        throwError: true,
       });
 
       // add embedded items if there are any
       const schema = new Schema(parentList[Globals.listSchemaFieldName]);
       await Promise.all(
         schema.getEmbedded().map(async (embedded) => {
-          if (item[embedded]){
-            noitems = (embedded === Globals.childlistFieldName && 
-                       item[Globals.addItemModeFieldName] &&
-                       item[Globals.addItemModeFieldName] === Globals.addWithPersistentFormNoItems ? true : noitems);
-           item[embedded] = await this.findWithItems(user, item[embedded], filter, noitems);
+          if (item[embedded]) {
+            const embeddedNoItems =
+              embedded === Globals.childlistFieldName &&
+              item[Globals.addItemModeFieldName] &&
+              item[Globals.addItemModeFieldName] ===
+                Globals.addWithPersistentFormNoItems
+                ? true
+                : noitems;
+            item[embedded] = await this.findWithItems(
+              user,
+              item[embedded],
+              filter,
+              embeddedNoItems
+            );
           }
         })
       );
@@ -425,7 +458,7 @@ class Controler {
         parentList[Globals.itemIdFieldName],
         {
           strict: false,
-          post: true
+          post: true,
         }
       );
     }
@@ -434,17 +467,17 @@ class Controler {
 
   async insertMany(user, listid, item) {
     // find the parent list
-    var parentList = await this.getParentList(listid);
+    const parentList = await this.getParentList(listid);
 
     // validate permissions
     ValidatePerm.validateCPerm({
-      user: user,
+      user,
       list: parentList,
-      throwError: true
+      throwError: true,
     });
 
     // validate item against schema
-    var newItems = await this.validateItems(
+    let newItems = await this.validateItems(
       parentList[Globals.listSchemaFieldName],
       item,
       user,
@@ -459,8 +492,15 @@ class Controler {
       newItems = await this.coll.insertMany(newItems);
     } else {
       // if the new item is a view, add a corresponding list
-      if (listid === Globals.listofAllViewId && !newItems[Globals.childlistFieldName]) {
-        var newList = await this.insertMany(user, Globals.listofAllListId, {});
+      if (
+        listid === Globals.listOfAllViewId &&
+        !newItems[Globals.childlistFieldName]
+      ) {
+        const newList = await this.insertMany(
+          user,
+          Globals.listOfAllListId,
+          {}
+        );
         newItems[Globals.childlistFieldName] = newList[Globals.itemIdFieldName];
       }
 
@@ -468,20 +508,27 @@ class Controler {
         await this.coll.insertOne(newItems);
       } catch (error) {
         if (error.code === 11000) {
-          throw new Errors.BadRequest(NodeUtil.format(Errors.ErrMsg.Item_AlreadyExists, item[Globals.itemIdFieldName]));
+          throw new Errors.BadRequest(
+            NodeUtil.format(
+              Errors.ErrMsg.Item_AlreadyExists,
+              item[Globals.itemIdFieldName]
+            )
+          );
         }
       }
     }
 
-    if (!newItems || (newItems.acknowledged !== undefined && !newItems.acknowledged)) {
+    if (
+      !newItems ||
+      (newItems.acknowledged !== undefined && !newItems.acknowledged)
+    ) {
       throw new Errors.InternalServerError(Errors.ErrMsg.Item_CouldNotCreate);
     }
 
     // delete the acknowledgment property if there was many items
     if (newItems.acknowledged !== undefined) {
       delete newItems.acknowledged;
-    }
-    else {
+    } else {
       // post validate the item against schema (mostly to remove hidden properties)
       newItems = await this.validateItems(
         parentList[Globals.listSchemaFieldName],
@@ -490,7 +537,7 @@ class Controler {
         listid,
         {
           strict: false,
-          post: true
+          post: true,
         }
       );
     }
@@ -498,7 +545,7 @@ class Controler {
     return newItems;
   }
 
-  async patch(user, itemid, newitem) {
+  async patch(user, itemid, newItem) {
     if (!MongoDB.ObjectId.isValid(itemid)) {
       throw new Errors.BadRequest(
         NodeUtil.format(Errors.ErrMsg.MalformedID, itemid)
@@ -506,7 +553,7 @@ class Controler {
     }
 
     // find the item to get it's parent list schema
-    var item = await this.coll.findOne({
+    let item = await this.coll.findOne({
       [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid),
     });
     if (!item) {
@@ -516,22 +563,22 @@ class Controler {
     }
 
     // find item schema
-    var parentList = await this.getParentList(item[Globals.listIdFieldName]);
+    const parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
     ValidatePerm.validateRWPerm({
-      user: user,
+      user,
       list: parentList,
-      item: item,
-      throwError: true
+      item,
+      throwError: true,
     });
 
     // validate item against schema
-    newitem = await this.validateItems(
+    const validItem = await this.validateItems(
       parentList[Globals.listSchemaFieldName],
       {
-        ...newitem,
+        ...newItem,
         // include the actual itemid when patching so we can ignore it when validating unicity
-        [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid)
+        [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid),
       },
       user,
       item[Globals.listIdFieldName],
@@ -539,10 +586,10 @@ class Controler {
         strict: false,
       }
     );
-    
+
     // update it
-    var unsetProps = Schema.getEmptyProps(newitem);
-    var pipeline = { $set: newitem };
+    const unsetProps = Schema.getEmptyProps(validItem);
+    let pipeline = { $set: validItem };
     if (unsetProps.length > 0) {
       pipeline = [pipeline, { $unset: unsetProps }];
     }
@@ -563,10 +610,10 @@ class Controler {
       item.value[Globals.listIdFieldName],
       {
         strict: false,
-        post: true
+        post: true,
       }
     );
-      
+
     return item;
   }
 
@@ -575,35 +622,39 @@ class Controler {
       throw new Errors.Forbidden(Errors.ErrMsg.Forbidden);
     }
 
-    var filter = {};
+    let filter = {};
     if (!all) {
       filter = {
         $and: [
-          { // do not delete the list of all lists and the list of all views
+          {
+            // do not delete the list of all lists and the list of all views
             [Globals.listIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.voidListId),
             },
           },
-          /*{ // do not delete the users
+          /* { // do not delete the users
             [Globals.listIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
-          },*/
-          { // do not delete the users list
+          }, */
+          {
+            // do not delete the users list
             [Globals.itemIdFieldName]: {
               $ne: MongoDB.ObjectId(Globals.userListId),
             },
-          }
+          },
         ],
       };
       // do not delete the initial views (on list of view, on list of list, on user list)
-      filter.$and = filter.$and.concat(this.initialViews().map(view => {
-        return {
-          [Globals.itemIdFieldName]: {
-            $ne: MongoDB.ObjectId(view[Globals.itemIdFieldName])
-          }
-        }
-      }))
+      filter.$and = filter.$and.concat(
+        Controler.initialViews().map((view) => {
+          return {
+            [Globals.itemIdFieldName]: {
+              $ne: MongoDB.ObjectId(view[Globals.itemIdFieldName]),
+            },
+          };
+        })
+      );
     }
 
     return this.coll.deleteMany(filter);
@@ -622,7 +673,7 @@ class Controler {
     }
 
     // find the item to check if it is a list or an item
-    var item = await this.coll.findOne({
+    const item = await this.coll.findOne({
       [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid),
     });
     if (!item) {
@@ -632,15 +683,15 @@ class Controler {
     }
 
     // find item schema
-    var parentList = await this.getParentList(item[Globals.listIdFieldName]);
+    const parentList = await this.getParentList(item[Globals.listIdFieldName]);
 
     // check user permissions
     ValidatePerm.validateDPerm({
-        user: user,
-        list: parentList,
-        item: item,
-        throwError: true
-      });
+      user,
+      list: parentList,
+      item,
+      throwError: true,
+    });
     if (Controler.isList(item)) {
       // delete all associated items
       await this.coll.deleteMany({
@@ -648,9 +699,11 @@ class Controler {
           item[Globals.itemIdFieldName]
         ),
       });
-    } 
+    }
 
-    return this.coll.deleteOne({ [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid) });
+    return this.coll.deleteOne({
+      [Globals.itemIdFieldName]: MongoDB.ObjectId(itemid),
+    });
   }
 }
 

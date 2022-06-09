@@ -71,7 +71,7 @@ describe("testRoutes.js List API", () => {
       };
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllListId)
         .send(lastList)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -96,7 +96,7 @@ describe("testRoutes.js List API", () => {
       delete lastList["x" + Globals.ownerFieldName];
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllListId)
         .send(lastList)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -115,7 +115,7 @@ describe("testRoutes.js List API", () => {
     it("2.3 - Post a new, valid empty list", (done) => {
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllListId)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           lastList = response.body;
@@ -193,7 +193,7 @@ describe("testRoutes.js List API", () => {
     it("2.8 - Try to post a new list with an already existing id", (done) => {
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllListId)
         .send(lastList)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -1233,7 +1233,7 @@ describe("testRoutes.js List API", () => {
     it("11.1 - Add an extra list", (done) => {
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllListId)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
           newList = response.body;
@@ -1248,7 +1248,7 @@ describe("testRoutes.js List API", () => {
     it("11.2 - Get the list of all lists (except the list of users)", (done) => {
       chai
         .request(server)
-        .get("/api/" + Globals.APIKeyword + "/" + Globals.listofAllListId)
+        .get("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllListId)
         .end((err, response) => {
           listOfAllList[Globals.itemsFieldName].unshift(Globals.listOfUsers);
           listOfAllList[Globals.itemsFieldName][0][Globals.itemIdFieldName] = listOfAllList[Globals.itemsFieldName][0][Globals.itemIdFieldName].toString();
@@ -1276,7 +1276,7 @@ describe("testRoutes.js List API", () => {
       };
       chai
         .request(server)
-        .post("/api/" + Globals.APIKeyword + "/" + Globals.listofAllViewId)
+        .post("/api/" + Globals.APIKeyword + "/" + Globals.listOfAllViewId)
         .send(newView)
         .auth(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD)
         .end((err, response) => {
@@ -1483,7 +1483,7 @@ describe("testRoutes.js List API", () => {
 
     it('13.1 - Add a list of referenced items', (done) => {
       refItemList = {
-        [Globals.listIdFieldName]: Globals.listofAllListId,
+        [Globals.listIdFieldName]: Globals.listOfAllListId,
         [Globals.nameFieldName]: 'List of referenced items',
         [Globals.ownerFieldName]: 'pedro@gmail.com', 
         [Globals.readWritePermFieldName]: '@owner',
@@ -1585,7 +1585,7 @@ describe("testRoutes.js List API", () => {
 
     it('13.4 - Create a view on the list', (done) => {
       embView = {
-        [Globals.listIdFieldName]: Globals.listofAllViewId,
+        [Globals.listIdFieldName]: Globals.listOfAllViewId,
         [Globals.nameFieldName]: 'View on embedded items',
         [Globals.ownerFieldName]: 'p@gmail.com',
         [Globals.readWritePermFieldName]: '@owner',

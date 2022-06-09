@@ -1,20 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import renderer from 'react-test-renderer';
+/* eslint-env mocha */
+import React from "react";
+import ReactDOM from "react-dom";
+import renderer from "react-test-renderer";
 
-import Item from './Item';
+import Item from "./Item";
 
-describe('Item', () => {
-  it('renders without crashing', () => {
-    const div = document.createElement('div');
+describe("Item", () => {
+  it("renders without crashing", () => {
+    const div = document.createElement("div");
     ReactDOM.render(<Item />, div);
   });
 
-  it('has a valid snapshot', () => {
-    const component = renderer.create(
-      <Item />
-    );
-    let tree = component.toJSON();
+  it("has a valid snapshot", () => {
+    const component = renderer.create(<Item />);
+    const tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   });
 });

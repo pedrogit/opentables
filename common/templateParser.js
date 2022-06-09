@@ -6,9 +6,12 @@ class TemplateParser {
   }
 
   getUsedProperties() {
-    const regex = new RegExp("(?<={\\s*)" + Globals.identifierRegEx + "(?=\\s*})", "g");
+    const regex = new RegExp(
+      `(?<={\\s*)${Globals.identifierRegEx}(?=\\s*})`,
+      "g"
+    );
     return this.templateStr.match(regex);
   }
 }
 
-module.exports = TemplateParser
+module.exports = TemplateParser;

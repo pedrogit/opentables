@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 class BadRequest extends Error {
   constructor(message) {
     super(message);
@@ -33,18 +34,12 @@ class InternalServerError extends Error {
   }
 }
 
-class FatalServerError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 599;
-  }
-}
-
-var ErrMsg = {
+const ErrMsg = {
   Database_CouldNotConnect: "Could not connect to database...",
   InvalidUser: "User does not exists...",
   CouldNotLogin: "Could not login user...",
-  Forbidden: "User does not have sufficient permission to execute this request...",
+  Forbidden:
+    "User does not have sufficient permission to execute this request...",
   MalformedID: "Malformed ID (%s)...",
   CouldNotCreate: "Could not create %s...",
 
@@ -53,19 +48,27 @@ var ErrMsg = {
   Schema_TooManyLevels: 'Too many levels for schema "%s"...',
   Schema_InvalidValue: "Invalid value (%s) for %s...",
   Schema_InvalidSchema: "Invalid schema (%s)...",
-  Schema_InvalidSchemaParameter: 'Invalid schema parameter (%s) for property "%s"...',
-  Schema_InvalidSchemaOneRequired: "Invalid schema (%s). At least one property must be required...",
+  Schema_InvalidSchemaParameter:
+    'Invalid schema parameter (%s) for property "%s"...',
+  Schema_InvalidSchemaOneRequired:
+    "Invalid schema (%s). At least one property must be required...",
 
-  SchemaValidator_NotUnique: 'Item is not valid. "%s" should be unique but value (%s) already exists...',
+  SchemaValidator_NotUnique:
+    'Item is not valid. "%s" should be unique but value (%s) already exists...',
   SchemaValidator_NoControler: "No controler provided to Schema...",
   SchemaValidator_MissingProp: 'Item is not valid. "%s" is missing...',
-  SchemaValidator_InvalidOptionValue: 'Item is not valid. "%s" is not a valid option value for "%s" ("%s")...',
-  SchemaValidator_InvalidOption: 'Item is not valid. "%s" is not a valid value for the "options" property...',
-  SchemaValidator_InvalidType: 'Item is not valid. "%s" value (%s) is not a valid %s...',
-  SchemaValidator_Malformed: 'Item is not valid. %s...',
-  SchemaValidator_Required: 'Item is not valid. A value is required for "%s"...',
+  SchemaValidator_InvalidOptionValue:
+    'Item is not valid. "%s" is not a valid option value for "%s" ("%s")...',
+  SchemaValidator_InvalidOption:
+    'Item is not valid. "%s" is not a valid value for the "options" property...',
+  SchemaValidator_InvalidType:
+    'Item is not valid. "%s" value (%s) is not a valid %s...',
+  SchemaValidator_Malformed: "Item is not valid. %s...",
+  SchemaValidator_Required:
+    'Item is not valid. A value is required for "%s"...',
   SchemaValidator_NoDefault: 'Item does not allow default value for "%s"...',
-  SchemaValidator_MinLength: 'Item is not valid. "%s" should have a minimum of %s characters...',
+  SchemaValidator_MinLength:
+    'Item is not valid. "%s" should have a minimum of %s characters...',
 
   List_Missing: "List ID is missing from query...",
   List_NotFound: "Could not find list (%s)...",
@@ -74,7 +77,8 @@ var ErrMsg = {
   Item_Invalid: "Invalid item...",
   Item_CouldNotCreate: "Could not create item...",
   Item_CouldNotUpdate: "Could not update item...",
-  Item_AlreadyExists: "Could not create item. An item with this ID (%s) already exists...",
+  Item_AlreadyExists:
+    "Could not create item. An item with this ID (%s) already exists...",
 
   Filter_Null: "Filter can not be null...",
   Filter_InvalidFilter: "Invalid filter (%s)...",
@@ -86,10 +90,10 @@ var ErrMsg = {
 };
 
 module.exports = {
-  BadRequest: BadRequest,
-  Unauthorized: Unauthorized,
-  Forbidden: Forbidden,
-  NotFound: NotFound,
-  InternalServerError: InternalServerError,
-  ErrMsg: ErrMsg,
+  BadRequest,
+  Unauthorized,
+  Forbidden,
+  NotFound,
+  InternalServerError,
+  ErrMsg,
 };

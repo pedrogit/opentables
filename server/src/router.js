@@ -1,22 +1,20 @@
 const express = require("express");
-const url = require("url");
-const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
 const Globals = require("../../common/globals");
 const Utils = require("./serverUtils");
 const Errors = require("../../common/errors");
-
 const controler = require("./controler");
+
 const router = express.Router();
-/************************************************************************
+/** **********************************************************************
   GET /api/APIKeyword/login
 
   Login
 
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.get(
   "/login",
   asyncHandler(async (req, res) => {
@@ -24,14 +22,14 @@ router.get(
   })
 );
 
-/************************************************************************
+/** **********************************************************************
   GET /api/APIKeyword/logout
 
   Logout (forget the token)
 
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.get(
   "/logout",
   asyncHandler(async (req, res) => {
@@ -40,7 +38,7 @@ router.get(
   })
 );
 
-/************************************************************************
+/** **********************************************************************
   GET /api/APIKeyword/:itemid
 
   Get a list item by id if has list read permission.
@@ -50,13 +48,13 @@ router.get(
 
   Return status: 200, 400 invalid or invalid listid, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.get(
   "/:itemid/?",
   asyncHandler(async (req, res) => {
     // construct the full URL so we can then extract the filter parameter
     const fullURL = new URL(
-      req.protocol + "://" + req.get("host") + req.originalUrl
+      `${req.protocol}://${req.get("host")}${req.originalUrl}`
     );
     const item = await controler.findWithItems(
       req.user,
@@ -68,61 +66,62 @@ router.get(
   })
 );
 
-router.get(
-  "/", 
-  (req, res) => {
-    res.redirect("/api/" + Globals.APIKeyword + '/' + Globals.viewOnAllViewViewId);
-  }
-);
+router.get("/", (req, res) => {
+  res.redirect(`/api/${Globals.APIKeyword}/${Globals.viewOnAllViewViewId}`);
+});
 
-/************************************************************************
+/** **********************************************************************
   POST /api/APIKeyword/
 
   Post one or many new list items if has list edit permission.
 
   Return status: 201, 400 invalid json, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.post(
   "",
   asyncHandler(async (req, res) => {
     res.status(404);
-    throw new Errors.NotFound(
-      Errors.ErrMsg.List_Missing
-    );
+    throw new Errors.NotFound(Errors.ErrMsg.List_Missing);
   })
 );
 
 router.post(
   "/:listid",
   asyncHandler(async (req, res) => {
-    const item = await controler.insertMany(req.user, req.params.listid, req.body);
+    const item = await controler.insertMany(
+      req.user,
+      req.params.listid,
+      req.body
+    );
 
     // convert username to cookie token when registering
     if (req.params.listid === Globals.userListId) {
-      Utils.setCookieJWT(req, res, { username: item[Globals.usernameFieldName] });
+      Utils.setCookieJWT(req, res, {
+        username: item[Globals.usernameFieldName],
+      });
     }
 
     res.status(201).send(item);
   })
 );
 
-/************************************************************************
+/** **********************************************************************
   POST /api/APIKeyword/:itemid
   
   Clone an item if has list edit permission.
 
   Return status: 201, 400 invalid json, 401, 403
-*************************************************************************/
+************************************************************************ */
 
-/************************************************************************
+/** **********************************************************************
   PATCH /api/APIKeyword/:itemid
   
   Patch a list item if has list edit permission.
 
   Return status: 200, 400 invalid json, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.patch(
   "/:itemid",
   asyncHandler(async (req, res) => {
@@ -135,14 +134,14 @@ router.patch(
   })
 );
 
-/************************************************************************
+/** **********************************************************************
   DELETE /api/APIKeyword/ 
   
   Delete all listsItems! For testing purpose only
   
   Status: 200, 400 invalid json, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.delete(
   "",
   asyncHandler(async (req, res) => {
@@ -153,11 +152,11 @@ router.delete(
     }
   })
 );
-/************************************************************************
+/** **********************************************************************
   DELETE /api/APIKeyword/:itemid  // Delete one or many list items if has list edit permission
                                 // Status: 200, 400 invalid json, 401, 403
 
-*************************************************************************/
+************************************************************************ */
 router.delete(
   "/:itemid",
   asyncHandler(async (req, res) => {

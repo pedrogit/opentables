@@ -1,22 +1,27 @@
+/* eslint-env mocha */
 const chai = require("chai");
 const SimpleJSON = require("../simpleJSON");
 
-var expect = chai.expect;
+const { expect } = chai;
 
-var replaceStrInObject = function(obj, searchStr, replaceStr) {
-  for (let key in obj) {
-    if (obj.hasOwnProperty(key) && (typeof obj[key] === 'string' || obj[key] instanceof String)) {
-      obj[key] = obj[key].replace(searchStr, replaceStr);
+const replaceStrInObject = (obj, searchStr, replaceStr) => {
+  const newObj = { ...obj };
+  Object.keys(obj).forEach((key) => {
+    if (
+      Object.prototype.hasOwnProperty.call(newObj, key) &&
+      (typeof newObj[key] === "string" || newObj[key] instanceof String)
+    ) {
+      newObj[key] = newObj[key].replace(searchStr, replaceStr);
+    } else if (
+      typeof newObj[key] === "object" &&
+      !Array.isArray(newObj[key]) &&
+      newObj[key] !== null
+    ) {
+      newObj[key] = replaceStrInObject(newObj[key], searchStr, replaceStr);
     }
-    else if(typeof obj[key] === 'object' && !Array.isArray(obj[key]) && obj[key] !== null) {
-      obj[key] = replaceStrInObject(obj[key], searchStr, replaceStr)
-    }
-    else {
-      obj[key] = obj[key];
-    }
-  }
-  return obj;
-}
+  });
+  return newObj;
+};
 
 describe("testSimpleJSON.js Test simpleJSON functions", () => {
   describe("A - Test trimFromEdges()", () => {
@@ -33,168 +38,169 @@ describe("testSimpleJSON.js Test simpleJSON functions", () => {
     });
 
     it("4 - Provides 2 characters long remove strings", () => {
-      expect(function () {
+      expect(() => {
         SimpleJSON.trimFromEdges('"aaaa"', ["({", "})"]);
       }).to.throw("Trim strings should contain only one character...");
     });
 
     it("5 - Provides 3 remove strings", () => {
-      expect(function () {
+      expect(() => {
         SimpleJSON.trimFromEdges('"aaaa"', ["({", "})", '"']);
       }).to.throw("Trim array should not contain more than two strings...");
     });
 
     it("6 - With space at the end without removing them first", () => {
-      var result = SimpleJSON.trimFromEdges('"aaaa" ');
+      const result = SimpleJSON.trimFromEdges('"aaaa" ');
       expect(result).to.equal('"aaaa" ');
     });
 
     it("7 - With space at the end removing them first", () => {
-      var result = SimpleJSON.trimFromEdges('"aaaa" ', '"', true, true);
+      const result = SimpleJSON.trimFromEdges('"aaaa" ', '"', true, true);
       expect(result).to.equal("aaaa");
     });
 
     it("8 - With space at the end removing them first and removing inside spaces too", () => {
-      var result = SimpleJSON.trimFromEdges('"aaaa " ', '"', true, true);
+      const result = SimpleJSON.trimFromEdges('"aaaa " ', '"', true, true);
       expect(result).to.equal("aaaa");
     });
 
     it("9 - With two brackets", () => {
-      var result = SimpleJSON.trimFromEdges("{aaaa}", ["{", "}"]);
+      const result = SimpleJSON.trimFromEdges("{aaaa}", ["{", "}"]);
       expect(result).to.equal("aaaa");
     });
 
     it("10 - Remove surrounding space even if trimming characters are not found", () => {
-      var result = SimpleJSON.trimFromEdges(" {aaaa}", '"', true, false);
+      const result = SimpleJSON.trimFromEdges(" {aaaa}", '"', true, false);
       expect(result).to.equal("{aaaa}");
     });
 
     it("11 - Remove space surrounding trimmed string when trimming characters are not found has no effect", () => {
-      var result = SimpleJSON.trimFromEdges(" {aaaa }", '"', true, true);
+      const result = SimpleJSON.trimFromEdges(" {aaaa }", '"', true, true);
       expect(result).to.equal("{aaaa }");
     });
   });
 
   describe("B - Test isSurroundedBy()", () => {
-    it('1 - First arg undefined', () => {
+    it("1 - First arg undefined", () => {
       expect(SimpleJSON.isSurroundedBy(undefined, '"')).to.equal(false);
     });
 
-    it('2 - Second arg undefined', () => {
+    it("2 - Second arg undefined", () => {
       expect(SimpleJSON.isSurroundedBy('"aaaa"', undefined)).to.equal(false);
     });
-    
-    it('3 - Simple test', () => {
+
+    it("3 - Simple test", () => {
       expect(SimpleJSON.isSurroundedBy('"aaaa"', '"')).to.equal(true);
     });
   });
 
   describe("C - Test completeTrueValues()", () => {
     it("1 - Simple test", () => {
-      var result = SimpleJSON.completeTrueValues("{pr1: {required}}");
+      const result = SimpleJSON.completeTrueValues("{pr1: {required}}");
       expect(result).to.equal("{pr1: {required: true}}");
     });
 
     it("2 - Simple string", () => {
-      var result = SimpleJSON.completeTrueValues("pr1, pr2, pr3");
+      const result = SimpleJSON.completeTrueValues("pr1, pr2, pr3");
       expect(result).to.equal("pr1: true, pr2: true, pr3: true");
     });
 
     it("3 - No spaces", () => {
-      var result = SimpleJSON.completeTrueValues("{pr1:{required}}");
+      const result = SimpleJSON.completeTrueValues("{pr1:{required}}");
       expect(result).to.equal("{pr1:{required: true}}");
     });
 
     it("4 - More spaces", () => {
-      var result = SimpleJSON.completeTrueValues("{pr1: {  required  }}");
+      const result = SimpleJSON.completeTrueValues("{pr1: {  required  }}");
       expect(result).to.equal("{pr1: {  required: true  }}");
     });
 
     it("5 - More complex key", () => {
-      var result = SimpleJSON.completeTrueValues("{00fi-eld_1: {00fi-eld_2}}");
+      const result = SimpleJSON.completeTrueValues(
+        "{00fi-eld_1: {00fi-eld_2}}"
+      );
       expect(result).to.equal("{00fi-eld_1: {00fi-eld_2: true}}");
     });
 
     it("6 - Double quoted key", () => {
-      var result = SimpleJSON.completeTrueValues('{pr1: {  "required"  }}');
+      const result = SimpleJSON.completeTrueValues('{pr1: {  "required"  }}');
       expect(result).to.equal('{pr1: {  "required": true  }}');
     });
 
     it("7 - More values", () => {
-      var result = SimpleJSON.completeTrueValues("{a: {b, c}}");
+      const result = SimpleJSON.completeTrueValues("{a: {b, c}}");
       expect(result).to.equal("{a: {b: true, c: true}}");
     });
 
     it("8 - Double quoted keys", () => {
-      var result = SimpleJSON.completeTrueValues('{a: {"b"}}');
+      const result = SimpleJSON.completeTrueValues('{a: {"b"}}');
       expect(result).to.equal('{a: {"b": true}}');
     });
 
     it("9 - Single quoted keys", () => {
-      var result = SimpleJSON.completeTrueValues("{a: {'b'}}");
+      const result = SimpleJSON.completeTrueValues("{a: {'b'}}");
       expect(result).to.equal("{a: {'b': true}}");
     });
 
     it("10 - Array of strings", () => {
-      var result = SimpleJSON.completeTrueValues('{a: [b, c, d]}');
-      expect(result).to.equal('{a: [b, c, d]}');
-    });
-    
-    it("11 - Double quoted list of strings", () => {
-      var result = SimpleJSON.completeTrueValues('{a: \"b, c, d\"}');
-      expect(result).to.equal('{a: \"b, c, d\"}');
+      const result = SimpleJSON.completeTrueValues("{a: [b, c, d]}");
+      expect(result).to.equal("{a: [b, c, d]}");
     });
 
+    it("11 - Double quoted list of strings", () => {
+      const result = SimpleJSON.completeTrueValues('{a: "b, c, d"}');
+      expect(result).to.equal('{a: "b, c, d"}');
+    });
   });
 
   describe("D - Test unescapeChar()", () => {
     it("1 - Single quote alone 1", () => {
-      var result = SimpleJSON.unescapeChar("'", "'");
+      const result = SimpleJSON.unescapeChar("'", "'");
       expect(result).to.deep.equal("'");
     });
-    
+
     it("2 - Single quote alone 2", () => {
-      var result = SimpleJSON.unescapeChar("\'", "'");
+      const result = SimpleJSON.unescapeChar("'", "'");
       expect(result).to.deep.equal("'");
     });
 
     it("3 - Implicitely escaped single quote", () => {
-      var result = SimpleJSON.unescapeChar("\\'", "'");
+      const result = SimpleJSON.unescapeChar("\\'", "'");
       expect(result).to.deep.equal("'");
     });
 
     it("4 - Explicitely escaped single quote", () => {
-      var result = SimpleJSON.unescapeChar("\\\'", "'");
+      const result = SimpleJSON.unescapeChar("\\'", "'");
       expect(result).to.deep.equal("'");
     });
 
     it("5 - Unescaped single quote preceded by two backslashes", () => {
-      var result = SimpleJSON.unescapeChar("\\\\'", "'");
+      const result = SimpleJSON.unescapeChar("\\\\'", "'");
       expect(result).to.deep.equal("\\\\'");
     });
 
     it("6 - Implicitely escaped single quote preceded by two backslashes", () => {
-      var result = SimpleJSON.unescapeChar("\\\\\'", "'");
+      const result = SimpleJSON.unescapeChar("\\\\'", "'");
       expect(result).to.deep.equal("\\\\'");
     });
 
     it("7 - Explicitely escaped single quote preceded by two backslashes", () => {
-      var result = SimpleJSON.unescapeChar("\\\\\\'", "'");
+      const result = SimpleJSON.unescapeChar("\\\\\\'", "'");
       expect(result).to.deep.equal("\\\\'");
     });
 
     it("8 - Unescape final double quote", () => {
-      var result = SimpleJSON.unescapeChar('\\"', '"$');
+      const result = SimpleJSON.unescapeChar('\\"', '"$');
       expect(result).to.deep.equal('"');
     });
 
     it("9 - Unescape final double quote", () => {
-      var result = SimpleJSON.unescapeChar('\\\"', '"$');
+      const result = SimpleJSON.unescapeChar('\\"', '"$');
       expect(result).to.deep.equal('"');
     });
 
     it("10 - Unescape final double quote", () => {
-      var result = SimpleJSON.unescapeChar('\\\\"', '"$');
+      const result = SimpleJSON.unescapeChar('\\\\"', '"$');
       expect(result).to.deep.equal('\\\\"');
     });
   });
@@ -202,159 +208,165 @@ describe("testSimpleJSON.js Test simpleJSON functions", () => {
   describe("E - Test escapeUnescapedChar()", () => {
     it("1 - Single quote alone", () => {
       // there is zero escape char so ' is escaped
-      var result = SimpleJSON.escapeUnescapedChar("'", "'");
+      const result = SimpleJSON.escapeUnescapedChar("'", "'");
       expect(result).to.deep.equal("\\'");
     });
 
     it("2 - Single quote with 0 backslash", () => {
       // there is zero escape char so ' is escaped
-      var result = SimpleJSON.escapeUnescapedChar("a'b", "'");
+      const result = SimpleJSON.escapeUnescapedChar("a'b", "'");
       expect(result).to.deep.equal("a\\'b");
     });
 
     it("3 - Single quote with 1 backslash", () => {
       // \ count for zero escape char so ' is escaped
-      var result = SimpleJSON.escapeUnescapedChar("a\'bc\'d", "'");
+      const result = SimpleJSON.escapeUnescapedChar("a'bc'd", "'");
       expect(result).to.deep.equal("a\\'bc\\'d");
     });
 
     it("4 - Single quote with 2 backslash", () => {
       // \\ count for one escape char so it is just kept, not escaped
-      var result = SimpleJSON.escapeUnescapedChar("a\\'bc\\'d", "'");
+      const result = SimpleJSON.escapeUnescapedChar("a\\'bc\\'d", "'");
       expect(result).to.deep.equal("a\\'bc\\'d");
     });
 
     it("5 - Single quote with 3 backslash", () => {
       // \\ count for one escape char and \' is unescaped
-      var result = SimpleJSON.escapeUnescapedChar("a\\\'bc\\\'d", "'");
+      const result = SimpleJSON.escapeUnescapedChar("a\\'bc\\'d", "'");
       expect(result).to.deep.equal("a\\'bc\\'d");
     });
 
     it("6 - Single quote with 4 backslash", () => {
       // \\\\ are two backslashes, they are both escaped
-      var result = SimpleJSON.escapeUnescapedChar("a\\\\'bc\\\\'d", "'");
+      const result = SimpleJSON.escapeUnescapedChar("a\\\\'bc\\\\'d", "'");
       expect(result).to.deep.equal("a\\\\\\\\\\'bc\\\\\\\\\\'d");
     });
 
     it("7 - Single quote with 5 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar("a\\\\\'bc\\\\\'d", "'");
+      const result = SimpleJSON.escapeUnescapedChar("a\\\\'bc\\\\'d", "'");
       expect(result).to.deep.equal("a\\\\\\\\\\'bc\\\\\\\\\\'d");
     });
 
     it("8 - Double quote with 0 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar('a"b', '"');
+      const result = SimpleJSON.escapeUnescapedChar('a"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("9 - Double quote with 1 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar('a\"b', '"');
+      const result = SimpleJSON.escapeUnescapedChar('a"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("10 - Double quote with 2 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar('a\\"b', '"');
+      const result = SimpleJSON.escapeUnescapedChar('a\\"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("11 - Double quote with 3 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar('a\\\"b', '"');
+      const result = SimpleJSON.escapeUnescapedChar('a\\"b', '"');
       expect(result).to.deep.equal('a\\"b');
     });
 
     it("12 - Double quote with 4 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar('a\\\\"b', '"');
+      const result = SimpleJSON.escapeUnescapedChar('a\\\\"b', '"');
       expect(result).to.deep.equal('a\\\\\\\\\\"b');
     });
 
     it("13 - Double quote with 5 backslash", () => {
-      var result = SimpleJSON.escapeUnescapedChar('a\\\\\"b', '"');
+      const result = SimpleJSON.escapeUnescapedChar('a\\\\"b', '"');
       expect(result).to.deep.equal('a\\\\\\\\\\"b');
     });
   });
 
   describe("F - Test doubleQuoteKeys()", () => {
     it("1 - Simple test", () => {
-      var result = SimpleJSON.doubleQuoteKeys("{pr1: required}");
+      const result = SimpleJSON.doubleQuoteKeys("{pr1: required}");
       expect(result).to.equal('{"pr1": required}');
     });
 
     it("2 - Already double quoted", () => {
-      var result = SimpleJSON.doubleQuoteKeys('{"pr1": required}');
+      const result = SimpleJSON.doubleQuoteKeys('{"pr1": required}');
       expect(result).to.equal('{"pr1": required}');
     });
 
     it("3 - Key starting with a dollars sign", () => {
-      var result = SimpleJSON.doubleQuoteKeys("{$pr1: required}");
+      const result = SimpleJSON.doubleQuoteKeys("{$pr1: required}");
       expect(result).to.equal('{"$pr1": required}');
     });
 
     it("4 - Quoted value containing a key", () => {
-      var result = SimpleJSON.doubleQuoteKeys('{pr1: "b:", pr2: ""}');
+      const result = SimpleJSON.doubleQuoteKeys('{pr1: "b:", pr2: ""}');
       expect(result).to.equal('{"pr1": "b:", "pr2": ""}');
     });
 
     it("5 - Quoted value containing a key and excaped quotes", () => {
-      var result = SimpleJSON.doubleQuoteKeys('{pr1: "b :\\"", pr2: "b :\\"\\""}');
+      const result = SimpleJSON.doubleQuoteKeys(
+        '{pr1: "b :\\"", pr2: "b :\\"\\""}'
+      );
       expect(result).to.equal('{"pr1": "b :\\"", "pr2": "b :\\"\\""}');
     });
 
     it("6 - Quoted value containing a boolean", () => {
-      var result = SimpleJSON.doubleQuoteKeys('{pr1: true, pr2: false}');
+      const result = SimpleJSON.doubleQuoteKeys("{pr1: true, pr2: false}");
       expect(result).to.equal('{"pr1": true, "pr2": false}');
     });
   });
 
-  var specialCaseTestNames = {
+  const specialCaseTestNames = {
     test00: "Simple string containing @",
-    test01: "Boolean"
-  }
+    test01: "Boolean",
+  };
 
-  var specialCaseTests = {
+  const specialCaseTests = {
     test00: "pr1: @owner",
-    test01: "pr1: true, pr2: TruE, pr3: false, pr4: FalSe"
-  }
+    test01: "pr1: true, pr2: TruE, pr3: false, pr4: FalSe",
+  };
 
-  var specialCaseExpectedObj = {
-    test00: {pr1: "@owner"},
-    test01: {pr1: true, pr2: true, pr3: false, pr4: false}
-  }
+  const specialCaseExpectedObj = {
+    test00: { pr1: "@owner" },
+    test01: { pr1: true, pr2: true, pr3: false, pr4: false },
+  };
 
-  var specialCaseExpectedStr = {
-    test00: "pr1: \"@owner\"",
-    test01: "pr1: true, pr2: true, pr3: false, pr4: false"
-  }
+  const specialCaseExpectedStr = {
+    test00: 'pr1: "@owner"',
+    test01: "pr1: true, pr2: true, pr3: false, pr4: false",
+  };
 
   describe("G - Test doubleQuoteValues() with special cases", () => {
-    for (let key in specialCaseTestNames){
-      //console.log(key + ": " + testNb + " - " + specialCaseTestNames[key]);
-      if (specialCaseTestNames.hasOwnProperty(key)) {
-        it(key + " - " + specialCaseTestNames[key], () => {
-          /*if (key === 'test27') {
+    Object.keys(specialCaseTestNames).forEach((key) => {
+      // console.log(key + ": " + testNb + " - " + specialCaseTestNames[key]);
+      if (Object.prototype.hasOwnProperty.call(specialCaseTestNames, key)) {
+        it(`${key} - ${specialCaseTestNames[key]}`, () => {
+          /* if (key === 'test27') {
             console.log(key);
-          }*/
-          var result = SimpleJSON.doubleQuoteValues(specialCaseTests[key].trim());
+          } */
+          const result = SimpleJSON.doubleQuoteValues(
+            specialCaseTests[key].trim()
+          );
           expect(result).to.equal(specialCaseExpectedStr[key].trim());
         });
       }
-    }
+    });
   });
 
   describe("H - Test simpleJSONToJSON() with special cases", () => {
-    for (let key in specialCaseTestNames){
-      //console.log(key + ": " + testNb + " - " + specialCaseTestNames[key]);
-      if (specialCaseTestNames.hasOwnProperty(key)) {
-        it(key + " - " + specialCaseTestNames[key], () => {
-          /*if (key === 'test01') {
+    Object.keys(specialCaseTestNames).forEach((key) => {
+      // console.log(key + ": " + testNb + " - " + specialCaseTestNames[key]);
+      if (Object.prototype.hasOwnProperty.call(specialCaseTestNames, key)) {
+        it(`${key} - ${specialCaseTestNames[key]}`, () => {
+          /* if (key === 'test01') {
             console.log(key);
-          }*/
-          var result = SimpleJSON.simpleJSONToJSON(specialCaseTests[key].trim());
+          } */
+          const result = SimpleJSON.simpleJSONToJSON(
+            specialCaseTests[key].trim()
+          );
           expect(result).to.deep.equal(specialCaseExpectedObj[key]);
         });
       }
-    }
+    });
   });
 
-  var singleQuotesTestNames = {
+  const singleQuotesTestNames = {
     // simple tests
     test00: "Empty value",
     test01: "Simple value",
@@ -376,12 +388,12 @@ describe("testSimpleJSON.js Test simpleJSON functions", () => {
     test31: "Comma and value",
     test32: "Comma, value and space",
 
-    // unescaped and escaped quotes followed by JSON separators (,}]) 
+    // unescaped and escaped quotes followed by JSON separators (,}])
     // quotes are not interpreted as string terminators
     test40: "Single quote and comma",
     test41: "Escaped single quote and comma",
     test42: "Double escaped single quote and comma",
-    
+
     test43: "Single quote and closing brace",
     test44: "Escaped single quote and closing brace",
     test45: "Double escaped single quote and closing brace",
@@ -428,66 +440,98 @@ describe("testSimpleJSON.js Test simpleJSON functions", () => {
     test81: "Already quoted keys",
     test82: "Key and array",
     test83: "Already quoted array values",
-    test84: "Quoted list of strings"
-  }
+    test84: "Quoted list of strings",
+  };
 
-  var singleQuotesTests = {
+  const singleQuotesTests = {
     // simple tests
-    test00: "pr1: '', pr2: ' '                                                           ",
-    test01: "pr1: 'aa bb', pr2: ' aa bb ', pr3: 'aa'                                     ",
+    test00:
+      "pr1: '', pr2: ' '                                                           ",
+    test01:
+      "pr1: 'aa bb', pr2: ' aa bb ', pr3: 'aa'                                     ",
 
     // including unescaped quotes
-    test10: "pr1: ''', pr2: ' '', pr3: '' ', pr4: ' ' '                                  ",
-    test11: "pr1: ''a', pr2: 'a'', pr3: ''a''                                            ",
-    test12: "pr1: ' 'a', pr2: 'a' ', pr3: ' 'a ', pr4: ' a' '                            ",
+    test10:
+      "pr1: ''', pr2: ' '', pr3: '' ', pr4: ' ' '                                  ",
+    test11:
+      "pr1: ''a', pr2: 'a'', pr3: ''a''                                            ",
+    test12:
+      "pr1: ' 'a', pr2: 'a' ', pr3: ' 'a ', pr4: ' a' '                            ",
 
     // including escaped quotes
-    test20: "pr1: '\'', pr2: ' \'', pr3: '\' ', pr4: ' \' '                              ",
-    test21: "pr1: '\'a', pr2: ' a\'', pr3: '\'a ', pr4: ' a\' '                          ",
-    test22: "pr1: '\\'', pr2: ' \\'', pr3: '\\' ', pr4: ' \\' '                          ",
-    test23: "pr1: '\\'a', pr2: ' a\\'', pr3: '\\'a ', pr4: ' a\\' '                      ",
-    test24: "pr1: '\\\'a', pr2: ' a\\\'', pr3: '\\\'a ', pr4: ' a\\\' '                  ",
+    test20:
+      "pr1: ''', pr2: ' '', pr3: '' ', pr4: ' ' '                              ",
+    test21:
+      "pr1: ''a', pr2: ' a'', pr3: ''a ', pr4: ' a' '                          ",
+    test22:
+      "pr1: '\\'', pr2: ' \\'', pr3: '\\' ', pr4: ' \\' '                          ",
+    test23:
+      "pr1: '\\'a', pr2: ' a\\'', pr3: '\\'a ', pr4: ' a\\' '                      ",
+    test24:
+      "pr1: '\\'a', pr2: ' a\\'', pr3: '\\'a ', pr4: ' a\\' '                  ",
 
     // including commas
-    test30: "pr1: ',', pr2: ' ,', pr3: ', ', pr4: ' , '                                  ",
-    test31: "pr1: ',a', pr2: 'a,', pr3: 'a,b'                                            ",
-    test32: "pr1: ' ,a', pr2: ',a ', pr3: ' a,', pr4: 'a, '                              ",
+    test30:
+      "pr1: ',', pr2: ' ,', pr3: ', ', pr4: ' , '                                  ",
+    test31:
+      "pr1: ',a', pr2: 'a,', pr3: 'a,b'                                            ",
+    test32:
+      "pr1: ' ,a', pr2: ',a ', pr3: ' a,', pr4: 'a, '                              ",
 
-    // unescaped and escaped quotes followed by JSON separators (,}]) 
+    // unescaped and escaped quotes followed by JSON separators (,}])
     // quotes are not interpreted as string terminators
-    test40: "pr1: '',', pr2: ' ,'', pr3: ',' ', pr4: ' ', '                              ",
-    test41: "pr1: '\',', pr2: ' ,\'', pr3: ',\' ', pr4: ' \', '                          ",
-    test42: "pr1: '\\',', pr2: ' ,\\'', pr3: ',\\' ', pr4: ' \\', '                      ",
+    test40:
+      "pr1: '',', pr2: ' ,'', pr3: ',' ', pr4: ' ', '                              ",
+    test41:
+      "pr1: '',', pr2: ' ,'', pr3: ',' ', pr4: ' ', '                          ",
+    test42:
+      "pr1: '\\',', pr2: ' ,\\'', pr3: ',\\' ', pr4: ' \\', '                      ",
 
-    test43: "pr1: ''}', pr2: ' }'', pr3: '}' ', pr4: ' '} '                              ",
-    test44: "pr1: '\'}', pr2: ' }\'', pr3: '}\' ', pr4: ' \'} '                          ",
-    test45: "pr1: '\\'}', pr2: ' }\\'', pr3: '}\\' ', pr4: ' \\'} '                      ",
+    test43:
+      "pr1: ''}', pr2: ' }'', pr3: '}' ', pr4: ' '} '                              ",
+    test44:
+      "pr1: ''}', pr2: ' }'', pr3: '}' ', pr4: ' '} '                          ",
+    test45:
+      "pr1: '\\'}', pr2: ' }\\'', pr3: '}\\' ', pr4: ' \\'} '                      ",
 
-    test46: "pr1: '']', pr2: ' ]'', pr3: ']' ', pr4: ' '] '                              ",
-    test47: "pr1: '\']', pr2: ' ]\'', pr3: ']\' ', pr4: ' \'] '                          ",
-    test48: "pr1: '\\']', pr2: ' ]\\'', pr3: ']\\' ', pr4: ' \\'] '                      ",
+    test46:
+      "pr1: '']', pr2: ' ]'', pr3: ']' ', pr4: ' '] '                              ",
+    test47:
+      "pr1: '']', pr2: ' ]'', pr3: ']' ', pr4: ' '] '                          ",
+    test48:
+      "pr1: '\\']', pr2: ' ]\\'', pr3: ']\\' ', pr4: ' \\'] '                      ",
 
     // unescaped quotes followed by a JSON separators (,}]) a key and a semi column
     // quotes is automatically interpreted as a string terminator when followed by a comma
-    // quotes is interpreted as a string terminator when followed by a braquet not 
+    // quotes is interpreted as a string terminator when followed by a braquet not
     // matching an opening braquet
-    test50: "pr1: 'aa',pr2: 'bb'                                                         ",
-    test51: "pr1: 'aa'  ,  pr2: 'bb'                                                     ",
+    test50:
+      "pr1: 'aa',pr2: 'bb'                                                         ",
+    test51:
+      "pr1: 'aa'  ,  pr2: 'bb'                                                     ",
 
-    test52: "pr1: {pr2: 'aa'},pr3: 'bb'                                                  ",
-    test53: "pr1: 'aa'},pr3: 'bb'                                                        ",
-    test54: "pr1: {pr2: 'aa'}  ,  pr3: 'bb'                                              ",
-    test55: "pr1: 'aa'}  ,  pr3: 'bb'                                                    ",
+    test52:
+      "pr1: {pr2: 'aa'},pr3: 'bb'                                                  ",
+    test53:
+      "pr1: 'aa'},pr3: 'bb'                                                        ",
+    test54:
+      "pr1: {pr2: 'aa'}  ,  pr3: 'bb'                                              ",
+    test55:
+      "pr1: 'aa'}  ,  pr3: 'bb'                                                    ",
 
-    test56: "pr1: ['aa', 'bb'],pr2: 'cc'                                                 ",
-    test57: "pr1: ['aa', 'bb']  ,  pr2: 'cc'                                             ",
+    test56:
+      "pr1: ['aa', 'bb'],pr2: 'cc'                                                 ",
+    test57:
+      "pr1: ['aa', 'bb']  ,  pr2: 'cc'                                             ",
 
     // escaped quote followed by a JSON separators (,}]) a key and a semi column
     // escaped quote followed by a comma is not interpreted as a tring terminator
-    // escaped quote followed by a closing brace or a closing braquet are interpreted 
-    // as a string terminator only when they are not 
-    test60: "pr1: 'aa\\',pr2: 'bb'                                                       ",
-    test61: "pr1: 'aa\\'  ,  pr2: 'bb'                                                   ",
+    // escaped quote followed by a closing brace or a closing braquet are interpreted
+    // as a string terminator only when they are not
+    test60:
+      "pr1: 'aa\\',pr2: 'bb'                                                       ",
+    test61:
+      "pr1: 'aa\\'  ,  pr2: 'bb'                                                   ",
 
     /*
     test62: "pr1: {pr2: 'aa\\'},pr3: 'bb'                                                ",
@@ -495,144 +539,202 @@ describe("testSimpleJSON.js Test simpleJSON functions", () => {
     */
 
     // variable number of backslashes
-    test70: "pr1: '\'                                                                    ",
-    test71: "pr1: '\\'                                                                   ",
-    test72: "pr1: '\\\'                                                                  ",
-    test73: "pr1: '\\\\'                                                                 ",
-    test74: "pr1: '\\\\\'                                                                ",
-    test75: "pr1: '\\\\\\'                                                               ",
-    test76: "pr1: '\\\\\\\'                                                              ",
-    test77: "pr1: '\\\\\\\\'                                                             ",
-    test78: "pr1: '\', pr2: '\\', pr3: '\\\', pr4: '\\\\'                                ",
+    test70:
+      "pr1: ''                                                                    ",
+    test71:
+      "pr1: '\\'                                                                   ",
+    test72:
+      "pr1: '\\'                                                                  ",
+    test73:
+      "pr1: '\\\\'                                                                 ",
+    test74:
+      "pr1: '\\\\'                                                                ",
+    test75:
+      "pr1: '\\\\\\'                                                               ",
+    test76:
+      "pr1: '\\\\\\'                                                              ",
+    test77:
+      "pr1: '\\\\\\\\'                                                             ",
+    test78:
+      "pr1: '', pr2: '\\', pr3: '\\', pr4: '\\\\'                                ",
 
     // other tests
-    test80: "pr1: '\"', pr2: '\"\"'                                                      ",
-    test81: "\"pr1\": 'aa', \"pr2\": 'bb'                                                ",
-    test82: "$contains: [$pr1, aaa]                                                      ",
+    test80:
+      "pr1: '\"', pr2: '\"\"'                                                      ",
+    test81:
+      "\"pr1\": 'aa', \"pr2\": 'bb'                                                ",
+    test82:
+      "$contains: [$pr1, aaa]                                                      ",
     test83: "$contains: [  '$pr1'  ,  \"aaa\"  ,  'bbb'  ,  \"ccc\"  ]",
-    test84: "prop1: {type: string, options: \"a, b, c\"}"
+    test84: 'prop1: {type: string, options: "a, b, c"}',
   };
 
-  var singleQuotesExpectedObj = {
-    test00: {pr1: "", pr2: " "},
-    test01: {pr1: "aa bb", pr2: " aa bb ", pr3: "aa"},
+  const singleQuotesExpectedObj = {
+    test00: { pr1: "", pr2: " " },
+    test01: { pr1: "aa bb", pr2: " aa bb ", pr3: "aa" },
 
-    test10: {pr1: "'", pr2: " '", pr3: "' ", pr4: " ' "},
-    test11: {pr1: "'a", pr2: "a'", pr3: "'a'"},
-    test12: {pr1: " 'a", pr2: "a' ", pr3: " 'a ", pr4: " a' "},
+    test10: { pr1: "'", pr2: " '", pr3: "' ", pr4: " ' " },
+    test11: { pr1: "'a", pr2: "a'", pr3: "'a'" },
+    test12: { pr1: " 'a", pr2: "a' ", pr3: " 'a ", pr4: " a' " },
 
-    test20: {pr1: "'", pr2: " '", pr3: "' ", pr4: " ' "},
-    test21: {pr1: "'a", pr2: " a'", pr3: "'a ", pr4: " a' "},
-    test22: {pr1: "'", pr2: " '", pr3: "' ", pr4: " ' "},
-    test23: {pr1: "'a", pr2: " a'", pr3: "'a ", pr4: " a' "},
-    test24: {pr1: "'a", pr2: " a'", pr3: "'a ", pr4: " a' "},
+    test20: { pr1: "'", pr2: " '", pr3: "' ", pr4: " ' " },
+    test21: { pr1: "'a", pr2: " a'", pr3: "'a ", pr4: " a' " },
+    test22: { pr1: "'", pr2: " '", pr3: "' ", pr4: " ' " },
+    test23: { pr1: "'a", pr2: " a'", pr3: "'a ", pr4: " a' " },
+    test24: { pr1: "'a", pr2: " a'", pr3: "'a ", pr4: " a' " },
 
-    test30: {pr1: ",", pr2: " ,", pr3: ", ", pr4: " , "},
-    test31: {pr1: ",a", pr2: "a,", pr3: "a,b"},
-    test32: {pr1: " ,a", pr2: ",a ", pr3: " a,", pr4: "a, "},
+    test30: { pr1: ",", pr2: " ,", pr3: ", ", pr4: " , " },
+    test31: { pr1: ",a", pr2: "a,", pr3: "a,b" },
+    test32: { pr1: " ,a", pr2: ",a ", pr3: " a,", pr4: "a, " },
 
-    test40: {pr1: "',", pr2: " ,'", pr3: ",' ", pr4: " ', "},
-    test41: {pr1: "',", pr2: " ,'", pr3: ",' ", pr4: " ', "},
-    test42: {pr1: "',", pr2: " ,'", pr3: ",' ", pr4: " ', "},
+    test40: { pr1: "',", pr2: " ,'", pr3: ",' ", pr4: " ', " },
+    test41: { pr1: "',", pr2: " ,'", pr3: ",' ", pr4: " ', " },
+    test42: { pr1: "',", pr2: " ,'", pr3: ",' ", pr4: " ', " },
 
-    test43: {pr1: "\'}", pr2: " }\'", pr3: "}\' ", pr4: " \'} "},
-    test44: {pr1: "'}", pr2: " }'", pr3: "}' ", pr4: " '} "},
-    test45: {pr1: "'}", pr2: " }'", pr3: "}' ", pr4: " '} "},
-    
-    test46: {pr1: "\']", pr2: " ]\'", pr3: "]\' ", pr4: " \'] "},
-    test47: {pr1: "']", pr2: " ]'", pr3: "]' ", pr4: " '] "},
-    test48: {pr1: "']", pr2: " ]'", pr3: "]' ", pr4: " '] "},
+    test43: { pr1: "'}", pr2: " }'", pr3: "}' ", pr4: " '} " },
+    test44: { pr1: "'}", pr2: " }'", pr3: "}' ", pr4: " '} " },
+    test45: { pr1: "'}", pr2: " }'", pr3: "}' ", pr4: " '} " },
 
-    test50: {pr1: "aa", pr2: "bb"},
-    test51: {pr1: "aa", pr2: "bb"},
+    test46: { pr1: "']", pr2: " ]'", pr3: "]' ", pr4: " '] " },
+    test47: { pr1: "']", pr2: " ]'", pr3: "]' ", pr4: " '] " },
+    test48: { pr1: "']", pr2: " ]'", pr3: "]' ", pr4: " '] " },
 
-    test52: {pr1: {pr2: "aa"}, pr3: "bb"},
+    test50: { pr1: "aa", pr2: "bb" },
+    test51: { pr1: "aa", pr2: "bb" },
+
+    test52: { pr1: { pr2: "aa" }, pr3: "bb" },
     test53: "Unexpected token , in JSON at position 13",
-    test54: {pr1: {pr2: "aa"}, pr3: "bb"},
+    test54: { pr1: { pr2: "aa" }, pr3: "bb" },
     test55: "Unexpected token , in JSON at position 15",
 
-    test56: {pr1: ["aa", "bb"], pr2: "cc"},
-    test57: {pr1: ["aa", "bb"], pr2: "cc"},
+    test56: { pr1: ["aa", "bb"], pr2: "cc" },
+    test57: { pr1: ["aa", "bb"], pr2: "cc" },
 
-    test60: {pr1: "aa',pr2: 'bb"},
-    test61: {pr1: "aa'  ,  pr2: 'bb"},
+    test60: { pr1: "aa',pr2: 'bb" },
+    test61: { pr1: "aa'  ,  pr2: 'bb" },
 
-    test70: {pr1: ""},
-    test71: {pr1: "\\"},
-    test72: {pr1: "\\"},
-    test73: {pr1: "\\"},
-    test74: {pr1: "\\"},
-    test75: {pr1: "\\\\"},
-    test76: {pr1: "\\\\"},
-    test77: {pr1: "\\\\"},
-    test78: {pr1: "", pr2: "', pr3: '', pr4: '\\"},
+    test70: { pr1: "" },
+    test71: { pr1: "\\" },
+    test72: { pr1: "\\" },
+    test73: { pr1: "\\" },
+    test74: { pr1: "\\" },
+    test75: { pr1: "\\\\" },
+    test76: { pr1: "\\\\" },
+    test77: { pr1: "\\\\" },
+    test78: { pr1: "", pr2: "', pr3: '', pr4: '\\" },
 
-    test80: {pr1: "\"", pr2: "\"\""},
-    test81: {pr1: "aa", pr2: "bb"},
-    test82: {$contains: ["$pr1", "aaa"]},
-    test83: {$contains: ["$pr1", "aaa", "bbb", "ccc"]},
-    test84: {prop1: {type: "string", options: "a, b, c"}}
+    test80: { pr1: '"', pr2: '""' },
+    test81: { pr1: "aa", pr2: "bb" },
+    test82: { $contains: ["$pr1", "aaa"] },
+    test83: { $contains: ["$pr1", "aaa", "bbb", "ccc"] },
+    test84: { prop1: { type: "string", options: "a, b, c" } },
   };
 
-  var singleQuotesExpectedStr = {
-    test00: "pr1: \"\", pr2: \" \"                                                          ",
-    test01: "pr1: \"aa bb\", pr2: \" aa bb \", pr3: \"aa\"                                  ",
+  const singleQuotesExpectedStr = {
+    test00:
+      'pr1: "", pr2: " "                                                          ',
+    test01:
+      'pr1: "aa bb", pr2: " aa bb ", pr3: "aa"                                  ',
 
-    test10: "pr1: \"'\", pr2: \" '\", pr3: \"' \", pr4: \" ' \"                             ",
-    test11: "pr1: \"'a\", pr2: \"a'\", pr3: \"'a'\"                                         ",
-    test12: "pr1: \" 'a\", pr2: \"a' \", pr3: \" 'a \", pr4: \" a' \"                       ",
+    test10:
+      'pr1: "\'", pr2: " \'", pr3: "\' ", pr4: " \' "                             ',
+    test11:
+      'pr1: "\'a", pr2: "a\'", pr3: "\'a\'"                                         ',
+    test12:
+      'pr1: " \'a", pr2: "a\' ", pr3: " \'a ", pr4: " a\' "                       ',
 
-    test20: "pr1: \"'\", pr2: \" '\", pr3: \"' \", pr4: \" ' \"                             ",
-    test21: "pr1: \"'a\", pr2: \" a'\", pr3: \"'a \", pr4: \" a' \"                         ",
-    test22: "pr1: \"'\", pr2: \" '\", pr3: \"' \", pr4: \" ' \"                             ",
-    test23: "pr1: \"'a\", pr2: \" a'\", pr3: \"'a \", pr4: \" a' \"                         ",
-    test24: "pr1: \"'a\", pr2: \" a'\", pr3: \"'a \", pr4: \" a' \"                         ",
+    test20:
+      'pr1: "\'", pr2: " \'", pr3: "\' ", pr4: " \' "                             ',
+    test21:
+      'pr1: "\'a", pr2: " a\'", pr3: "\'a ", pr4: " a\' "                         ',
+    test22:
+      'pr1: "\'", pr2: " \'", pr3: "\' ", pr4: " \' "                             ',
+    test23:
+      'pr1: "\'a", pr2: " a\'", pr3: "\'a ", pr4: " a\' "                         ',
+    test24:
+      'pr1: "\'a", pr2: " a\'", pr3: "\'a ", pr4: " a\' "                         ',
 
-    test30: "pr1: \",\", pr2: \" ,\", pr3: \", \", pr4: \" , \"                             ",
-    test31: "pr1: \",a\", pr2: \"a,\", pr3: \"a,b\"                                         ",
-    test32: "pr1: \" ,a\", pr2: \",a \", pr3: \" a,\", pr4: \"a, \"                         ",
+    test30:
+      'pr1: ",", pr2: " ,", pr3: ", ", pr4: " , "                             ',
+    test31:
+      'pr1: ",a", pr2: "a,", pr3: "a,b"                                         ',
+    test32:
+      'pr1: " ,a", pr2: ",a ", pr3: " a,", pr4: "a, "                         ',
 
-    test40: "pr1: \"',\", pr2: \" ,'\", pr3: \",' \", pr4: \" ', \"                         ",
-    test41: "pr1: \"',\", pr2: \" ,'\", pr3: \",' \", pr4: \" ', \"                         ",
-    test42: "pr1: \"',\", pr2: \" ,'\", pr3: \",' \", pr4: \" ', \"                         ",
-    
-    test43: "pr1: \"'}\", pr2: \" }'\", pr3: \"}' \", pr4: \" '} \"                         ",
-    test44: "pr1: \"'}\", pr2: \" }'\", pr3: \"}' \", pr4: \" '} \"                         ",
-    test45: "pr1: \"'}\", pr2: \" }'\", pr3: \"}' \", pr4: \" '} \"                         ",
-    
-    test46: "pr1: \"']\", pr2: \" ]'\", pr3: \"]' \", pr4: \" '] \"                         ",
-    test47: "pr1: \"']\", pr2: \" ]'\", pr3: \"]' \", pr4: \" '] \"                         ",
-    test48: "pr1: \"']\", pr2: \" ]'\", pr3: \"]' \", pr4: \" '] \"                         ",
+    test40:
+      'pr1: "\',", pr2: " ,\'", pr3: ",\' ", pr4: " \', "                         ',
+    test41:
+      'pr1: "\',", pr2: " ,\'", pr3: ",\' ", pr4: " \', "                         ',
+    test42:
+      'pr1: "\',", pr2: " ,\'", pr3: ",\' ", pr4: " \', "                         ',
 
-    test50: "pr1: \"aa\",pr2: \"bb\"                                                        ",
-    test51: "pr1: \"aa\",  pr2: \"bb\"                                                      ",
+    test43:
+      'pr1: "\'}", pr2: " }\'", pr3: "}\' ", pr4: " \'} "                         ',
+    test44:
+      'pr1: "\'}", pr2: " }\'", pr3: "}\' ", pr4: " \'} "                         ',
+    test45:
+      'pr1: "\'}", pr2: " }\'", pr3: "}\' ", pr4: " \'} "                         ',
 
-    test52: "pr1: {pr2: \"aa\"},pr3: \"bb\"                                                 ",
-    test53: "pr1: \"aa\"},pr3: \"bb\"                                                       ",
-    test54: "pr1: {pr2: \"aa\"}  ,  pr3: \"bb\"                                             ",
-    test55: "pr1: \"aa\"}  ,  pr3: \"bb\"                                                   ",
+    test46:
+      'pr1: "\']", pr2: " ]\'", pr3: "]\' ", pr4: " \'] "                         ',
+    test47:
+      'pr1: "\']", pr2: " ]\'", pr3: "]\' ", pr4: " \'] "                         ',
+    test48:
+      'pr1: "\']", pr2: " ]\'", pr3: "]\' ", pr4: " \'] "                         ',
 
-    test56: "pr1: [ \"aa\", \"bb\"],pr2: \"cc\"                                                      ",
-    test57: "pr1: [ \"aa\", \"bb\"]  ,  pr2: \"cc\"                                                  ",
+    test50:
+      'pr1: "aa",pr2: "bb"                                                        ',
+    test51:
+      'pr1: "aa",  pr2: "bb"                                                      ',
 
-    test60: "pr1: \"aa',pr2: 'bb\"                                                          ",
-    test61: "pr1: \"aa'  ,  pr2: 'bb\"                                                      ",
+    test52:
+      'pr1: {pr2: "aa"},pr3: "bb"                                                 ',
+    test53:
+      'pr1: "aa"},pr3: "bb"                                                       ',
+    test54:
+      'pr1: {pr2: "aa"}  ,  pr3: "bb"                                             ',
+    test55:
+      'pr1: "aa"}  ,  pr3: "bb"                                                   ',
 
-    test70: "pr1: \"\"                                                                      ",
-    test71: "pr1: \"\\\\\"                                                                  ",
-    test72: "pr1: \"\\\\\"                                                                  ",
-    test73: "pr1: \"\\\\\"                                                                  ",
-    test74: "pr1: \"\\\\\"                                                                  ",
-    test75: "pr1: \"\\\\\\\\\"                                                              ",
-    test76: "pr1: \"\\\\\\\\\"                                                              ",
-    test77: "pr1: \"\\\\\\\\\"                                                              ",
-    test78: "pr1: \"\", pr2: \"', pr3: '', pr4: '\\\\\"                                     ",
+    test56:
+      'pr1: [ "aa", "bb"],pr2: "cc"                                                      ',
+    test57:
+      'pr1: [ "aa", "bb"]  ,  pr2: "cc"                                                  ',
 
-    test80: "pr1: \"\\\"\", pr2: \"\\\"\\\"\"                                               ",
-    test81: "\"pr1\": \"aa\", \"pr2\": \"bb\"                                               ",
-    test82: "$contains: [ \"$pr1\", \"aaa\"]                                                ",
-    test83: "$contains: [ \"$pr1\", \"aaa\", \"bbb\", \"ccc\"]                              ",
-    test84: "prop1: {type: \"string\", options: \"a, b, c\"}                                "
+    test60:
+      "pr1: \"aa',pr2: 'bb\"                                                          ",
+    test61:
+      "pr1: \"aa'  ,  pr2: 'bb\"                                                      ",
+
+    test70:
+      'pr1: ""                                                                      ',
+    test71:
+      'pr1: "\\\\"                                                                  ',
+    test72:
+      'pr1: "\\\\"                                                                  ',
+    test73:
+      'pr1: "\\\\"                                                                  ',
+    test74:
+      'pr1: "\\\\"                                                                  ',
+    test75:
+      'pr1: "\\\\\\\\"                                                              ',
+    test76:
+      'pr1: "\\\\\\\\"                                                              ',
+    test77:
+      'pr1: "\\\\\\\\"                                                              ',
+    test78:
+      "pr1: \"\", pr2: \"', pr3: '', pr4: '\\\\\"                                     ",
+
+    test80:
+      'pr1: "\\"", pr2: "\\"\\""                                               ',
+    test81:
+      '"pr1": "aa", "pr2": "bb"                                               ',
+    test82:
+      '$contains: [ "$pr1", "aaa"]                                                ',
+    test83:
+      '$contains: [ "$pr1", "aaa", "bbb", "ccc"]                              ',
+    test84:
+      'prop1: {type: "string", options: "a, b, c"}                                ',
   };
 
   describe("I - Test doubleQuoteValues() with single quoted string", () => {
@@ -706,106 +808,115 @@ describe("testSimpleJSON.js Test simpleJSON functions", () => {
 
     // ?) inner ' must be escaped for JSON.parse to work properly
 
-    for (let key in singleQuotesTestNames){
-      //console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
-      if (singleQuotesTestNames.hasOwnProperty(key)) {
-        it(key + " - " + singleQuotesTestNames[key], () => {
-          /*if (key === 'test83') {
+    Object.keys(singleQuotesTestNames).forEach((key) => {
+      // console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
+      if (Object.prototype.hasOwnProperty.call(singleQuotesTestNames, key)) {
+        it(`${key} - ${singleQuotesTestNames[key]}`, () => {
+          /* if (key === 'test83') {
             console.log(key);
-          }*/
-          var result = SimpleJSON.doubleQuoteValues(singleQuotesTests[key].trim());
+          } */
+          const result = SimpleJSON.doubleQuoteValues(
+            singleQuotesTests[key].trim()
+          );
           expect(result).to.equal(singleQuotesExpectedStr[key].trim());
         });
       }
-    }
+    });
   });
 
   describe("J - Test simpleJSONToJSON() with multi level object strings", () => {
     it("Simple test", () => {
-      var result = SimpleJSON.simpleJSONToJSON("pr1: {required}");
+      const result = SimpleJSON.simpleJSONToJSON("pr1: {required}");
       expect(result).to.deep.equal({ pr1: { required: true } });
     });
 
     it("Test empty JSON schema", () => {
-      var result = SimpleJSON.simpleJSONToJSON("{}");
+      const result = SimpleJSON.simpleJSONToJSON("{}");
       expect(result).to.deep.equal({});
     });
 
     it("Test simple string", () => {
-      var result = SimpleJSON.simpleJSONToJSON("abc");
+      const result = SimpleJSON.simpleJSONToJSON("abc");
       expect(result).to.deep.equal({ abc: true });
     });
 
     it("Simple test with two values", () => {
-      var result = SimpleJSON.simpleJSONToJSON("a: {b, c}");
+      const result = SimpleJSON.simpleJSONToJSON("a: {b, c}");
       expect(result).to.deep.equal({ a: { b: true, c: true } });
     });
 
     it("Simple test with one set value and two unset values", () => {
-      var result = SimpleJSON.simpleJSONToJSON("a: {b, c:true, d}");
+      const result = SimpleJSON.simpleJSONToJSON("a: {b, c:true, d}");
       expect(result).to.deep.equal({ a: { b: true, c: true, d: true } });
     });
 
     it("Simple test with two base values", () => {
-      var result = SimpleJSON.simpleJSONToJSON("a: {b, c}, d: {e}");
+      const result = SimpleJSON.simpleJSONToJSON("a: {b, c}, d: {e}");
       expect(result).to.deep.equal({ a: { b: true, c: true }, d: { e: true } });
     });
   });
 
   describe("K - Test simpleJSONToJSON() with single quotes", () => {
-    for (let key in singleQuotesTestNames){
-      //console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
-      if (singleQuotesTestNames.hasOwnProperty(key)) {
-        it(key + " - " + singleQuotesTestNames[key], () => {
-          if (key === 'test84') {
+    Object.keys(singleQuotesTestNames).forEach((key) => {
+      // console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
+      if (Object.prototype.hasOwnProperty.call(singleQuotesTestNames, key)) {
+        it(`${key} - ${singleQuotesTestNames[key]}`, () => {
+          if (key === "test84") {
             console.log(key);
           }
-          if (key === 'test53' || key === 'test55') {
-            /*try {
+          if (key === "test53" || key === "test55") {
+            /* try {
               SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim());
             }
             catch(err) {
               console.log(err);
-            }*/
-            expect(function () {
-              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim())
+            } */
+            expect(() => {
+              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim());
             }).to.throw(singleQuotesExpectedObj[key]);
-          }
-          
-          else {
-            var result = SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].trim());
+          } else {
+            const result = SimpleJSON.simpleJSONToJSON(
+              singleQuotesTests[key].trim()
+            );
             expect(result).to.deep.equal(singleQuotesExpectedObj[key]);
           }
         });
       }
-    }
+    });
   });
 
   describe("L - Test simpleJSONToJSON() with double quotes", () => {
-    for (let key in singleQuotesTestNames){
-      //console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
-      if (singleQuotesTestNames.hasOwnProperty(key)) {
-        it(key + " - " + singleQuotesTestNames[key].replace("Single", "Double").replace("single", "double"), () => {
-          /*if (key === 'test55') {
+    Object.keys(singleQuotesTestNames).forEach((key) => {
+      // console.log(key + ": " + testNb + " - " + singleQuotesTestNames[key]);
+      if (Object.prototype.hasOwnProperty.call(singleQuotesTestNames, key)) {
+        it(`${key} - ${singleQuotesTestNames[key]
+          .replace("Single", "Double")
+          .replace("single", "double")}`, () => {
+          /* if (key === 'test55') {
             console.log(key);
-          }*/
-          if (key === 'test53' || key === 'test55') {
-            /*try {
+          } */
+          if (key === "test53" || key === "test55") {
+            /* try {
               SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim());
             }
             catch(err) {
               console.log(err);
-            }*/
-            expect(function () {
-              SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim())
+            } */
+            expect(() => {
+              SimpleJSON.simpleJSONToJSON(
+                singleQuotesTests[key].replace(/'/g, '"').trim()
+              );
             }).to.throw(singleQuotesExpectedObj[key]);
-          }
-          else {
-            var result = SimpleJSON.simpleJSONToJSON(singleQuotesTests[key].replace(/'/g, "\"").trim());
-            expect(result).to.deep.equal(replaceStrInObject(singleQuotesExpectedObj[key], /'/g, "\""));
+          } else {
+            const result = SimpleJSON.simpleJSONToJSON(
+              singleQuotesTests[key].replace(/'/g, '"').trim()
+            );
+            expect(result).to.deep.equal(
+              replaceStrInObject(singleQuotesExpectedObj[key], /'/g, '"')
+            );
           }
         });
       }
-    }
+    });
   });
 });

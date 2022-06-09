@@ -1,7 +1,7 @@
-var Globals = {
+let Globals = {
   voidListId: "000000000000000000000000",
-  listofAllListId: "000000000000000000000001",
-  listofAllViewId: "000000000000000000000002",
+  listOfAllListId: "000000000000000000000001",
+  listOfAllViewId: "000000000000000000000002",
   userListId: "000000000000000000000003",
   viewOnAllViewViewId: "000000000000000000000004",
   viewOnAllListViewId: "000000000000000000000005",
@@ -28,7 +28,7 @@ var Globals = {
 
   mongoCollectionName: "items",
   mongoDatabaseName: "listitdata",
-  
+
   APIKeyword: "opentables",
   browserHistoryKey: "otviews",
 
@@ -61,55 +61,52 @@ var Globals = {
   noOptionalPropertyToAddMenu: "No Optional Property to Add",
 
   noPermissionViewList: "You do not have the permission to view this list...",
-  noPermissionViewItems: "You do not have the permission to view items from this list...",
-  noItemsInList: "There are no items in this list yet..."
+  noPermissionViewItems:
+    "You do not have the permission to view items from this list...",
+  noItemsInList: "There are no items in this list yet...",
 };
 
 Globals = {
   ...Globals,
   specialUsers: [
-    Globals.ownerUserName, 
-    Globals.authUserName, 
-    Globals.allUserName
+    Globals.ownerUserName,
+    Globals.authUserName,
+    Globals.allUserName,
   ],
 
   listOfAllLists: {
-    [Globals.itemIdFieldName]: Globals.listofAllListId,
+    [Globals.itemIdFieldName]: Globals.listOfAllListId,
     [Globals.nameFieldName]: "List of all lists",
     [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.authUserName,
     [Globals.listSchemaFieldName]:
-      "{" +
-      Globals.nameFieldName + ": {type: string, required, default: 'List Name'}, " +
-      Globals.ownerFieldName + ": {type: user, required}, " +
-      Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
-      Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.itemCreatePermFieldName + ": {type: user_list, lower, default: " + Globals.authUserName + "}, " +
-      Globals.itemReadPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
-      Globals.itemReadWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.listSchemaFieldName + ": {type: schema, required, default: 'prop1: string'}" +
-      "}",
+      `{` +
+      `${Globals.nameFieldName}: {type: string, required, default: 'List Name'}, ` +
+      `${Globals.ownerFieldName}: {type: user, required}, ` +
+      `${Globals.readPermFieldName}: {type: user_list, lower, default: ${Globals.allUserName}}, ` +
+      `${Globals.readWritePermFieldName}: {type: user_list, lower, default: ${Globals.ownerUserName}}, ` +
+      `${Globals.itemCreatePermFieldName}: {type: user_list, lower, default: ${Globals.authUserName}}, ` +
+      `${Globals.itemReadPermFieldName}: {type: user_list, lower, default: ${Globals.allUserName}}, ` +
+      `${Globals.itemReadWritePermFieldName}: {type: user_list, lower, default: ${Globals.ownerUserName}}, ` +
+      `${Globals.listSchemaFieldName}: {type: schema, required, default: 'prop1: string'}` +
+      `}`,
   },
 
   listOfAllViews: {
-    [Globals.itemIdFieldName]: Globals.listofAllViewId,
+    [Globals.itemIdFieldName]: Globals.listOfAllViewId,
     [Globals.nameFieldName]: "List of all views",
     [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.authUserName,
     [Globals.listSchemaFieldName]:
-      "{" +
-      Globals.nameFieldName + ": {type: string, required, default: 'View Name'}, " +
-      Globals.ownerFieldName + ": {type: user, required}, " +
-      Globals.readPermFieldName + ": {type: user_list, lower, default: " + Globals.allUserName + "}, " +
-      Globals.readWritePermFieldName + ": {type: user_list, lower, default: " + Globals.ownerUserName + "}, " +
-      Globals.addItemModeFieldName + ": {type: string, options: ['" + Globals.addItemModeDefault + "', '" + 
-                                                                     Globals.addItemModeAsForm + "', '" + 
-                                                                     Globals.addWithPersistentFormAndItems + "', '" + 
-                                                                     Globals.addWithPersistentFormNoItems + 
-                                                                "'], default: " + Globals.addItemModeDefault + "}, " +
-      Globals.itemTemplateFieldName + ": template, " +
-      Globals.childlistFieldName + ": embedded_listid" +
-      "}",
+      `{` +
+      `${Globals.nameFieldName}: {type: string, required, default: 'View Name'}, ` +
+      `${Globals.ownerFieldName}: {type: user, required},` +
+      `${Globals.readPermFieldName}: {type: user_list, lower, default: ${Globals.allUserName}}, ` +
+      `${Globals.readWritePermFieldName}: {type: user_list, lower, default: ${Globals.ownerUserName}}, ` +
+      `${Globals.addItemModeFieldName}: {type: string, options: ['${Globals.addItemModeDefault}', '${Globals.addItemModeAsForm}', '${Globals.addWithPersistentFormAndItems}', '${Globals.addWithPersistentFormNoItems}'], default: ${Globals.addItemModeDefault}}, ` +
+      `${Globals.itemTemplateFieldName}: template,` +
+      `${Globals.childlistFieldName}: embedded_listid` +
+      `}`,
   },
 
   listOfUsers: {
@@ -118,26 +115,26 @@ Globals = {
     [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.itemCreatePermFieldName]: Globals.allUserName,
     [Globals.listSchemaFieldName]:
-      "username: {type: string, required, unique, minlength: 6," + Globals.noDefault + "}, " + 
-      Globals.emailFieldName + ": {type: email, required, unique, lower, " + Globals.noDefault + "}, " + 
-      "password: {type: encrypted_string, required, minlength: 8, " + Globals.noDefault + "}",
+      `username: {type: string, required, unique, minlength: 6,${Globals.noDefault}}, ` +
+      `${Globals.emailFieldName}: {type: email, required, unique, lower, ${Globals.noDefault}}, ` +
+      `password: {type: encrypted_string, required, minlength: 8, ${Globals.noDefault}}`,
   },
 
   viewOnTheListOfAllLists: {
     [Globals.itemIdFieldName]: Globals.viewOnAllListViewId,
     [Globals.nameFieldName]: "Lists",
     [Globals.ownerFieldName]: Globals.adminUserName,
-    [Globals.childlistFieldName]: Globals.listofAllListId,
+    [Globals.childlistFieldName]: Globals.listOfAllListId,
   },
 
   viewOnTheListOfAllViews: {
     [Globals.itemIdFieldName]: Globals.viewOnAllViewViewId,
     [Globals.nameFieldName]: "Views",
     [Globals.ownerFieldName]: Globals.adminUserName,
-    [Globals.itemTemplateFieldName]: "<Viewlink text={name} viewid={" + Globals.itemIdFieldName + "}/>",
-    [Globals.childlistFieldName]: Globals.listofAllViewId,
+    [Globals.itemTemplateFieldName]: `<Viewlink text={name} viewid={${Globals.itemIdFieldName}}/>`,
+    [Globals.childlistFieldName]: Globals.listOfAllViewId,
   },
-  
+
   viewOnTheListOfUsers: {
     [Globals.itemIdFieldName]: Globals.viewOnUserListViewId,
     [Globals.nameFieldName]: "Users (add with default values)",
@@ -154,7 +151,10 @@ Globals = {
   },
 
   viewOnTheListOfUsersAtLoad: {
-    [Globals.itemIdFieldName]: (Globals.voidListId + (Globals.signUpViewOnUserListViewId *1 + 1)).slice(-24),
+    [Globals.itemIdFieldName]: (
+      Globals.voidListId +
+      (Globals.signUpViewOnUserListViewId * 1 + 1)
+    ).slice(-24),
     [Globals.nameFieldName]: "Users (persistent form with items)",
     [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.addItemModeFieldName]: Globals.addWithPersistentFormAndItems,
@@ -162,12 +162,15 @@ Globals = {
   },
 
   viewOnTheListOfUsersAsForm: {
-    [Globals.itemIdFieldName]: (Globals.voidListId + (Globals.signUpViewOnUserListViewId *1 + 2)).slice(-24),
+    [Globals.itemIdFieldName]: (
+      Globals.voidListId +
+      (Globals.signUpViewOnUserListViewId * 1 + 2)
+    ).slice(-24),
     [Globals.nameFieldName]: "Users (add with form)",
     [Globals.ownerFieldName]: Globals.adminUserName,
     [Globals.addItemModeFieldName]: Globals.addItemModeAsForm,
     [Globals.childlistFieldName]: Globals.userListId,
-  }
+  },
 };
 
 module.exports = Globals;

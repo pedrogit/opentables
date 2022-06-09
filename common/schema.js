@@ -49,38 +49,39 @@ class Schema {
       throw new Error(
         NodeUtil.format(
           Errors.ErrMsg.Schema_InvalidSchema,
-          typeof schema === "object"
-            ? JSON.stringify(schema)
-            : '"' + schema + '"'
+          typeof schema === "object" ? JSON.stringify(schema) : `"${schema}"`
         )
       );
     }
 
-    this.hidden = [];    // properties having the schema hidden property set
-    this.reserved = [];  // properties starting with "_"
+    this.hidden = []; // properties having the schema hidden property set
+    this.reserved = []; // properties starting with "_"
     this.noDefault = []; // properties having the nodefault schema property set
-    this.required = [];  // properties having the required schema property set
-    this.embedded = [];  // properties defining an embedded item
+    this.required = []; // properties having the required schema property set
+    this.embedded = []; // properties defining an embedded item
 
-    var count = 0;
-    var lastKey;
-    for (var key in this.schema) {
+    let count = 0;
+    let lastKey;
+    Object.keys(this.schema).forEach((key) => {
       // find hidden properties
-      if ((this.schema[key]["hidden"] && this.schema[key]["hidden"] === true) || 
-          this.schema[key] === "encrypted_string" ||
-          this.schema[key]["type"] === "encrypted_string") {
-            this.hidden.push(key);
+      if (
+        (this.schema[key].hidden && this.schema[key].hidden === true) ||
+        this.schema[key] === "encrypted_string" ||
+        this.schema[key].type === "encrypted_string"
+      ) {
+        this.hidden.push(key);
       }
 
       // find nodefault properties
-      if (this.schema[key][Globals.noDefault] && 
-          this.schema[key][Globals.noDefault] === true) {
+      if (
+        this.schema[key][Globals.noDefault] &&
+        this.schema[key][Globals.noDefault] === true
+      ) {
         this.noDefault.push(key);
       }
 
       // find required properties
-      if (this.schema[key]["required"] &&
-          this.schema[key]["required"] === true) {
+      if (this.schema[key].required && this.schema[key].required === true) {
         this.required.push(key);
       }
 
@@ -99,29 +100,27 @@ class Schema {
       ) {
         this.embedded.push(key);
       }
-      count++;
+      count += 1;
       lastKey = key;
-    }
+    });
     if (count === 1 && this.required.length === 0) {
-      if (typeof this.schema[key] === "object") {
-        this.schema[key]["required"] = true;
+      if (typeof this.schema[lastKey] === "object") {
+        this.schema[lastKey].required = true;
       }
       this.required.push(lastKey);
     }
     if (count > 1 && this.required.length === 0) {
       throw new Error(
-                    NodeUtil.format(
-                      Errors.ErrMsg.Schema_InvalidSchemaOneRequired,
-                        typeof schema === "object"
-                          ? JSON.stringify(schema)
-                          : '"' + schema + '"'
-                    )
-                  );
+        NodeUtil.format(
+          Errors.ErrMsg.Schema_InvalidSchemaOneRequired,
+          typeof schema === "object" ? JSON.stringify(schema) : `"${schema}"`
+        )
+      );
     }
   }
 
   validate() {
-    var jsonschema = {
+    const jsonschema = {
       $defs: {
         onelevel: {
           type: "string",
@@ -146,24 +145,20 @@ class Schema {
                 [Globals.noDefault]: { type: "boolean" },
                 options: {
                   anyOf: [
-                    { type: "string",
-                      minLength: 1
-                    }, 
-                    { type: "array", 
+                    { type: "string", minLength: 1 },
+                    {
+                      type: "array",
                       items: {
                         type: "string",
-                        minLength: 1
+                        minLength: 1,
                       },
-                      minItems: 1
-                    }
-                  ]
+                      minItems: 1,
+                    },
+                  ],
                 },
                 default: {
-                  anyOf: [
-                    { type: "string" }, 
-                    { type: "boolean" }
-                  ]
-                }
+                  anyOf: [{ type: "string" }, { type: "boolean" }],
+                },
               },
               additionalProperties: false,
             },
@@ -173,9 +168,9 @@ class Schema {
       additionalProperties: false,
       type: "object",
     };
-    var ajv = new Ajv({ allErrors: false });
-    var validate = ajv.compile(jsonschema);
-    var result = validate(this.schema);
+    const ajv = new Ajv({ allErrors: false });
+    const validate = ajv.compile(jsonschema);
+    const result = validate(this.schema);
     return result;
   }
 
@@ -184,44 +179,46 @@ class Schema {
   }
 
   getType(key) {
-    if (this.schema.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(this.schema, key)) {
       if (validTypes.includes(this.schema[key])) {
         return this.schema[key];
       }
-      if (this.schema[key].hasOwnProperty('type') &&
-          validTypes.includes(this.schema[key]['type'])) {
-       return this.schema[key]['type'];
+      if (
+        Object.prototype.hasOwnProperty.call(this.schema[key], "type") &&
+        validTypes.includes(this.schema[key].type)
+      ) {
+        return this.schema[key].type;
       }
-      return 'text'
-    } 
+      return "text";
+    }
     return null;
   }
 
   getDefault(key, user, listSchemaStr) {
-    if (this.schema.hasOwnProperty(key)) {
-      if (this.schema[key].hasOwnProperty('nodefault')) {
-        return '';
+    if (Object.prototype.hasOwnProperty.call(this.schema, key)) {
+      if (Object.prototype.hasOwnProperty.call(this.schema[key], "nodefault")) {
+        return "";
       }
-      if (this.schema[key].hasOwnProperty('default')) {
-        return this.schema[key]['default'];
+      if (Object.prototype.hasOwnProperty.call(this.schema[key], "default")) {
+        return this.schema[key].default;
       }
 
-      var propType = this.getType(key);
-      
-      if (propType === 'template')
-      {
+      const propType = this.getType(key);
+
+      if (propType === "template") {
         if (listSchemaStr) {
-          return this.getDefaultTemplate({listSchema: (new Schema(listSchemaStr))});
+          return this.getDefaultTemplate({
+            listSchema: new Schema(listSchemaStr),
+          });
         }
-        else {
-          return '';
-        }
+
+        return "";
       }
 
-      if (propType === 'schema') return 'prop1: "string"';
-      if (propType === 'number') return 0;
-      if (propType === 'email') return "email@gmail.com";
-      if (propType === 'user' || propType === 'user_list') return user;
+      if (propType === "schema") return 'prop1: "string"';
+      if (propType === "number") return 0;
+      if (propType === "email") return "email@gmail.com";
+      if (propType === "user" || propType === "user_list") return user;
       return key;
     }
 
@@ -229,55 +226,54 @@ class Schema {
   }
 
   static deleteEmptyProps(item) {
-    var props = Object.keys(item)
-    props.forEach(p => {
-      if (item[p] === "") {
-        delete item[p];
+    Object.keys(item).forEach((prop) => {
+      if (item[prop] === "") {
+        // eslint-disable-next-line no-param-reassign
+        delete item[prop];
       }
     });
     return item;
   }
 
   static getEmptyProps(item) {
-    var props = Object.keys(item)
-    return props.filter(p => item[p] === null || item[p] === "");
+    const props = Object.keys(item);
+    return props.filter((p) => item[p] === null || item[p] === "");
   }
 
   getDefaultTemplate({
-    hidden = false, 
+    hidden = false,
     reserved = false,
-    listSchema = null
+    listSchema = null,
   } = {}) {
-    var schema = listSchema ? listSchema : this;
-    return schema.getProps({
-      hidden: hidden, 
-      reserved: reserved
-    })
-    .map((prop) => {
-      if (schema.hasProperty(prop, "options")) {
-        return ("<Select val={" + prop + "} options={['" + schema.getProperty(prop, "options").join("', '") + "']} inline /> ")
-      }
-      if (schema.getType(prop) === 'encrypted_string') {
-        return ("<Password val={" + prop + "} inline /> ")
-      }
-      return ("<Text val={" + prop + "} inline /> ")
-    })
-    .join("");
+    const schema = listSchema || this;
+    return schema
+      .getProps({
+        hidden,
+        reserved,
+      })
+      .map((prop) => {
+        if (schema.hasProperty(prop, "options")) {
+          return `<Select val={${prop}} options={['${schema
+            .getProperty(prop, "options")
+            .join("', '")}']} inline /> `;
+        }
+        if (schema.getType(prop) === "encrypted_string") {
+          return `<Password val={${prop}} inline /> `;
+        }
+        return `<Text val={${prop}} inline /> `;
+      })
+      .join("");
   }
 
-  getRequiredDefaults({
-    throwIfNoDefault = false, 
-    user,
-    listSchema
-  } = {}) {
+  getRequiredDefaults({ throwIfNoDefault = false, user, listSchema } = {}) {
     return this.getAllDefaults({
       hidden: false,
       reserved: false,
       others: false,
-      throwIfNoDefault: throwIfNoDefault, 
-      user: user,
-      listSchema: listSchema
-    })
+      throwIfNoDefault,
+      user,
+      listSchema,
+    });
   }
 
   getAllDefaults({
@@ -285,23 +281,28 @@ class Schema {
     hidden = true,
     reserved = true,
     others = true,
-    throwIfNoDefault = false, 
+    throwIfNoDefault = false,
     user,
-    listSchema
+    listSchema,
   } = {}) {
-    var def = {};
+    const def = {};
     if (throwIfNoDefault && this.noDefault.length !== 0) {
-      throw new Error(NodeUtil.format(Errors.ErrMsg.SchemaValidator_NoDefault, this.noDefault.join(', ')));
+      throw new Error(
+        NodeUtil.format(
+          Errors.ErrMsg.SchemaValidator_NoDefault,
+          this.noDefault.join(", ")
+        )
+      );
     }
 
     this.getProps({
-      required: required,
-      hidden: hidden,
-      reserved: reserved,
-      others: others
+      required,
+      hidden,
+      reserved,
+      others,
     }).forEach((key) => {
       def[key] = this.getDefault(key, user, listSchema);
-    })
+    });
     return def;
   }
 
@@ -310,41 +311,35 @@ class Schema {
   }
 
   getProps({
-      required = true,
-      hidden = true,
-      reserved = true,
-      others = true,
+    required = true,
+    hidden = true,
+    reserved = true,
+    others = true,
   } = {}) {
     return this.filterProps(Object.keys(this.schema), {
-      required: required,
-      hidden: hidden,
-      reserved: reserved,
-      others: others
-    })
+      required,
+      hidden,
+      reserved,
+      others,
+    });
   }
 
   filterProps(
     props,
-    {
-      required = true,
-      hidden = true,
-      reserved = true,
-      others = true,
-    } = {}
+    { required = true, hidden = true, reserved = true, others = true } = {}
   ) {
-    var allProps = Object.keys(this.schema);
+    let allProps = Object.keys(this.schema);
     if (others) {
       if (!required) {
-        allProps = allProps.filter(p => !(this.required.includes(p)));
+        allProps = allProps.filter((p) => !this.required.includes(p));
       }
       if (!hidden) {
-        allProps = allProps.filter(p => !(this.hidden.includes(p)));
+        allProps = allProps.filter((p) => !this.hidden.includes(p));
       }
       if (!reserved) {
-        allProps = allProps.filter(p => !(this.reserved.includes(p)));
+        allProps = allProps.filter((p) => !this.reserved.includes(p));
       }
-    }
-    else {
+    } else {
       allProps = [];
       if (required) {
         allProps = this.required;
@@ -356,7 +351,7 @@ class Schema {
         allProps = allProps.concat(this.reserved);
       }
     }
-    return allProps.filter(p => props.includes(p));;
+    return allProps.filter((p) => props.includes(p));
   }
 
   isRequired(prop) {
@@ -364,12 +359,12 @@ class Schema {
   }
 
   getRequired() {
-    return this.required
+    return this.required;
   }
 
   getOptional() {
     return this.getProps({
-      required: false
+      required: false,
     });
   }
 
@@ -379,7 +374,7 @@ class Schema {
 
   getNotHidden() {
     return this.getProps({
-      hidden: false
+      hidden: false,
     });
   }
 
@@ -389,28 +384,28 @@ class Schema {
 
   getNotReserved() {
     return this.getProps({
-      reserved: false
+      reserved: false,
     });
   }
 
-  getUnsetProps(
-    item,
-    {
-      hidden = false,
-      reserved = false
-    } = {}
-  ) {
-    return this.getProps({hidden: hidden, reserved: reserved}).filter(key => item[key] === undefined);
+  getUnsetProps(item, { hidden = false, reserved = false } = {}) {
+    return this.getProps({ hidden, reserved }).filter(
+      (key) => item[key] === undefined
+    );
   }
 
   hasProperty(key, property) {
-    return this.schema.hasOwnProperty(key) && 
-           this.schema[key].hasOwnProperty(property);
+    return (
+      Object.prototype.hasOwnProperty.call(this.schema, key) &&
+      Object.prototype.hasOwnProperty.call(this.schema[key], property)
+    );
   }
 
   getProperty(key, property) {
-    return this.schema.hasOwnProperty(key) && 
-           this.schema[key][property];
+    return (
+      Object.prototype.hasOwnProperty.call(this.schema, key) &&
+      this.schema[key][property]
+    );
   }
 }
 

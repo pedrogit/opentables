@@ -1,35 +1,36 @@
-//var assert = require('assert');
+/* eslint-disable no-unused-expressions */
+/* eslint-env mocha */
 const chai = require("chai");
 const Filter = require("../filter");
 
-var expect = chai.expect;
+const { expect } = chai;
 
 describe("testFilter.js List Item Filter", () => {
   it("Pass null", () => {
-    var filter = new Filter();
-    var finalFilter = filter.final();
+    const filter = new Filter();
+    const finalFilter = filter.final();
     expect(finalFilter).to.be.null;
   });
 
   it("Test a string filter", () => {
-    var filter = new Filter('field1: "aaa"');
-    var finalFilter = filter.final();
+    const filter = new Filter('field1: "aaa"');
+    const finalFilter = filter.final();
 
     expect(finalFilter).to.be.an("object");
     expect(finalFilter).to.have.property("field1", "aaa");
   });
 
   it("Pass JSON filter", () => {
-    var filter = new Filter({ field1: "aaa" });
-    var finalFilter = filter.final();
+    const filter = new Filter({ field1: "aaa" });
+    const finalFilter = filter.final();
 
     expect(finalFilter).to.be.an("object");
     expect(finalFilter).to.have.property("field1", "aaa");
   });
 
   it("Test $contains", () => {
-    var filter = new Filter("$contains: [$field1, aaa]");
-    var finalFilter = filter.final();
+    const filter = new Filter("$contains: [$field1, aaa]");
+    const finalFilter = filter.final();
 
     expect(finalFilter).to.be.an("object");
     expect(finalFilter).to.have.deep.property("$regexFind", {

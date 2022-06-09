@@ -7,9 +7,9 @@ import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
-import MUISelect from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
+import MUISelect from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { useTheme } from "@mui/material/styles";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -18,29 +18,40 @@ import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
 const Globals = require("../../../common/globals");
 const Errors = require("../../../common/errors");
 
-/********************
+const extractNameAndVal = (val) => {
+  if (val) {
+    return {
+      propName: val.prop === undefined ? "Missing property name" : val.prop,
+      propVal: val.val === undefined ? "Missing property value" : val.val,
+    };
+  }
+  return {
+    propName: "",
+    propVal: "",
+  };
+};
+
+/* *******************
  *  Label component
- ********************/
+ ******************* */
 function Label({
   val, // label text
   vertical = false, // label is over the component (vertical=true), or  on the left size of it (vertical=false)
   nolabel = false, // do not dispay the label
-  sx // label sx
+  sx, // label sx
 }) {
   const theme = useTheme();
-  var fontSize = vertical
-    ? theme.typography.caption
-    : theme.typography.body1;
+  const fontSize = vertical ? theme.typography.caption : theme.typography.body1;
 
-  var defaultSx = {
-    fontSize: fontSize,
+  const defaultSx = {
+    fontSize,
     color: theme.palette.primary.main,
     fontWeight: "bold",
     marginRight: 1,
   };
 
   if (!nolabel) {
-    var separator = vertical ? null : <>&nbsp;:</>;
+    const separator = vertical ? null : <>&nbsp;:</>;
     return (
       <Typography sx={{ ...defaultSx, ...sx }}>
         {val}
@@ -52,12 +63,12 @@ function Label({
   return null;
 }
 
-/********************
+/** ******************
  *  Text component
- ********************/
+ ******************* */
 function Text({
-  val, 
-  inline = false, // edit mode is inline 
+  val,
+  inline = false, // edit mode is inline
   wrappedInform = false, // component is part of a form
   pretty = false, // make inline inputs pretty
   editmode = false, // switch between read and edit mode
@@ -65,10 +76,9 @@ function Text({
   label, // label
   nolabel = false, // do not display label
   labelSx = {}, // label sx
-  sx  // component sx
+  sx, // component sx
 }) {
-  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : '';
-  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : '';
+  const { propName, propVal } = extractNameAndVal(val);
 
   const valueRef = React.useRef();
   const theme = useTheme();
@@ -81,16 +91,26 @@ function Text({
     if (wrappedInform && val && val.val !== undefined) {
       setEditVal(val.val);
     }
-  }, [val, wrappedInform] );
+  }, [val, wrappedInform]);
 
   if (val && (propName || editVal)) {
-
-    var defaultSx = {
-      marginTop: inline && pretty && (editmode || isEditing) ? "8px" : "inherit",
-      marginBottom: inline && pretty && (editmode || isEditing) ? "8px" : "inherit"
+    const defaultSx = {
+      marginTop:
+        inline && pretty && (editmode || isEditing) ? "8px" : "inherit",
+      marginBottom:
+        inline && pretty && (editmode || isEditing) ? "8px" : "inherit",
     };
 
-    const handleEdit = (e) => {
+    const setIsEditingOff = () => {
+      if (!wrappedInform) {
+        setIsEditing(false);
+        if (!editVal) {
+          setEditVal(propVal);
+        }
+      }
+    };
+
+    const handleEdit = () => {
       if (!wrappedInform && val.checkItemEditPerm(propName)) {
         if (!editVal) {
           setEditVal(propVal);
@@ -103,8 +123,7 @@ function Text({
       if (wrappedInform) {
         // change the List editingItem
         val.handleSaveProperty({ [propName]: newVal });
-      }
-      else {
+      } else {
         setEditVal(newVal);
       }
     };
@@ -112,14 +131,13 @@ function Text({
     const handleSave = () => {
       if (!wrappedInform) {
         if (editVal !== propVal) {
-          val.handleSaveProperty({ [propName]: editVal }, (success, val) => {
+          val.handleSaveProperty({ [propName]: editVal }, (success, value) => {
             if (success) {
               setIsEditingOff();
-              setEditVal(val[propName]);
+              setEditVal(value[propName]);
             }
           });
-        }
-        else {
+        } else {
           setIsEditingOff();
         }
       }
@@ -127,33 +145,30 @@ function Text({
 
     const keyPressed = (e) => {
       if (!wrappedInform) {
-        if (e.keyCode === 13) { // enter
+        if (e.keyCode === 13) {
+          // enter
           handleSave();
         }
       }
-      if (e.keyCode === 27) { // escape
+      if (e.keyCode === 27) {
+        // escape
         setEditVal(propVal);
-        setIsEditingOff()
+        setIsEditingOff();
       }
     };
 
-    const setIsEditingOff = () => {
-      if (!wrappedInform) {
-        setIsEditing(false);
-        if (!editVal) {
-          setEditVal(propVal);
-        }
-      }
-    }
-
-    const inputLabel = 'Edit "' + propName + '"...';
+    const inputLabel = `Edit "${propName}"...`;
     const getWidth = () => {
       const labelFontWidth = 0.75 * theme.typography.fontSize * 0.4;
       const labelW = labelFontWidth * inputLabel.length;
       const inputPadding = 28;
       const popoverPadding = 16;
       return Math.max(
-        (valueRef && valueRef.current && valueRef.current.offsetWidth ? valueRef.current.offsetWidth : 0) + inputPadding + popoverPadding,
+        (valueRef && valueRef.current && valueRef.current.offsetWidth
+          ? valueRef.current.offsetWidth
+          : 0) +
+          inputPadding +
+          popoverPadding,
         labelW + 2 * labelFontWidth + inputPadding + popoverPadding
       );
     };
@@ -161,33 +176,48 @@ function Text({
     return (
       <>
         <Stack direction={vertical ? "column" : "row"}>
-          {(!(inline && pretty) || !(editmode || isEditing)) && <Label 
-            vertical={vertical} 
-            val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
-            nolabel={nolabel} 
-            sx={{...defaultSx, ...sx, ...labelSx}}
-          />}
+          {(!(inline && pretty) || !(editmode || isEditing)) && (
+            <Label
+              vertical={vertical}
+              val={
+                label || propName.charAt(0).toUpperCase() + propName.slice(1)
+              }
+              nolabel={nolabel}
+              sx={{ ...defaultSx, ...sx, ...labelSx }}
+            />
+          )}
           {(editmode || isEditing) && inline ? (
-            <>
             <ClickAwayListener onClickAway={setIsEditingOff}>
               <TextField
                 name={propName}
                 variant={pretty ? "outlined" : "filled"}
-                sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
-                inputProps={pretty? {} : {
-                  style: {padding: '0px'}
+                sx={{
+                  ...defaultSx,
+                  ...sx,
+                  backgroundColor: theme.palette.primary.palebg,
                 }}
+                inputProps={
+                  pretty
+                    ? {}
+                    : {
+                        style: { padding: "0px" },
+                      }
+                }
                 size="small"
-                label={pretty ? (label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)) : null}
+                label={
+                  pretty
+                    ? label ||
+                      propName.charAt(0).toUpperCase() + propName.slice(1)
+                    : null
+                }
                 fullWidth
                 value={editVal}
                 onChange={(e) => handleChange(e.target.value)}
                 onKeyDown={(e) => keyPressed(e)}
-                InputLabelProps={{shrink: true}}
-                autoFocus={wrappedInform ? false : true}
+                InputLabelProps={{ shrink: true }}
+                autoFocus={!wrappedInform}
               />
             </ClickAwayListener>
-            </>
           ) : (
             <Typography
               id={propName}
@@ -210,7 +240,7 @@ function Text({
         >
           <Box sx={{ p: 1, width: getWidth() }}>
             <TextField
-              sx={{backgroundColor: theme.palette.primary.palebg}}
+              sx={{ backgroundColor: theme.palette.primary.palebg }}
               fullWidth
               id="outlined-basic"
               variant="outlined"
@@ -229,10 +259,10 @@ function Text({
   return null;
 }
 
-/********************
+/** ******************
  *  Select component
- ********************/
- function Select({
+ ******************* */
+function Select({
   val,
   options,
   wrappedInform = false, // component is surrounded with a ItemWrapperForm form
@@ -242,22 +272,31 @@ function Text({
   label, // label
   nolabel = false, // do not display label
   labelSx = {}, // label sx
-  sx  // component sx
+  sx, // component sx
 }) {
-  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
-  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
+  const { propName, propVal } = extractNameAndVal(val);
 
   const [editVal, setEditVal] = React.useState(propVal);
   const [isEditing, setIsEditing] = React.useState(editmode);
 
   if (val && (propName || editVal)) {
-
-    var defaultSx = {
-      marginTop: wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit",
-      marginBottom: wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit"
+    const defaultSx = {
+      marginTop:
+        wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit",
+      marginBottom:
+        wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit",
     };
 
-    const handleEdit = (e) => {
+    const setIsEditingOff = () => {
+      if (!wrappedInform) {
+        setIsEditing(false);
+        if (!editVal) {
+          setEditVal(propVal);
+        }
+      }
+    };
+
+    const handleEdit = () => {
       if (!wrappedInform && val.checkItemEditPerm(propName)) {
         if (!editVal) {
           setEditVal(propVal);
@@ -278,59 +317,60 @@ function Text({
     };
 
     const keyPressed = (e) => {
-      if (e.keyCode === 27) { // escape
+      if (e.keyCode === 27) {
+        // escape
         setEditVal(propVal);
-        setIsEditingOff()
+        setIsEditingOff();
       }
     };
 
-    const setIsEditingOff = () => {
-      if (!wrappedInform) {
-        setIsEditing(false);
-        if (!editVal) {
-          setEditVal(propVal);
-        }
-      }
-    }
-
     return (
       <Stack direction={vertical ? "column" : "row"}>
-        {(!(wrappedInform && pretty) || !(editmode || isEditing)) && <Label 
-          vertical={vertical} 
-          val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
-          nolabel={nolabel} 
-          sx={{...defaultSx, ...sx, ...labelSx}}
-        />}
-        {(editmode || isEditing) ? (
-          <>
-            <MUISelect
-              name={propName}
-              open={editmode || isEditing}
-              variant={"standard"}
-              sx={{ ...defaultSx, ...sx}}
-              MenuProps={{
-                anchorOrigin: {
-                  vertical: "bottom",
-                  horizontal: "left"
-                },
-                transformOrigin: {
-                  vertical: "top",
-                  horizontal: "left"
-                },
-                getContentAnchorEl: null,
-              }}
-              SelectDisplayProps={{style: {padding:'0px 20px 0px 0px '}}}
-              size="small"
-              autoWidth={true}
-              value={editVal}
-              onChange={(e) => {handleChange(e.target.value)}}
-              onKeyDown={(e) => keyPressed(e)}
-              onClose={setIsEditingOff}
-            >
-              <MenuItem value="" dense={true}><em>unset</em></MenuItem>
-              {options && options.map(opt => <MenuItem value={opt} dense={true}>{opt}</MenuItem>)}
-            </MUISelect>
-          </>
+        {(!(wrappedInform && pretty) || !(editmode || isEditing)) && (
+          <Label
+            vertical={vertical}
+            val={label || propName.charAt(0).toUpperCase() + propName.slice(1)}
+            nolabel={nolabel}
+            sx={{ ...defaultSx, ...sx, ...labelSx }}
+          />
+        )}
+        {editmode || isEditing ? (
+          <MUISelect
+            name={propName}
+            open={editmode || isEditing}
+            variant="standard"
+            sx={{ ...defaultSx, ...sx }}
+            MenuProps={{
+              anchorOrigin: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
+              transformOrigin: {
+                vertical: "top",
+                horizontal: "left",
+              },
+              getContentAnchorEl: null,
+            }}
+            SelectDisplayProps={{ style: { padding: "0px 20px 0px 0px " } }}
+            size="small"
+            autoWidth
+            value={editVal}
+            onChange={(e) => {
+              handleChange(e.target.value);
+            }}
+            onKeyDown={(e) => keyPressed(e)}
+            onClose={setIsEditingOff}
+          >
+            <MenuItem value="" dense>
+              <em>unset</em>
+            </MenuItem>
+            {options &&
+              options.map((opt) => (
+                <MenuItem value={opt} dense>
+                  {opt}
+                </MenuItem>
+              ))}
+          </MUISelect>
         ) : (
           <Typography
             id={propName}
@@ -346,25 +386,33 @@ function Text({
   return null;
 }
 
-/*************************
+/** ***********************
  *  Viewlink component
- *************************/
+ ************************ */
 function Viewlink({
-  text,  // text to display under the link
-  viewid // viewid of the view to display
+  text, // text to display under the link
+  viewid, // viewid of the view to display
 }) {
   return (
-    <Link onClick={viewid && viewid.setViewId ? (() => (viewid.setViewId)(viewid.val)) : null}>
-      {text ? (text.val ? text.val : "Text property missing...") : "Text property missing..."}
-    </Link>
-  )
+    <Typography>
+      {
+        // eslint-disable-next-line prettier/prettier, jsx-a11y/anchor-is-valid
+      }<Link
+        onClick={
+          viewid && viewid.setViewId ? () => viewid.setViewId(viewid.val) : null
+        }
+      >
+        {text && text.val ? text.val : "Text property missing..."}
+      </Link>
+    </Typography>
+  );
 }
 
-/*************************
+/** ***********************
  *  Password component
- *  
+ *
  *  Always in edit mode
- *************************/
+ ************************ */
 function Password({
   val,
   inline = true, // inline or popop (for now always inline)
@@ -373,18 +421,17 @@ function Password({
   label, // label to display
   nolabel = false, // do not display any label
   labelSx = {}, // label sx
-  sx // input sx
+  sx, // input sx
 }) {
-  const propName = val ? (val.prop === undefined ? "Missing property name" : val.prop) : undefined;
-  const propVal = val ? (val.val === undefined ? "Missing value" : val.val) : undefined;
+  const { propName, propVal } = extractNameAndVal(val);
 
   const [editVal, setEditVal] = React.useState(propVal);
   const theme = useTheme();
 
   if (val && (propName || editVal)) {
-    var defaultSx = {
+    const defaultSx = {
       marginTop: inline && pretty ? "8px" : "inherit",
-      marginBottom: inline && pretty ? "8px" : "inherit"
+      marginBottom: inline && pretty ? "8px" : "inherit",
     };
 
     const handleChange = (newVal) => {
@@ -392,82 +439,103 @@ function Password({
     };
 
     return (
-      <>
-        <Stack direction={vertical ? "column" : "row"}>
-          {!pretty && <Label 
-              vertical={vertical} 
-              val={label ? label : propName.charAt(0).toUpperCase() + propName.slice(1)}
-              nolabel={nolabel} 
-              sx={{...defaultSx, ...sx, ...labelSx}}
-            />
-          }
-          
-          <VisibilityPasswordTextField
-            name={propName}
-            value={editVal}
-            sx={{ ...defaultSx, ...sx, backgroundColor: theme.palette.primary.palebg}}
-            inputProps={pretty? {} : {
-              style: {padding: "0px"}
-            }}
-            variant={inline && !pretty ? "filled" : "outlined"}
-            size="small"
-            fullWidth
-            label={inline && !pretty ? null : (label ? label : propName.charAt(0).toUpperCase() + propName.slice(1))}
-            autoComplete="off"
-            onChange={(e) => handleChange(e.target.value)}
-            InputLabelProps={{shrink: true}}
+      <Stack direction={vertical ? "column" : "row"}>
+        {!pretty && (
+          <Label
+            vertical={vertical}
+            val={label || propName.charAt(0).toUpperCase() + propName.slice(1)}
+            nolabel={nolabel}
+            sx={{ ...defaultSx, ...sx, ...labelSx }}
           />
-        </Stack>
-      </>
-    )
+        )}
+
+        <VisibilityPasswordTextField
+          name={propName}
+          value={editVal}
+          sx={{
+            ...defaultSx,
+            ...sx,
+            backgroundColor: theme.palette.primary.palebg,
+          }}
+          inputProps={
+            pretty
+              ? {}
+              : {
+                  style: { padding: "0px" },
+                }
+          }
+          variant={inline && !pretty ? "filled" : "outlined"}
+          size="small"
+          fullWidth
+          label={
+            inline && !pretty
+              ? null
+              : label || propName.charAt(0).toUpperCase() + propName.slice(1)
+          }
+          autoComplete="off"
+          onChange={(e) => handleChange(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+      </Stack>
+    );
   }
-  return null
+  return null;
 }
 
-/*************************
+/** ***********************
  *  Add Item Wrapper Form
- *  
- *  Add cancel (or add or reset) and Add (or Register) buttons 
+ *
+ *  Add cancel (or add or reset) and Add (or Register) buttons
  *  around the item template and set the template component
  *  properties to necessary values (wrappedInform, inline, pretty)
- *************************/
-function ItemWrapperForm({
-  handlers, 
-  otherProps, 
-  children
-}) {
+ ************************ */
+function ItemWrapperForm({ handlers, otherProps, children }) {
   const defChildProps = {
-    wrappedInform: true, 
-    inline: true, 
-    pretty: true, 
-    editmode: true
-  }
-  const [recaptchaResponse, setRecaptchaResponse] = React.useState('');
+    wrappedInform: true,
+    inline: true,
+    pretty: true,
+    editmode: true,
+  };
+  const [recaptchaResponse, setRecaptchaResponse] = React.useState("");
   const [submitButtonDisabled, setSubmitButtonDisabled] = React.useState(true);
 
   const recaptchaRef = React.useRef();
-  var options = {
+
+  const resetRecaptcha = () => {
+    if (recaptchaRef && recaptchaRef.current) {
+      setRecaptchaResponse("");
+      recaptchaRef.current.reset();
+    }
+  };
+
+  const resetForm = () => {
+    resetRecaptcha();
+    otherProps.resetEditingItem();
+  };
+
+  let options = {
     cancelLabel: "Cancel",
     cancelAction: () => {
       resetForm();
       otherProps.setAddItem(false);
     },
     addLabel: "Add",
-    addAction: () => otherProps.setAddItem(false)
+    addAction: () => otherProps.setAddItem(false),
   };
 
   if (otherProps.addItemMode === Globals.addWithPersistentFormNoItems) {
     options = {
       ...options,
-      cancelAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
+      cancelAction: () =>
+        otherProps.backToMainView(Globals.viewOnAllViewViewId),
       addLabel: otherProps.addLabel ? otherProps.addLabel : "Save",
       addAction: () => otherProps.backToMainView(Globals.viewOnAllViewViewId),
       addMessage: {
-        severity:"success",
+        severity: "success",
         title: "Success!",
-        text: "Your new item was added..."
-      }
-    }
+        text: "Your new item was added...",
+      },
+    };
     if (otherProps && otherProps.addMessageText) {
       options.addMessage.text = otherProps.addMessageText;
     }
@@ -476,36 +544,26 @@ function ItemWrapperForm({
     }
   }
 
-  const resetRecaptcha = () => {
-    if (recaptchaRef && recaptchaRef.current) {
-      setRecaptchaResponse('');
-      recaptchaRef.current.reset();
-    }
-  }
-
-  const resetForm = () => {
-    resetRecaptcha();
-    otherProps.resetEditingItem();
-  }
-  
   if (otherProps.addItemMode === Globals.addWithPersistentFormAndItems) {
     options = {
       cancelLabel: "Reset",
       cancelAction: () => resetForm(),
       addLabel: "Add",
-      addAction: () => resetForm()
-    }
+      addAction: () => resetForm(),
+    };
   }
 
   const extractValues = (target) => {
-    var item = {};
-    for (var i = 0; i < target.length - 1; i++) {
-      if (target[i].type !== "button" && 
-          target[i].type !== "fieldset" && 
-          target[i].name !== undefined && 
-          target[i].defaultValue !== undefined &&
-          target[i].defaultValue !== null &&
-          target[i].defaultValue !== "") {
+    const item = {};
+    for (let i = 0; i < target.length - 1; i += 1) {
+      if (
+        target[i].type !== "button" &&
+        target[i].type !== "fieldset" &&
+        target[i].name !== undefined &&
+        target[i].defaultValue !== undefined &&
+        target[i].defaultValue !== null &&
+        target[i].defaultValue !== ""
+      ) {
         item[target[i].name] = target[i].defaultValue;
       }
       if (target[i].name === Globals.gRecaptchaResponse && recaptchaResponse) {
@@ -513,15 +571,16 @@ function ItemWrapperForm({
       }
     }
     return item;
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!otherProps.recaptcha || (otherProps.recaptcha && recaptchaResponse)) {
-      var newItem = extractValues(e.target);
+      const newItem = extractValues(e.target);
       handlers.handleAddItem({
         item: newItem,
-        addToLocalList: otherProps.addItemMode === Globals.addWithPersistentFormNoItems ? false : true,
+        addToLocalList:
+          otherProps.addItemMode !== Globals.addWithPersistentFormNoItems,
         callback: (success) => {
           if (success) {
             setSubmitButtonDisabled(true);
@@ -530,17 +589,16 @@ function ItemWrapperForm({
               handlers.setErrorMsg(options.addMessage);
             }
           }
-        }
-      })
+        },
+      });
+    } else {
+      handlers.setErrorMsg({ text: Errors.ErrMsg.Recaptcha_Failed });
     }
-    else {
-      handlers.setErrorMsg({text: Errors.ErrMsg.Recaptcha_Failed});
-    }
-   }
+  };
 
-  const childrenWithProp = React.Children.map(children, child => {
+  const childrenWithProp = React.Children.map(children, (child) => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, defChildProps);  
+      return React.cloneElement(child, defChildProps);
     }
     return child;
   });
@@ -552,45 +610,49 @@ function ItemWrapperForm({
     if (e.keyCode !== 13 && e.keyCode !== 8 && e.keyCode !== 46) {
       setSubmitButtonDisabled(false);
     }
-    /*else {
-      setSubmitButtonDisabled(true);
-    }*/
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      onKeyDown={keyPressed}
-    >
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+    <form onSubmit={handleSubmit} onKeyDown={keyPressed}>
       {childrenWithProp}
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
+        direction={{ xs: "column", sm: "row" }}
         justifyContent={otherProps.recaptcha ? "space-between" : "flex-end"}
       >
-        {otherProps.recaptcha &&
+        {otherProps.recaptcha && (
           <ReCAPTCHA
-            id='g-recaptcha'
+            id="g-recaptcha"
             ref={recaptchaRef}
-            sitekey={window.Cypress
-              ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' // always positive key
-              : '6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V'}
+            sitekey={
+              window.Cypress
+                ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // always positive key
+                : "6LcH-QkfAAAAAEKeUGIPbeY1OUlN4aQRkMyRoY_V"
+            }
             onChange={(value) => setRecaptchaResponse(value)}
-            onExpired={() => setRecaptchaResponse('')}
+            onExpired={() => setRecaptchaResponse("")}
           />
-        }
-        <Stack 
-          direction="row" 
-          justifyContent="flex-end"
-          alignItems="flex-end"
-        >
+        )}
+        <Stack direction="row" justifyContent="flex-end" alignItems="flex-end">
           <ButtonGroup variant="contained" size="small">
-            <Button id="addCancelItemFormButton" onClick={() => options.cancelAction()}>{options.cancelLabel}</Button>
-            <Button id="addItemFormButton" type="submit" disabled={submitButtonDisabled}>{options.addLabel}</Button>
+            <Button
+              id="addCancelItemFormButton"
+              onClick={() => options.cancelAction()}
+            >
+              {options.cancelLabel}
+            </Button>
+            <Button
+              id="addItemFormButton"
+              type="submit"
+              disabled={submitButtonDisabled}
+            >
+              {options.addLabel}
+            </Button>
           </ButtonGroup>
         </Stack>
       </Stack>
     </form>
-  )
+  );
 }
 
 function allComponentsAsJson() {

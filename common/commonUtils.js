@@ -1,5 +1,3 @@
-const jwt = require("jsonwebtoken");
-
 /*
 exports.objKeysInObjKeys = function (obj1, obj2) {
   for (var key of Object.keys(obj1)) {
@@ -11,15 +9,16 @@ exports.objKeysInObjKeys = function (obj1, obj2) {
 };
 */
 
-exports.objWithout = function (obj, without) {
+exports.objWithout = (obj, without) => {
+  let withoutArr = without;
   if (typeof obj === "object") {
-    var newObj = { ...obj };
-    if (without && typeof without === "string") {
-      without = [without];
+    const newObj = { ...obj };
+    if (withoutArr && typeof withoutArr === "string") {
+      withoutArr = [without];
     }
-    if (typeof newObj === "object" && without instanceof Array) {
-      without.forEach((x) => {
-        if (newObj.hasOwnProperty(x)) {
+    if (typeof newObj === "object" && withoutArr instanceof Array) {
+      withoutArr.forEach((x) => {
+        if (Object.prototype.hasOwnProperty.call(newObj, x)) {
           delete newObj[x];
         }
       });
@@ -38,8 +37,3 @@ exports.isObjEmpty = function (obj) {
   );
 };
 */
-
-
-
-
-
