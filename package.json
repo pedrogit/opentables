@@ -14,7 +14,7 @@
     "test-routes": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha server/test/testRoutes.js --timeout 0\"",
     "test-all": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha common/test/testTemplateParser.js server/test/testSchemaValidator.js common/test/testUtils.js common/test/testFilter.js common/test/testSimpleJSON.js common/test/testPermissions.js --timeout 0\"",
     "test-components": "cross-env NODE_ENV=development nodemon --inspect --exec \"mocha client/src/components/components.test.js --timeout 0\"",
-    "start-server": "node ./server/index.js",
+    "start": "node ./server/index.js",
     "debug-server": "cross-env NODE_ENV=development nodemon --nolazy --inspect --watch ./common --watch ./server/src --watch ./server/index.js ./server/index.js",
     "cypress:open": "cypress open --browser chrome --e2e",
     "cypress:open-edge": "cypress open --browser edge --e2e",
