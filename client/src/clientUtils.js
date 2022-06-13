@@ -20,4 +20,10 @@ const getURLParam = (paramName) => {
   return url.searchParams.get(paramName);
 };
 
-export { getUser, getURLParam };
+const getScriptBaseURL = (() => {
+  const allScripts = document.getElementsByTagName("script");
+  const thisScript = allScripts[allScripts.length - 1];
+  return () => thisScript.src.slice(0, -12);
+})();
+
+export { getUser, getURLParam, getScriptBaseURL };
