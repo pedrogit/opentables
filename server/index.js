@@ -1,5 +1,5 @@
 const express = require("express");
-var cors = require("cors");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const jwt = require("jsonwebtoken");
@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3001;
 app.use(
   cors({
     origin: true,
-    //preflightContinue: true, // allow HTTP methods other than GET, HEAD and POST (e.g. PATCH and DELETE)
+    // preflightContinue: true, // allow HTTP methods other than GET, HEAD and POST (e.g. PATCH and DELETE)
     credentials: true,
   })
 );
@@ -35,22 +35,22 @@ app.use(async (req, res, next) => {
   req.user = Globals.allUserName;
 
   // check for credentiel in the authorization header
-  if (req.headers.hasOwnProperty("authorization")) {
-    var item = {};
+  if (Object.prototype.hasOwnProperty.call(req.headers, "authorization")) {
+    let item = {};
     const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
-    var [email, password] = Buffer.from(b64auth, "base64")
+    const [email, password] = Buffer.from(b64auth, "base64")
       .toString()
       .split(":");
-      email = email.toLowerCase();
+    const lcEmail = email.toLowerCase();
 
-    if (email !== "") {
+    if (lcEmail !== "") {
       if (password === "") {
         return next(
           new Errors.Unauthorized(NodeUtil.format(Errors.ErrMsg.CouldNotLogin))
         );
       }
 
-      if (email === process.env.ADMIN_EMAIL) {
+      if (lcEmail === process.env.ADMIN_EMAIL) {
         if (password !== process.env.ADMIN_PASSWORD) {
           return next(
             new Errors.Unauthorized(
@@ -60,7 +60,9 @@ app.use(async (req, res, next) => {
         }
         req.user = Globals.adminUserName;
       } else {
-        item = await controler.simpleFind(Globals.userListId, { [Globals.emailFieldName]: email });
+        item = await controler.simpleFind(Globals.userListId, {
+          [Globals.emailFieldName]: lcEmail,
+        });
 
         if (!item) {
           return next(
@@ -77,7 +79,7 @@ app.use(async (req, res, next) => {
         req.user = item[Globals.usernameFieldName];
       }
 
-      Utils.setCookieJWT(req, res, { username: req.user});
+      Utils.setCookieJWT(req, res, { username: req.user });
     }
   }
 
@@ -100,32 +102,36 @@ app.use(async (req, res, next) => {
 });
 
 // Make the server able to server filesystem files from the public folder
-//app.use(express.static(path.join(__dirname, '../public')));
+// app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, "../public")));
 
 // Handle the REST API
-app.use("/api/" + Globals.APIKeyword, router);
+app.use(`/api/${Globals.APIKeyword}`, router);
 
 // Implement a generic error sending middleware
-app.use((err, req, res, next) => {
-  if (!err.statusCode) {
-    err.statusCode = 500;
+app.use((err, req, res) => {
+  const newErr = { ...err };
+  if (!newErr.statusCode) {
+    newErr.statusCode = 500;
   }
 
-  if (err.statusCode === 301) {
+  if (newErr.statusCode === 301) {
     return res.status(301).redirect("/not-found");
   }
 
-  return res.status(err.statusCode).json({ err: err.message });
+  return res.status(newErr.statusCode).json({ err: newErr.message });
 });
 
 // Start the BD and then the server
 controler.init(() => {
   app.listen(PORT, () => {
-    console.log("Server started on port " + PORT + 
-      " in " + (process.env.NODE_ENV || "production") + " mode...");
-    app.emit('started');
+    console.log(
+      `Server started on port ${PORT} in ${
+        process.env.NODE_ENV || "production"
+      } mode...`
+    );
+    app.emit("started");
   });
-})
+});
 
 module.exports = app;
