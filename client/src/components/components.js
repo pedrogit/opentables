@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Typography from "@mui/material/Typography";
-import Link from "@mui/material/Link";
+import MUILink from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
@@ -397,15 +397,128 @@ function Viewlink({
     <Typography>
       {
         // eslint-disable-next-line prettier/prettier, jsx-a11y/anchor-is-valid
-      }<Link
+      }<MUILink
         onClick={
           viewid && viewid.setViewId ? () => viewid.setViewId(viewid.val) : null
         }
       >
         {text && text.val ? text.val : "Text property missing..."}
-      </Link>
+      </MUILink>
     </Typography>
   );
+}
+
+/** ***********************
+ *  Link component
+ ************************ */
+function Link({
+  text, // text to display under the link
+  href,
+  newtab = true,
+  wrappedInform = false, // component is part of a form
+  pretty = false, // make inline inputs pretty
+  editmode = false, // switch between read and edit mode
+  vertical = false, // vertical lavels (horizontal otherwise)
+  label, // label,
+  nolabel = false, // do not display label
+  labelSx = {}, // label sx
+  sx, // component sx
+}) {
+  const [isEditing, setIsEditing] = React.useState(editmode);
+  const [alreadyClicked, setAlreadyClicked] = React.useState(false);
+  const alreadyClickedTimeout = React.useRef(null);
+
+  const valueRef = React.useRef();
+
+  const tempText = extractNameAndVal(text);
+  const { propName } = tempText;
+  let { propVal } = tempText;
+  const textPropName = propName;
+  const textPropVal = propVal;
+
+  ({ propVal } = extractNameAndVal(href));
+  const hrefPropVal = propVal;
+
+  if (text && textPropName) {
+    const defaultSx = {
+      marginTop:
+        wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit",
+      marginBottom:
+        wrappedInform && pretty && (editmode || isEditing) ? "8px" : "inherit",
+    };
+
+    const setIsEditingOff = () => {
+      if (!wrappedInform) {
+        setIsEditing(false);
+      }
+    };
+
+    const handleEdit = (e) => {
+      e.preventDefault();
+      if (alreadyClicked) {
+        // second click
+        setAlreadyClicked(false);
+        clearTimeout(alreadyClickedTimeout.current);
+        if (!wrappedInform && text.checkItemEditPerm(textPropName)) {
+          setIsEditing(true);
+        }
+      } else {
+        // first click
+        setAlreadyClicked(true);
+        alreadyClickedTimeout.current = setTimeout(() => {
+          // no double click
+          setAlreadyClicked(false);
+          if (newtab) {
+            window.open(hrefPropVal, "_blank");
+          } else {
+            window.location = hrefPropVal;
+          }
+        }, 300);
+      }
+    };
+
+    return (
+      <>
+        <Stack direction={vertical ? "column" : "row"}>
+          {(!(wrappedInform && pretty) || !(editmode || isEditing)) && (
+            <Label
+              vertical={vertical}
+              val={
+                label ||
+                textPropName.charAt(0).toUpperCase() + textPropName.slice(1)
+              }
+              nolabel={nolabel}
+              sx={{ ...defaultSx, ...sx, ...labelSx }}
+            />
+          )}
+          <Typography id={propName} sx={{ ...defaultSx, ...sx }} ref={valueRef}>
+            {hrefPropVal ? (
+              <MUILink onClick={handleEdit} href={hrefPropVal}>
+                {textPropVal}
+              </MUILink>
+            ) : (
+              textPropVal
+            )}
+          </Typography>
+        </Stack>
+        <Popover
+          open={editmode || isEditing}
+          anchorEl={valueRef.current}
+          onClose={setIsEditingOff}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <Box sx={{ p: 1 }}>
+            <Text val={text} inline label="Text" />
+            <Text val={href} inline label="URL" />
+          </Box>
+        </Popover>
+      </>
+    );
+  }
+  return null;
 }
 
 /** ***********************
@@ -656,7 +769,7 @@ function ItemWrapperForm({ handlers, otherProps, children }) {
 }
 
 function allComponentsAsJson() {
-  return { Text, Select, Label, Viewlink, Password, ItemWrapperForm };
+  return { Text, Select, Label, Viewlink, Link, Password, ItemWrapperForm };
 }
 
 export { allComponentsAsJson, Text };

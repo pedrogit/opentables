@@ -2,6 +2,7 @@
 const MongoDB = require("mongodb");
 const NodeUtil = require("util");
 const bcrypt = require("bcrypt");
+const urlRegex = require("url-regex");
 
 const Globals = require("../../common/globals");
 const Errors = require("../../common/errors");
@@ -192,7 +193,29 @@ class SchemaValidator {
 
   validate_type(type, key, val) {
     const typeValidatorName = `validate_type_${type}`;
+    if (!this[typeValidatorName]) {
+      throw new Error(
+        NodeUtil.format(Errors.ErrMsg.SchemaValidator_InvalidType, type)
+      );
+    }
     return this[typeValidatorName](key, val);
+  }
+
+  validate_type_url(key, val) {
+    if (val === "" || val === key) {
+      return val;
+    }
+    if (!urlRegex().test(val)) {
+      throw new Error(
+        NodeUtil.format(
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
+          key,
+          val,
+          "url"
+        )
+      );
+    }
+    return val;
   }
 
   validate_type_objectid(key, val) {
@@ -202,7 +225,7 @@ class SchemaValidator {
     if (!MongoDB.ObjectId.isValid(val)) {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "objectid"
@@ -220,7 +243,7 @@ class SchemaValidator {
     if (!MongoDB.ObjectId.isValid(val)) {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "embedded_listid"
@@ -238,7 +261,7 @@ class SchemaValidator {
     if (!MongoDB.ObjectId.isValid(val)) {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "embedded_itemid"
@@ -263,7 +286,7 @@ class SchemaValidator {
     } catch (err) {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "user_array"
@@ -299,7 +322,7 @@ class SchemaValidator {
     } catch (err) {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "user_list"
@@ -313,7 +336,7 @@ class SchemaValidator {
     if (typeof val !== "string") {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "string"
@@ -327,7 +350,7 @@ class SchemaValidator {
     if (typeof val !== "boolean") {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "boolean"
@@ -345,7 +368,7 @@ class SchemaValidator {
     if (typeof val !== "string") {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "encrypted_string"
@@ -363,7 +386,7 @@ class SchemaValidator {
     if (typeof val !== "number") {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "number"
@@ -377,7 +400,7 @@ class SchemaValidator {
     if (typeof val !== "string") {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "schema"
@@ -393,7 +416,7 @@ class SchemaValidator {
     if (typeof val !== "string") {
       throw new Error(
         NodeUtil.format(
-          Errors.ErrMsg.SchemaValidator_InvalidType,
+          Errors.ErrMsg.SchemaValidator_InvalidValueType,
           key,
           val,
           "template"
@@ -407,7 +430,7 @@ class SchemaValidator {
   validate_type_email(key, email) {
     const emailError = new Error(
       NodeUtil.format(
-        Errors.ErrMsg.SchemaValidator_InvalidType,
+        Errors.ErrMsg.SchemaValidator_InvalidValueType,
         key,
         email,
         "email"

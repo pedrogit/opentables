@@ -538,7 +538,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             err: NodeUtil.format(
-              Errors.ErrMsg.SchemaValidator_InvalidType,
+              Errors.ErrMsg.SchemaValidator_InvalidValueType,
               "field2",
               "222",
               "string"
@@ -781,7 +781,7 @@ describe("testRoutes.js List API", () => {
           expect(response.body).to.be.a("object");
           expect(response.body).to.deep.equal({
             err: NodeUtil.format(
-              Errors.ErrMsg.SchemaValidator_InvalidType,
+              Errors.ErrMsg.SchemaValidator_InvalidValueType,
               "field4",
               "123",
               "string"

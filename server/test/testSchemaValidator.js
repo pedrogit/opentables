@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 /* eslint-disable no-unused-vars */
 const chai = require("chai");
 const NodeUtil = require("util");
@@ -217,7 +218,7 @@ describe("2 testSchemaValidator.js test string against schema", () => {
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "toto"}'),
       NodeUtil.format(
-        Errors.ErrMsg.SchemaValidator_InvalidType,
+        Errors.ErrMsg.SchemaValidator_InvalidValueType,
         "prop1",
         "toto",
         "number"
@@ -308,7 +309,7 @@ describe("2 testSchemaValidator.js test string against schema", () => {
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": 123}'),
       NodeUtil.format(
-        Errors.ErrMsg.SchemaValidator_InvalidType,
+        Errors.ErrMsg.SchemaValidator_InvalidValueType,
         "prop1",
         "123",
         "string"
@@ -331,7 +332,7 @@ describe("2 testSchemaValidator.js test string against schema", () => {
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "aaaa"}'),
       NodeUtil.format(
-        Errors.ErrMsg.SchemaValidator_InvalidType,
+        Errors.ErrMsg.SchemaValidator_InvalidValueType,
         "prop1",
         "aaaa",
         "email"
@@ -352,7 +353,7 @@ describe("2 testSchemaValidator.js test string against schema", () => {
     await expectThrowsAsync(
       () => schemaValidator.validateJson('{"prop1": "aa, bb"}'),
       NodeUtil.format(
-        Errors.ErrMsg.SchemaValidator_InvalidType,
+        Errors.ErrMsg.SchemaValidator_InvalidValueType,
         "prop1",
         "aa, bb",
         "user_list"
@@ -512,5 +513,32 @@ describe("2 testSchemaValidator.js test string against schema", () => {
 
     const json = await schemaValidator.validateJson('"prop1": "yyyyyyyy"');
     expect(json.prop1.length).to.equal(60);
+  });
+});
+
+describe("3 testSchemaValidator.js test link against schema", () => {
+  it("3.1 Validate a simple json URL against a one level schema", async () => {
+    const schemaValidator = new SchemaValidator("prop1: url");
+    const result = await schemaValidator.validateJson(
+      '{"prop1": "http://www.google.com"}'
+    );
+    // just make sure the constructor does not throw
+    expect(result).to.be.an("object");
+    expect(result).to.have.property("prop1", "http://www.google.com");
+  });
+
+  it("3.2 Validate an invalid URL against a one level schema", async () => {
+    const schemaValidator = new SchemaValidator("prop1: url");
+    expect(schemaValidator).to.be.an("object");
+
+    await expectThrowsAsync(
+      () => schemaValidator.validateJson('{"prop1": xxx}'),
+      NodeUtil.format(
+        Errors.ErrMsg.SchemaValidator_InvalidValueType,
+        "prop1",
+        "xxx",
+        "url"
+      )
+    );
   });
 });

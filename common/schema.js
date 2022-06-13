@@ -18,6 +18,7 @@ const validTypes = [
   "schema",
   "email",
   "template",
+  "url",
 ];
 
 class Schema {
@@ -217,6 +218,7 @@ class Schema {
 
       if (propType === "schema") return 'prop1: "string"';
       if (propType === "number") return 0;
+      if (propType === "url") return "http://www.google.com";
       if (propType === "email") return "email@gmail.com";
       if (propType === "user" || propType === "user_list") return user;
       return key;
@@ -252,14 +254,26 @@ class Schema {
         reserved,
       })
       .map((prop) => {
-        if (schema.hasProperty(prop, "options")) {
+        // match Select
+        if (schema.hasSecondLevelProperty(prop, "options")) {
           return `<Select val={${prop}} options={['${schema
             .getProperty(prop, "options")
             .join("', '")}']} inline /> `;
         }
+        // match Password
         if (schema.getType(prop) === "encrypted_string") {
           return `<Password val={${prop}} inline /> `;
         }
+        // prop has a prop-link sister property, it a Link
+        if (schema.hasProperty(`${prop}_link`)) {
+          return `<Link text={${prop}} texturl={${prop}_link} /> `;
+        }
+        // do nothing with links which have a sister property
+        if (prop.endsWith("_link") && schema.hasProperty(prop.slice(0, -5))) {
+          return "";
+        }
+
+        // default to Text
         return `<Text val={${prop}} inline /> `;
       })
       .join("");
@@ -394,11 +408,15 @@ class Schema {
     );
   }
 
-  hasProperty(key, property) {
+  hasSecondLevelProperty(key, property) {
     return (
       Object.prototype.hasOwnProperty.call(this.schema, key) &&
       Object.prototype.hasOwnProperty.call(this.schema[key], property)
     );
+  }
+
+  hasProperty(property) {
+    return Object.prototype.hasOwnProperty.call(this.schema, property);
   }
 
   getProperty(key, property) {

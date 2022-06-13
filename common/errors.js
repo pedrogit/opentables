@@ -62,8 +62,10 @@ const ErrMsg = {
     'Item is not valid. "%s" is not a valid option value for "%s" ("%s")...',
   SchemaValidator_InvalidOption:
     'Item is not valid. "%s" is not a valid value for the "options" property...',
-  SchemaValidator_InvalidType:
+  SchemaValidator_InvalidValueType:
     'Item is not valid. "%s" value (%s) is not a valid %s...',
+  SchemaValidator_InvalidType:
+    'Schema is not valid. "%s" is not a valid property type...',
   SchemaValidator_Malformed: "Item is not valid. %s...",
   SchemaValidator_Required:
     'Item is not valid. A value is required for "%s"...',
