@@ -7,6 +7,8 @@ const getUser = () => {
   const authtoken = Cookies.get("authtoken");
   if (authtoken) {
     const user = jwt.decode(authtoken).username;
+    // eslint-disable-next-line no-alert
+    alert(user);
     if (user !== null && user !== "") {
       return user;
     }
