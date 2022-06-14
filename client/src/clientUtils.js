@@ -4,11 +4,12 @@ const jwt = require("jsonwebtoken");
 const Globals = require("../../common/globals");
 
 const getUser = () => {
+  console.log(JSON.stringify(Cookies.get()));
   const authtoken = Cookies.get("authtoken");
   if (authtoken) {
     const user = jwt.decode(authtoken).username;
     // eslint-disable-next-line no-alert
-    alert(user);
+    console.log(`user=${user}`);
     if (user !== null && user !== "") {
       return user;
     }

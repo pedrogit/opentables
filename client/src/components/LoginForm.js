@@ -299,6 +299,7 @@ function LoginButton({ setViewId, setAuthAPIRequest, handleReload, buttons }) {
 
   let loginButtonText = "Login";
   const user = getUser();
+  console.log(`Logged ${user}`);
   if (user && user !== Globals.allUserName) {
     loginButtonText = `Logout ${user}`;
   }
