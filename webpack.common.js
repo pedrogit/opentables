@@ -1,13 +1,12 @@
-const path = require('path');
-const webpack = require('webpack');
-const ESLintPlugin = require('eslint-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: './client/src/index.js',
+  entry: "./client/src/index.js",
   output: {
-    filename: 'opentable.js',
-    path: path.resolve(__dirname, 'public'),
+    filename: "opentable.js",
+    path: path.resolve(__dirname, "public"),
   },
   module: {
     rules: [
@@ -17,33 +16,35 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react']
-          }
-        }
+            presets: ["@babel/preset-env", "@babel/preset-react"],
+          },
+        },
       },
-    ]
+    ],
   },
   resolve: {
     fallback: {
       // make sure you `npm install path-browserify` to use this
-      crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'),
-      "buffer": require.resolve("buffer")
-    }
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+      buffer: require.resolve("buffer"),
+    },
   },
   plugins: [
     // fix "process is not defined" error:
     // (do "npm install process" before running the build)
     new webpack.ProvidePlugin({
-      process: 'process/browser',
+      process: "process/browser",
     }),
     new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-    })
+      Buffer: ["buffer", "Buffer"],
+    }),
   ],
   optimization: {
-    minimizer: [new TerserPlugin({
-      extractComments: false,
-    })],
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+      }),
+    ],
   },
 };
