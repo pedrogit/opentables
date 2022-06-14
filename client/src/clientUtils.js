@@ -19,6 +19,10 @@ const getScriptDomain = () => {
   return new URL(getScriptBaseURL()).hostname;
 };
 
+const removeCookie = (cookie) => {
+  Cookies.remove(cookie, { path: "", domain: `.${getScriptDomain()}` });
+};
+
 const getUser = () => {
   console.log(JSON.stringify(Cookies.get()));
   const authtoken = Cookies.get("authtoken");
@@ -29,9 +33,15 @@ const getUser = () => {
     if (user !== null && user !== "") {
       return user;
     }
-    Cookies.remove("authtoken", { path: "", domain: `.${getScriptDomain()}` });
+    removeCookie("authtoken");
   }
   return Globals.allUserName;
 };
 
-export { getUser, getURLParam, getScriptBaseURL, getScriptDomain };
+export {
+  getUser,
+  getURLParam,
+  getScriptBaseURL,
+  getScriptDomain,
+  removeCookie,
+};

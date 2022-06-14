@@ -10,7 +10,6 @@ import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
-import Cookies from "js-cookie";
 import IconButton from "@mui/material/IconButton";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -18,7 +17,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 import Tooltip from "@mui/material/Tooltip";
 
 import VisibilityPasswordTextField from "./VisibilityPasswordTextField";
-import { getUser, getScriptBaseURL } from "../clientUtils";
+import { getUser, getScriptBaseURL, removeCookie } from "../clientUtils";
 
 const Errors = require("../../../common/errors");
 const Globals = require("../../../common/globals");
@@ -306,7 +305,7 @@ function LoginButton({ setViewId, setAuthAPIRequest, handleReload, buttons }) {
 
   const handleLoginLogout = () => {
     if (user && user !== Globals.allUserName) {
-      Cookies.remove("authtoken");
+      removeCookie("authtoken");
       handleReload();
     } else {
       setAuthAPIRequest({
