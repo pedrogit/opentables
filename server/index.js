@@ -109,17 +109,13 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use(`/api/${Globals.APIKeyword}`, router);
 
 // Implement a generic error sending middleware
-app.use((err, req, res) => {
-  const newErr = { ...err };
-  if (!newErr.statusCode) {
-    newErr.statusCode = 500;
-  }
-
-  if (newErr.statusCode === 301) {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  if (err.statusCode === 301) {
     return res.status(301).redirect("/not-found");
   }
 
-  return res.status(newErr.statusCode).json({ err: newErr.message });
+  return res.status(err.statusCode || 500).json({ err: err.message });
 });
 
 // Start the BD and then the server
